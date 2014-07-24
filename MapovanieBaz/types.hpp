@@ -9,6 +9,7 @@
 #define TYPES_HPP
 
 #include <cassert>
+#include <string>
 
 class Base
 {
@@ -29,6 +30,17 @@ struct Point
 
 
 typedef std::pair<int, int> BasePair;
+
+
+struct Global
+{
+    // definicie in-suborov:
+    static std::string HS_seq; 
+    static std::string HS_db;
+    static std::string HS_bpseq;
+    static std::string HS_rnafold;
+    static std::string HS_zatvorky;
+};
 
 
 #endif /* !TYPES_HPP */

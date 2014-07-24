@@ -60,3 +60,10 @@ Base::Base(char ch)
 {
     setBase(ch);
 }
+
+
+std::string Global::HS_seq = "../InFiles/seq";
+std::string Global::HS_db = "../InFiles/homo_sapiens.ps";
+std::string Global::HS_bpseq = "../InFiles/homo_sapiens.bpseq";
+std::string Global::HS_rnafold = "../InFiles/homo_sapiens_RNAfold.ps";
+std::string Global::HS_zatvorky = "../InFiles/zatvorky";
