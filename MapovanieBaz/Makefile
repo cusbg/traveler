@@ -12,11 +12,13 @@ LFLAGS = -std=c++11
 SOURCES = files_read.cpp\
 		  main.cpp \
 		  types.cpp \
-		  rnafold.cpp
+		  rnafold.cpp \
+		  tree.cpp
 
 HEADERS = files_read.hpp\
 		  types.hpp \
-		  rnafold.hpp
+		  rnafold.hpp \
+		  tree.hpp
 
 
 

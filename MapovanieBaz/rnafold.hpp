@@ -24,6 +24,7 @@ private:
     void Run2();
     int MakePairsRecursive(int from, std::vector<BasePair>& vec);
 public:
+    RNAfold(std::vector<Base> vec);
     RNAfold(std::string _seq = "../InFiles/zatvorky");
     std::vector<BasePair> makePairs();
     std::string getSeq();

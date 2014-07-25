@@ -22,8 +22,15 @@ string RNAfold::getBrackets()
 RNAfold::RNAfold(string _seq)
     : seq(_seq)
 {
-   Run2();
+   Run();
    //assert(seq.size() != brackets.size());
+}
+
+RNAfold::RNAfold(vector<Base> vec)
+{
+    for (const auto& val: vec)
+        seq.push_back(val.getBase());
+    Run();
 }
 
 void RNAfold::Run2()
@@ -37,10 +44,12 @@ void RNAfold::Run2()
 
 void RNAfold::Run()
 {
+    cout << "RUN" << endl;
     char filename[L_tmpnam];
     tmpnam(filename);
     
-    string command = "echo \'" + seq + "\' | RNAfold ---noPS >> " + filename;
+    string outputToPS = ">build/output.ps\n";
+    string command = "echo \'" + outputToPS + seq + "\' | RNAfold >> " + filename;
     system(command.c_str());
 
     ifstream input(filename);
@@ -48,7 +57,9 @@ void RNAfold::Run()
     getline(input, brackets);  // == seq
     getline(input, brackets);  // == output
 
-    brackets = brackets.substr(brackets.find(' '));
+    brackets = brackets.substr(0, brackets.find(' '));
+
+    remove(filename);
 }
 
 std::vector<BasePair> RNAfold::makePairs()
@@ -56,7 +67,6 @@ std::vector<BasePair> RNAfold::makePairs()
     //cout << seq << endl;
     //cout << brackets << endl;
 
-    brackets = ".......";
     vector<BasePair> vec(brackets.size(), make_pair<int,int>(-1, -1));
 
     for (int i=0; i< brackets.size(); i++)

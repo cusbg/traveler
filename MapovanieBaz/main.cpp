@@ -14,6 +14,11 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
+    Reader r;
+    RNAfold f(r.readPS_DB_format(Global::HS_db).first);
+
+    cout << f.getSeq() << endl;
+    cout << f.getBrackets() << endl;
 
     return 0;
 }

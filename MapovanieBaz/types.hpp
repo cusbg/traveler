@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <string>
+#include <vector>
 
 class Base
 {
