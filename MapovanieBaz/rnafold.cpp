@@ -49,13 +49,18 @@ void RNAfold::Run()
     tmpnam(filename);
     
     string outputToPS = ">build/output.ps\n";
+    outputToPS = "";
     string command = "echo \'" + outputToPS + seq + "\' | RNAfold >> " + filename;
     system(command.c_str());
 
     ifstream input(filename);
 
+    cout << "reading : " << filename << endl;
     getline(input, brackets);  // == seq
+    cout << brackets << endl;
     getline(input, brackets);  // == output
+    cout << brackets << endl;
+    cout << "END read" << endl;
 
     brackets = brackets.substr(0, brackets.find(' '));
 

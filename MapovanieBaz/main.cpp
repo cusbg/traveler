@@ -20,6 +20,7 @@ int main(int argc, char** argv)
     cout << f.getSeq() << endl;
     cout << f.getBrackets() << endl;
 
+
     return 0;
 }
 
