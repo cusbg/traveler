@@ -11,55 +11,32 @@
 #include <iostream>
 #include "types.hpp"
 
-
 class Node
 {
 private:
-    static size_t ID /* = 0 */;
-
+    static size_t ID; // ID je inicializovane na 0
 public:
-    typedef std::string label;
-    typedef std::vector<Node> children;
-    Node(const label& _l);
-    Node();
-
-    size_t findLongestPath() const
-    {
-        if (isroot)
-            return 0;
-        return (ch.size() != 1 ? 1 : 1 + ch[0].findLongestPath());
-    }
-
-    size_t createTree(const std::string& s, size_t from);
-    size_t createTreeLabels(const std::string& s, size_t from);
-    void push_back(const Node& _ch);
-    const children& getChildren() const
-    {
-        return ch;
-    }
-
-    void makeRoot();
-    bool isRoot()
-    {
-        return isroot;
-    }
-    bool empty() const
-    {
-        return ch.empty();
-    }
-    std::string getTreeLabels() const;
-    std::string toString() const;
-    void getIDs() const;
-public:
-    
-private:
-    children ch;
-    label l;
+    typedef std::string labelType;
+    typedef std::vector<Node> childrenType;
+protected:
+    labelType label;
+    childrenType children;
     size_t id = ID++;
+private:
+public:
+    virtual ~Node();
+    Node(const labelType& _label = std::to_string(ID));
 
-    enum { undefined, pair, base } type = undefined;
-    bool isroot = false;
+    size_t createTree(const std::string& labels, const std::string& brackets, size_t from);
+        // vytvori cely strom podla zatvoriek a da im labely
+        //      podla toho ci to je par (i,j) -> labels[i]labels[j]
+        //      alebo je to len samotna baza i -> labels[i]
+    const childrenType& getChildren() const;
+    const labelType& getLabel() const;
+    size_t getId() const;
 };
+
+
 
 
 

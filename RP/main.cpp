@@ -6,30 +6,24 @@
 
 #include <iostream>
 #include "trees.hpp"
+#include "other.hpp"
 
 using namespace std;
 
 string zatvorky =   "(.).((.).)";
-string rna =        "UAACGGACAC";
+string rna =        "UAACGiAjAC";
 
 
 int main(int argc, char** argv)
 {
-    zatvorky = "(.)";
+    Node n;
+    n.createTree(rna, zatvorky,0);
 
-    Node n("LABEL");
-    n.makeRoot();
-    n.createTree(zatvorky, 0);
-    n.createTreeLabels(rna,0);
+    cout << rna << endl << zatvorky << endl << endl;
+    cout << printLabels(n) << endl;
     
-    n.getIDs();
+    cout << "R_path"<<endl;
 
-    cout << endl <<n.findLongestPath() << endl;
-    cout << endl <<n.getChildren()[0].findLongestPath() << endl;
-    
-
-    cout << n.toString() << endl;
-    cout << n.getTreeLabels() << endl;
     return 0;
 }
 

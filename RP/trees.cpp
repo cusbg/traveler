@@ -8,87 +8,53 @@
 
 using namespace std;
 
-size_t Node::ID = 0;
+/* static */size_t Node::ID = 0;
 
-size_t Node::createTree(const std::string& s, size_t from)
+/* virtual */ Node::~Node() {}
+
+Node::Node(const labelType& _label)
+    : label(_label)
+{}
+
+size_t Node::createTree(const std::string& labels, const std::string& brackets, size_t from)
 {
-    while(s.size() > from)
+    assert(labels.size() == brackets.size());
+    while(brackets.size() > from)
     {
-        switch(s[from])
+        switch (brackets[from])
         {
             case '.':
-                ch.push_back(Node("."));
-                ch.back().type = base;
+                children.push_back(Node());
+                children.back().label += labels.substr(from,1);
                 break;
             case '(':
-                ch.push_back(Node("()"));
-                from = ch.back().createTree(s,from + 1);
-                ch.back().type = pair;
+                children.push_back(Node());
+                children.back().label += labels.substr(from,1);
+                from = children.back().createTree(labels, brackets,from + 1);
+                children.back().label += labels.substr(from,1);
                 break;
             case ')':
                 return from;
+            default:
+                assert(false && "ERROR: should not happen");
         }
         ++from;
     }
-}
-
-size_t Node::createTreeLabels(const string& s, size_t from)
-{
-    assert(from < s.size());
-    l = s.substr(from, 1);
-    ++from;
-    
-    for (auto& child : ch)
-        from = child.createTreeLabels(s,from);
-    if (type == pair)
-        l += s.substr(from++,1);
-
     return from;
 }
 
-Node::Node(const label& _l)
-    :l(_l)
-{}
-
-Node::Node() {}
-
-void Node::push_back(const Node& _ch)
+const Node::childrenType& Node::getChildren() const
 {
-    ch.push_back(_ch);
+    return children;
 }
 
-string Node::getTreeLabels() const
+const Node::labelType& Node::getLabel() const
 {
-    string out = l.substr(0,1);
-    for (const auto& child : ch)
-        out += child.getTreeLabels();
-    if (type == pair)
-        out += l.substr(1);
-    return out;
+    return label;
 }
 
-string Node::toString() const
+size_t Node::getId() const
 {
-    string output;
-    if (type == pair)
-        output = "(";
-    else if (type == base)
-        output = ".";
-    for (auto& child : ch)
-        output += child.toString();
-    if (type == pair)
-        output += ")";
-    return output;
+    return id;
 }
 
-void Node::makeRoot()
-{
-   isroot = true; 
-}
-
-void Node::getIDs() const
-{
-    std::cout << id << std::endl;
-    for (const auto& child : ch)
-        child.getIDs();
-}
