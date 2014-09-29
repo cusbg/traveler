@@ -13,11 +13,12 @@
 #include <string>
 #include <vector>
 
+#include <log4cpp/Category.hh>
 
 class Base
 {
 private:
-    enum _base { Adenin, Cytosin, Guanin, Uracyl } b;
+    enum _base { Adenin, Cytosin, Guanin, Uracil } b;
     void setBase(char ch);
 public:
     Base(char ch);
@@ -41,11 +42,14 @@ struct Global
     static std::string HS_bpseq;
     static std::string HS_rnafold;
     static std::string HS_zatvorky;
+
+    static std::string zatvorky;
+    static std::string rnaseq;
 };
 
 
 
-
+extern log4cpp::Category& logger; // globalna premenna...
 
 #endif /* !TYPES_HPP */
 

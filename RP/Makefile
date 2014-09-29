@@ -6,8 +6,9 @@
 
 
 CC = g++
-CFLAGS = -std=c++11 -c -Wall
-LFLAGS = -std=c++11
+# -g je na debuggovanie
+CFLAGS = -std=c++11 -c -Wall -g
+LFLAGS = -std=c++11 $(shell pkg-config --libs log4cpp)
 
 BUILDDIR = build
 
@@ -41,7 +42,7 @@ $(BUILDDIR)/$(TARGET): $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILE
 $(BUILDDIR)/%.mk: %.cpp
 	@mkdir -p $(BUILDDIR)
 	@rm -f $@
-	@$(MAKEDEPENDENCY) $^ | sed 's@\([^. :]*.[hc]pp\)@../\1@g' \
+	@$(MAKEDEPENDENCY) $^ | sed 's@\([^. :]*.\([hc]pp\|hh\)\)@../\1@g' \
 					>> $@
 	@echo '	$(CC) $(CFLAGS) $$< -o $$@ ' \
 					>> $@

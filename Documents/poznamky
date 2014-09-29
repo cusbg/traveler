@@ -1,53 +1,7 @@
-nezapisane:
-Setter; efficient drawing of RNA sec.struct; 
 
 
 
+Pi sep 26 10:19:24 CEST 2014
 
-
-
-### COMPUTING_SIMILARITY_BETWEEN_RNA_SECONDARY_STRUCTURES ###
-clanok je tiez skor resers na zname algoritmy, je tam edit_distance, weighted largest common substructure, oba v O(n^2 log^2n). potom este pocitaju alignment a pocitaju weighted smallest common super-structure. 
-clanok sa vztahuje k mojej praci, ale nieje tam nic co by nebolo uz niekde inde a aj lepsie napisane. 
-
-
-### COMPUTING_SIMILARITY_BETWEEN_RNA_STRUCTURES ###
-clanok sa vacsinou zaobera terciarnou strukturou, zo sekundarnej tam je len zaklad, znacenie, dokaz ze ked M je mapovanie R1->R2, N je z R2->R3 tak M°N je R1->R3.. 
-clanok sa nevztahuje k mojej praci
-
-
-### COMPUTING_SIMILARITY_BETWEEN_RNA_STRINGS ###
-clanok je dost stary, z 95, je akousi resersou znamych algoritmov na porovnavanie RNA, pomocou string-matching, alignment,.. s tym, ze global_similarity&edit_distance je tam v O(n^4).. takze nic z neho
-clanok sa nevztahuje k mojej praci
-
-
-### D.T.-TREE_EDIT_DISTANCE_ANALYSIS ###
-### D.T.-ANALYSIS_OF_TREE_EDIT_DISTANCE_ALGORITHMS ###
-formalizacia algoritmov na tree-edit-distance. neskor si to aspon precitat.
-
-
-### LOCAL_SIMILARITY_IN_RNA_SECONDARY_STRUCTURES ###
-v clanku hladaju alignment stromov, teda najmensiu strom T taky, ze F,G je podstromom T.
-vrcholy F,G su bud bazy, alebo pary (B/P)
-vrcholy T reprezentuju dvojice (a,b), kde a, b je bud par/dvojica/'-', kde - znamena ze v danom strome vrchol nieje (ale podstrom sa tam najst moze).
-
-clanok sa nevztahuje k mojej praci, hladaju nadstrom, kym ja iba spolocne casti.
-
-
-### A_2D_GRAPHICAL_REPRESENTATION_OF_RNA_SECONDARY_STRUCTURES_AND_THE_ANALYSIS_OF_SIMILARITY-DISSIMILARITY_BASED_ON_IT ###
-v clanku reprezentuju RNA molekulu ako string z abecedy {A,G,C,U,A',G',C',U'}, kde normalne pismena su bazy, a ciarkovane su sparovane bazy. 
-bazy rozdelili na take so slabou a so silnou vezbou ({A,U} / {G, C}).
-rna reprezentuju ako 2D graf, kde na y osy je sila vezby a na x osy je zaradom string RNA.
-potom vytvoria nejaky vektor, z ktoreho vedia vicitat, ako sa jednotlive RNA na seba podobaju.
-
-clanok sa ciastocne vztahuje k mojej praci, pocitaju vzdialenosti 2 RNA, mozno z toho sa daju vyplut aj nejake spolocne casti, ale pocita to inou metodou ako klasicke TED (pomocou operacii na stromoch).
-
-
-### LOCAL_ALIGNMENT_OF_RNA_SEQUENCES_WITH_ARBITRARY_SCORING_SCHEMES ###
-v clanku rozoberaju local a global alignment algoritmy, z ktorych som vela nepochopil, su zalozene na dynamickom programovani. 
-
-clanok sa nevztahuje k mojej praci.
-
-
-
+TreeNode potrebuje si ukladat velkost podstromu aby sa dalo v konstantnom case zistit tree.size().
 

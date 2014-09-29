@@ -24,11 +24,6 @@ void Node::setLabel(const string& _label)
     label = _label;
 }
 
-void Node::addToLabel(const string& _label)
-{
-    label+= _label;
-}
-
 const string& Node::getLabel() const
 {
     return label;
@@ -43,36 +38,15 @@ size_t Node::getId() const
 /* TREENODE */
 
 
-/* virtual */ bool TreeNode::hasParent() const
-{
-    return parent != 0xBAADF00D; //TODO: mozno doplnit radsej nejaky bool kontrolujuci inicializaciu parent-a
-}
-
-size_t TreeNode::getParent() const
-{
-    assert(hasParent());
-    return parent;
-}
-
-TreeNode::TreeNode(size_t _parent, Tree* _tree)
-    : parent(_parent), tree(_tree)
+TreeNode::TreeNode()
 {}
 
-TreeNode::TreeNode()
+TreeNode::TreeNode(const string& _label)
+    : Node(_label)
 {}
 
 /* virtual */ TreeNode::~TreeNode()
 {}
-
-void TreeNode::push_back(size_t child)
-{
-    children.push_back(child);
-}
-
-void TreeNode::setTree(Tree* _tree)
-{
-    tree = _tree;
-}
 
 /* virtual */ bool TreeNode::isCompressed() const
 {
@@ -80,27 +54,39 @@ void TreeNode::setTree(Tree* _tree)
 }
 
 
-/* ROOTNODE */
+
+
+
+
+
+
+
+
+
+
+
+/*
+[> ROOTNODE <]
 
 RootNode::RootNode()
 {
     label+=" - ROOTNODE";
 }
 
-/* virtual */  RootNode::~RootNode()
+[> virtual <]  RootNode::~RootNode()
 {}
 
-/* virtual */ bool RootNode::hasParent() const
+[> virtual <] bool RootNode::hasParent() const
 {
     return false;
 }
 
 
 
-/* COMPRESSEDNODE */
+[> COMPRESSEDNODE <]
 
 
-/* virtual */ CompressedNode::~CompressedNode()
+[> virtual <] CompressedNode::~CompressedNode()
 {}
 
 CompressedNode::CompressedNode(compressionType _t, std::vector<size_t> c)
@@ -121,6 +107,6 @@ CompressedNode::compressionType CompressedNode::getType() const
 
 
 
-
+*/
 
 

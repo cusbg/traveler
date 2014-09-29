@@ -32,7 +32,7 @@ void Base::setBase(char ch)
             break;
         case 'U':
         case 'u':
-            b = _base::Uracyl;
+            b = _base::Uracil;
             break;
         default:
             throw "ERROR: not a base";
@@ -47,7 +47,7 @@ char Base::getBase() const
             return 'A';
         case Guanin:
             return 'G';
-        case Uracyl:
+        case Uracil:
             return 'U';
         case Cytosin:
             return 'C';
@@ -66,4 +66,40 @@ std::string Global::HS_db = "../InFiles/homo_sapiens.ps";
 std::string Global::HS_bpseq = "../InFiles/homo_sapiens.bpseq";
 std::string Global::HS_rnafold = "../InFiles/homo_sapiens_RNAfold.ps";
 std::string Global::HS_zatvorky = "../InFiles/zatvorky";
+
+std::string Global::rnaseq =    "AACGTTuGvCATU";
+std::string Global::zatvorky =  "((...).(.).).";
+
+
+
+
+#include <log4cpp/Appender.hh>
+#include <log4cpp/FileAppender.hh>
+#include <log4cpp/OstreamAppender.hh>
+#include <log4cpp/Layout.hh>
+#include <log4cpp/BasicLayout.hh>
+#include <log4cpp/Priority.hh>
+#include <log4cpp/PatternLayout.hh>
+
+log4cpp::Category& init_logger()
+{
+    log4cpp::Appender *appender = new log4cpp::OstreamAppender("console", &std::cout);
+    log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
+    layout->setConversionPattern("%d{%H:%M:%S} [%p] %m%n");
+    appender->setLayout(layout);
+
+
+    log4cpp::Category& logger = log4cpp::Category::getRoot();
+    logger.setPriority(log4cpp::Priority::DEBUG);
+
+    logger.addAppender(appender);
+    return logger;
+}
+
+log4cpp::Category& logger = init_logger();
+
+
+
+
+
 

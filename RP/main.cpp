@@ -1,116 +1,66 @@
 /*
- * File: main.cpp
- * Created: 2014-09-01
- * By: eliasr <eliasr@u-pl22>
+ * main.cpp
+ * Copyright (C) 2014 Richard Eliáš <richard@ba30.eu>
+ *
+ * Distributed under terms of the MIT license.
  */
 
 #include <iostream>
-#include "trees.hpp"
+#include "types.hpp"
+#include "tree.hh"
+#include "nodes.hpp"
+#include "tree_util.hh"
+#include "rna.hpp"
 
 using namespace std;
 
-    typedef vector<int> vint;
+typedef tree<TreeNode> rna_tree;
+typedef vector<rna_tree> rna_forest;
 
-                    //  {1, 2, 3, 4, 5, 6}
-    vint left1 =        {1, 1, 3, 4, 1, 1};
-    vint left2 =        {1, 1, 3, 3, 5, 1};
-    vint LRkeyroots1 =  {0, 0, 1, 1, 0, 1};
-    vint LRkeyroots2 =  {0, 0, 0, 1, 1, 1};
 
-    vector<vector<int> > cost= 
-                        {{0, 1, 1, 1, 1, 1, 1},
-                         {1, 0, 1, 0, 1, 0, 1},
-                         {1, 1, 0, 1, 0, 1, 1},
-                         {1, 0, 1, 0, 1, 0, 1},
-                         {1, 0, 1, 0, 1, 0, 1}, 
-                         {1, 1, 0, 1, 0, 1, 1}, 
-                         {1, 1, 0, 1, 0, 1, 1}};
-
-    vector<vector<int> > TED(left1.size() + 1, vector<int>(left2.size() + 1, 0xBADF00D));
-
-int min(int x, int y, int z)
+int main(int argc, char** argv)
 {
-    if (x <= y && x <= z)
-        return x;
-    if (y <= x && y <= z)
-        return y;
-    return z;
-}
-
-void treedist(int pos1, int pos2)
-{
-    int b1 = pos1 - left1[pos1-1]+2;
-    int b2 = pos2 - left2[pos2-1]+2;
-
-    vector<vector<int> > Fdist(b1, vector<int>(b2, 0xBADF00D));
-    //cout << Fdist.size() << endl;
-    //cout << Fdist.at(0).size() << endl;
-    
-    Fdist[0][0] = 0;
-    for (int i = 1; i < b1; ++i)
-        Fdist[i][0] = Fdist[i - 1][0] + cost[i][0];
-    for (int i = 1; i < b2; ++i)
-        Fdist[0][i] = Fdist[0][i - 1] + cost[0][i];
-
-    int i(1), j(1), k, l;
-    for (k = left1[pos1]; k != pos1; ++k, ++i)
+    logger.info("LOGGER");
+    logger.debugStream() << "text";
+    try
     {
-        for (l = left2[pos2]; l != pos2; ++l, ++j)
+        rna r;
+        auto forrest = r.create_forest(Global::zatvorky, Global::rnaseq);
+        //auto forrest = ct2(Global::zatvorky, Global::rnaseq);
+        for (auto& les: forrest)
         {
-            if (left1[k] == left1[pos1] && left2[l] == left2[pos2])
-            {
-                Fdist[i][j] = min(
-                            Fdist[i-1][j] + cost[0][l],
-                            Fdist[i][j-1] + cost[k][0],
-                            Fdist[i-1][j-1] + cost[k][l]
-                        );
-                TED[k][l] = Fdist [i][j];
-            }
-            else
-            {
-                int M = left1[k] - left1[pos1];
-                int N = left2[l] - left2[pos2];
+            //for (auto& val : les)
+                //cout << val.getLabel() << endl;
 
-                Fdist[i][j] = min(
-                        Fdist[i-1][j] + cost[0][l],
-                        Fdist[i][j - 1] + cost[k][0],
-                        Fdist[M][N] + TED[k][l]
-                     );
+            cout << endl;
+            for (auto strom = les.begin_post(); strom != les.end_post(); ++strom)
+            {
+                cout << *strom << " ";
             }
+
+            cout << endl << "Strom: ";
+            kptree::print_tree_bracketed(les);
         }
+        cout << endl << "ITERACIA PODSTROMOM" << endl;
+        auto it = forrest[0].child(forrest[0].begin(), 0);
+        rna_tree::post_order_iterator it2 = it;
+        while(it2.number_of_children() != 0)
+            it2 = forrest[0].child(it2, 0);
+        cout << "IT: " << *it << endl;
+        kptree::print_subtree_bracketed(forrest[0], it, cout);
+        for (;it != it2; ++it2)
+            cout << *it2 << endl;
+        cout << *it2 << endl;
+        
     }
-}
-
-int main()
-{
-    treedist(3, 4);
-
-    //vint left1 =        {1, 2, 2, 1, 5, 1}
-    //vint left2 =        {1, 2, 1, 1, 5, 1}
-    //vint LRkeyroots1 =  {0, 0, 1, 0, 1, 1}
-    //vint LRkeyroots2 =  {0, 1, 0, 0, 1, 1}
-    //int cost[X][Y];
-
-    return 0;
+    catch(const char* ex)
+    {
+        cout << "EXCEPTION: " <<  ex << endl;
+    }
+	return 0;
 }
 
 
 
 
-//string zatvorky =   "(.).((.).)";
-//string rna =        "UAACGiAjAC";
-
-
-//int main(int argc, char** argv)
-//{
-    //Node n;
-    //n.createTree(rna, zatvorky,0);
-
-    //cout << rna << endl << zatvorky << endl << endl;
-    //cout << printLabels(n) << endl;
-    
-    //cout << "R_path"<<endl;
-
-    //return 0;
-//}
 

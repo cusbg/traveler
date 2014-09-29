@@ -26,52 +26,48 @@ public:
     size_t getId() const;
     const std::string& getLabel() const;
     void setLabel(const std::string& _label);
-    void addToLabel(const std::string& _label);
+    friend std::ostream& operator<<(std::ostream & out, Node& n)
+    {
+        out << n.label;
+        return out;
+    }
 };
 
 
 class TreeNode : public Node
 {
 public:
-    typedef std::vector<size_t> vecIds;
-
-    TreeNode(size_t _parent, Tree* _tree);
     TreeNode();
+    TreeNode(const std::string& _label);
     virtual ~TreeNode();
-    virtual bool hasParent() const;
-    void push_back(size_t child);
-    size_t getParent() const;
-    const vecIds getChildren() const { return children;}
-    virtual bool isCompressed() const;
-protected:
-private:
+    bool isCompressed() const;
 };
 
 
 
-class RootNode : public TreeNode
+/*class RootNode : public TreeNode
 {
 public:
     virtual bool hasParent() const;
     virtual ~RootNode();
     RootNode();
-};
+};*/
 
 
 
-class CompressedNode : public TreeNode
+/*class CompressedNode : public TreeNode
 {
 public:
     enum compressionType {path, sequence};
 private:
     compressionType type;
-    /*std::vector<size_t>*/ vecIds compressedIds;
+    [>std::vector<size_t><] vecIds compressedIds;
 public:
     CompressedNode(compressionType _t, std::vector<size_t> c);
     virtual ~CompressedNode();
-    /*std::vector<size_t>*/ const vecIds& decompress() const;
+    [>std::vector<size_t><] const vecIds& decompress() const;
     compressionType getType() const;
-};
+};*/
 
 
 
