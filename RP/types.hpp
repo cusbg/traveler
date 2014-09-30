@@ -33,6 +33,11 @@ struct Point
     float Y;
 };
 
+enum path_enum
+{
+    left, heavy, right
+};
+
 
 struct Global
 {
