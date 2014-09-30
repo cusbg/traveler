@@ -11,6 +11,7 @@
 #include "tree_hh/tree_util.hh"
 #include "node.hpp"
 #include "tree_base.hpp"
+#include "tree.hpp"
 
 using namespace std;
 
@@ -19,6 +20,7 @@ using namespace std;
 int main(int argc, char** argv)
 {
     tree<node<string> > t;
+    
     cout << t.size() << endl;
     cout << node<string>().get_id() << endl;
     logger.info("LOGGER");

@@ -9,6 +9,14 @@
 #define TREE_HPP
 
 #include "tree_base.hpp"
+#include "node.hpp"
+
+class rna_tree : public tree_base<node<std::string> >
+{
+private:
+public:
+};
+
 
 
 #endif /* !TREE_HPP */

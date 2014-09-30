@@ -20,8 +20,8 @@ class tree_base
 {
 public:
     typedef tree<node_type> tree_type;
-    using typename tree_type::sibling_iterator;
-    using typename tree_type::post_order_iterator;
+    typedef typename tree_type::sibling_iterator sibling_iterator;
+    typedef typename tree_type::post_order_iterator post_order_iterator;
     typedef typename tree_type::iterator pre_order_iterator;
     typedef std::vector<sibling_iterator> path_type;
 

@@ -22,6 +22,7 @@ public:
     node(size_t _depth);
     virtual ~node();
     void set_depth(size_t _depth);
+    size_t get_depth() const;
 };
 
 
@@ -42,7 +43,15 @@ node<label_type>::~node()
 template <typename label_type>
 void node<label_type>::set_depth(size_t _depth)
 {
+    depth_was_set = true;
     depth = _depth;
+}
+
+template <typename label_type>
+size_t node<label_type>::get_depth() const
+{
+    assert(depth_was_set);
+    return depth;
 }
 
 
