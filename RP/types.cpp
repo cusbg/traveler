@@ -67,7 +67,7 @@ std::string Global::HS_bpseq = "../InFiles/homo_sapiens.bpseq";
 std::string Global::HS_rnafold = "../InFiles/homo_sapiens_RNAfold.ps";
 std::string Global::HS_zatvorky = "../InFiles/zatvorky";
 
-std::string Global::rnaseq =    "AACGTTuGvCATU";
+std::string Global::rnaseq =    "ABCDEFGHIJKLM";
 std::string Global::zatvorky =  "((...).(.).).";
 
 
@@ -85,7 +85,7 @@ log4cpp::Category& init_logger()
 {
     log4cpp::Appender *appender = new log4cpp::OstreamAppender("console", &std::cout);
     log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
-    layout->setConversionPattern("%d{%H:%M:%S:%m}\t[%p] %m%n");
+    layout->setConversionPattern("%d{%H:%M:%S:%l} %u:\t[%p] %m%n");
     appender->setLayout(layout);
 
 

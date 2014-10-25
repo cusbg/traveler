@@ -6,9 +6,8 @@
 
 
 CC = g++
-# -g je na debuggovanie
 CFLAGS = -std=c++11 -c -Wall -g
-LFLAGS = -std=c++11 $(shell pkg-config --libs log4cpp)
+LFLAGS = -std=c++11 -Wall -g $(shell pkg-config --libs log4cpp)
 
 BUILDDIR = build
 
@@ -18,25 +17,37 @@ HEADERS = $(shell find ./ -name "*.hpp" | sed 's@\./@@g')
 OBJECTS = $(SOURCES:%.cpp=%.o)
 MAKEFILES = $(SOURCES:%.cpp=%.mk)
 
-MAKEDEPENDENCY = $(CC) -MM -E 
+MAKEDEPENDENCY = $(CC) -MM -E -std=c++11
 
 
-
-all: $(BUILDDIR)/$(TARGET)
-	@echo "Makefile needs your attention"
-
-
-$(BUILDDIR)/$(TARGET): $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES))
-	@echo "****************COMPILING:****************"
-	@cd $(BUILDDIR) && ls *.mk | while read file; do echo; if ! make -f $$file; then exit 5; fi; done #2>/dev/null
+run: build
+	@echo "**********************************************************************"
+	@echo "********************* RUNNING  PROGRAM *******************************"
+	@echo "**********************************************************************"
 	@echo
-	@echo "**************END-COMPILING:**************"
-	@echo
-			@# vypisuje nejaku hlasku o predefinovani targetu *.o... 
+	$(BUILDDIR)/$(TARGET)
+
+
+build: $(BUILDDIR)/$(TARGET)
+
+
+$(BUILDDIR)/$(TARGET): $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES)) $(BUILDDIR)/Makefile
 	@echo "****************LINKING:****************"
+	@echo
 	$(CC) $(LFLAGS) $(addprefix $(BUILDDIR)/,$(OBJECTS)) -o $@ 
 	@echo
 	@echo "**************END-LINKING:**************"
+
+$(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES)) Makefile
+	@echo "****************COMPILING:****************"
+	@echo
+	@rm -f $@
+	@echo '$(TARGET) : $(OBJECTS)' >> $(BUILDDIR)/Makefile
+	@echo 'include $(MAKEFILES)' >> $(BUILDDIR)/Makefile
+	@make --directory=$(BUILDDIR) -f Makefile
+	@echo
+	@echo "**************END-COMPILING:**************"
+	@echo
 
 
 $(BUILDDIR)/%.mk: %.cpp
@@ -48,16 +59,12 @@ $(BUILDDIR)/%.mk: %.cpp
 					>> $@
 
 
-build: $(BUILDDIR)/$(TARGET)
-
-
 clean:
 	rm -rf $(BUILDDIR)
 
+cleanmk:
+	rm -f $(BUILDDIR)/*.mk Makefile
 
-run: build
-	@echo "**********************************************************************"
-	@echo "********************* RUNNING  PROGRAM *******************************"
-	@echo "**********************************************************************"
-	@echo
-	$(BUILDDIR)/$(TARGET)
+.PHONY: $(BUILDDIR)/Makefile clean
+
+
