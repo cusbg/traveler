@@ -101,5 +101,3 @@ log4cpp::Category& logger = init_logger();
 
 
 
-
-

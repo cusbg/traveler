@@ -32,22 +32,33 @@ build: $(BUILDDIR)/$(TARGET)
 
 
 $(BUILDDIR)/$(TARGET): $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES)) $(BUILDDIR)/Makefile
-	@echo "****************LINKING:****************"
-	@echo
-	$(CC) $(LFLAGS) $(addprefix $(BUILDDIR)/,$(OBJECTS)) -o $@ 
-	@echo
-	@echo "**************END-LINKING:**************"
 
 $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES)) Makefile
-	@echo "****************COMPILING:****************"
-	@echo
 	@rm -f $@
-	@echo '$(TARGET) : $(OBJECTS)' >> $(BUILDDIR)/Makefile
-	@echo 'include $(MAKEFILES)' >> $(BUILDDIR)/Makefile
+	@echo -e\
+			\\nbuild : $(TARGET) \\n \
+			\\n \
+			\\n$(TARGET) : $(OBJECTS) \\n\\t \
+			@echo "****************LINKING:****************" \\n\\t \
+			@echo \\n\\t \
+			$(CC) $(LFLAGS) $(OBJECTS) -o $(TARGET) \\n\\t \
+			@echo \\n\\t \
+			@echo "**************END-LINKING:**************" \\n\\t \
+			@echo \\n\\t \
+			\\n \
+			\\nCOMPBEGIN: \\n\\t \
+			@echo \\n\\t \
+			@echo "****************COMPILING:****************" \\n\\t \
+			@echo \
+			\\n \
+			\\nCOMPEND: \\n\\t \
+			@echo \\n\\t \
+			@echo "**************END-COMPILING:**************" \\n\\t \
+			@echo \
+			\\n \
+			\\ninclude $(MAKEFILES) \
+					>> $@
 	@make --directory=$(BUILDDIR) -f Makefile
-	@echo
-	@echo "**************END-COMPILING:**************"
-	@echo
 
 
 $(BUILDDIR)/%.mk: %.cpp

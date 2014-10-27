@@ -17,11 +17,22 @@
 
 class rted
 {
+#define RTED_VECTOR_T1_HEAVY_INDEX  0
+#define RTED_VECTOR_T2_HEAVY_INDEX  1
+#define RTED_VECTOR_T1_LEFT_INDEX   2
+#define RTED_VECTOR_T2_LEFT_INDEX   3
+#define RTED_VECTOR_T1_RIGHT_INDEX  4
+#define RTED_VECTOR_T2_RIGHT_INDEX  5
+
 private:
     typedef tree<node_base<std::string>> tree_type;
     typedef std::unordered_map<size_t, size_t> map_type;
     tree_type::iterator most_left(const tree_type& t) const;
     tree_type::iterator most_right(const tree_type& t) const;
+    tree_type::iterator parent(const tree_type::iterator& it) const;
+    bool is_leftmost_child(const tree_type::iterator& it) const;
+    bool is_rightmost_child(const tree_type::iterator& it) const;
+    const char* label(const tree_type::iterator& it) const;
     bool is_leaf(tree_type::iterator_base it) const;
 
     void check_map_contains_children(const tree_type& t, tree_type::iterator it, const map_type& m) const;
@@ -40,13 +51,14 @@ private:
     void init_T1_LRH_v_tables(tree_type::iterator it1, tree_type::iterator it2);
     void init_T2_LRH_w_tables(tree_type::iterator it);
 
+    size_t update_STR_table(const std::vector<size_t>& vec, tree_type::iterator it1, tree_type::iterator it2);
+
     size_t get_value(size_t index1, size_t index2, const std::unordered_map<size_t, map_type>& m);
     size_t get_value(size_t index, const map_type& m);
 
 public:
     rted(const rna_tree& _t1, const rna_tree& _t2);
     void run_rted();
-    void test1();
 
 private:
     tree_type t1;
@@ -87,15 +99,36 @@ private:
         size_t c_min;
         size_t H_value;
     };
-
     typedef std::unordered_map<size_t, t2_hw_partial_result> partial_result_map;
 
-    partial_result_map T2_Hw_partials;
-    std::unordered_map<size_t, partial_result_map> T1_Hv_partials;
 
-    std::unordered_map<size_t, std::unordered_map<size_t, path_strategy>> STR;
+    partial_result_map
+            T2_Hw_partials;
+    std::unordered_map<size_t, partial_result_map>
+            T1_Hv_partials;
+
+    enum graph
+    {
+        T1, T2
+    };
+
+    std::unordered_map<size_t, std::unordered_map<size_t, std::pair<graph, path_strategy>>>
+            STR;
 };
 
+//#define NO_LOGGER_DEBUG_MESSAGES
+
+#ifndef NO_LOGGER_DEBUG_MESSAGES
+
+#define LOGGER_DEBUG_INIT
+#define LOGGER_DEBUG_UPDATE_TABLE
+#define LOGGER_DEBUG_COMPUTE_DECOMPOSITION
+#define LOGGER_DEBUG_COMPUTE_SUBFOREST
+#define LOGGER_DEBUG_COMPUTE_SIZE
+#define LOGGER_DEBUG_STRATEGY_MIN_VECTOR
+#define LOGGER_DEBUG_STRATEGY
+
+#endif
 
 #endif /* !RTED_HPP */
 

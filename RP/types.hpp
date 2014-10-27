@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 #include <sstream>
+#include <algorithm>
 
 
 #include <log4cpp/Category.hh>
@@ -58,9 +59,8 @@ struct Global
 
 extern log4cpp::Category& logger; // globalna premenna...
 
-
 #ifndef APP_DEBUG_FNAME
-#define APP_DEBUG_FNAME logger.debug("Function: %s", __PRETTY_FUNCTION__)
+#define APP_DEBUG_FNAME logger.debug("entering function: %s", __PRETTY_FUNCTION__)
 #endif
 
 

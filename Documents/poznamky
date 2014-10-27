@@ -1,3 +1,7 @@
+So okt 25 18:25:49 CEST 2014
+pocitanie relevant_subforests a full_decomposition funguje ako je napisane nizsie. implementoval som to pomocou unordered_map (== hash_map), s hashovanim cez node_id.
+
+
 Št okt 23 10:29:39 CEST 2014
 pocitanie set-of-relevant-subforests by malo fungovat tak, o=otec, i je najlavejsi syn, j su zvysny (i!=j)
 	F(o, left_path) = F(i, left_path) + Tj.size() + 1

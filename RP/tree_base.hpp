@@ -103,29 +103,22 @@ typename tree_base<node_type>::post_order_iterator tree_base<node_type>::most_le
     return it;
 }
 
-/*template <typename node_type>
-std::vector<tree_base<node_type> > tree_base<node_type>::divide_with_path(const typename tree_base<node_type>::path_type& _path) const
+
+template <typename T>
+void logger_print_tree_bracketed(const tree<T>& t)
 {
-    std::vector<tree_base<node_type> > out;
+    std::stringstream s;
+    kptree::print_tree_bracketed(t, s);
+    logger.debug(s.str());
+}
 
-    for (auto itR : _path)
-    {
-        assert(tree_ptr->is_valid(itR));
-
-        auto itL = itR;
-        while(tree_ptr->is_valid(--itL))
-        {
-            tree_base<node_type> b(tree_ptr, itL);
-            out.push_bask(b);
-        }
-        while(tree_ptr->is_valid(++itR))
-        {
-            tree_base<node_type> b(tree_ptr, itR);
-            out.push_bask(b);
-        }
-    }
-    return out;
-}*/
+template <typename T>
+void logger_print_subtree_bracketed(const tree<T>& t, typename tree<T>::iterator it)
+{
+    std::stringstream s;
+    kptree::print_subtree_bracketed(t, it, s);
+    logger.debug(s.str());
+}
 
 
 
