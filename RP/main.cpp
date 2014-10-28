@@ -71,33 +71,6 @@ void try_tree(rna_tree rna)
 
 int main(int argc, char** argv)
 {
-/*
-    string b, z;
-    //b = "ACGT";
-    //z = "(..)";
-    string b2 = "ABCDEFEGCA";
-    string z2 = "(.(.(.).))";
-
-    b = b2;
-    z = z2;
-
-
-    vector<node_base<string> > bases;
-    for (unsigned i =0 ; i < b.size(); ++i)
-        bases.push_back(b.substr(i, 1));
-    //bases[0].get
-    tree_base<node_base<string> > tb(z, bases);
-
-
-    //rna_tree t2(Global::zatvorky, Global::rnaseq);
-    rna_tree t2(z2, b2);
-
-    cout << z2 << endl << b2 << endl;
-    rted r(t2, t2);
-
-    //r.test1();
-    r.run_rted();
-*/
     cout << boolalpha << endl;
     string b1, l1, b2, l2;
     l1 = "3123";

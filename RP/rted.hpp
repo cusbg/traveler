@@ -14,6 +14,13 @@
 
 
 
+enum graph
+{
+    T1, T2
+};
+
+const char* to_string(graph h);
+const char* to_string(path_strategy p);
 
 class rted
 {
@@ -27,38 +34,164 @@ class rted
 private:
     typedef tree<node_base<std::string>> tree_type;
     typedef std::unordered_map<size_t, size_t> map_type;
+    typedef std::unordered_map<size_t, std::unordered_map<size_t, 
+                std::pair<graph, path_strategy>>>
+                    strategy_map_type;
+    /* return most_left child in tree */
     tree_type::iterator most_left(const tree_type& t) const;
+    /* return most_right child in tree */
     tree_type::iterator most_right(const tree_type& t) const;
+    /* return parent of it in tree */
     tree_type::iterator parent(const tree_type::iterator& it) const;
+    /* is first child */
     bool is_leftmost_child(const tree_type::iterator& it) const;
+    /* is last child */
     bool is_rightmost_child(const tree_type::iterator& it) const;
     const char* label(const tree_type::iterator& it) const;
     bool is_leaf(tree_type::iterator_base it) const;
 
-    void check_map_contains_children(const tree_type& t, tree_type::iterator it, const map_type& m) const;
-    //void check_same_tree(const tree_type& t, tree_type::iterator it) const; // NEFUNGUJE!!! z iteratora sa neda zistit ci ukazuje do daneho stromu..
+    /* check if for each child of it, map contains it */
+    void 
+    check_map_contains_children(
+                const tree_type& t,
+                tree_type::iterator it,
+                const map_type& m) const;
 
-    void compute_full_decomposition(const tree_type& t, tree_type::iterator it, map_type& A, map_type& ALeft, map_type& ARight);
-    void compute_relevant_subforrests(const tree_type& t, tree_type::iterator it, map_type& m_left, map_type& m_right, map_type& m_size);
-    void compute_subtree_size(const tree_type& t, tree_type::iterator it, map_type& m);
+    /* 
+     * upgrade full_decomposition tables
+     *
+     * ALeft == left_decomposition
+     * ARight == right_decomposition
+     * A[parent] = sum(ALeft[ch1] * ARight[ch2]) + sum(A[ch]) + 1
+     *  where ch, ch1, ch2 are children, and ch1<ch2
+     * ALeft[parent] = sum(ALeft[ch]) + 1
+     * ARight[parent] = sum(ARight[ch]) + 1
+     */
+    void compute_full_decomposition(const tree_type& t,
+                                    tree_type::iterator it,
+                                    map_type& A,
+                                    map_type& ALeft,
+                                    map_type& ARight);
+    /*
+     * upgrade relevant_subforests tables of it with respect to left/right path
+     *
+     * FLeft[parent] = 1 + F[mostleft_child] + 
+     *                  sum(Size[other_children] + F[other_children])
+     * FRight[parent] = 1 + F[mostright_child] +
+     *                  sum(Size[other_children] + F[other_children])
+     *
+     *  where   mostleft_child_index == 0,
+     *          other_children_index == 1,..,n-1,
+     *          rightmost_child_index == n-1
+     */
+    void compute_relevant_subforrests(const tree_type& t,
+                                    tree_type::iterator it,
+                                    map_type& FLeft,
+                                    map_type& FRight,
+                                    map_type& Size);
+    /*
+     * update Size table from children:
+     *
+     * Size[parent] = sum(Size[ch]) + 1
+     *  where ch are children
+     */
+    void compute_subtree_size(const tree_type& t,
+                                tree_type::iterator it,
+                                map_type& Size);
 
-    void update_T2_LR_w_tables(tree_type::iterator it, size_t c_min);
-    void update_T2_H_w_table(tree_type::iterator it, size_t c_min);
+    /*
+     * == ekvivalent to line 20, 21 in rted_opt_strategy(F,G)
+     *
+     * T2_Lw[parent_it] += (it == leftmost_child) ? T2_Lw[it] : c_min;
+     * T2_Rw[parent_it] += (it == rightmost_child) ? T2_Rw[it] : c_min;
+     */
+    void update_T2_LR_w_tables(tree_type::iterator it,
+                                size_t c_min);
+    /*
+     * == ekvivalent to line 22 in rted_opt_strategy(F,G)
+     *
+     * T2_Hw[parent_it] += (it is on heavy_parents_path) ? T2_Hw[it] : c_min;
+     *
+     * it cant be predicted if term is true or false, so i am using another map
+     * T2_Hw_partials, where is stored tuple (subtree_size, c_min, H_value)
+     * of heaviest child i saw. if i find another ch2, that 
+     * Size[ch2] > subtree_size, i compute
+     * T2_Hw[parent_it] += c_min - H_value + T2_Hw[ch2]
+     * and store values from ch2:
+     *      subtree_size = Size[ch2];
+     *      c_min = function_c_min;
+     *      H_value = T2_Hw[ch2]
+     */
+    void update_T2_H_w_table(tree_type::iterator it,
+                            size_t c_min);
     
-    void update_T1_LR_v_tables(tree_type::iterator it1, tree_type::iterator it2, size_t c_min);
-    void update_T1_H_v_table(tree_type::iterator it1, tree_type::iterator it2, size_t c_min);
+    /*
+     * == ekvivalent to line 16, 17 in rted_opt_strategy(F,G)
+     *
+     * T1_Lv[parent_it1][it2] += (it1 == leftmost_child) ?
+     *                              T1_Lv[it1][it2] : c_min;
+     * T1_Rv[parent_it1][it2] += (it1 == leftmost_child) ?
+     *                              T1_Rv[it1][it2] : c_min;
+     */
+    void update_T1_LR_v_tables(tree_type::iterator it1, 
+                                tree_type::iterator it2,
+                                size_t c_min);
+    /*
+     * == ekvivalent to line 18 in rted_opt_strategy(F,G)
+     *
+     * T1_Hv[parent_it1][it2] += (it1 is on heavy_parents_path) ?
+     *                              T2_Hw[it1][it2] : c_min;
+     * 
+     * as in update_T2_H_w_table, we use map T1_Hv_partials,
+     * where we store tuple (subtree_size, c_min, H_value) of heaviest child
+     * if i find heavier ch2 (Size[ch2] > subtree_size) i compute
+     * T1_Hv[parent1_id][it2_id] = c_min - H_value + T1_Hv[it1_id][it2_id]
+     * and store values from ch2:
+     *      subtree_size = Size[ch2];
+     *      c_min = function_c_min;
+     *      H_value = T1_Hv[it1_id][it2_id];
+     */
+    void update_T1_H_v_table(tree_type::iterator it1, 
+                                tree_type::iterator it2,
+                                size_t c_min);
 
-    void init_T1_LRH_v_tables(tree_type::iterator it1, tree_type::iterator it2);
+    /*
+     * initialize L/R/H_v tables for leaf it1
+     *
+     * T1_{L,R,H}v[it1_id][it2_id] = 0;
+     */
+    void init_T1_LRH_v_tables(tree_type::iterator it1, 
+                                tree_type::iterator it2);
+    /*
+     * initialize L/R/H_w tables for leaf it
+     *
+     * T2_{L,R,H}w[it_id] = 0;
+     */
     void init_T2_LRH_w_tables(tree_type::iterator it);
 
-    size_t update_STR_table(const std::vector<size_t>& vec, tree_type::iterator it1, tree_type::iterator it2);
+    /*
+     * compute C from rted_opt_strategy(F,G) (== lines 7-12)
+     * find minimum and stores minimal_path
+     * returns c_min
+     */
+    size_t update_STR_table(tree_type::iterator it1,
+                            tree_type::iterator it2);
 
-    size_t get_value(size_t index1, size_t index2, const std::unordered_map<size_t, map_type>& m);
-    size_t get_value(size_t index, const map_type& m);
+    /*
+     * tests if there is a m[index1][index2] value, and returns it
+     */
+    size_t get_value(size_t index1,
+                    size_t index2,
+                    const std::unordered_map<size_t, map_type>& m);
+    /*
+     * tests if there is a m[index] value and returns it
+     */
+    size_t get_value(size_t index, 
+                    const map_type& m);
 
 public:
     rted(const rna_tree& _t1, const rna_tree& _t2);
-    void run_rted();
+    strategy_map_type run_rted();
 
 private:
     tree_type t1;
@@ -107,26 +240,20 @@ private:
     std::unordered_map<size_t, partial_result_map>
             T1_Hv_partials;
 
-    enum graph
-    {
-        T1, T2
-    };
-
-    std::unordered_map<size_t, std::unordered_map<size_t, std::pair<graph, path_strategy>>>
-            STR;
+    strategy_map_type STR;
 };
 
-//#define NO_LOGGER_DEBUG_MESSAGES
+//#define NO_LOGGER_RTED_DEBUG_MESSAGES
 
-#ifndef NO_LOGGER_DEBUG_MESSAGES
+#ifndef NO_LOGGER_RTED_DEBUG_MESSAGES
 
-#define LOGGER_DEBUG_INIT
-#define LOGGER_DEBUG_UPDATE_TABLE
-#define LOGGER_DEBUG_COMPUTE_DECOMPOSITION
-#define LOGGER_DEBUG_COMPUTE_SUBFOREST
-#define LOGGER_DEBUG_COMPUTE_SIZE
-#define LOGGER_DEBUG_STRATEGY_MIN_VECTOR
-#define LOGGER_DEBUG_STRATEGY
+#define LOGGER_DEBUG_RTED_INIT
+#define LOGGER_DEBUG_RTED_UPDATE_TABLE
+#define LOGGER_DEBUG_RTED_COMPUTE_DECOMPOSITION
+#define LOGGER_DEBUG_RTED_COMPUTE_SUBFOREST
+#define LOGGER_DEBUG_RTED_COMPUTE_SIZE
+#define LOGGER_DEBUG_RTED_STRATEGY_MIN_VECTOR
+#define LOGGER_DEBUG_RTED_STRATEGY
 
 #endif
 
