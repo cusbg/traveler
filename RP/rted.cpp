@@ -1,8 +1,22 @@
 /*
- * rted.cpp
+ * File: rted.cpp
+ *
  * Copyright (C) 2014 Richard Eliáš <richard@ba30.eu>
  *
- * Distributed under terms of the MIT license.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #include "rted.hpp"
@@ -11,6 +25,21 @@
 #include <set>
 #include <algorithm>
 #include <math.h>
+
+//#define NO_LOGGER_RTED_DEBUG_MESSAGES
+
+#ifndef NO_LOGGER_RTED_DEBUG_MESSAGES
+
+#define LOGGER_DEBUG_RTED_INIT
+#define LOGGER_DEBUG_RTED_UPDATE_TABLE
+#define LOGGER_DEBUG_RTED_COMPUTE_DECOMPOSITION
+#define LOGGER_DEBUG_RTED_COMPUTE_SUBFOREST
+#define LOGGER_DEBUG_RTED_COMPUTE_SIZE
+#define LOGGER_DEBUG_RTED_STRATEGY_MIN_VECTOR
+#define LOGGER_DEBUG_RTED_STRATEGY
+
+#endif
+
 
 using namespace std;
 
@@ -25,65 +54,28 @@ const char* to_string(path_strategy p)
 }
 
 
-//TODO: uvolnovat pamet po precitani z mapy...
 
-rted::rted(const rna_tree& _t1, const rna_tree& _t2)
-    : t1(*_t1.tree_ptr), t2(*_t2.tree_ptr)
+/*
+//TODO: uvolnovat pamet po precitani z mapy...
+template<typename tree_type>
+rted<tree_type>::rted(const rna_tree& _t1, const rna_tree& _t2)
+    : t1(_t1), t2(_t2)
 {
     APP_DEBUG_FNAME;
 }
 
-size_t cost(const node_base<std::string>& n1,
-            const node_base<std::string>& n2)
-{
-    return 0;
-}
-
-rted::tree_type::iterator rted::most_left(const rted::tree_type& t) const
-{
-    return t.begin_post();
-}
-
-rted::tree_type::iterator rted::most_right(const rted::tree_type& t) const
-{
-    assert (t.begin() != t.end());
-    return --t.end();
-}
-
-bool rted::is_leftmost_child(const tree_type::iterator& it) const
-{
-    // it == it.begin() nefunguje!!! 
-    return tree_type::child(parent(it), 0) == it;
-}
-
-bool rted::is_rightmost_child(const tree_type::iterator& it) const
-{
-    size_t n = parent(it).number_of_children();
-    return tree_type::child(parent(it), n - 1) == it;
-}
-
-rted::tree_type::iterator rted::parent(const tree_type::iterator& it) const
-{
-    return tree_type::parent(it);
-}
-
-const char* rted::label(const tree_type::iterator& it) const
-{
-    return it->get_label().c_str();
-}
-
-bool rted::is_leaf(rted::tree_type::iterator_base it) const
-{
-    return it.number_of_children() == 0;
-}
-
-void rted::check_map_contains_children(const tree_type& t,
-                                    tree_type::iterator it,
+template<typename tree_type>
+void rted<tree_type>::check_map_contains_children(const tree_type& t,
+                                    typename tree_type::iterator it,
                                     const map_type& m) const
 {
-    if (is_leaf(it))
+    cout << "id: " << it->get_id() << endl;
+    cout << "label: " << label(it) << endl;
+    if (tree_type::is_leaf(it))
         return;
-    auto ch = t.child(it, 0);
+
+    //TODO auto=, ale treba preistotu kontrolovat typ..
+    typename tree_type::sibling_iterator ch = t.child(it, 0);
     for (; ch != ch.end(); ++ch)
     {
         if (m.find(ch->get_id()) == m.end())
@@ -96,8 +88,9 @@ void rted::check_map_contains_children(const tree_type& t,
     }
 }
 
-void rted::compute_full_decomposition(const tree_type& t,
-                                        tree_type::iterator it,
+template<typename tree_type>
+void rted<tree_type>::compute_full_decomposition(const tree_type& t,
+                                        typename tree_type::iterator it,
                                         map_type& A,
                                         map_type& ALeft,
                                         map_type& ARight)
@@ -113,7 +106,7 @@ void rted::compute_full_decomposition(const tree_type& t,
     ARight[it_id]   = 1;
 
     // if is_leaf(it) -> set A* = 1, what is done ..
-    if (!is_leaf(it))
+    if (!tree_type::is_leaf(it))
     {
         auto ch = t.child(it, 0);
         while(ch != ch.end())
@@ -145,15 +138,16 @@ void rted::compute_full_decomposition(const tree_type& t,
 #endif
 }
 
-void rted::compute_subtree_size(const tree_type& t,
-                                tree_type::iterator it,
+template<typename tree_type>
+void rted<tree_type>::compute_subtree_size(const tree_type& t,
+                                typename tree_type::iterator it,
                                 map_type& m)
 {
     check_map_contains_children(t, it, m);
     size_t it_id = it->get_id();
 
     m[it_id] = 1;
-    if (!is_leaf(it))
+    if (!tree_type::is_leaf(it))
     {
         for (auto ch = t.child(it, 0); ch != ch.end(); ++ch)
             m[it_id] += m[ch->get_id()];
@@ -166,8 +160,9 @@ void rted::compute_subtree_size(const tree_type& t,
 #endif
 }
 
-void rted::compute_relevant_subforrests(const tree_type& t, 
-                                        tree_type::iterator it,
+template<typename tree_type>
+void rted<tree_type>::compute_relevant_subforrests(const tree_type& t, 
+                                        typename tree_type::iterator it,
                                         map_type& FLeft, 
                                         map_type& FRight, 
                                         map_type& Size)
@@ -186,7 +181,7 @@ void rted::compute_relevant_subforrests(const tree_type& t,
     FLeft[it_id]   = 1;
     FRight[it_id]  = 1;
 
-    if (!is_leaf(it))
+    if (!tree_type::is_leaf(it))
     {
         auto ch = t.child(it, 0);
 
@@ -220,7 +215,8 @@ void rted::compute_relevant_subforrests(const tree_type& t,
 #endif
 }
 
-void rted::update_T2_LR_w_tables(tree_type::iterator it,
+template<typename tree_type>
+void rted<tree_type>::update_T2_LR_w_tables(typename tree_type::iterator it,
                                 size_t c_min)
 {
 
@@ -231,28 +227,29 @@ void rted::update_T2_LR_w_tables(tree_type::iterator it,
     get_value(it_id, T2_Rw);
     // ^^ == test ci je inicializovana hodnota..
 
-    T2_Lw[parent_id] += (is_leftmost_child(it) ? //it =?= leftmost_child
+    T2_Lw[parent_id] += (tree_type::is_leftmost_subtree_child(it) ? //it =?= leftmost_child
                 T2_Lw[it_id] :
                 c_min
             );
 
-    T2_Rw[parent_id] += (is_rightmost_child(it) ? //it =?= rigtmost_child
+    T2_Rw[parent_id] += (tree_type::is_rightmost_subtree_child(it) ? //it =?= rigtmost_child
                 T2_Rw[it_id] :
                 c_min
             );
 
 #ifdef LOGGER_DEBUG_RTED_UPDATE_TABLE
     logger.debug("update: T2_Lw[%s]\t= %lu",
-                label(parent(it)),
+                label(tree_type::parent(it)),
                 T2_Lw[parent_id]);
     logger.debug("update: T2_Rw[%s]\t= %lu",
-                label(parent(it)),
+                label(tree_type::parent(it)),
                 T2_Rw[parent_id]);
 #endif
 }
 
-void rted::update_T1_LR_v_tables(tree_type::iterator it1, 
-                                tree_type::iterator it2, 
+template<typename tree_type>
+void rted<tree_type>::update_T1_LR_v_tables(typename tree_type::iterator it1, 
+                                typename tree_type::iterator it2, 
                                 size_t c_min)
 {
     size_t it1_id = it1->get_id();
@@ -263,29 +260,30 @@ void rted::update_T1_LR_v_tables(tree_type::iterator it1,
     get_value(it1_id, it2_id, T1_Rv);
     // ^^ == test ci je inicializovana hodnota..
 
-    T1_Lv[parent1_id][it2_id] += (is_leftmost_child(it1) ? // it1 =?= leftmost_child
+    T1_Lv[parent1_id][it2_id] += (tree_type::is_leftmost_subtree_child(it1) ? // it1 =?= leftmost_child
                 T1_Lv[it1_id][it2_id] :
                 c_min
             );
 
-    T1_Rv[parent1_id][it2_id] += (is_rightmost_child(it1) ? // it1 =?= rightmost_child
+    T1_Rv[parent1_id][it2_id] += (tree_type::is_rightmost_subtree_child(it1) ? // it1 =?= rightmost_child
                 T1_Rv[it1_id][it2_id] :
                 c_min
             );
     
 #ifdef LOGGER_DEBUG_RTED_UPDATE_TABLE
     logger.debug("update: T1_Lv[%s][%s]\t= %lu",
-                label(parent(it1)),
+                label(tree_type::parent(it1)),
                 label(it2),
                 T1_Lv[parent1_id][it2_id]);
     logger.debug("update: T1_Rv[%s][%s]\t= %lu",
-                label(parent(it1)),
+                label(tree_type::parent(it1)),
                 label(it2),
                 T1_Rv[parent1_id][it2_id]);
 #endif
 }
 
-void rted::update_T2_H_w_table(tree_type::iterator it, 
+template<typename tree_type>
+void rted<tree_type>::update_T2_H_w_table(typename tree_type::iterator it, 
                                 size_t c_min)
 {
     size_t it_id = it->get_id();
@@ -312,13 +310,14 @@ void rted::update_T2_H_w_table(tree_type::iterator it,
 
 #ifdef LOGGER_DEBUG_RTED_UPDATE_TABLE
     logger.debug("update: T2_Hw[%s]\t= %lu",
-                label(parent(it)),
+                label(tree_type::parent(it)),
                 T2_Hw[parent_id]);
 #endif
 }
 
-void rted::update_T1_H_v_table(tree_type::iterator it1, 
-                                tree_type::iterator it2, 
+template<typename tree_type>
+void rted<tree_type>::update_T1_H_v_table(typename tree_type::iterator it1, 
+                                typename tree_type::iterator it2, 
                                 size_t c_min)
 {
     size_t it1_id = it1->get_id();
@@ -346,16 +345,17 @@ void rted::update_T1_H_v_table(tree_type::iterator it1,
     
 #ifdef LOGGER_DEBUG_RTED_UPDATE_TABLE
     logger.debug("update: T1_Hv[%s][%s]\t= %lu",
-            label(parent(it1)),
+            label(tree_type::parent(it1)),
             label(it2),
             T1_Hv[parent1_id][it2_id]);
 #endif
 }
 
-void rted::init_T1_LRH_v_tables(tree_type::iterator it1, 
-                                tree_type::iterator it2)
+template<typename tree_type>
+void rted<tree_type>::init_T1_LRH_v_tables(typename tree_type::iterator it1, 
+                                typename tree_type::iterator it2)
 {
-    assert(is_leaf(it1));
+    assert(tree_type::is_leaf(it1));
 
     size_t it1_id = it1->get_id();
     size_t it2_id = it2->get_id();
@@ -375,9 +375,10 @@ void rted::init_T1_LRH_v_tables(tree_type::iterator it1,
 #endif
 }
 
-void rted::init_T2_LRH_w_tables(tree_type::iterator it)
+template<typename tree_type>
+void rted<tree_type>::init_T2_LRH_w_tables(typename tree_type::iterator it)
 {
-    assert(is_leaf(it));
+    assert(tree_type::is_leaf(it));
 
     size_t it_id = it->get_id();
 
@@ -391,7 +392,8 @@ void rted::init_T2_LRH_w_tables(tree_type::iterator it)
 #endif
 }
 
-size_t rted::get_value(size_t index1,
+template<typename tree_type>
+size_t rted<tree_type>::get_value(size_t index1,
                         size_t index2,
                         const std::unordered_map<size_t, map_type>& m)
 {
@@ -405,7 +407,8 @@ size_t rted::get_value(size_t index1,
     return m.at(index1).at(index2);
 }
 
-size_t rted::get_value(size_t index, 
+template<typename tree_type>
+size_t rted<tree_type>::get_value(size_t index, 
                         const map_type& m)
 {
     if (m.find(index) == m.end())
@@ -417,8 +420,9 @@ size_t rted::get_value(size_t index,
     return m.at(index);
 }
 
-size_t rted::update_STR_table(tree_type::iterator it1,
-                            tree_type::iterator it2)
+template<typename tree_type>
+size_t rted<tree_type>::update_STR_table(typename tree_type::iterator it1,
+                            typename tree_type::iterator it2)
 {
     vector<size_t> vec(6, 0xBADF00D);
     size_t it1_id = it1->get_id();
@@ -464,6 +468,41 @@ size_t rted::update_STR_table(tree_type::iterator it1,
     logger.debug("minimum_vec = %lu", c_min);
 #endif
 
+    switch(index)
+    {
+        case RTED_VECTOR_T1_HEAVY_INDEX:
+        case RTED_VECTOR_T1_LEFT_INDEX:
+        case RTED_VECTOR_T1_RIGHT_INDEX:
+            STR[it1_id][it2_id].first = graph::T1;
+            break;
+        case RTED_VECTOR_T2_HEAVY_INDEX:
+        case RTED_VECTOR_T2_LEFT_INDEX:
+        case RTED_VECTOR_T2_RIGHT_INDEX:
+            STR[it1_id][it2_id].first = graph::T2;
+            break;
+        default:
+            logger.error("i should not be there, %lu == c_min_index != 0..5", index);
+            exit(1);
+    }
+    switch(index)
+    {
+        case RTED_VECTOR_T1_HEAVY_INDEX:
+        case RTED_VECTOR_T2_HEAVY_INDEX:
+            STR[it1_id][it2_id].second = path_strategy::heavy;
+            break;
+        case RTED_VECTOR_T1_LEFT_INDEX: 
+        case RTED_VECTOR_T2_LEFT_INDEX: 
+            STR[it1_id][it2_id].second = path_strategy::left;
+            break;
+        case RTED_VECTOR_T1_RIGHT_INDEX:
+        case RTED_VECTOR_T2_RIGHT_INDEX:
+            STR[it1_id][it2_id].second = path_strategy::right;
+            break;
+        default:
+            logger.error("i should not be there, %lu == c_min_index != 0..5", index);
+            exit(1);
+    }
+[>
     switch (index)
     {
         case RTED_VECTOR_T1_HEAVY_INDEX:
@@ -494,6 +533,7 @@ size_t rted::update_STR_table(tree_type::iterator it1,
             logger.error("i should not be there, %lu == c_min_index != 0..5", index);
             exit(1);
     }
+<]
 #ifdef LOGGER_DEBUG_RTED_STRATEGY
 
     const char* _str = to_string(STR[it1_id][it2_id].second);
@@ -512,13 +552,14 @@ size_t rted::update_STR_table(tree_type::iterator it1,
     return c_min;
 }
 
-rted::strategy_map_type rted::run_rted()
+template<typename tree_type>
+typename rted<tree_type>::strategy_map_type rted<tree_type>::run_rted()
 {
     APP_DEBUG_FNAME;
 
-    logger.notice("RTED alg starting");
+    logger.notice("RTED: BEGIN");
     logger.notice("computing full_decomposition & relevant_subforests for T2");
-    for (auto it2 = t2.begin_post(); it2 != t2.end_post(); ++it2)
+    for (auto it2 = t2.tree_ptr->begin_post(); it2 != t2.tree_ptr->end_post(); ++it2)
     {
         compute_full_decomposition(t2, it2, T2_A, T2_ALeft, T2_ARight);
         compute_relevant_subforrests(t2, it2, T2_FLeft, T2_FRight, T2_Size);
@@ -528,7 +569,7 @@ rted::strategy_map_type rted::run_rted()
     logger.notice("full_decomposition & relevant_subforests for T1 will be computed in main cycle..");
     logger.notice("starting main algorithm cycle");
 
-    for (auto it1 = t1.begin_post(); it1 != t1.end_post(); ++it1)
+    for (auto it1 = t1.tree_ptr->begin_post(); it1 != t1.tree_ptr->end_post(); ++it1)
     {
         if (it1->is_root())
             break;
@@ -540,14 +581,16 @@ rted::strategy_map_type rted::run_rted()
         T2_Rw.clear();
         T2_Hw_partials.clear();
 
-        for (auto it2 = t2.begin_post(); it2 != t2.end_post(); ++it2)
+        for (auto it2 = t2.tree_ptr->begin_post(); it2 != t2.tree_ptr->end_post(); ++it2)
         {
+            logger.info("ids: '%lu', '%lu'", it1->get_id(), it2->get_id());
+            logger.info("labels: '%s', '%s'", label(it1), label(it2));
             if (it2->is_root())
                 break;
 
-            if (is_leaf(it1))
+            if (tree_type::is_leaf(it1))
                 init_T1_LRH_v_tables(it1, it2);
-            if (is_leaf(it2))
+            if (tree_type::is_leaf(it2))
                 init_T2_LRH_w_tables(it2);
 
             size_t c_min = update_STR_table(it1, it2);
@@ -560,10 +603,13 @@ rted::strategy_map_type rted::run_rted()
             update_T2_H_w_table(it2, c_min);
         }
     }
+
+    logger.notice("RTED: END");
+
     return STR;
 }
 
 
 
 
-
+*/

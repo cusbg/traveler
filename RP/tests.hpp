@@ -1,5 +1,5 @@
 /*
- * File: rna_tree.hpp
+ * File: tests.hpp
  *
  * Copyright (C) 2014 Richard Eliáš <richard@ba30.eu>
  *
@@ -19,28 +19,27 @@
  * USA.
  */
 
-#ifndef RNA_TREE_HPP
-#define RNA_TREE_HPP
+#ifndef TESTS_HPP
+#define TESTS_HPP
 
-#include "tree_base.hpp"
-#include "node_base.hpp"
-#include <unordered_map>
+#include "types.hpp"
+#include "rted.hpp"
 
+// == figure 4, str. 337
+#define LABELS1      "1234565731"
+#define BRACKETS1    "(.(.(.).))"
 
-typedef tree_base<node_base<std::string> > RNA_tree_type;
-
-
-class rna_tree : public RNA_tree_type
-{
-private:
-    std::vector<node_base<std::string> > convert(const std::string& labels);
-
-public:
-    rna_tree() = default;
-    rna_tree(const std::string& brackets, const std::string& labels);
-    virtual ~rna_tree();
-};
+// == figure 6, str. 341
+#define LABELS21     "3123"
+#define BRACKETS21   "(..)"
+#define LABELS22     "212"
+#define BRACKETS22   "(.)"
 
 
-#endif /* !RNA_TREE_HPP */
+
+void rted_tests();
+
+
+
+#endif /* !TESTS_HPP */
 

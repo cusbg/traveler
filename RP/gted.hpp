@@ -1,5 +1,5 @@
 /*
- * File: main.cpp
+ * File: gted.hpp
  *
  * Copyright (C) 2014 Richard Eliáš <richard@ba30.eu>
  *
@@ -19,67 +19,38 @@
  * USA.
  */
 
-#include <iostream>
+#ifndef GTED_HPP
+#define GTED_HPP
+
 #include "types.hpp"
-#include "tree_hh/tree.hh"
-#include "tree_hh/tree_util.hh"
-#include "node_base.hpp"
-#include "tree_base.hpp"
 #include "rna_tree.hpp"
-#include <fstream>
 #include "rted.hpp"
-#include "tests.hpp"
-#include "gted.hpp"
 
 
-
-
-using namespace std;
-
-
-
-
-string readseq()
+//template <typename tree_type>
+class gted
 {
-    ifstream input("../InFiles/seq");
-    string s;
-    input >> s;
-    return s;
-}
-string readbrackets()
-{
-    ifstream input("../InFiles/zatvorky");
-    string s;
-    input >> s;
-    return s;
-}
+    typedef tree_base<node_base<std::string>> tree_type;
+    typedef std::vector<tree_type::iterator> relevant_subtrees;
+private:
+    tree_type t1;
+    tree_type t2;
+    typename rted<tree_type>::strategy_map_type strategies;
+public:
+    gted(const tree_type& _t1, const tree_type& _t2,
+            const typename rted<tree_type>::strategy_map_type& _strategies);
+    void run_gted();
 
-
-int main(int argc, char** argv)
-{
-    rna_tree rr(".", "a");
-    rna_tree::last_child(rr.tree_ptr->begin());
-
-    string b1, l1, b2, l2;
-    l1 = LABELS1;
-    b1 = BRACKETS1;
-    l2 = LABELS22;
-    b2 = BRACKETS22;
-
-    rna_tree rna1(b1, l1);
-    rna_tree rna2(b2, l2);
-
-    rted<RNA_tree_type> r(rna1, rna2);
-
-    gted g(rna1, rna2, r.run_rted());
-    g.run_gted();
-
-
-
-	return 0;
-}
+private:
+    relevant_subtrees path_decomposition(tree_type::iterator it,
+            path_strategy s);
+    relevant_subtrees left_decomposition(tree_type::iterator it);
+    relevant_subtrees right_decomposition(tree_type::iterator it);
+};
 
 
 
 
+
+#endif /* !GTED_HPP */
 
