@@ -22,7 +22,6 @@
 #include "tests.hpp"
 
 using namespace std;
-
 void rted_test1()
 {
     APP_DEBUG_FNAME;
@@ -34,12 +33,12 @@ void rted_test1()
     rna_tree rna1(b1, l1);
     rna_tree rna2(b2, l2);
 
-    rted<RNA_tree_type> r(rna1, rna2);
+    rted r(rna1, rna2);
     auto val = r.run_rted();
 
 
-    auto t1_id = rna1.tree_ptr->child(rna1.tree_ptr->begin(), 0)->get_id();
-    auto t2_id = rna2.tree_ptr->child(rna2.tree_ptr->begin(), 0)->get_id();
+    auto t1_id = rted::tree_type::child(rna1.tree_ptr->begin(), 0)->get_id();
+    auto t2_id = rted::tree_type::child(rna2.tree_ptr->begin(), 0)->get_id();
 
     assert(val.at(t1_id).at(t2_id).second == path_strategy::right);
 }
@@ -57,12 +56,12 @@ void rted_test2()
     rna_tree rna1(b1, l1);
     rna_tree rna2(b2, l2);
 
-    rted<RNA_tree_type> r(rna1, rna2);
+    rted r(rna1, rna2);
     auto val = r.run_rted();
 
 
-    auto t1_id = rna1.tree_ptr->child(rna1.tree_ptr->begin(), 0)->get_id();
-    auto t2_id = rna2.tree_ptr->child(rna2.tree_ptr->begin(), 0)->get_id();
+    auto t1_id = rted::tree_type::child(rna1.tree_ptr->begin(), 0)->get_id();
+    auto t2_id = rted::tree_type::child(rna2.tree_ptr->begin(), 0)->get_id();
 
     assert(val.at(t1_id).at(t2_id).second == path_strategy::left);
 }
@@ -72,7 +71,7 @@ void rted_tests()
     APP_DEBUG_FNAME;
     logger.info("BEGIN tests");
     auto priority = logger.getPriority();
-    //logger.setPriority(log4cpp::Priority::WARN);
+    logger.setPriority(log4cpp::Priority::WARN);
 
 
     rted_test1();
@@ -81,4 +80,8 @@ void rted_tests()
     logger.setPriority(priority);
     logger.info("END tests");
 }
+
+
+
+
 

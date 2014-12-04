@@ -35,10 +35,10 @@ class gted
 private:
     tree_type t1;
     tree_type t2;
-    typename rted<tree_type>::strategy_map_type strategies;
+    rted::strategy_map_type strategies;
 public:
     gted(const tree_type& _t1, const tree_type& _t2,
-            const typename rted<tree_type>::strategy_map_type& _strategies);
+            const rted::strategy_map_type& _strategies);
     void run_gted();
 
 private:

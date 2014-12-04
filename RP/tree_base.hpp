@@ -188,8 +188,12 @@ iter tree_base<node_type>::last_child(iter it)
 template <typename node_type>
 bool tree_base<node_type>::is_first_child(const base_iterator& it)
 {
-    // it == it.begin() nefunguje!!! 
-    return tree_type::child(parent(it), 0) == it;
+    // it == it.begin() nefunguje!!!
+    //return fist_child(parent(it)) == it;
+
+    return first_child(parent(it)).node == it.node;
+
+    //return tree_type::child(parent(it), 0) == it;
 }
 
 /* static */
@@ -197,8 +201,12 @@ template <typename node_type>
 bool tree_base<node_type>::is_last_child(const base_iterator& it)
 {
     // TODO: neist cez number_of_children, ale radsej cez tree::node..
-    size_t n = parent(it).number_of_children();
-    return tree_type::child(parent(it), n - 1) == it;
+    // .. nieje definovany operator==(base_it, base_it)..
+    
+    return last_child(parent(it)).node == it.node;
+    
+    //size_t n = parent(it).number_of_children();
+    //return tree_type::child(parent(it), n - 1) == it;
 }
 
 /* static */

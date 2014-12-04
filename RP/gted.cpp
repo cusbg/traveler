@@ -24,7 +24,7 @@
 
 using namespace std;
 
-gted::gted(const tree_type& _t1, const tree_type& _t2, const typename rted<tree_type>::strategy_map_type& _strategies)
+gted::gted(const tree_type& _t1, const tree_type& _t2, const rted::strategy_map_type& _strategies)
     : t1(_t1), t2(_t2), strategies(_strategies)
 {}
 

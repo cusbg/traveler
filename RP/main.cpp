@@ -57,6 +57,10 @@ string readbrackets()
 
 int main(int argc, char** argv)
 {
+    rted_tests();
+    return 0;
+
+
     rna_tree rr(".", "a");
     rna_tree::last_child(rr.tree_ptr->begin());
 
@@ -69,7 +73,7 @@ int main(int argc, char** argv)
     rna_tree rna1(b1, l1);
     rna_tree rna2(b2, l2);
 
-    rted<RNA_tree_type> r(rna1, rna2);
+    rted r(rna1, rna2);
 
     gted g(rna1, rna2, r.run_rted());
     g.run_gted();
