@@ -53,9 +53,9 @@ public:
                 std::pair<graph, path_strategy>>>
                     strategy_map_type;
     typedef tree_base<node_base<std::string>> tree_type;
-private:
     typedef std::unordered_map<size_t, size_t> map_type;
 
+private:
     /* check if for each child of it, map contains it */
     void 
     check_map_contains_children(
@@ -196,8 +196,12 @@ private:
                     const map_type& m);
 
 public:
-    rted(const rna_tree& _t1, const rna_tree& _t2);
-    strategy_map_type run_rted();
+    rted(const tree_type& _t1, const tree_type& _t2);
+    void run_rted();
+    const strategy_map_type& get_strategies() const { return STR; }
+    const map_type& get_t1_sizes() const { return T1_Size; }
+    const map_type& get_t2_sizes() const { return T2_Size; }
+
 
 private:
     tree_type t1;
