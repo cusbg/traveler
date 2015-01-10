@@ -40,20 +40,23 @@ public:
 public:
     size_t get_id() const;
     const label_type& get_label() const;
+
     void set_label(const label_type& _label);
+    void reset_id();
+
+    virtual bool is_root() const;
+    bool operator==(const node_base<label_type>& other) const;
     friend std::ostream& operator<<(std::ostream& out, const node_base<label_type>& n)
     {
         out << n.label;
         return out;
     }
-    virtual bool is_root() const;
-    bool operator==(const node_base<label_type>& other) const;
 };
 
 
 
 template <typename label_type>
-size_t node_base<label_type>::ID = 0;
+size_t node_base<label_type>::ID = 1;
 
 template <typename label_type>
 node_base<label_type>::~node_base()
@@ -80,6 +83,12 @@ template <typename label_type>
 void node_base<label_type>::set_label(const label_type& _label)
 {
     label = _label;
+}
+
+template <typename label_type>
+void node_base<label_type>::reset_id()
+{
+    id = ID++;
 }
 
 template <typename label_type>
