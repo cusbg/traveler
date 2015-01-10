@@ -32,13 +32,21 @@ typedef tree_base<node_base<std::string> > RNA_tree_type;
 
 class rna_tree : public RNA_tree_type
 {
-private:
-    std::vector<node_base<std::string> > convert(const std::string& labels);
-
 public:
+    virtual ~rna_tree() = default;
     rna_tree() = default;
-    rna_tree(const std::string& brackets, const std::string& labels);
-    virtual ~rna_tree();
+    rna_tree(const std::string& brackets, const std::string& labels)
+        : tree_base<node_base<std::string> >(brackets, convert(labels))
+    {}
+        
+private:
+    inline std::vector<node_base<std::string> > convert(const std::string& labels)
+    {
+        std::vector<node_base<std::string> > vec;
+        for (size_t i = 0; i < labels.size(); ++i)
+            vec.emplace_back(labels.substr(i, 1));
+        return vec;
+    }
 };
 
 
