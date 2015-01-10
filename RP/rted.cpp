@@ -59,7 +59,7 @@ const char* to_string(path_strategy p)
 
 //TODO: uvolnovat pamet po precitani z mapy...
 
-rted::rted(const rna_tree& _t1, const rna_tree& _t2)
+rted::rted(const tree_type& _t1, const tree_type& _t2)
     : t1(_t1), t2(_t2)
 {
     APP_DEBUG_FNAME;
@@ -90,7 +90,6 @@ void rted::compute_full_decomposition(const tree_type& t,
                                         map_type& ALeft,
                                         map_type& ARight)
 {
-    //TODO: prepisat vsetko na .at() alebo [] pri tabulkach. resp. nejaky debug mod
     check_map_contains_children(t, it, A);
     check_map_contains_children(t, it, ALeft);
     check_map_contains_children(t, it, ARight);
@@ -108,9 +107,9 @@ void rted::compute_full_decomposition(const tree_type& t,
         {
             size_t ch_id = ch->get_id();
             
-            A[it_id]        += A.at(ch_id);
-            ALeft[it_id]    += ALeft.at(ch_id);
-            ARight[it_id]   += ARight.at(ch_id);
+            A.at(it_id)        += A.at(ch_id);
+            ALeft.at(it_id)    += ALeft.at(ch_id);
+            ARight.at(it_id)   += ARight.at(ch_id);
             
             auto ch2 = ch;
             ++ch2;
@@ -123,13 +122,13 @@ void rted::compute_full_decomposition(const tree_type& t,
 #ifdef LOGGER_DEBUG_RTED_COMPUTE_DECOMPOSITION
     logger.debug("A\t[%s]\t== %lu",
                 label(it),
-                A[it_id]);
+                A.at(it_id));
     logger.debug("ALeft\t[%s]\t== %lu",
                 label(it),
-                ALeft[it_id]);
+                ALeft.at(it_id));
     logger.debug("ARight\t[%s]\t== %lu",
                 label(it),
-                ARight[it_id]);
+                ARight.at(it_id));
 #endif
 }
 
@@ -144,13 +143,13 @@ void rted::compute_subtree_size(const tree_type& t,
     if (!tree_type::is_leaf(it))
     {
         for (auto ch = t.child(it, 0); ch != ch.end(); ++ch)
-            m[it_id] += m[ch->get_id()];
+            m.at(it_id) += m.at(ch->get_id());
     }
 
 #ifdef LOGGER_DEBUG_RTED_COMPUTE_SIZE
     logger.debug("subtree_size[%s] = %lu",
             label(it),
-            m[it_id]);
+            m.at(it_id));
 #endif
 }
 
@@ -179,10 +178,10 @@ void rted::compute_relevant_subforrests(const tree_type& t,
         auto ch = t.child(it, 0);
 
         // FLeft
-        FLeft[it_id] += FLeft[ch->get_id()];  // == leftmost
+        FLeft.at(it_id) += FLeft.at(ch->get_id());  // == leftmost
         ++ch;
         for (; ch != ch.end(); ++ch)
-            FLeft[it_id] += Size[ch->get_id()] + FLeft[ch->get_id()];
+            FLeft.at(it_id) += Size.at(ch->get_id()) + FLeft.at(ch->get_id());
 
         // FRight
         ch = t.child(it, 0);
@@ -192,19 +191,19 @@ void rted::compute_relevant_subforrests(const tree_type& t,
             ++ch2;
 
             for (; ch2 != ch2.end(); ++ch2, ++ch) // == ch != --ch.end()
-                FRight[it_id] += Size[ch->get_id()] + FRight[ch->get_id()];
+                FRight.at(it_id) += Size.at(ch->get_id()) + FRight.at(ch->get_id());
             assert(ch2 == ch2.end());
-            FRight[it_id] += FRight[ch->get_id()];
+            FRight.at(it_id) += FRight.at(ch->get_id());
         }
     }
 
 #ifdef LOGGER_DEBUG_RTED_COMPUTE_SUBFOREST
     logger.debug("FLeft\t[%s]\t == %lu",
                 label(it),
-                FLeft[it_id]);
+                FLeft.at(it_id));
     logger.debug("FRight\t[%s]\t== %lu",
                 label(it),
-                FRight[it_id]);
+                FRight.at(it_id));
 #endif
 }
 
@@ -220,22 +219,22 @@ void rted::update_T2_LR_w_tables(tree_type::iterator it,
     // ^^ == test ci je inicializovana hodnota..
 
     T2_Lw[parent_id] += (tree_type::is_first_child(it) ? //it =?= leftmost_child
-                T2_Lw[it_id] :
+                T2_Lw.at(it_id) :
                 c_min
             );
 
     T2_Rw[parent_id] += (tree_type::is_last_child(it) ? //it =?= rigtmost_child
-                T2_Rw[it_id] :
+                T2_Rw.at(it_id) :
                 c_min
             );
 
 #ifdef LOGGER_DEBUG_RTED_UPDATE_TABLE
     logger.debug("update: T2_Lw[%s]\t= %lu",
                 label(tree_type::parent(it)),
-                T2_Lw[parent_id]);
+                T2_Lw.at(parent_id));
     logger.debug("update: T2_Rw[%s]\t= %lu",
                 label(tree_type::parent(it)),
-                T2_Rw[parent_id]);
+                T2_Rw.at(parent_id));
 #endif
 }
 
@@ -252,12 +251,12 @@ void rted::update_T1_LR_v_tables(tree_type::iterator it1,
     // ^^ == test ci je inicializovana hodnota..
 
     T1_Lv[parent1_id][it2_id] += (tree_type::is_first_child(it1) ? // it1 =?= leftmost_child
-                T1_Lv[it1_id][it2_id] :
+                T1_Lv.at(it1_id).at(it2_id) :
                 c_min
             );
 
     T1_Rv[parent1_id][it2_id] += (tree_type::is_last_child(it1) ? // it1 =?= rightmost_child
-                T1_Rv[it1_id][it2_id] :
+                T1_Rv.at(it1_id).at(it2_id) :
                 c_min
             );
     
@@ -265,11 +264,11 @@ void rted::update_T1_LR_v_tables(tree_type::iterator it1,
     logger.debug("update: T1_Lv[%s][%s]\t= %lu",
                 label(tree_type::parent(it1)),
                 label(it2),
-                T1_Lv[parent1_id][it2_id]);
+                T1_Lv.at(parent1_id).at(it2_id));
     logger.debug("update: T1_Rv[%s][%s]\t= %lu",
                 label(tree_type::parent(it1)),
                 label(it2),
-                T1_Rv[parent1_id][it2_id]);
+                T1_Rv.at(parent1_id).at(it2_id));
 #endif
 }
 
@@ -284,16 +283,17 @@ void rted::update_T2_H_w_table(tree_type::iterator it,
 
     assert(T2_Size.find(it_id) != T2_Size.end());
 
+    //TODO: nasledujuce s .at() failne, opravit ???
     auto& res = T2_Hw_partials[parent_id];
 
-    if (T2_Size[it_id] > res.subtree_size)
+    if (T2_Size.at(it_id) > res.subtree_size)
     {
         // terajsi podstrom je vacsi, odcitam povodne Hw, pricitam povodne c_min a svoje Hw.
-        T2_Hw[parent_id] += T2_Hw[it_id] - res.H_value + res.c_min;
+        T2_Hw[parent_id] += T2_Hw.at(it_id) - res.H_value + res.c_min;
         // a nastavim nove hodnoty podla aktualneho maxima.
-        res.subtree_size = T2_Size[it_id];
+        res.subtree_size = T2_Size.at(it_id);
         res.c_min = c_min;
-        res.H_value = T2_Hw[it_id];
+        res.H_value = T2_Hw.at(it_id);
     }
     else
         T2_Hw[parent_id] += c_min;
@@ -301,7 +301,7 @@ void rted::update_T2_H_w_table(tree_type::iterator it,
 #ifdef LOGGER_DEBUG_RTED_UPDATE_TABLE
     logger.debug("update: T2_Hw[%s]\t= %lu",
                 label(tree_type::parent(it)),
-                T2_Hw[parent_id]);
+                T2_Hw.at(parent_id));
 #endif
 }
 
@@ -318,15 +318,16 @@ void rted::update_T1_H_v_table(tree_type::iterator it1,
     
     assert(T1_Size.find(it1_id) != T1_Size.end() && "size should be computed");
 
+    //TODO: opravit vv na .at()
     auto& res = T1_Hv_partials[parent1_id][it2_id];
 
-    if (T1_Size[it1_id] > res.subtree_size)
+    if (T1_Size.at(it1_id) > res.subtree_size)
     {
-        T1_Hv[parent1_id][it2_id] += T1_Hv[it1_id][it2_id] - res.H_value + res.c_min;
+        T1_Hv[parent1_id][it2_id] += T1_Hv.at(it1_id).at(it2_id) - res.H_value + res.c_min;
 
-        res.subtree_size = T1_Size[it1_id];
+        res.subtree_size = T1_Size.at(it1_id);
         res.c_min = c_min;
-        res.H_value = T1_Hv[it1_id][it2_id];
+        res.H_value = T1_Hv.at(it1_id).at(it2_id);
 
     }
     else
@@ -336,7 +337,7 @@ void rted::update_T1_H_v_table(tree_type::iterator it1,
     logger.debug("update: T1_Hv[%s][%s]\t= %lu",
             label(tree_type::parent(it1)),
             label(it2),
-            T1_Hv[parent1_id][it2_id]);
+            T1_Hv.at(parent1_id).at(it2_id));
 #endif
 }
 
@@ -442,7 +443,7 @@ size_t rted::update_STR_table(tree_type::iterator it1,
 
     auto c_min_it = std::min_element(vec.begin(), vec.end());
     size_t index = distance(vec.begin(), c_min_it);
-    size_t c_min = vec[index];
+    size_t c_min = vec.at(index);
 
 #ifdef LOGGER_DEBUG_RTED_STRATEGY_MIN_VECTOR
     stringstream s;
@@ -522,8 +523,8 @@ size_t rted::update_STR_table(tree_type::iterator it1,
 
 #ifdef LOGGER_DEBUG_RTED_STRATEGY
 
-    const char* _str = to_string(STR[it1_id][it2_id].second);
-    const char* _g = to_string(STR[it1_id][it2_id].first);
+    const char* _str = to_string(STR.at(it1_id).at(it2_id).second);
+    const char* _g = to_string(STR.at(it1_id).at(it2_id).first);
     
     logger.debug("STR_strategy[%s][%s] = %s",
             label(it1),
@@ -538,7 +539,7 @@ size_t rted::update_STR_table(tree_type::iterator it1,
     return c_min;
 }
 
-rted::strategy_map_type rted::run_rted()
+void rted::run_rted()
 {
     APP_DEBUG_FNAME;
 
@@ -588,7 +589,7 @@ rted::strategy_map_type rted::run_rted()
     }
     logger.notice("RTED: END");
 
-    return STR;
+    //return STR;
 }
 
 
