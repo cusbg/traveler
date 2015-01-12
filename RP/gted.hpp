@@ -74,11 +74,20 @@ private:
     /** return 0 if (is_leftmost || from > to) or to.id() */
     size_t index_from_ids(tree_type::iterator it1, tree_type::iterator it2, bool is_leftmost = false) const;
 
-    void compute_distance_recursive(tree_type::iterator it1, tree_type::iterator it2);
-    void compute_distance(tree_type::iterator it1, tree_type::iterator it2);
     void init_forest_dist_table(distance_table& table, tree_type::iterator root1, tree_type::iterator root2);
     void init_tree_dist_table();
 
+    void compute_distance_recursive(tree_type::iterator it1, tree_type::iterator it2);
+    void compute_distance(tree_type::iterator it1, tree_type::iterator it2);
+
+    void left(tree_type::iterator root1, tree_type::iterator root2, const decomposition_type& dec1, const decomposition_type& dec2);
+    void right(tree_type::iterator root1, tree_type::iterator root2, const decomposition_type& dec1, const decomposition_type& dec2);
+    void heavy(tree_type::iterator root1, tree_type::iterator root2, const decomposition_type& dec1, const decomposition_type& dec2);
+/*
+    void compute_distance_left(tree_type::iterator it1, tree_type::iterator it2);
+    void compute_distance_right(tree_type::iterator it1, tree_type::iterator it2);
+    void compute_distance_heavy(tree_type::iterator it1, tree_type::iterator it2);
+*/
     inline bool node_lies_on_path(tree_type::iterator it, const path_type& path) const;
 
 private:

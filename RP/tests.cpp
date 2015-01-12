@@ -21,6 +21,7 @@
 
 #include "tests.hpp"
 
+
 using namespace std;
 void rted_test1()
 {
@@ -34,7 +35,8 @@ void rted_test1()
     rna_tree rna2(b2, l2);
 
     rted r(rna1, rna2);
-    auto val = r.run_rted();
+    r.run_rted();
+    auto val = r.get_strategies();
 
 
     auto t1_id = rted::tree_type::child(rna1.tree_ptr->begin(), 0)->get_id();
@@ -57,7 +59,8 @@ void rted_test2()
     rna_tree rna2(b2, l2);
 
     rted r(rna1, rna2);
-    auto val = r.run_rted();
+    r.run_rted();
+    auto val = r.get_strategies();
 
 
     auto t1_id = rted::tree_type::child(rna1.tree_ptr->begin(), 0)->get_id();
@@ -81,6 +84,31 @@ void rted_tests()
     logger.info("END tests");
 }
 
+void gted_test1()
+{
+    APP_DEBUG_FNAME;
+
+    /*string b1, l1, b2, l2;
+    l1 = LABELS1;
+    b1 = BRACKETS1;
+    l2 = LABELS22;
+    b2 = BRACKETS22;
+
+    rna_tree rna1(b1, l1);
+    rna_tree rna2(b2, l2);
+    rna1.set_ids_postorder();
+    rna2.set_ids_postorder();
+    
+    gted g(rna1, rna2);
+    */
+}
+
+void gted_tests()
+{
+    APP_DEBUG_FNAME;
+
+    gted_test1();
+}
 
 
 

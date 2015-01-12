@@ -73,10 +73,48 @@ struct Global
 
 extern log4cpp::Category& logger; // globalna premenna...
 
-#ifndef APP_DEBUG_FNAME
-#define APP_DEBUG_FNAME logger.debug("Entering function: %s", __PRETTY_FUNCTION__)
-#endif
 
+class set_logger_priority_to_return_function
+{
+public:
+    set_logger_priority_to_return_function(log4cpp::Priority::Value new_priority)
+    {
+        old_priority = logger.getPriority();
+        logger.setPriority(new_priority);
+    }
+    ~set_logger_priority_to_return_function()
+    {
+        logger.setPriority(old_priority);
+    }
+
+private:
+    log4cpp::Priority::Value old_priority;
+};
+
+
+#define APP_DEBUG_FNAME logger.debug("Entering function: %s", __PRETTY_FUNCTION__)
+
+#define SUBTREE_DEBUG_PRINT(tree, iterator) \
+        { \
+            std::stringstream stream; \
+            kptree::print_subtree_bracketed(tree, iterator, stream); \
+            logger.debug("SUBTREE: %s", stream.str().c_str()); \
+        }
+
+#define TREE_DEBUG_PRINT(tree) \
+        { \
+            std::stringstream stream; \
+            kptree::print_tree_bracketed(tree, stream); \
+            logger.debug("TREE: %s", stream.str().c_str()); \
+        }
+
+#define LOGGER_PRINT_CONTAINER(container, name) \
+        { \
+            std::stringstream stream; \
+            for (auto __value : container) \
+                stream << __value << " "; \
+            logger.debug(name": %s", stream.str().c_str()); \
+        }
 
 
 #endif /* !TYPES_HPP */

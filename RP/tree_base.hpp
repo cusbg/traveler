@@ -30,6 +30,12 @@
 #include <sstream>
 
 
+template <typename iterator>
+const char* label(iterator it);
+
+template <typename iterator>
+size_t id(iterator it);
+
 
 template <typename node_type>
 class tree_base
@@ -55,32 +61,39 @@ public:
     virtual ~tree_base() = default;
     template<typename labels_array>
         tree_base(const std::string& brackets, const labels_array& l);
-
-    
-    /* return most_left child in tree */
-    iterator leftmost_child() const;
-    /* return most_right child in tree */
-    iterator rightmost_child() const;
+    /** for each node in postorder calls node.reset_id() => node_ids became post_ordered */
+    void set_ids_postorder();
 
 public: /* STATIC functions: */
     // POZOR! treba brat/vracat take iste typy ako povodne funkcie pre tree_type..
 
-    /* return parent of it in tree */
+    /** return parent of it in tree */
     template <typename iter>
-    static iter parent(iter it);
-    /* return n-th child of it */
+        static iter parent(iter it);
+    /** return n-th child of it */
     static sibling_iterator child(const base_iterator& it, size_t n);
 
+    /** return it.child(0) */
     template <typename iter>
-    static iter first_child(iter it);
+        static iter first_child(iter it);
+    /** return it.child(it.number_of_children - 1) */
     template <typename iter>
-    static iter last_child(iter it);
+        static iter last_child(iter it);
 
+    /**
+     * return leftmost child in subtree rooted in it (=> it can be it itself)
+     */
+    static iterator leftmost_child(iterator it);
+    /**
+     * return rightmost child in subtree rooted in it (=> it can be it itself)
+     */
+    static iterator rightmost_child(iterator it);
 
-    /* is first child of parent */
+    /** is first child of its parent */
     static bool is_first_child(const base_iterator& it);
-    /* is last child of parent */
+    /** is last child of its parent */
     static bool is_last_child(const base_iterator& it);
+    /** has no children */
     static bool is_leaf(const base_iterator& it);
 };
 
@@ -129,18 +142,30 @@ tree_base<node_type>::tree_base(std::shared_ptr<tree_type> _tree_ptr, sibling_it
 {}
 
 template <typename node_type>
-typename tree_base<node_type>::iterator tree_base<node_type>::leftmost_child() const
+void tree_base<node_type>::set_ids_postorder()
 {
-    return tree_ptr->begin_post();
+    for (auto it = tree_ptr->begin_post(); it != tree_ptr->end_post(); ++it)
+        it->reset_id();
 }
 
+
+/* static */
 template <typename node_type>
-typename tree_base<node_type>::iterator tree_base<node_type>::rightmost_child() const
+typename tree_base<node_type>::iterator tree_base<node_type>::leftmost_child(iterator it)
 {
-    assert(tree_ptr->begin() != tree_ptr->end());
-    return --tree_ptr->end();
+    while (!is_leaf(it))
+        it = first_child(it);
+    return it;
 }
 
+/* static */
+template <typename node_type>
+typename tree_base<node_type>::iterator tree_base<node_type>::rightmost_child(iterator it)
+{
+    while (!is_leaf(it))
+        it = last_child(it);
+    return it;
+}
 
 
 /* static */
@@ -225,6 +250,12 @@ const char* label(iterator it)
     return it->get_label().c_str();
 }
 
+/* global function */
+template <typename iterator>
+size_t id(iterator it)
+{
+    return it->get_id();
+}
 
 #endif /* !TREE_BASE_HPP */
 

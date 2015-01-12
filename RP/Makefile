@@ -6,8 +6,8 @@
 
 
 CC = g++
-CFLAGS = -std=c++11 -c -Wall -g
-LFLAGS = -std=c++11 -Wall -g $(shell pkg-config --libs log4cpp)
+CFLAGS = -std=c++11 -c -Wall
+LFLAGS = -std=c++11 -Wall $(shell pkg-config --libs log4cpp)
 SHELL = /bin/bash
 
 BUILDDIR = build

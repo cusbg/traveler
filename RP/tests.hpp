@@ -24,6 +24,8 @@
 
 #include "types.hpp"
 #include "rted.hpp"
+#include "gted.hpp"
+
 
 // == figure 4, str. 337
 #define LABELS1      "1234565731"
@@ -38,6 +40,7 @@
 
 
 void rted_tests();
+void gted_tests();
 
 
 
