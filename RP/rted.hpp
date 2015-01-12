@@ -1,9 +1,24 @@
 /*
- * rted.hpp
+ * File: rted.hpp
+ *
  * Copyright (C) 2014 Richard Eliáš <richard@ba30.eu>
  *
- * Distributed under terms of the MIT license.
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
+
 
 #ifndef RTED_HPP
 #define RTED_HPP
@@ -24,32 +39,23 @@ const char* to_string(path_strategy p);
 
 class rted
 {
-#define RTED_VECTOR_T1_HEAVY_INDEX  0
-#define RTED_VECTOR_T2_HEAVY_INDEX  1
-#define RTED_VECTOR_T1_LEFT_INDEX   2
-#define RTED_VECTOR_T2_LEFT_INDEX   3
-#define RTED_VECTOR_T1_RIGHT_INDEX  4
-#define RTED_VECTOR_T2_RIGHT_INDEX  5
 
-private:
-    typedef tree<node_base<std::string>> tree_type;
-    typedef std::unordered_map<size_t, size_t> map_type;
+#define RTED_VECTOR_T1_LEFT_INDEX   0
+#define RTED_VECTOR_T2_LEFT_INDEX   1
+#define RTED_VECTOR_T1_RIGHT_INDEX  2
+#define RTED_VECTOR_T2_RIGHT_INDEX  3
+#define RTED_VECTOR_T1_HEAVY_INDEX  4
+#define RTED_VECTOR_T2_HEAVY_INDEX  5
+
+
+public:
     typedef std::unordered_map<size_t, std::unordered_map<size_t, 
                 std::pair<graph, path_strategy>>>
                     strategy_map_type;
-    /* return most_left child in tree */
-    tree_type::iterator most_left(const tree_type& t) const;
-    /* return most_right child in tree */
-    tree_type::iterator most_right(const tree_type& t) const;
-    /* return parent of it in tree */
-    tree_type::iterator parent(const tree_type::iterator& it) const;
-    /* is first child */
-    bool is_leftmost_child(const tree_type::iterator& it) const;
-    /* is last child */
-    bool is_rightmost_child(const tree_type::iterator& it) const;
-    const char* label(const tree_type::iterator& it) const;
-    bool is_leaf(tree_type::iterator_base it) const;
+    typedef tree_base<node_base<std::string>> tree_type;
+    typedef std::unordered_map<size_t, size_t> map_type;
 
+private:
     /* check if for each child of it, map contains it */
     void 
     check_map_contains_children(
@@ -190,8 +196,12 @@ private:
                     const map_type& m);
 
 public:
-    rted(const rna_tree& _t1, const rna_tree& _t2);
-    strategy_map_type run_rted();
+    rted(const tree_type& _t1, const tree_type& _t2);
+    void run_rted();
+    const strategy_map_type& get_strategies() const { return STR; }
+    const map_type& get_t1_sizes() const { return T1_Size; }
+    const map_type& get_t2_sizes() const { return T2_Size; }
+
 
 private:
     tree_type t1;
@@ -242,20 +252,6 @@ private:
 
     strategy_map_type STR;
 };
-
-//#define NO_LOGGER_RTED_DEBUG_MESSAGES
-
-#ifndef NO_LOGGER_RTED_DEBUG_MESSAGES
-
-#define LOGGER_DEBUG_RTED_INIT
-#define LOGGER_DEBUG_RTED_UPDATE_TABLE
-#define LOGGER_DEBUG_RTED_COMPUTE_DECOMPOSITION
-#define LOGGER_DEBUG_RTED_COMPUTE_SUBFOREST
-#define LOGGER_DEBUG_RTED_COMPUTE_SIZE
-#define LOGGER_DEBUG_RTED_STRATEGY_MIN_VECTOR
-#define LOGGER_DEBUG_RTED_STRATEGY
-
-#endif
 
 #endif /* !RTED_HPP */
 

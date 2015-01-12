@@ -6,8 +6,9 @@
 
 
 CC = g++
-CFLAGS = -std=c++11 -c -Wall -g
-LFLAGS = -std=c++11 -Wall -g $(shell pkg-config --libs log4cpp)
+CFLAGS = -std=c++11 -c -Wall
+LFLAGS = -std=c++11 -Wall $(shell pkg-config --libs log4cpp)
+SHELL = /bin/bash
 
 BUILDDIR = build
 
@@ -17,7 +18,7 @@ HEADERS = $(shell find ./ -name "*.hpp" | sed 's@\./@@g')
 OBJECTS = $(SOURCES:%.cpp=%.o)
 MAKEFILES = $(SOURCES:%.cpp=%.mk)
 
-MAKEDEPENDENCY = $(CC) -MM -E -std=c++11
+MAKEDEPENDENCY = $(CC) -MM -E 
 
 
 run: build
@@ -64,7 +65,7 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 $(BUILDDIR)/%.mk: %.cpp
 	@mkdir -p $(BUILDDIR)
 	@rm -f $@
-	@$(MAKEDEPENDENCY) $^ | sed 's@\([^. :]*.\([hc]pp\|hh\)\)@../\1@g' \
+	@$(MAKEDEPENDENCY) $(CFLAGS) $^ | sed 's@\([^. :]*.\([hc]pp\|hh\)\)@../\1@g' \
 					>> $@
 	@echo '	$(CC) $(CFLAGS) $$< -o $$@ ' \
 					>> $@
@@ -73,9 +74,9 @@ $(BUILDDIR)/%.mk: %.cpp
 clean:
 	rm -rf $(BUILDDIR)
 
-cleanmk:
+cleanMK:
 	rm -f $(BUILDDIR)/*.mk Makefile
 
-.PHONY: $(BUILDDIR)/Makefile clean
+.PHONY: $(BUILDDIR)/Makefile clean cleanMK
 
 
