@@ -67,6 +67,13 @@ public:
     /** for each node in postorder calls node.reset_id() => node_ids became post_ordered */
     void set_ids_postorder();
 
+public:
+    // .begin() a .end() funkcie z tree<>
+    iterator begin() const;
+    iterator end() const;
+    post_order_iterator begin_post() const;
+    post_order_iterator end_post() const;
+    // + reverzny post_order
     reverse_post_order_iterator begin_post_reverse() const;
     reverse_post_order_iterator end_post_reverse() const;
 
@@ -104,6 +111,8 @@ public: /* STATIC functions: */
 
 };
 
+
+// CONSTRUCTORS: 
 
 template <typename node_type> 
 template <typename labels_array>
@@ -154,6 +163,69 @@ void tree_base<node_type>::set_ids_postorder()
         it->reset_id();
 }
 
+// ITERATORS:
+
+/* normal iterators + post_order iterators returns tree_ptr->FUNCT_NAME()..  */
+template <typename node_type>
+typename tree_base<node_type>::iterator tree_base<node_type>::begin() const
+{
+    return tree_ptr->begin();
+}
+
+template <typename node_type>
+typename tree_base<node_type>::iterator tree_base<node_type>::end() const
+{
+    return tree_ptr->end();
+}
+
+template <typename node_type>
+typename tree_base<node_type>::post_order_iterator tree_base<node_type>::begin_post() const
+{
+    return tree_ptr->begin_post();
+}
+
+template <typename node_type>
+typename tree_base<node_type>::post_order_iterator tree_base<node_type>::end_post() const
+{
+    return tree_ptr->end_post();
+}
+
+/* reverse iterator .begin() and .end(): */
+template <typename node_type>
+typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>::begin_post_reverse() const
+{
+    //// z tree<>::begin_post():
+    //
+	//tree_node *tmp=head->next_sibling;
+	//if(tmp!=feet) {
+		//while(tmp->first_child)
+			//tmp=tmp->first_child;
+		//}
+	//return post_order_iterator(tmp);
+    
+    tree_node* tmp = tree_ptr->head->next_sibling;
+    if (tmp != tree_ptr->feet)
+    {
+        while(tmp->last_child)
+            tmp = tmp->last_child;
+    }
+    return reverse_post_order_iterator(base_iterator(tmp));
+}
+
+template <typename node_type>
+typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>::end_post_reverse() const
+{
+    //// z tree<>::end_post():
+    //
+	//return post_order_iterator(feet);
+    //
+    //// Ja idem vzdy do .prev_sibling v ++ => nakoniec dojdem do .head
+    
+    return reverse_post_order_iterator(base_iterator(tree_ptr->head));
+}
+
+
+// STATIC FUNCTIONS:
 
 /* static */
 template <typename node_type>
@@ -248,6 +320,7 @@ bool tree_base<node_type>::is_leaf(const base_iterator& it)
 }
 
 
+// GLOBAL FUNCTIONS:
 
 /* global function */
 template <typename iterator>
@@ -281,6 +354,8 @@ public:
     _reverse_post_order_iterator   operator++(int);
     _reverse_post_order_iterator&  operator++();
 };
+
+// REVERSE POST ORDER ITERATOR FUNCTIONS:
 
 /* _reverse_post_order_iterator class functions: */
 template <typename node_type>
@@ -360,40 +435,6 @@ typename tree_base<node_type>::_reverse_post_order_iterator& tree_base<node_type
     return *this;
 }
 
-
-/* reverse iterator .begin() and .end(): */
-template <typename node_type>
-typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>::begin_post_reverse() const
-{
-    //// z tree<>::begin_post():
-    //
-	//tree_node *tmp=head->next_sibling;
-	//if(tmp!=feet) {
-		//while(tmp->first_child)
-			//tmp=tmp->first_child;
-		//}
-	//return post_order_iterator(tmp);
-    
-    tree_node* tmp = tree_ptr->head->next_sibling;
-    if (tmp != tree_ptr->feet)
-    {
-        while(tmp->last_child)
-            tmp = tmp->last_child;
-    }
-    return reverse_post_order_iterator(base_iterator(tmp));
-}
-
-template <typename node_type>
-typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>::end_post_reverse() const
-{
-    //// z tree<>::end_post():
-    //
-	//return post_order_iterator(feet);
-    //
-    //// Ja idem vzdy do .prev_sibling v ++ => nakoniec dojdem do .head
-    
-    return reverse_post_order_iterator(base_iterator(tree_ptr->head));
-}
 
 
 
