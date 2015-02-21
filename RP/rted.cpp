@@ -545,7 +545,7 @@ void rted::run_rted()
 
     logger.notice("RTED: BEGIN");
     logger.notice("computing full_decomposition & relevant_subforests for T2");
-    for (auto it2 = t2.tree_ptr->begin_post(); it2 != t2.tree_ptr->end_post(); ++it2)
+    for (auto it2 = t2.begin_post(); it2 != t2.end_post(); ++it2)
     {
         compute_full_decomposition(t2, it2, T2_A, T2_ALeft, T2_ARight);
         compute_relevant_subforrests(t2, it2, T2_FLeft, T2_FRight, T2_Size);
@@ -555,7 +555,7 @@ void rted::run_rted()
     logger.notice("full_decomposition & relevant_subforests for T1 will be computed in main cycle..");
     logger.notice("starting main algorithm cycle");
 
-    for (auto it1 = t1.tree_ptr->begin_post(); it1 != t1.tree_ptr->end_post(); ++it1)
+    for (auto it1 = t1.begin_post(); it1 != t1.end_post(); ++it1)
     {
         if (it1->is_root())
             break;
@@ -567,7 +567,7 @@ void rted::run_rted()
         T2_Rw.clear();
         T2_Hw_partials.clear();
 
-        for (auto it2 = t2.tree_ptr->begin_post(); it2 != t2.tree_ptr->end_post(); ++it2)
+        for (auto it2 = t2.begin_post(); it2 != t2.end_post(); ++it2)
         {
             if (it2->is_root())
                 break;

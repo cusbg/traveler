@@ -163,6 +163,7 @@ void tree_base<node_type>::set_ids_postorder()
         it->reset_id();
 }
 
+
 // ITERATORS:
 
 /* normal iterators + post_order iterators returns tree_ptr->FUNCT_NAME()..  */
