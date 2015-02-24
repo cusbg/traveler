@@ -66,38 +66,26 @@ int main(int argc, char** argv)
     l2 = LABELS22;
     b2 = BRACKETS22;
 
-    l1 = "1231";
-    b1 = "(..)";
+    //l1 = "1231";
+    //b1 = "(..)";
+
+    l1 = "1a23241";
+    b1 = "(.(.).)";
+
+    l2 = "121";
+    b2 = "(.)";
+
+
 
     rna_tree rna1(b1, l1);
     rna_tree rna2(b2, l2);
     rna1.set_ids_postorder();
     rna2.set_ids_postorder();
-/*
-    for (auto it = rna1.tree_ptr->begin_post(); it != rna1.tree_ptr->end_post(); ++it)
-        cout << it->get_label() << "	" << it->get_id() << endl;
-    for (auto it = rna2.tree_ptr->begin_post(); it != rna2.tree_ptr->end_post(); ++it)
-        cout << it->get_label() << "	" << it->get_id() << endl;
 
-    return 0;
-*/
-    //cout << rna1.rightmost_child(rna1.tree_ptr->begin())->get_label() << endl;
-    //return 0;
-/*
-    TREE_DEBUG_PRINT(*rna2.tree_ptr, rna2.tree_ptr->begin());
-    cout << "size: " << rna2.tree_ptr->size() << endl;
-
-    auto it = rna2.tree_ptr->begin();
-    while (it != rna2.tree_ptr->end())
-    {
-        cout << it->get_label() << endl;
-
-        ++it;
-    }
-
-
-    return 0;
-*/
+    rna_tree::post_order_iterator it = rna1.begin_post_reverse();
+    while (it != rna1.end_post())
+        cout << *it++ << " ";
+    cout << endl;
 
     gted g(rna1, rna2);
     g.run_gted();

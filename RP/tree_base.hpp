@@ -66,6 +66,8 @@ public:
         tree_base(const std::string& brackets, const labels_array& l);
     /** for each node in postorder calls node.reset_id() => node_ids became post_ordered */
     void set_ids_postorder();
+    void print_subtree(iterator root) const;
+    void print_tree() const;
 
 public:
     // .begin() a .end() funkcie z tree<>
@@ -83,6 +85,8 @@ public: /* STATIC functions: */
     /** return parent of it in tree */
     template <typename iter>
         static iter parent(iter it);
+    /** return parent of it in tree */
+    static reverse_post_order_iterator parent(reverse_post_order_iterator it);
     /** return n-th child of it */
     static sibling_iterator child(const base_iterator& it, size_t n);
 
@@ -108,7 +112,6 @@ public: /* STATIC functions: */
     static bool is_last_child(const base_iterator& it);
     /** has no children */
     static bool is_leaf(const base_iterator& it);
-
 };
 
 
@@ -154,13 +157,33 @@ tree_base<node_type>::tree_base(const std::string& brackets, const labels_array&
 template <typename node_type>
 tree_base<node_type>::tree_base(std::shared_ptr<tree_type> _tree_ptr, sibling_iterator _tree_head)
     : tree_ptr(_tree_ptr)
-{}
+{
+    std::stringstream stream; \
+    kptree::print_tree_bracketed(*tree_ptr, stream); \
+    logger.debug("TREE: %s", stream.str().c_str()); \
+}
+
+// PUBLIC FUNCTIONS:
 
 template <typename node_type>
 void tree_base<node_type>::set_ids_postorder()
 {
     for (auto it = tree_ptr->begin_post(); it != tree_ptr->end_post(); ++it)
         it->reset_id();
+}
+
+template <typename node_type>
+void tree_base<node_type>::print_subtree(iterator root) const
+{
+    std::stringstream stream;
+    kptree::print_subtree_bracketed(*tree_ptr, root, stream);
+    logger.debug("%s", stream.str().c_str());
+}
+
+template <typename node_type>
+void tree_base<node_type>::print_tree() const
+{
+    print_subtree(begin());
 }
 
 
@@ -246,6 +269,12 @@ typename tree_base<node_type>::iterator tree_base<node_type>::rightmost_child(it
     return it;
 }
 
+/* static */
+template <typename node_type>
+typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>::parent(reverse_post_order_iterator it)
+{
+    return reverse_post_order_iterator(parent(iterator(it)));
+}
 
 /* static */
 template <typename node_type>
@@ -321,24 +350,7 @@ bool tree_base<node_type>::is_leaf(const base_iterator& it)
 }
 
 
-// GLOBAL FUNCTIONS:
-
-/* global function */
-template <typename iterator>
-const char* label(iterator it)
-{
-    return it->get_label().c_str();
-}
-
-/* global function */
-template <typename iterator>
-size_t id(iterator it)
-{
-    return it->get_id();
-}
-
-
-/* inner function */
+/* inner class postorder iterator */
 template <typename node_type>
 class tree_base<node_type>::_reverse_post_order_iterator : public tree_base<node_type>::tree_type::iterator_base
 {
@@ -438,6 +450,25 @@ typename tree_base<node_type>::_reverse_post_order_iterator& tree_base<node_type
 
 
 
+// GLOBAL FUNCTIONS:
+
+/* global function */
+template <typename iterator>
+const char* label(iterator it)
+{
+    if (it.node == NULL)
+        return "<null>";
+    return it->get_label().c_str();
+}
+
+/* global function */
+template <typename iterator>
+size_t id(iterator it)
+{
+    if (it.node == NULL)
+        throw "NULL iterator";
+    return it->get_id();
+}
 
 #endif /* !TREE_BASE_HPP */
 
