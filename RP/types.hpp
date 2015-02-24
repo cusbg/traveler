@@ -91,8 +91,14 @@ private:
     log4cpp::Priority::Value old_priority;
 };
 
+#define DEBUG(...) \
+    logger.debug(__VA_ARGS__);
 
-#define APP_DEBUG_FNAME logger.debug("Entering function: %s", __PRETTY_FUNCTION__)
+#define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
+    set_logger_priority_to_return_function __value(log4cpp::Priority::PRIORITY)
+
+#define APP_DEBUG_FNAME \
+    logger.debug("Entering function: %s", __PRETTY_FUNCTION__)
 
 #define SUBTREE_DEBUG_PRINT(tree, iterator) \
         { \
