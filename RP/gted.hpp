@@ -50,6 +50,7 @@ class gted
         tree_type::reverse_post_order_iterator left;    // included
         tree_type::post_order_iterator right;           // included
         tree_type::iterator root;
+        tree_type::iterator path_node;
 
         bool operator==(const subtree& other) const;
         struct hash
@@ -98,10 +99,17 @@ private:
                                 subtree_pairs p) const;
     void init_tree_dist_table();
 
-    void compute_forrest_distances(forest_distance_table& table,
+    void compute_forest_distances_recursive(
+                                            tree_type::iterator root1,
+                                            tree_type::iterator root2);
+    void compute_forest_distances(forest_distance_table& table,
                                     subtree_pairs p);
+    void fill_tables(forest_distance_table& table,
+                    const subtree_pairs& roots,
+                    const subtree_pairs& prevs);
 
 
+    void print_FDist(const forest_distance_table& table) const;
 private:
     tree_type t1;
     tree_type t2;

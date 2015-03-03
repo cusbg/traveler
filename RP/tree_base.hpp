@@ -79,6 +79,7 @@ public:
     reverse_post_order_iterator begin_post_reverse() const;
     reverse_post_order_iterator end_post_reverse() const;
 
+    //TODO: skontrolovat ci templaty funguju aj pre reverse_post_order_iterator.. 
 public: /* STATIC functions: */
     // POZOR! treba brat/vracat take iste typy ako povodne funkcie pre tree_type..
 
