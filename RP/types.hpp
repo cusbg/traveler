@@ -92,7 +92,7 @@ private:
 };
 
 #define DEBUG(...) \
-    logger.debug(__VA_ARGS__);
+    logger.debug(__VA_ARGS__)
 
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
     set_logger_priority_to_return_function __value(log4cpp::Priority::PRIORITY)

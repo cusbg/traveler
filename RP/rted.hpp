@@ -49,8 +49,9 @@ class rted
 
 
 public:
+    typedef std::pair<graph, path_strategy> strategy_graph_pair_type;
     typedef std::unordered_map<size_t, std::unordered_map<size_t, 
-                std::pair<graph, path_strategy>>>
+                strategy_graph_pair_type>>
                     strategy_map_type;
     typedef tree_base<node_base<std::string>> tree_type;
     typedef std::unordered_map<size_t, size_t> map_type;

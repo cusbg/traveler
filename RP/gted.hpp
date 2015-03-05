@@ -28,7 +28,96 @@
 #include <unordered_map>
 
 
+class gted
+{
+private:
+    typedef rted::tree_type tree_type;
+    struct subforest
+    {
+        tree_type::reverse_post_order_iterator  left;
+        tree_type::post_order_iterator          right;
+        tree_type::iterator                     root;
+        tree_type::iterator                     path_node;
 
+        enum last_added {Lnode, Rnode, undef}   last = undef;
+
+        bool operator==(const subforest& other) const;
+        // hashovacia funkcia do mapy..
+        struct hash
+        {
+            size_t operator()(const subforest& s) const;
+        };
+    };
+    typedef std::unordered_map<subforest,
+            size_t, subforest::hash> _subforest_map_type;
+    typedef std::unordered_map<subforest,
+            _subforest_map_type, subforest::hash> forest_distance_table_type;
+    struct subforest_pairs
+    {
+        subforest f1;
+        subforest f2;
+    };
+    typedef std::unordered_map<size_t,
+            std::unordered_map<size_t, size_t>> tree_distance_table_type;
+    struct decomposition_type
+    {
+        typedef std::vector<tree_type::iterator> relevant_subtrees;
+        typedef std::vector<tree_type::iterator> path_type;
+
+        path_type path;
+        relevant_subtrees subtrees;
+    };
+public:
+    gted(const tree_type& _t1, const tree_type& _t2);
+    void run_gted();
+private:
+    decomposition_type path_decomposition(tree_type::iterator it,
+                                        const tree_type& t,
+                                        const rted::map_type& t_sizes,
+                                        path_strategy s) const;
+
+    size_t biggest_subtree_child(tree_type::iterator root,
+                                const tree_type& t,
+                                const rted::map_type& t_sizes) const;
+
+    void init_tree_dist_table();
+    void init_forest_dist_table(forest_distance_table_type& table,
+                                subforest_pairs p,
+                                graph who_first) const;
+
+    void compute_forest_distances_recursive(tree_type::iterator root1,
+                                            tree_type::iterator root2);
+    void compute_forest_distances(forest_distance_table_type& table,
+                                    subforest_pairs p
+                                    );
+    void fill_tables(forest_distance_table_type& table,
+                                const subforest_pairs& roots,
+                                const subforest_pairs& prevs
+                                );
+
+    inline void set_forest_distance_table_value(forest_distance_table_type& table,
+                                                const subforest& index1,
+                                                const subforest& index2,
+                                                size_t value,
+                                                graph who_first) const;
+    inline size_t get_forest_distance_table_value(const forest_distance_table_type& table,
+                                                const subforest& index1,
+                                                const subforest& index2,
+                                                graph who_first) const;
+
+    void print_TDist() const;
+    void print_FDist(const forest_distance_table_type& table) const;
+private:
+    tree_type t1;
+    tree_type t2;
+    rted::map_type t1_sizes;
+    rted::map_type t2_sizes;
+    rted::strategy_map_type strategies;
+    tree_distance_table_type tree_distances;
+};
+
+
+/*
 //template <typename tree_type>
 class gted
 {
@@ -51,6 +140,7 @@ class gted
         tree_type::post_order_iterator right;           // included
         tree_type::iterator root;
         tree_type::iterator path_node;
+        enum last_add {left_node, right_node} last;
 
         bool operator==(const subtree& other) const;
         struct hash
@@ -76,11 +166,13 @@ public:
     void run_gted();
     void print_distances() const;
 
+*/
+/*
 private:
-    /**
+    [>*
      * decompone tree t by path_strategy s
      * returns struct decomposition_type as pair (siblings of path_nodes; path_nodes)
-     */
+     <]
     decomposition_type
     path_decomposition(tree_type::iterator it,
                         const tree_type& t,
@@ -99,8 +191,7 @@ private:
                                 subtree_pairs p) const;
     void init_tree_dist_table();
 
-    void compute_forest_distances_recursive(
-                                            tree_type::iterator root1,
+    void compute_forest_distances_recursive(tree_type::iterator root1,
                                             tree_type::iterator root2);
     void compute_forest_distances(forest_distance_table& table,
                                     subtree_pairs p);
@@ -123,7 +214,7 @@ private:
 
 
 
-
+*/
 
 #endif /* !GTED_HPP */
 
