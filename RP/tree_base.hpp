@@ -28,6 +28,7 @@
 #include "tree_hh/tree_util.hh"
 #include <memory>
 #include <sstream>
+#include <stdexcept>
 
 
 template <typename iterator>
@@ -145,7 +146,10 @@ tree_base<node_type>::tree_base(const std::string& brackets, const labels_array&
                 tree_ptr->append_child(iter, _labels[i]);
                 break;
             default:
-                throw "EX";
+                std::string s = std::string() + "Tree constructor: invalid bracket character '"
+                    + brackets[i] + "' at index " + std::to_string(i);
+                std::invalid_argument ex(s);
+                throw ex;
         }
         ++i;
     }
@@ -467,7 +471,7 @@ template <typename iterator>
 size_t id(iterator it)
 {
     if (it.node == NULL)
-        throw "NULL iterator";
+        throw std::invalid_argument("NULL iterator");
     return it->get_id();
 }
 

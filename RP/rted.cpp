@@ -74,10 +74,10 @@ void rted::check_map_contains_children(const tree_type& t,
     auto ch = t.child(it, 0);
     for (; ch != ch.end(); ++ch)
     {
-        if (m.find(ch->get_id()) == m.end())
+        if (m.find(id(ch)) == m.end())
         {
             logger.error("tree_node[%u](=='%s') was not found in the map",
-                        ch->get_id(),
+                        id(ch),
                         label(ch));
             exit(1);
         }
@@ -94,7 +94,7 @@ void rted::compute_full_decomposition(const tree_type& t,
     check_map_contains_children(t, it, ALeft);
     check_map_contains_children(t, it, ARight);
 
-    size_t it_id = it->get_id();
+    size_t it_id = id(it);
     A[it_id]        = 1;
     ALeft[it_id]    = 1;
     ARight[it_id]   = 1;
@@ -105,7 +105,7 @@ void rted::compute_full_decomposition(const tree_type& t,
         auto ch = t.child(it, 0);
         while(ch != ch.end())
         {
-            size_t ch_id = ch->get_id();
+            size_t ch_id = id(ch);
             
             A.at(it_id)        += A.at(ch_id);
             ALeft.at(it_id)    += ALeft.at(ch_id);
@@ -114,7 +114,7 @@ void rted::compute_full_decomposition(const tree_type& t,
             auto ch2 = ch;
             ++ch2;
             for (; ch2 != ch2.end(); ++ch2)
-                A.at(it_id) += ALeft.at(ch_id) * ARight.at(ch2->get_id());
+                A.at(it_id) += ALeft.at(ch_id) * ARight.at(id(ch2));
 
             ++ch;
         }
@@ -137,13 +137,13 @@ void rted::compute_subtree_size(const tree_type& t,
                                 map_type& m)
 {
     check_map_contains_children(t, it, m);
-    size_t it_id = it->get_id();
+    size_t it_id = id(it);
 
     m[it_id] = 1;
     if (!tree_type::is_leaf(it))
     {
         for (auto ch = t.child(it, 0); ch != ch.end(); ++ch)
-            m.at(it_id) += m.at(ch->get_id());
+            m.at(it_id) += m.at(id(ch));
     }
 
 #ifdef LOGGER_DEBUG_RTED_COMPUTE_SIZE
@@ -169,7 +169,7 @@ void rted::compute_relevant_subforrests(const tree_type& t,
     //      + sum(size(children_right) + F[children_right]) 
     //          // child_left == first_child (==1); children_right == 2..n
 
-    size_t it_id = it->get_id();
+    size_t it_id = id(it);
     FLeft[it_id]   = 1;
     FRight[it_id]  = 1;
 
@@ -178,10 +178,10 @@ void rted::compute_relevant_subforrests(const tree_type& t,
         auto ch = t.child(it, 0);
 
         // FLeft
-        FLeft.at(it_id) += FLeft.at(ch->get_id());  // == leftmost
+        FLeft.at(it_id) += FLeft.at(id(ch));  // == leftmost
         ++ch;
         for (; ch != ch.end(); ++ch)
-            FLeft.at(it_id) += Size.at(ch->get_id()) + FLeft.at(ch->get_id());
+            FLeft.at(it_id) += Size.at(id(ch)) + FLeft.at(id(ch));
 
         // FRight
         ch = t.child(it, 0);
@@ -191,9 +191,9 @@ void rted::compute_relevant_subforrests(const tree_type& t,
             ++ch2;
 
             for (; ch2 != ch2.end(); ++ch2, ++ch) // == ch != --ch.end()
-                FRight.at(it_id) += Size.at(ch->get_id()) + FRight.at(ch->get_id());
+                FRight.at(it_id) += Size.at(id(ch)) + FRight.at(id(ch));
             assert(ch2 == ch2.end());
-            FRight.at(it_id) += FRight.at(ch->get_id());
+            FRight.at(it_id) += FRight.at(id(ch));
         }
     }
 
@@ -211,8 +211,8 @@ void rted::update_T2_LR_w_tables(tree_type::iterator it,
                                 size_t c_min)
 {
 
-    size_t it_id = it->get_id();
-    size_t parent_id = tree_type::parent(it)->get_id();
+    size_t it_id = id(it);
+    size_t parent_id = id(tree_type::parent(it));
     
     get_value(it_id, T2_Lw);
     get_value(it_id, T2_Rw);
@@ -242,9 +242,9 @@ void rted::update_T1_LR_v_tables(tree_type::iterator it1,
                                 tree_type::iterator it2, 
                                 size_t c_min)
 {
-    size_t it1_id = it1->get_id();
-    size_t it2_id = it2->get_id();
-    size_t parent1_id = tree_type::parent(it1)->get_id();
+    size_t it1_id = id(it1);
+    size_t it2_id = id(it2);
+    size_t parent1_id = id(tree_type::parent(it1));
 
     get_value(it1_id, it2_id, T1_Lv);
     get_value(it1_id, it2_id, T1_Rv);
@@ -275,8 +275,8 @@ void rted::update_T1_LR_v_tables(tree_type::iterator it1,
 void rted::update_T2_H_w_table(tree_type::iterator it, 
                                 size_t c_min)
 {
-    size_t it_id = it->get_id();
-    size_t parent_id = tree_type::parent(it)->get_id();
+    size_t it_id = id(it);
+    size_t parent_id = id(tree_type::parent(it));
 
     get_value(it_id, T2_Hw);
     // ^^ == test ci je inicializovana hodnota..
@@ -309,9 +309,9 @@ void rted::update_T1_H_v_table(tree_type::iterator it1,
                                 tree_type::iterator it2, 
                                 size_t c_min)
 {
-    size_t it1_id = it1->get_id();
-    size_t it2_id = it2->get_id();
-    size_t parent1_id = tree_type::parent(it1)->get_id();
+    size_t it1_id = id(it1);
+    size_t it2_id = id(it2);
+    size_t parent1_id = id(tree_type::parent(it1));
 
     get_value(it1_id, it2_id, T1_Hv);
     // ^^ == test ci je inicializovana hodnota..
@@ -346,8 +346,8 @@ void rted::init_T1_LRH_v_tables(tree_type::iterator it1,
 {
     assert(tree_type::is_leaf(it1));
 
-    size_t it1_id = it1->get_id();
-    size_t it2_id = it2->get_id();
+    size_t it1_id = id(it1);
+    size_t it2_id = id(it2);
 
     T1_Lv[it1_id] =
         T1_Rv[it1_id] =
@@ -368,7 +368,7 @@ void rted::init_T2_LRH_w_tables(tree_type::iterator it)
 {
     assert(tree_type::is_leaf(it));
 
-    size_t it_id = it->get_id();
+    size_t it_id = id(it);
 
     T2_Lw[it_id] =
         T2_Rw[it_id] = 
@@ -410,8 +410,8 @@ size_t rted::update_STR_table(tree_type::iterator it1,
                             tree_type::iterator it2)
 {
     vector<size_t> vec(6, 0xBADF00D);
-    size_t it1_id = it1->get_id();
-    size_t it2_id = it2->get_id();
+    size_t it1_id = id(it1);
+    size_t it2_id = id(it2);
 
     // compute C from rted_opt_strategy(F,G), linex 7-12
 
@@ -488,38 +488,6 @@ size_t rted::update_STR_table(tree_type::iterator it1,
             exit(1);
     }
 
-/*
-    switch (index)
-    {
-        case RTED_VECTOR_T1_HEAVY_INDEX:
-            STR[it1_id][it2_id].first = graph::T1;
-            STR[it1_id][it2_id].second = path_strategy::heavy;
-            break;
-        case RTED_VECTOR_T2_HEAVY_INDEX:
-            STR[it1_id][it2_id].first = graph::T2;
-            STR[it1_id][it2_id].second = path_strategy::heavy;
-            break;
-        case RTED_VECTOR_T1_LEFT_INDEX:
-            STR[it1_id][it2_id].first = graph::T1;
-            STR[it1_id][it2_id].second = path_strategy::left;
-            break;
-        case RTED_VECTOR_T2_LEFT_INDEX:
-            STR[it1_id][it2_id].first = graph::T2;
-            STR[it1_id][it2_id].second = path_strategy::left;
-            break;
-        case RTED_VECTOR_T1_RIGHT_INDEX:
-            STR[it1_id][it2_id].first = graph::T1;
-            STR[it1_id][it2_id].second = path_strategy::right;
-            break;
-        case RTED_VECTOR_T2_RIGHT_INDEX:
-            STR[it1_id][it2_id].first = graph::T2;
-            STR[it1_id][it2_id].second = path_strategy::right;
-            break;
-        default:
-            logger.error("i should not be there, %lu == c_min_index != 0..5", index);
-            exit(1);
-    }
-*/
 
 #ifdef LOGGER_DEBUG_RTED_STRATEGY
 
