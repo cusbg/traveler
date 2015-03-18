@@ -58,11 +58,10 @@ public:
 
 private:
     /* check if for each child of it, map contains it */
-    void 
-    check_map_contains_children(
-                const tree_type& t,
-                tree_type::iterator it,
-                const map_type& m) const;
+    void check_map_contains_children(
+                                    const tree_type& t,
+                                    tree_type::iterator it,
+                                    const map_type& m) const;
 
     /* 
      * upgrade full_decomposition tables
@@ -196,6 +195,8 @@ private:
     size_t get_value(size_t index, 
                     const map_type& m);
 
+    void print_strategies() const;
+
 public:
     rted(const tree_type& _t1, const tree_type& _t2);
     void run_rted();
@@ -209,27 +210,32 @@ private:
     tree_type t2;
     
               //tables for A(Gw), .., F(Gw), ..
-    map_type  T1_ALeft,
-              T1_ARight,
-              T1_A,
+    map_type
+                // A* = decomposition tables.
+                // ALeft/ARight == left/right decomposition
+                T1_ALeft,
+                T1_ARight,
+                T1_A,
               
-              T2_ALeft,
-              T2_ARight,
-              T2_A,
-              
-              T1_FLeft,
-              T1_FRight,
-              
-              T2_FLeft,
-              T2_FRight,
+                T2_ALeft,
+                T2_ARight,
+                T2_A,
 
-              T1_Size,
-              T2_Size,
-              
-              //main loop, {L,R,H}w
-              T2_Lw,
-              T2_Rw,
-              T2_Hw;
+                // F* = relevant subforests tables
+                T1_FLeft,
+                T1_FRight,
+                
+                T2_FLeft,
+                T2_FRight,
+               
+                // subtree sizes
+                T1_Size,
+                T2_Size,
+                
+                //main loop, {L,R,H}w
+                T2_Lw,
+                T2_Rw,
+                T2_Hw;
 
     // 2D maps: _map[v_id][w_id] == value
     std::unordered_map<size_t, map_type> 

@@ -26,6 +26,7 @@
 #include <set>
 #include <algorithm>
 #include <math.h>
+#include <iomanip>
 
 using namespace std;
 
@@ -63,6 +64,26 @@ rted::rted(const tree_type& _t1, const tree_type& _t2)
     : t1(_t1), t2(_t2)
 {
     APP_DEBUG_FNAME;
+}
+
+void rted::print_strategies() const
+{
+    APP_DEBUG_FNAME;
+    stringstream out;
+    out << "STRATEGY MAP:" << endl;
+    int odsadenie = 15;
+    for (tree_type::post_order_iterator it1 = t1.begin_post(); !it1->is_root(); ++it1)
+    {
+        for (tree_type::post_order_iterator it2 = t2.begin_post(); !it2->is_root(); ++it2)
+        {
+            string s = string() + "[" + label(it1) + "," + label(it2) + "]";
+            out << setw(odsadenie) << s;
+            auto val = STR.at(id(it1)).at(id(it2));
+            out << setw(5) << to_string(val.first) << setw(10) << to_string(val.second) << endl;
+        }
+        out << endl;
+    }
+    logger.debugStream() << out.str();
 }
 
 void rted::check_map_contains_children(const tree_type& t,
@@ -557,9 +578,9 @@ void rted::run_rted()
     }
     logger.notice("RTED: END");
 
+    print_strategies();
     //return STR;
 }
-
 
 
 

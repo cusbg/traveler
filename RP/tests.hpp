@@ -24,7 +24,7 @@
 
 #include "types.hpp"
 #include "rted.hpp"
-#include "gted.hpp"
+//#include "gted.hpp"
 
 
 // == figure 4, str. 337

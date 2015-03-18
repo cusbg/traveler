@@ -32,15 +32,20 @@
 
 
 template <typename iterator>
-const char* label(iterator it);
+inline const char* label(iterator it);
 
 template <typename iterator>
-size_t id(iterator it);
+inline size_t id(iterator it);
 
 
 template <typename node_type>
 class tree_base
 {
+private:
+    static size_t ID;
+    size_t id = ID++;
+    // do korena posadi vrchol ROOT_id
+
 private:
     typedef tree<node_type> tree_type;
     class _reverse_post_order_iterator;
@@ -117,6 +122,14 @@ public: /* STATIC functions: */
 };
 
 
+
+// STATIC member ID init
+/* static */
+template <typename node_type>
+size_t tree_base<node_type>::ID = 0;
+
+
+
 // CONSTRUCTORS: 
 
 template <typename node_type> 
@@ -125,7 +138,7 @@ tree_base<node_type>::tree_base(const std::string& brackets, const labels_array&
 {
     assert(brackets.size() == _labels.size());
     
-    tree_ptr = std::make_shared<tree_type>(node_type("ROOT", true));
+    tree_ptr = std::make_shared<tree_type>(node_type("ROOT_" + std::to_string(id), true));
     auto iter = tree_ptr->begin();
     size_t i = 0;
     while(i < brackets.size())
@@ -471,7 +484,7 @@ template <typename iterator>
 size_t id(iterator it)
 {
     if (it.node == NULL)
-        throw std::invalid_argument("NULL iterator");
+        throw std::invalid_argument("id(): NULL iterator");
     return it->get_id();
 }
 
