@@ -68,24 +68,33 @@ int main(int argc, char** argv)
 
     //l1 = "1231";
     //b1 = "(..)";
-    l1 = "1234351";
-    b1 = "(.(.).)";
+    //l1 = "1234351";
+    //b1 = "(.(.).)";
 
-    l2 = "ABCDCA";
-    b2 = "(.(.))";
+    //l2 = "ABCDCA";
+    //b2 = "(.(.))";
+
+    l1 = "5142345";
+    b1 = "(.(..))";
+
+    l2 = "EABDE";
+    b2 = "(...)";
 
     //b2 = "(" + readbrackets() + ")";
     //l2 = "0" + readseq() + "0";
 
 
-    rna_tree rna1("(" + b1 + ")", "." + l1 + ".");
-    rna_tree rna2("(" + b2 + ")", "," + l2 + ",");
+    //rna_tree rna1("(" + b1 + ")", "." + l1 + ".");
+    //rna_tree rna2("(" + b2 + ")", "," + l2 + ",");
+    rna_tree rna1(b1, l1);
+    rna_tree rna2(b2, l2);
     rna1.set_ids_postorder();
     rna2.set_ids_postorder();
 
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
     //rted r(rna1, rna2);
     //r.run_rted();
+    //return 0;
+    //
     //auto s1 = r.get_t2_sizes();
     //for (auto val : s1)
         //cout << val.second << endl;

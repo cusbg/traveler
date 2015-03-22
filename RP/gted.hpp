@@ -31,6 +31,7 @@
 class gted
 {
 private:
+public: // TODO remove:
     typedef rted::tree_type tree_type;
     struct subforest
     {
@@ -52,33 +53,37 @@ private:
             size_t, subforest::hash> _subforest_map_type;
     typedef std::unordered_map<subforest,
             _subforest_map_type, subforest::hash> forest_distance_table_type;
-    struct subforest_pairs
+    struct subforest_pair
     {
         subforest f1;
         subforest f2;
     };
     typedef std::unordered_map<size_t,
             std::unordered_map<size_t, size_t>> tree_distance_table_type;
-    struct decomposition_type
+    struct heavy_paths_tables
     {
-        typedef std::vector<tree_type::iterator> relevant_subtrees;
-        typedef std::vector<tree_type::iterator> path_type;
+        /* ku kazdemu id vrati list na konci decomposition_path */
+        typedef std::unordered_map<size_t,
+                tree_type::iterator> table_type;
 
-        path_type path;
-        relevant_subtrees subtrees;
+        table_type T1_heavy;
+        table_type T2_heavy;
+    };
+    struct iterator_pair
+    {
+        tree_type::iterator it1;
+        tree_type::iterator it2;
     };
 public:
     gted(const tree_type& _t1, const tree_type& _t2);
     void run_gted();
 private:
+
+/*
     decomposition_type path_decomposition(tree_type::iterator it,
                                         const tree_type& t,
                                         const rted::map_type& t_sizes,
                                         path_strategy s) const;
-
-    size_t biggest_subtree_child(tree_type::iterator root,
-                                const tree_type& t,
-                                const rted::map_type& t_sizes) const;
 
     void init_tree_dist_table();
     void init_forest_dist_table(forest_distance_table_type& table,
@@ -107,15 +112,70 @@ private:
                                                 const subforest& index2,
                                                 graph who_first) const;
 
+*/ 
+
+
+
+    bool do_decompone_LR(tree_type::iterator& it_ref,
+                        tree_type::iterator root,
+                        path_strategy str) const;
+    bool do_decompone_LR_recursive(tree_type::iterator& it_ref,
+                                    tree_type::iterator& leaf,
+                                    tree_type::iterator end,
+                                    path_strategy str) const;
+
+    void fill_table(forest_distance_table_type& forest_dist,
+                    const subforest_pair& roots,
+                    const subforest_pair& prevs,
+                    iterator_pair prev_roots,
+                    graph who_first);
+
+    void compute_distance(subforest_pair pair,
+                            graph who_first);
+
+    void compute_distances_recursive(tree_type::iterator root1,
+                                        tree_type::iterator root2);
+
+    void single_path_function_LR(tree_type::iterator root1,
+                                    tree_type::iterator root2,
+                                    path_strategy str,
+                                    graph who_first);
+/*
+    bool do_decompone_H(tree_type::iterator& it_ref,
+                        tree_type::iterator& it_path_node,
+                        tree_type::iterator root) const;
+    void single_path_function_H(tree_type::iterator root1,
+                                    tree_type::iterator root2,
+                                    graph who_first);
+*/
+    void init_FDist_table(forest_distance_table_type& forest_dist,
+                        subforest_pair subforests);
+
+
+    void init_subforest_pair(subforest_pair& pair,
+                        tree_type::iterator root1,
+                        tree_type::iterator root2,
+                        path_strategy str,
+                        graph who_first) const;
+
+    void precompute_heavy_paths();
+    //tree_type::iterator get_path_node(tree_type::iterator it) const;
+
+    size_t biggest_subtree_child(tree_type::iterator root,
+                                const tree_type& t,
+                                const rted::map_type& t_sizes) const;
+
     void print_TDist() const;
     void print_FDist(const forest_distance_table_type& table) const;
     void pretty_printF(const subforest& index1,
                         const subforest& index2,
                         const forest_distance_table_type& forest_dist,
                         graph who_first) const;
-    void pretty_print(const subforest& index1,
+    void pretty_printT(const subforest& index1,
                     const subforest& index2,
                     graph who_first) const;
+
+    using empty_iterator = tree_type::iterator;
 private:
     tree_type t1;
     tree_type t2;
@@ -123,6 +183,7 @@ private:
     rted::map_type t2_sizes;
     rted::strategy_map_type strategies;
     tree_distance_table_type tree_distances;
+    heavy_paths_tables heavy_paths;
 };
 
 #endif /* !GTED_HPP */
