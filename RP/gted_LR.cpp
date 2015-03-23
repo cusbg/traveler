@@ -1259,7 +1259,7 @@ void gted::compute_distance(subforest_pair forests,
     parents.it2 = tree_type::parent(leafs.it2);
 
     last_tree_roots.it2 = leafs.it2;
-/*
+
     struct
     {
         vector<tree_type::iterator> s1, s2;
@@ -1269,19 +1269,31 @@ void gted::compute_distance(subforest_pair forests,
         for (auto i : stack)
             cout << *i << " ";
         cout << endl;
-        while(tree_type::parent(stack.back()) ==  it)
+        while(!stack.empty())
         {
+            if (tree_type::parent(stack.back()) != it)
+                break;
             assert(!stack.empty());
             DEBUG("stack.s1.back == it, deleting %s", label(stack.back()));
             stack.pop_back();
         }
     };
+    auto get_back = [](vector<tree_type::iterator> stack, tree_type::iterator ifempty)
+    {
+        if (stack.empty())
+            return ifempty;
+        //assert(!stack.empty());
+        return stack.back();
+    };
 
-    last_tree_roots_stacks.s2 = {leafs.it2};
-*/
 #define compute_fdist_command() \
     fill_table(forest_dist, forests, prevs, \
             last_tree_roots, who_first)
+
+#define get_back_f1() \
+    get_back(last_tree_roots_stacks.s1, leafs.it1)
+#define get_back_f2() \
+    get_back(last_tree_roots_stacks.s2, leafs.it2)
 
     bool loop = true;
     do
@@ -1318,9 +1330,9 @@ void gted::compute_distance(subforest_pair forests,
         parents.it1 = tree_type::parent(leafs.it1);
         prevs.f1.right = forests.f1.right;
         prevs.f1.left = tree_type::iterator();
-        //last_tree_roots_stacks.s1 = { leafs.it1 };
-        //last_tree_roots.it1 = last_tree_roots_stacks.s1.back();
-        last_tree_roots.it1 = leafs.it1;
+        last_tree_roots_stacks.s1.clear();
+        last_tree_roots.it1 = get_back_f1();
+        //last_tree_roots.it1 = leafs.it1;
 
         compute_fdist_command();
 
@@ -1333,13 +1345,13 @@ void gted::compute_distance(subforest_pair forests,
             {
                 if (tree_type::is_leaf(forests.f1.left))
                 {
-                    last_tree_roots.it1 = prevs.f1.left;
-                    //last_tree_roots_stacks.s1.push_back(prevs.f1.left);
-                    DEBUG("L: last_tree <- %s", label(last_tree_roots.it1));
+                    //last_tree_roots.it1 = prevs.f1.left;
+                    last_tree_roots_stacks.s1.push_back(prevs.f1.left);
+                    DEBUG("L: last_tree <- %s", label(prevs.f1.left));
                 }
                 // ak som v rodicovi, zmazem vsetkych synov ktore boli v zasobniku..
-                //del_stack_children(last_tree_roots_stacks.s1, forests.f1.left);
-                //last_tree_roots.it1 = last_tree_roots_stacks.s1.back();
+                del_stack_children(last_tree_roots_stacks.s1, forests.f1.left);
+                last_tree_roots.it1 = get_back_f1();
 
                 compute_fdist_command();
                 prevs.f1.left = forests.f1.left++;
@@ -1352,11 +1364,12 @@ void gted::compute_distance(subforest_pair forests,
             {
                 if (tree_type::is_leaf(forests.f1.right))
                 {
-                    //last_tree_roots_stacks.s1.push_back(prevs.f1.right);
-                    DEBUG("R: last_tree <- %s", label(last_tree_roots.it1));
+                    //last_tree_roots.it1 = prevs.f1.right;
+                    last_tree_roots_stacks.s1.push_back(prevs.f1.right);
+                    DEBUG("R: last_tree <- %s", label(prevs.f1.right));
                 }
-                //del_stack_children(last_tree_roots_stacks.s1, forests.f1.right);
-                //last_tree_roots.it1 = last_tree_roots_stacks.s1.back();
+                del_stack_children(last_tree_roots_stacks.s1, forests.f1.right);
+                last_tree_roots.it1 = get_back_f1();
                 compute_fdist_command();
                 prevs.f1.right = forests.f1.right++;
             }
@@ -1371,8 +1384,10 @@ void gted::compute_distance(subforest_pair forests,
             // inac 3. podmienka je iba
             //          F[prevs.f1][prevs.f2] + MODIFY
             //
+
             parents.it1 = tree_type::parent(forests.f1.right);
-            last_tree_roots.it1 = leafs.it1;
+            del_stack_children(last_tree_roots_stacks.s1, forests.f1.right);
+            last_tree_roots.it1 = get_back_f1();
             forests.f1.last = subforest::undef;
             forests.f1.left =
                 forests.f1.path_node = forests.f1.right;
@@ -1397,12 +1412,12 @@ void gted::compute_distance(subforest_pair forests,
         }*/
         if (tree_type::is_leaf(forests.f2.left))
         {
-            last_tree_roots.it2 = prevs.f2.left;
+            //last_tree_roots.it2 = prevs.f2.left;
+            last_tree_roots_stacks.s2.push_back(prevs.f2.left);
             DEBUG("L2: last <- left, %s", label(prevs.f2.left));
-            //last_tree_roots_stacks.s2.push_back(prevs.f2.left);
         }
-        //del_stack_children(last_tree_roots_stacks.s2, forests.f2.left);
-        //last_tree_roots.it2 = last_tree_roots_stacks.s2.back();
+        del_stack_children(last_tree_roots_stacks.s2, forests.f2.left);
+        last_tree_roots.it2 = get_back_f2();
 
         if (forests.f2.left == parents.it2)
         {
@@ -1414,12 +1429,12 @@ void gted::compute_distance(subforest_pair forests,
 
             if (tree_type::is_leaf(forests.f2.right))
             {
-                last_tree_roots.it2 = prevs.f2.right;
+                //last_tree_roots.it2 = prevs.f2.right;
+                last_tree_roots_stacks.s2.push_back(prevs.f2.right);
                 DEBUG("L2: last <- right, %s", label(prevs.f2.right));
-                //last_tree_roots_stacks.s2.push_back(prevs.f2.right);
             }
-            //del_stack_children(last_tree_roots_stacks.s2, forests.f2.right);
-            //last_tree_roots.it2 = last_tree_roots_stacks.s2.back();
+            del_stack_children(last_tree_roots_stacks.s2, forests.f2.right);
+            last_tree_roots.it2 = get_back_f2();
 
             if (forests.f2.right == parents.it2)
             {
@@ -1598,7 +1613,17 @@ void gted::fill_table(forest_distance_table_type& forest_dist,
     DEBUG("");
 }
 
-
+void gted::test()
+{
+    vector<vector<size_t>> vec = {
+            /*  1   2   3   44  55  */
+    /*  A   */{                    },
+    /*  B   */{                    },
+    /*  CC  */{                    },
+    /*  D   */{                    },
+    /*  EE  */{                    }
+    };
+}
 
 
 
