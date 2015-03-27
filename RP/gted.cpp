@@ -47,25 +47,25 @@ bool gted::subforest::operator==(const gted::subforest& other) const
 
 size_t gted::subforest::hash::operator()(const gted::subforest& s) const
 {
-    // TODO:
-    //return 0;
-
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     // zdroj hash funkcie:
     // http://stackoverflow.com/questions/682438/hash-function-providing-unique-uint-from-an-integer-coordinate-pair
+    auto hash_f = [](size_t x, size_t y) 
+    {
+        return (x * 0x1F1F1F1F) ^ y;
+    };
     assert(s.right.node != NULL);
 
-    int out;
+    size_t out;
+    // TODO zmazat, zatial to je len na debug ucely...
     if (s.left.node == NULL)
         out = 0;
-    else if (s.left == s.right)
+    // id su jednoznacne... 
+    else if (s.left == s.right || s.left.node == NULL)
         out = s.right->get_id();
     else
-        out = (s.left->get_id() * 0x1F1F1F1F) ^ s.right->get_id();
-
-    if (s.right == NULL)
-        logger.warn("right iterator is NULL..!!");
+        out = hash_f(s.left->get_id(), s.right->get_id());
 
     static vector<subforest> hashes;
     if (find(hashes.begin(), hashes.end(), s) == hashes.end())
@@ -78,6 +78,7 @@ size_t gted::subforest::hash::operator()(const gted::subforest& s) const
 
 void gted::precompute_heavy_paths()
 {
+    // TODO skontrolovat...
     APP_DEBUG_FNAME;
 
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
@@ -790,8 +791,6 @@ void gted::fill_table(forest_distance_table_type& forest_dist,
                 iterator_pair prev_roots,
                 graph who_first)
 {
-    APP_DEBUG_FNAME;
-
     /*
      * do forest_dist zapisujem normalne v poradi [F1][F2]
      * do tree_distances zapisujem podla who_first:

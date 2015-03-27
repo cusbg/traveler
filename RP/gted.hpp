@@ -80,41 +80,6 @@ public:
     void test();
 private:
 
-/*
-    decomposition_type path_decomposition(tree_type::iterator it,
-                                        const tree_type& t,
-                                        const rted::map_type& t_sizes,
-                                        path_strategy s) const;
-
-    void init_tree_dist_table();
-    void init_forest_dist_table(forest_distance_table_type& table,
-                                subforest_pairs p,
-                                graph who_first) const;
-
-    void compute_forest_distances_recursive(tree_type::iterator root1,
-                                            tree_type::iterator root2);
-    void compute_forest_distances(forest_distance_table_type& table,
-                                    subforest_pairs p,
-                                    graph who_first);
-    void fill_distance_tables(forest_distance_table_type& table,
-                            const subforest_pairs& root_forests,
-                            const subforest_pairs& prevs,
-                            tree_type::iterator tree_root1,
-                            tree_type::iterator tree_root2,
-                            graph who_first);
-
-    inline void set_forest_distance_table_value(forest_distance_table_type& table,
-                                                const subforest& index1,
-                                                const subforest& index2,
-                                                size_t value,
-                                                graph who_first) const;
-    inline size_t get_forest_distance_table_value(const forest_distance_table_type& table,
-                                                const subforest& index1,
-                                                const subforest& index2,
-                                                graph who_first) const;
-
-*/ 
-
 
 
     bool do_decompone_LR(tree_type::iterator& it_ref,
@@ -124,6 +89,10 @@ private:
                                     tree_type::iterator& leaf,
                                     tree_type::iterator end,
                                     path_strategy str) const;
+    void single_path_function_LR(tree_type::iterator root1,
+                                    tree_type::iterator root2,
+                                    path_strategy str,
+                                    graph who_first);
 
     void fill_table(forest_distance_table_type& forest_dist,
                     const subforest_pair& roots,
@@ -134,26 +103,30 @@ private:
     void compute_distance(subforest_pair pair,
                             graph who_first);
 
+    /**
+     * rekurzivne rozkladam stromy podla strategie z rted-u
+     * nakoniec pustim single_path_function(root1, root2)
+     * ktora vyrata
+     *      T[root1][root2]
+     *      T[i][j], pre i, j vrcholy na root-leaf path
+     */
     void compute_distances_recursive(tree_type::iterator root1,
                                         tree_type::iterator root2);
 
-    void single_path_function_LR(tree_type::iterator root1,
-                                    tree_type::iterator root2,
-                                    path_strategy str,
-                                    graph who_first);
 
-/*
-    bool do_decompone_H(tree_type::iterator& it_ref,
-                        tree_type::iterator& it_path_node,
-                        tree_type::iterator root) const;
-    void single_path_function_H(tree_type::iterator root1,
-                                    tree_type::iterator root2,
-                                    graph who_first);
-*/
+    /**
+     * zinicializuje tabulku forest_dist na vzdialenosti pri mazani vrcholov
+     * teda pre kazdy f = podles T1 -> F[f][EMPTY] = |f|
+     * a naopak kazdy f = podles T2 -> F[EMPTY][f] = |f|
+     */
     void init_FDist_table(forest_distance_table_type& forest_dist,
                         subforest_pair subforests);
 
-
+    /**
+     * zinicializuje pair tak, ze
+     *  .left == .right == .path_node == list na root-leaf-path
+     *  .root == root
+     */
     void init_subforest_pair(subforest_pair& pair,
                         tree_type::iterator root1,
                         tree_type::iterator root2,
@@ -162,6 +135,9 @@ private:
 
     void precompute_heavy_paths();
 
+    /**
+     * vrati index potomka s najvacsim podstromom
+     */
     size_t biggest_subtree_child(tree_type::iterator root,
                                 const tree_type& t,
                                 const rted::map_type& t_sizes) const;
