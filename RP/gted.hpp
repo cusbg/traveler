@@ -77,6 +77,7 @@ public: // TODO remove:
 public:
     gted(const tree_type& _t1, const tree_type& _t2);
     void run_gted();
+    void test();
 private:
 
 /*
@@ -140,6 +141,7 @@ private:
                                     tree_type::iterator root2,
                                     path_strategy str,
                                     graph who_first);
+
 /*
     bool do_decompone_H(tree_type::iterator& it_ref,
                         tree_type::iterator& it_path_node,
@@ -149,7 +151,8 @@ private:
                                     graph who_first);
 */
     void init_FDist_table(forest_distance_table_type& forest_dist,
-                        subforest_pair subforests);
+                        subforest_pair subforests,
+                        graph who_first);
 
 
     void init_subforest_pair(subforest_pair& pair,
@@ -174,6 +177,23 @@ private:
     void pretty_printT(const subforest& index1,
                     const subforest& index2,
                     graph who_first) const;
+
+    /* bez who_first, vzdy vracia v danom poradi ako dostane, teda table[index1][index2] */
+    size_t get_Fdist(const subforest& index1,
+                    const subforest& index2,
+                    const forest_distance_table_type& table) const;
+    size_t get_Tdist(tree_type::iterator index1,
+                    tree_type::iterator index2,
+                    graph who_first) const;
+    void set_Fdist(const subforest& index1,
+                    const subforest& index2,
+                    forest_distance_table_type& table,
+                    size_t value,
+                    graph who_first) const;
+    void set_Tdist(tree_type::iterator index1,
+                    tree_type::iterator index2,
+                    size_t value,
+                    graph who_first);
 
     using empty_iterator = tree_type::iterator;
 private:
