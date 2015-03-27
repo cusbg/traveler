@@ -212,7 +212,7 @@ void gted::print_FDist(const forest_distance_table_type& table) const
     logger.debugStream() << out.str();
 }
 
-/* GET/SET functions: */
+/* GET & SET functions: */
 size_t gted::get_Fdist(const subforest& index1,
                     const subforest& index2,
                     const forest_distance_table_type& forest_dist) const
@@ -256,21 +256,11 @@ size_t gted::get_Tdist(tree_type::iterator index1,
 void gted::set_Fdist(const subforest& index1,
                     const subforest& index2,
                     forest_distance_table_type& forest_dist,
-                    size_t value,
-                    graph who_first) const
+                    size_t value) const
 {
-    if (who_first == T1)
-    {
-        DEBUG("SET: " F_str " = %lu",
-                labels_LR(index2), labels_LR(index1), value);
-        forest_dist[index2][index1] = value;
-    }
-    else
-    {
-        DEBUG("SET: " F_str " = %lu",
-                labels_LR(index1), labels_LR(index2), value);
-        forest_dist[index1][index2] = value;
-    }
+    DEBUG("SET: " F_str " = %lu",
+            labels_LR(index1), labels_LR(index2), value);
+    forest_dist[index1][index2] = value;
 }
 
 void gted::set_Tdist(tree_type::iterator index1,
@@ -295,8 +285,7 @@ void gted::set_Tdist(tree_type::iterator index1,
 
 
 void gted::init_FDist_table(forest_distance_table_type& forest_dist,
-                            subforest_pair forests,
-                            graph who_first)
+                            subforest_pair forests)
 {
     //LOGGER_PRIORITY_ON_FUNCTION(INFO);
     APP_DEBUG_FNAME;
@@ -321,7 +310,7 @@ void gted::init_FDist_table(forest_distance_table_type& forest_dist,
             forest_dist.hash_function()(forests.f2) == 0);
 
 #define init_command() \
-    set_Fdist(forests.f1, forests.f2, forest_dist, i++, who_first)
+    set_Fdist(forests.f1, forests.f2, forest_dist, i++)
 
     i = 0;
     init_command();
@@ -410,13 +399,130 @@ void gted::run_gted()
 
     precompute_heavy_paths();
     compute_distances_recursive(t1.begin(), t2.begin());
-
-    //init_tree_dist_table();
-    //print_TDist();
-
-    //compute_forest_distances_recursive(++t1.begin(), ++t2.begin());
-    //print_TDist();
 }
+
+
+
+
+void gted::compute_distances_recursive(tree_type::iterator root1,
+                                    tree_type::iterator root2)
+{
+    APP_DEBUG_FNAME;
+
+    // pouzivam STRATEGIES...
+    //
+    tree_type::iterator it;
+    rted::strategy_map_type::mapped_type::mapped_type spair;
+    //spair = make_pair(T1, path_strategy::left);
+    //spair = make_pair(T2, path_strategy::left);
+    spair = make_pair(T1, path_strategy::right);
+    //spair = make_pair(T2, path_strategy::right);
+    //spair = make_pair(T1, path_strategy::heavy);
+    //spair = make_pair(T2, path_strategy::heavy);
+    //
+    //spair = strategies.at(id(root1)).at(id(root2));
+
+    if (spair.second == path_strategy::heavy)
+    {
+        logger.error("not implemented yet");
+        abort();
+    }
+    else
+    {
+        // L/R
+        if (spair.first == T1)
+        {
+            // rozkladam T1, zacinam vrcholom na ceste,
+            // v do_decompone() ho menim
+            if (spair.second == path_strategy::left)
+                it = tree_type::leftmost_child(root1);
+            else
+                it = tree_type::rightmost_child(root1);
+
+            while (do_decompone_LR(it, root1, spair.second))
+                compute_distances_recursive(it, root2);
+            assert(it == root1);
+        }
+        else
+        {
+            abort();
+            // rozkladam T2
+            if (spair.second == path_strategy::left)
+                it = tree_type::leftmost_child(root2);
+            else
+                it = tree_type::rightmost_child(root2);
+
+            while (do_decompone_LR(it, root2, spair.second))
+                compute_distances_recursive(root1, it);
+            assert(it == root2);
+        }
+        // mam uz dopocitane rekurzivne vsetky dekompozicie {T1/T2}
+        // uz len doratat vzdialenost root1, root2
+        single_path_function_LR(root1, root2, spair.second, spair.first);
+    }
+}
+
+void gted::init_subforest_pair(subforest_pair& forests,
+                    tree_type::iterator root1,
+                    tree_type::iterator root2,
+                    path_strategy str,
+                    graph g) const
+{
+    APP_DEBUG_FNAME;
+
+    assert(heavy_paths.T1_heavy.find(id(root1)) ==
+            heavy_paths.T1_heavy.end() ||
+            heavy_paths.T2_heavy.find(id(root1)) ==
+            heavy_paths.T2_heavy.end());
+    assert(heavy_paths.T1_heavy.find(id(root2)) ==
+            heavy_paths.T1_heavy.end() ||
+            heavy_paths.T2_heavy.find(id(root2)) ==
+            heavy_paths.T2_heavy.end());
+
+    tree_type::iterator first, second;
+
+    assert(g == T1); // TODO skontrolovat co to bude robit pre T2
+    if (g == T2)
+        swap(root1, root2);
+
+    switch (str)
+    {
+        // situacia: 
+        //  (root1.subtrees, root2.tree) je uz vypocitane pre kazdy podstrom root1.
+        //  teraz idem pocitat vzdialenost root2.subtrees od root1
+        //  takze v root1 sa musim postavit na cestu, v root2 zase na opacnu stranu (len pre L/R)
+        //  a kedze iterujem cez forests.f1, first<-f(root2), second<-f(root1)
+        case path_strategy::left:
+            first  = tree_type::rightmost_child(root2);
+            second = tree_type::leftmost_child (root1);
+            break;
+        case path_strategy::right:
+            first  = tree_type::leftmost_child (root2);
+            second = tree_type::rightmost_child(root1);
+            break;
+        case path_strategy::heavy:
+            abort();
+            break;
+    }
+
+    forests.f1.root = root2;
+    forests.f2.root = root1;
+        
+    forests.f1.left =
+        forests.f1.right =
+        forests.f1.path_node = first;
+    forests.f2.left =
+        forests.f2.right =
+        forests.f2.path_node = second;
+
+
+    assert(forests.f1.root !=  empty_iterator() &&
+            forests.f2.root != empty_iterator());
+}
+
+
+
+
 
 
 
@@ -476,7 +582,7 @@ void gted::compute_distance(subforest_pair forests,
         leafs.it2 : last_tree_roots_stacks.s2.back()
 
     // VARS INIT:
-    init_FDist_table(forest_dist, forests, who_first);
+    init_FDist_table(forest_dist, forests);
 
     // in prevs, we use only right/left...
     prevs.f1.right = forests.f1.right;
@@ -626,6 +732,12 @@ void gted::compute_distance(subforest_pair forests,
         prevs.f2.left = forests.f2.left++;
 
         DEBUG("LNODE");
+        // vynoril som sa z podstromu, ale .right este vzdy ukazuje do praveho syna...
+        if (prevs.f2.left == forests.f2.path_node)
+        {
+            DEBUG(".left == .path_node");
+            prevs.f2.right = prevs.f2.left;
+        }
         if (tree_type::is_leaf(forests.f2.left))
         {
             last_tree_roots_stacks.s2.push_back(prevs.f2.left);
@@ -672,14 +784,132 @@ void gted::compute_distance(subforest_pair forests,
 
 
 
+void gted::fill_table(forest_distance_table_type& forest_dist,
+                const subforest_pair& roots,
+                const subforest_pair& prevs,
+                iterator_pair prev_roots,
+                graph who_first)
+{
+    APP_DEBUG_FNAME;
 
+    /*
+     * do forest_dist zapisujem normalne v poradi [F1][F2]
+     * do tree_distances zapisujem podla who_first:
+     *      ak == T1, poradie je [F2][F1], inac [F1][F2]
+     *
+     * inac predpoklady su take, ze v prev_roots su:
+     *      ak .last == undef, je tam vrchol na root-leaf ceste (tam kde som zacal)
+     *      inac je tam predchadzajuci vrchol najblizsie k aktualnemu a nieje v jeho podstrome
+     *          viz. poznamka v compute_distance funkcii
+     */
 
+#define GTED_VECTOR_DELETE_LEFT     0
+#define GTED_VECTOR_DELETE_RIGHT    1
+#define GTED_VECTOR_DELETE_BOTH     2
 
+#define GTED_COST_MODIFY            0
+#define GTED_COST_DELETE            1
 
+#define labels_LR(s) label(s.left), label(s.right)
 
+    assert(who_first == T1);
 
+    vector<size_t> vec(3, 0xBADF00D);
+    size_t c_min;
+    // pocitam F[p.it1][p.it2]..
+    iterator_pair p;
+    if (roots.f1.last == subforest::Lnode)
+        p.it1 = roots.f1.left;
+    else
+        p.it1 = roots.f1.right;
+    if (roots.f2.last == subforest::Lnode)
+        p.it2 = roots.f2.left;
+    else
+        p.it2 = roots.f2.right;
 
+    vec[GTED_VECTOR_DELETE_LEFT]  =
+        get_Fdist(prevs.f1, roots.f2, forest_dist);
+    vec[GTED_VECTOR_DELETE_RIGHT] =
+        get_Fdist(roots.f1, prevs.f2, forest_dist);
 
+    vec[GTED_VECTOR_DELETE_LEFT]  += GTED_COST_DELETE;
+    vec[GTED_VECTOR_DELETE_RIGHT] += GTED_COST_DELETE;
 
+    if (p.it1 == roots.f1.path_node &&
+            p.it2 == roots.f2.path_node)
+    {
+        DEBUG("path node");
+        vec[GTED_VECTOR_DELETE_BOTH] =
+            get_Fdist(prevs.f1, prevs.f2, forest_dist);
+    }
+    else
+    {
+        DEBUG("not path node");
+        DEBUG("prevroots=[%s, %s]",
+                label(prev_roots.it1), label(prev_roots.it2));
+
+        subforest_pair other = prevs;
+        tree_type::iterator t_it1, t_it2;
+
+        if (roots.f1.last == subforest::Lnode)
+        {
+            DEBUG("f1.last = lnode");
+            other.f1.left = prev_roots.it1;
+            t_it1 = roots.f1.left;
+        }
+        else if (roots.f1.last == subforest::Rnode)
+        {
+            DEBUG("f1.last == rnode");
+            other.f1.right = prev_roots.it1;
+            t_it1 = roots.f1.right;
+        }
+        else
+        {
+            DEBUG("f1.last == undef");
+            other.f1.left = empty_iterator();
+            other.f1.right = prev_roots.it1;
+            t_it1 = roots.f1.right;
+        }
+
+        if (roots.f2.last == subforest::Lnode)
+        {
+            DEBUG("f2.last = lnode");
+            other.f2.left = prev_roots.it2;
+            t_it2 = roots.f2.left;
+        }
+        else if (roots.f2.last == subforest::Rnode)
+        {
+            DEBUG("f2.last == rnode");
+            other.f2.right = prev_roots.it2;
+            t_it2 = roots.f2.right;
+        }
+        else
+        {
+            DEBUG("f2.last == undef");
+            other.f2.left = empty_iterator();
+            other.f2.right = prev_roots.it2;
+            t_it2 = roots.f2.right;
+        }
+
+        vec[GTED_VECTOR_DELETE_BOTH] =
+            get_Fdist(other.f1, other.f2, forest_dist);
+
+        vec[GTED_VECTOR_DELETE_BOTH] +=
+            get_Tdist(t_it1, t_it2, who_first);
+    }
+
+    LOGGER_PRINT_CONTAINER(vec, "vec");
+
+    c_min = *min_element(vec.begin(), vec.end());
+    set_Fdist(roots.f1, roots.f2, forest_dist, c_min);
+
+    if (p.it1 == roots.f1.path_node &&
+            p.it2 == roots.f2.path_node)
+    {
+        assert(who_first == T1);
+        set_Tdist(p.it1, p.it2, c_min, who_first);
+    }
+    DEBUG("");
+}
 
 

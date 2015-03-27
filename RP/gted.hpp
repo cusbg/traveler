@@ -151,8 +151,7 @@ private:
                                     graph who_first);
 */
     void init_FDist_table(forest_distance_table_type& forest_dist,
-                        subforest_pair subforests,
-                        graph who_first);
+                        subforest_pair subforests);
 
 
     void init_subforest_pair(subforest_pair& pair,
@@ -162,7 +161,6 @@ private:
                         graph who_first) const;
 
     void precompute_heavy_paths();
-    //tree_type::iterator get_path_node(tree_type::iterator it) const;
 
     size_t biggest_subtree_child(tree_type::iterator root,
                                 const tree_type& t,
@@ -178,7 +176,9 @@ private:
                     const subforest& index2,
                     graph who_first) const;
 
-    /* bez who_first, vzdy vracia v danom poradi ako dostane, teda table[index1][index2] */
+
+
+
     size_t get_Fdist(const subforest& index1,
                     const subforest& index2,
                     const forest_distance_table_type& table) const;
@@ -188,8 +188,7 @@ private:
     void set_Fdist(const subforest& index1,
                     const subforest& index2,
                     forest_distance_table_type& table,
-                    size_t value,
-                    graph who_first) const;
+                    size_t value) const;
     void set_Tdist(tree_type::iterator index1,
                     tree_type::iterator index2,
                     size_t value,
