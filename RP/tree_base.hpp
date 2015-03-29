@@ -64,7 +64,6 @@ public:
 
 protected:
     tree_base() = default;
-    tree_base(std::shared_ptr<tree_type> _tree_ptr, sibling_iterator _tree_head);
 
 public:
     virtual ~tree_base() = default;
@@ -167,18 +166,9 @@ tree_base<node_type>::tree_base(const std::string& brackets, const labels_array&
         ++i;
     }
     std::stringstream stream;
+    stream << "TREE WAS CONSTRUCTED, size = " << tree_ptr->size() << std::endl;
     kptree::print_tree_bracketed(*tree_ptr, stream);
-    logger.info("tree was constructed:");
     logger.info(stream.str());
-}
-
-template <typename node_type>
-tree_base<node_type>::tree_base(std::shared_ptr<tree_type> _tree_ptr, sibling_iterator _tree_head)
-    : tree_ptr(_tree_ptr)
-{
-    std::stringstream stream; \
-    kptree::print_tree_bracketed(*tree_ptr, stream); \
-    logger.debug("TREE: %s", stream.str().c_str()); \
 }
 
 // PUBLIC FUNCTIONS:
