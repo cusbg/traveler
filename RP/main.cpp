@@ -77,11 +77,19 @@ int main(int argc, char** argv)
     l1 = "5142345";
     b1 = "(.(..))";
 
-    l2 = "EABDE";
-    b2 = "(...)";
+    l2 = "EACBCDE";
+    b2 = "(.(.).)";
 
-    //b2 = "(" + readbrackets() + ")";
-    //l2 = "0" + readseq() + "0";
+    //b2 = "()";
+    //l2 = "00";
+    b2 = "(" + readbrackets() + ")";
+    l2 = "0" + readseq() + "0";
+
+    //l1 = "5142345";
+    //b1 = "(.(..))";
+
+    //l2 = "DABCD";
+    //b2 = "(...)";
 
 
     //rna_tree rna1("(" + b1 + ")", "." + l1 + ".");
@@ -102,8 +110,7 @@ int main(int argc, char** argv)
 
     gted g(rna1, rna2);
     g.run_gted();
-    //rted r(rna1, rna2);
-    //r.run_rted();
+    //g.test();
 
 
 	return 0;

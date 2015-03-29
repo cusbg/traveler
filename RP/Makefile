@@ -31,6 +31,9 @@ run: build
 
 build: $(BUILDDIR)/$(TARGET)
 
+debug: build
+	gdb $(BUILDDIR)/$(TARGET)
+
 
 $(BUILDDIR)/$(TARGET): $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES)) $(BUILDDIR)/Makefile
 

@@ -74,8 +74,7 @@ public: // TODO remove:
         tree_type::iterator it1;
         tree_type::iterator it2;
     };
-    typedef std::vector<std::pair<tree_type::iterator,
-                                    tree_type::iterator>> mapping_table_type;
+    typedef std::vector<iterator_pair> mapping_table_type;
 public:
     gted(const tree_type& _t1, const tree_type& _t2);
     void run_gted();

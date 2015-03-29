@@ -34,11 +34,6 @@ using namespace std;
 #define all_subforest_nodes_init(Subforest, value) \
     Subforest.left = Subforest.right = Subforest.path_node = value
 
-
-// TODO nazaciatku vsetkeho skontrolovat ci
-// strategies.graph su z {T1, T2}
-// strategies.path_strategy z {L, R, H}
-
 void gted::test()
 {
     //return;
@@ -1048,8 +1043,6 @@ void gted::fill_table(forest_distance_table_type& forest_dist,
 
 void gted::compute_mapping()
 {
-    // TODO: 
-    //  poupravovat auto- funkcie... nerobia vzdy dobrotu...
     APP_DEBUG_FNAME;
     LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
 
@@ -1059,10 +1052,28 @@ void gted::compute_mapping()
 
     forest_distance_table_type forest_dist;
     vector<iterator_pair> to_be_matched;
-    vector<iterator_pair> mapping;
     iterator_pair current, leafs;
     subforest_pair forests, prevs;
 
+/*
+#define equal_funct(first1, first2, second1, second2, plus_value) \
+    (forest_dist.at(first1).at(first2) == \
+        forest_dist.at(second1).at(second2) + plus_value)
+*/
+    auto equal_funct = [&forest_dist](
+            const subforest& first1, const subforest& first2,
+            const subforest& second1, const subforest& second2,
+            size_t plus_value)
+    {
+        return forest_dist.at(first1).at(first2) ==
+            forest_dist.at(second1).at(second2) + plus_value;
+    };
+    auto print_mapping = [this]()
+    {
+        cout << "MAPPING:" << endl;
+        for (auto val : mapping)
+            cout << label(val.it1) << "\t" << label(val.it2) << endl;
+    };
     auto comp_funct = [this](iterator root1, iterator root2)
     {
         LOGGER_PRIORITY_ON_FUNCTION(INFO);
@@ -1082,31 +1093,16 @@ void gted::compute_mapping()
         auto table = compute_distance(forests, T2);
         
         // skontroluj ci sa nezmenila tabulka tree_distances
-
-        logger.info("FIRST");
-        print_TDist();
-        tree_distances = Ttable;
-        logger.info("SECOND:");
-        print_TDist();
-
-
-
-        assert(tree_distances == Ttable);
+        //assert(tree_distances == Ttable);
         logger.info("COMPFUNCT_END");
         return table;
-    };
-    auto equal_funct = [&forest_dist](subforest first1, subforest first2,
-                            subforest second1, subforest second2,
-                            size_t plus_value)
-    {
-        return forest_dist.at(first1).at(first2) ==
-            forest_dist.at(second1).at(second2) + plus_value;
     };
     auto step = [](subforest& s)
     {
         subforest other = s;
         if (s.left == s.right)
         {   // som vo vrchole na ceste... musim ist o patro nizsie
+            // ak som ale v liste, iba vyhodim .left
             if(tree_type::is_leaf(s.right))
                 s.left = empty_iterator();
             else
@@ -1115,9 +1111,7 @@ void gted::compute_mapping()
                 s.right = tree_type::last_child (s.right);
             }
         }
-        else if (s.left == empty_iterator())
-        {}
-        else
+        else if (s.left != empty_iterator())
         {   // inac idem iba s .right v post_order dozadu
             --s.right;
         }
@@ -1125,6 +1119,7 @@ void gted::compute_mapping()
                 label(other.left), label(other.right),
                 label(s.left), label(s.right));
     };
+
     auto jump_tree = [this](subforest& s, iterator leaf)
     {
         DEBUG("jump, %s", label(s.right));
@@ -1132,8 +1127,8 @@ void gted::compute_mapping()
         subforest other = s;
         if (s.right == leaf)
         {
-            DEBUG("is_first_child");
-            s.right = empty_iterator();
+            DEBUG(".right == leaf");
+            s.left = empty_iterator();
         }
         else if (s.right->is_root())
         {
@@ -1146,30 +1141,22 @@ void gted::compute_mapping()
             cerr << "isroot" << endl;
             abort();
         }
-        else if (!tree_type::is_first_child(s.right))
+        else
         {
-            DEBUG("get prev sibling");
+            DEBUG("get ancestor previous sibling");
+            while(tree_type::is_first_child(s.right))
+                s.right = tree_type::parent(s.right);
             tree_type::sibling_iterator it = s.right;
             --it;
             s.right = it;
-        }
-        else
-        {
-            DEBUG("get prev postorder");
-            --s.right;
         }
         DEBUG("changing from [%s, %s], to [%s, %s]",
                 label(other.left), label(other.right),
                 label(s.left), label(s.right));
     };
-    auto print_mapping = [&]()
-    {
-        for (auto val : mapping)
-            cout << label(val.it1) << "\t" << label(val.it2) << endl;
-    };
-    to_be_matched.push_back({t1.begin(), t2.begin()});
-    //auto forest_dist = comp_funct(root1, root2);
 
+    mapping.clear();
+    to_be_matched.push_back({++t1.begin(), ++t2.begin()});
 
 
     while(!to_be_matched.empty())
@@ -1179,19 +1166,19 @@ void gted::compute_mapping()
         current = to_be_matched.back();
         to_be_matched.pop_back();
         forest_dist = comp_funct(current.it1, current.it2);
-        print_FDist(forest_dist);
+        //print_FDist(forest_dist);
 
         leafs.it1 = tree_type::leftmost_child(current.it1);
         leafs.it2 = tree_type::leftmost_child(current.it2);
 
-        all_subforest_nodes_init(forests.f1, current.it1);
-        all_subforest_nodes_init(forests.f2, current.it2);
-
-        assert(forests.f1.left == forests.f1.right);
-        assert(forests.f2.left == forests.f2.right);
+        forests.f1.left =
+            forests.f1.right = current.it1;
+        forests.f2.left =
+            forests.f2.right = current.it2;
 
         if (tree_type::is_leaf(forests.f1.right))
             prevs.f1.right = forests.f1.right;
+            // prevs.f1.left == empty_iterator()
         else
         {
             prevs.f1.left  = tree_type::first_child(forests.f1.left );
@@ -1199,6 +1186,7 @@ void gted::compute_mapping()
         }
         if (tree_type::is_leaf(forests.f2.right))
             prevs.f2.right = forests.f2.right;
+            // prevs.f2.left == empty_iterator()
         else
         {
             prevs.f2.left  = tree_type::first_child(forests.f2.left );
@@ -1215,17 +1203,17 @@ void gted::compute_mapping()
                     label(prevs.f1.left), label(prevs.f1.right),
                     label(prevs.f2.left), label(prevs.f2.right));
 
-            //if(prevs.f1.right == leafs.it1 &&
-               //prevs.f2.right == leafs.it2)
+            // uz som v najlavejsom liste (na ceste)
+            // tak este dopocitaj toto a skonci.
             if (prevs.f1.left == empty_iterator() &&
                     prevs.f2.left == empty_iterator())
                 loop = false;
 
-
-
+            // samotny vypocet mapovania:
             if (forests.f1.right == forests.f1.left &&
                     forests.f2.right == forests.f2.left)
-            {   // som na ceste... takze mozem dane nody namatchovat na seba
+            {   // edit:
+                // som na ceste... takze mozem dane nody namatchovat na seba
                 DEBUG("map %s, %s", label(forests.f1.right), label(forests.f2.right));
                 mapping.push_back({forests.f1.right, forests.f2.right});
                 forests = prevs;
@@ -1247,13 +1235,12 @@ void gted::compute_mapping()
                 step(prevs.f1);
             }
             else
-            {
+            {   // inac musim vyratat a namatchovat dane stromy rekurzivne
                 DEBUG("to match %s, %s", label(forests.f1.right), label(forests.f2.right));
                 to_be_matched.push_back({forests.f1.right, forests.f2.right});
+                jump_tree(forests.f1, leafs.it1);
+                jump_tree(forests.f2, leafs.it2);
                 prevs = forests;
-                jump_tree(prevs.f1, leafs.it1);
-                jump_tree(prevs.f2, leafs.it2);
-                forests = prevs;
                 step(prevs.f1);
                 step(prevs.f2);
             }
