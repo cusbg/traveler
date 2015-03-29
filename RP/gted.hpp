@@ -74,12 +74,23 @@ public: // TODO remove:
         tree_type::iterator it1;
         tree_type::iterator it2;
     };
+    typedef std::vector<std::pair<tree_type::iterator,
+                                    tree_type::iterator>> mapping_table_type;
 public:
     gted(const tree_type& _t1, const tree_type& _t2);
     void run_gted();
     void test();
 private:
 
+    bool do_decompone_H(tree_type::iterator& it_ref,
+                        tree_type::iterator root,
+                        tree_type::iterator& it_path_node) const;
+    bool do_decompone_H_recursive(tree_type::iterator& it_ref,
+                                    tree_type::iterator& leaf,
+                                    tree_type::iterator end) const;
+    void single_path_function_H(tree_type::iterator root1,
+                                tree_type::iterator root2,
+                                graph who_first);
 
 
     bool do_decompone_LR(tree_type::iterator& it_ref,
@@ -100,8 +111,9 @@ private:
                     iterator_pair prev_roots,
                     graph who_first);
 
-    void compute_distance(subforest_pair pair,
-                            graph who_first);
+    forest_distance_table_type compute_distance(subforest_pair pair,
+                                                graph who_first);
+    void compute_mapping();
 
     /**
      * rekurzivne rozkladam stromy podla strategie z rted-u
@@ -144,16 +156,7 @@ private:
 
     void print_TDist() const;
     void print_FDist(const forest_distance_table_type& table) const;
-    void pretty_printF(const subforest& index1,
-                        const subforest& index2,
-                        const forest_distance_table_type& forest_dist,
-                        graph who_first) const;
-    void pretty_printT(const subforest& index1,
-                    const subforest& index2,
-                    graph who_first) const;
-
-
-
+    void print_subforest(const subforest& f);
 
     size_t get_Fdist(const subforest& index1,
                     const subforest& index2,
@@ -179,6 +182,7 @@ private:
     rted::strategy_map_type strategies;
     tree_distance_table_type tree_distances;
     heavy_paths_tables heavy_paths;
+    mapping_table_type mapping;
 };
 
 #endif /* !GTED_HPP */

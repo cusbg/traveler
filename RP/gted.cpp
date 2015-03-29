@@ -39,6 +39,85 @@ using namespace std;
 // strategies.graph su z {T1, T2}
 // strategies.path_strategy z {L, R, H}
 
+void gted::test()
+{
+    //return;
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    auto test_funct = [](rna_tree rna1, rna_tree rna2, vector<vector<size_t>> vec)
+    {
+        rna1.set_ids_postorder();
+        rna2.set_ids_postorder();
+
+        gted g(rna1, rna2);
+        g.run_gted();
+        auto dist = g.tree_distances;
+
+        size_t i, j;
+        i = j = 0;
+        tree_type::post_order_iterator it1, it2;
+        for (it1 = g.t1.begin_post(); it1 != --g.t1.end_post(); ++it1)
+        {
+            for (it2 = g.t2.begin_post(); it2 != --g.t2.end_post(); ++it2)
+            {
+                if (dist.at(id(it1)).at(id(it2)) != vec[i][j])
+                {
+                    logger.fatal("zle vyratane");
+                    cout << *it1 << " " << *it2 << endl <<
+                        "indexy: " << i << " " << j << endl;
+                    abort();
+                }
+                ++j;
+            }
+            ++i;
+            j = 0;
+        }
+        logger.notice("TEST OK");
+    };
+    string l1, l2, b1, b2;
+    vector<vector<size_t>> vec;
+    rna_tree rna1, rna2;
+
+    vec = { /*  A   B   CC  D   EE  */
+    /*  1   */{ 0,  0,  1,  0,  4   },
+    /*  2   */{ 0,  0,  1,  0,  4   },
+    /*  3   */{ 0,  0,  1,  0,  4   },
+    /*  44  */{ 2,  2,  1,  2,  2   },
+    /*  55  */{ 4,  4,  3,  4,  2   }
+    };
+
+    l1 = "5142345";
+    b1 = "(.(..))";
+
+    l2 = "EACBCDE";
+    b2 = "(.(.).)";
+
+    rna1 = rna_tree(b1, l1);
+    rna2 = rna_tree(b2, l2);
+
+    test_funct(rna1, rna2, vec);
+
+    vec = { /*  A   B   C   DD  */
+    /*  1   */{ 0,  0,  0,  3,  },
+    /*  2   */{ 0,  0,  0,  3,  },
+    /*  3   */{ 0,  0,  0,  3,  },
+    /*  44  */{ 2,  2,  2,  1,  },
+    /*  55  */{ 4,  4,  4,  1,  }
+    };
+
+    l1 = "5142345";
+    b1 = "(.(..))";
+
+    l2 = "DABCD";
+    b2 = "(...)";
+
+    rna1 = rna_tree(b1, l1);
+    rna2 = rna_tree(b2, l2);
+
+    test_funct(rna1, rna2, vec);
+
+}
+
 bool gted::subforest::operator==(const gted::subforest& other) const
 {
     return left == other.left &&
@@ -184,6 +263,7 @@ void gted::print_TDist() const
         out << endl;
     }
     logger.infoStream() << out.str();
+    cerr << out.str();
     if (was_catch)
         logger.warn("CATCH in TDist");
 }
@@ -192,10 +272,43 @@ void gted::print_FDist(const forest_distance_table_type& table) const
 {
     //APP_DEBUG_FNAME;
 
+    // TODO: ked niesu vyplnene vsetky stlpce, tak to nebude fungovat...
+    //
+    int odsadenie = 15;
     stringstream out;
     out << "FOREST_DISTANCE_TABLE:" << endl;
+/*
+    vector<subforest> vec;
+    string s;
 
-    int odsadenie = 15;
+    out << " ";
+    out << setw(odsadenie) << "";
+    for (auto val : table)
+        for (auto val2 : val.second)
+            if (find(vec.begin(), vec.end(), val2.first) == vec.end())
+            {
+                vec.push_back(val2.first);
+                s = string() +  "[" + label(val2.first.left) + "," + label(val2.first.right) + "]";
+                out << setw(odsadenie) << s;
+            }
+    out << endl;
+
+    for (auto val : table)
+    {
+        s = string() + "[" + label(val.first.left) + "," + label(val.first.right) + "]";
+        out << setw(odsadenie) << s;
+        for (auto val2 : val.second)
+        {
+            out << setw(odsadenie) << val2.second;
+        }
+        out << endl;
+    }
+
+
+    logger.debugStream() << out.str();
+    return;
+*/
+
     for (auto val : table)
     {
         string s = string() +  "[" + label(val.first.left) + "," + label(val.first.right) + "]";
@@ -211,6 +324,12 @@ void gted::print_FDist(const forest_distance_table_type& table) const
         out << endl;
     }
     logger.debugStream() << out.str();
+}
+
+void gted::print_subforest(const subforest& f)
+{
+    DEBUG("[%s, %s, %s, %s]", label(f.left), label(f.right),
+            label(f.path_node), label(f.root));
 }
 
 /* GET & SET functions: */
@@ -384,6 +503,13 @@ void gted::init_FDist_table(forest_distance_table_type& forest_dist,
 gted::gted(const tree_type& _t1, const tree_type& _t2)
     : t1(_t1), t2(_t2)
 {
+    //logger.info("FIRST TREE:");
+    //for (auto it = t1.begin(); it != t1.end(); ++it)
+        //logger.info("LABEL '%s'", label(it));
+    //logger.info("OTHER TREE:");
+    //for (auto it = t2.begin(); it != t2.end(); ++it)
+        //logger.info("LABEL '%s'", label(it));
+
     APP_DEBUG_FNAME;
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
@@ -397,9 +523,13 @@ gted::gted(const tree_type& _t1, const tree_type& _t2)
 void gted::run_gted()
 {
     APP_DEBUG_FNAME;
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     precompute_heavy_paths();
+    logger.notice("starting computing distances recursive");
     compute_distances_recursive(t1.begin(), t2.begin());
+    logger.notice("computing mapping");
+    compute_mapping();
 }
 
 
@@ -416,8 +546,8 @@ void gted::compute_distances_recursive(tree_type::iterator root1,
     rted::strategy_map_type::mapped_type::mapped_type spair;
     //spair = make_pair(T1, path_strategy::left);
     //spair = make_pair(T2, path_strategy::left);
-    spair = make_pair(T1, path_strategy::right);
-    //spair = make_pair(T2, path_strategy::right);
+    //spair = make_pair(T1, path_strategy::right);
+    spair = make_pair(T2, path_strategy::right);
     //spair = make_pair(T1, path_strategy::heavy);
     //spair = make_pair(T2, path_strategy::heavy);
     //
@@ -425,8 +555,17 @@ void gted::compute_distances_recursive(tree_type::iterator root1,
 
     if (spair.second == path_strategy::heavy)
     {
+        tree_type::iterator path_it;
         logger.error("not implemented yet");
-        abort();
+        if (spair.first == T1)
+            path_it = it = heavy_paths.T2_heavy.at(id(root2));
+        else
+            abort();
+
+        while (do_decompone_H(it, root2, path_it))
+            compute_distances_recursive(root1, it);
+
+        single_path_function_H(root1, root2, spair.first);
     }
     else
     {
@@ -446,7 +585,6 @@ void gted::compute_distances_recursive(tree_type::iterator root1,
         }
         else
         {
-            abort();
             // rozkladam T2
             if (spair.second == path_strategy::left)
                 it = tree_type::leftmost_child(root2);
@@ -482,7 +620,6 @@ void gted::init_subforest_pair(subforest_pair& forests,
 
     tree_type::iterator first, second;
 
-    assert(g == T1); // TODO skontrolovat co to bude robit pre T2
     if (g == T2)
         swap(root1, root2);
 
@@ -503,6 +640,8 @@ void gted::init_subforest_pair(subforest_pair& forests,
             break;
         case path_strategy::heavy:
             abort();
+            //first  = tree_type::leftmost_child(root2);
+            //second = heavy_paths.
             break;
     }
 
@@ -529,7 +668,7 @@ void gted::init_subforest_pair(subforest_pair& forests,
 
 
 
-void gted::compute_distance(subforest_pair forests,
+gted::forest_distance_table_type gted::compute_distance(subforest_pair forests,
                             graph who_first)
 {
     if (who_first == T1)
@@ -779,8 +918,7 @@ void gted::compute_distance(subforest_pair forests,
     while(loop);
 
     print_FDist(forest_dist);
-    if (forests.f1.root->is_root() && forests.f2.root->is_root())
-        print_TDist();
+    return forest_dist;
 }
 
 
@@ -810,8 +948,6 @@ void gted::fill_table(forest_distance_table_type& forest_dist,
 #define GTED_COST_DELETE            1
 
 #define labels_LR(s) label(s.left), label(s.right)
-
-    assert(who_first == T1);
 
     vector<size_t> vec(3, 0xBADF00D);
     size_t c_min;
@@ -903,12 +1039,239 @@ void gted::fill_table(forest_distance_table_type& forest_dist,
     set_Fdist(roots.f1, roots.f2, forest_dist, c_min);
 
     if (p.it1 == roots.f1.path_node &&
-            p.it2 == roots.f2.path_node)
+        p.it2 == roots.f2.path_node)
     {
-        assert(who_first == T1);
         set_Tdist(p.it1, p.it2, c_min, who_first);
     }
     DEBUG("");
 }
+
+void gted::compute_mapping()
+{
+    // TODO: 
+    //  poupravovat auto- funkcie... nerobia vzdy dobrotu...
+    APP_DEBUG_FNAME;
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+
+    using iterator = tree_type::iterator;
+
+    print_TDist();
+
+    forest_distance_table_type forest_dist;
+    vector<iterator_pair> to_be_matched;
+    vector<iterator_pair> mapping;
+    iterator_pair current, leafs;
+    subforest_pair forests, prevs;
+
+    auto comp_funct = [this](iterator root1, iterator root2)
+    {
+        LOGGER_PRIORITY_ON_FUNCTION(INFO);
+        subforest_pair forests;
+        // init:
+        forests.f1.root = root1;
+        forests.f2.root = root2;
+        all_subforest_nodes_init(forests.f1, tree_type::leftmost_child(root1));
+        all_subforest_nodes_init(forests.f2, tree_type::leftmost_child(root2));
+        // POZOR: ^^ nieje to ekvivalentne volaniu init_subforest_pair..
+
+        print_subforest(forests.f1);
+        print_subforest(forests.f2);
+        auto Ttable = tree_distances;
+
+        logger.info("COMPFUNCT");
+        auto table = compute_distance(forests, T2);
+        
+        // skontroluj ci sa nezmenila tabulka tree_distances
+
+        logger.info("FIRST");
+        print_TDist();
+        tree_distances = Ttable;
+        logger.info("SECOND:");
+        print_TDist();
+
+
+
+        assert(tree_distances == Ttable);
+        logger.info("COMPFUNCT_END");
+        return table;
+    };
+    auto equal_funct = [&forest_dist](subforest first1, subforest first2,
+                            subforest second1, subforest second2,
+                            size_t plus_value)
+    {
+        return forest_dist.at(first1).at(first2) ==
+            forest_dist.at(second1).at(second2) + plus_value;
+    };
+    auto step = [](subforest& s)
+    {
+        subforest other = s;
+        if (s.left == s.right)
+        {   // som vo vrchole na ceste... musim ist o patro nizsie
+            if(tree_type::is_leaf(s.right))
+                s.left = empty_iterator();
+            else
+            {
+                s.left  = tree_type::first_child(s.right);
+                s.right = tree_type::last_child (s.right);
+            }
+        }
+        else if (s.left == empty_iterator())
+        {}
+        else
+        {   // inac idem iba s .right v post_order dozadu
+            --s.right;
+        }
+        DEBUG("changing from [%s, %s], to [%s, %s]",
+                label(other.left), label(other.right),
+                label(s.left), label(s.right));
+    };
+    auto jump_tree = [this](subforest& s, iterator leaf)
+    {
+        DEBUG("jump, %s", label(s.right));
+        print_subforest(s);
+        subforest other = s;
+        if (s.right == leaf)
+        {
+            DEBUG("is_first_child");
+            s.right = empty_iterator();
+        }
+        else if (s.right->is_root())
+        {
+            // TODO:
+            // tu treba rovno zmenit aj prevs aj forests. 
+            // oba na (<null>, leaf)
+            // !!!
+            DEBUG("is_root");
+            logger.error("is_root, not implemented yet");
+            cerr << "isroot" << endl;
+            abort();
+        }
+        else if (!tree_type::is_first_child(s.right))
+        {
+            DEBUG("get prev sibling");
+            tree_type::sibling_iterator it = s.right;
+            --it;
+            s.right = it;
+        }
+        else
+        {
+            DEBUG("get prev postorder");
+            --s.right;
+        }
+        DEBUG("changing from [%s, %s], to [%s, %s]",
+                label(other.left), label(other.right),
+                label(s.left), label(s.right));
+    };
+    auto print_mapping = [&]()
+    {
+        for (auto val : mapping)
+            cout << label(val.it1) << "\t" << label(val.it2) << endl;
+    };
+    to_be_matched.push_back({t1.begin(), t2.begin()});
+    //auto forest_dist = comp_funct(root1, root2);
+
+
+
+    while(!to_be_matched.empty())
+    {
+        DEBUG("WHILE");
+
+        current = to_be_matched.back();
+        to_be_matched.pop_back();
+        forest_dist = comp_funct(current.it1, current.it2);
+        print_FDist(forest_dist);
+
+        leafs.it1 = tree_type::leftmost_child(current.it1);
+        leafs.it2 = tree_type::leftmost_child(current.it2);
+
+        all_subforest_nodes_init(forests.f1, current.it1);
+        all_subforest_nodes_init(forests.f2, current.it2);
+
+        assert(forests.f1.left == forests.f1.right);
+        assert(forests.f2.left == forests.f2.right);
+
+        if (tree_type::is_leaf(forests.f1.right))
+            prevs.f1.right = forests.f1.right;
+        else
+        {
+            prevs.f1.left  = tree_type::first_child(forests.f1.left );
+            prevs.f1.right = tree_type::last_child (forests.f1.right);
+        }
+        if (tree_type::is_leaf(forests.f2.right))
+            prevs.f2.right = forests.f2.right;
+        else
+        {
+            prevs.f2.left  = tree_type::first_child(forests.f2.left );
+            prevs.f2.right = tree_type::last_child (forests.f2.right);
+        }
+
+        bool loop = true;
+        while (loop)
+        {
+            DEBUG("FORESTS: [%s, %s][%s, %s]",
+                    label(forests.f1.left), label(forests.f1.right),
+                    label(forests.f2.left), label(forests.f2.right));
+            DEBUG("PREVS: [%s, %s][%s, %s]",
+                    label(prevs.f1.left), label(prevs.f1.right),
+                    label(prevs.f2.left), label(prevs.f2.right));
+
+            //if(prevs.f1.right == leafs.it1 &&
+               //prevs.f2.right == leafs.it2)
+            if (prevs.f1.left == empty_iterator() &&
+                    prevs.f2.left == empty_iterator())
+                loop = false;
+
+
+
+            if (forests.f1.right == forests.f1.left &&
+                    forests.f2.right == forests.f2.left)
+            {   // som na ceste... takze mozem dane nody namatchovat na seba
+                DEBUG("map %s, %s", label(forests.f1.right), label(forests.f2.right));
+                mapping.push_back({forests.f1.right, forests.f2.right});
+                forests = prevs;
+                step(prevs.f1);
+                step(prevs.f2);
+            }
+            else if (equal_funct(forests.f1, forests.f2, forests.f1, prevs.f2, GTED_COST_DELETE))
+            {   // delete node from F1
+                DEBUG("map <null>, %s", label(forests.f2.right));
+                mapping.push_back({empty_iterator(), forests.f2.right});
+                forests.f2 = prevs.f2;
+                step(prevs.f2);
+            }
+            else if (equal_funct(forests.f1, forests.f2, prevs.f1, forests.f2, GTED_COST_DELETE))
+            {   // delete node from F2
+                DEBUG("map %s, <null>", label(forests.f1.right));
+                mapping.push_back({forests.f1.right, empty_iterator()});
+                forests.f1 = prevs.f1;
+                step(prevs.f1);
+            }
+            else
+            {
+                DEBUG("to match %s, %s", label(forests.f1.right), label(forests.f2.right));
+                to_be_matched.push_back({forests.f1.right, forests.f2.right});
+                prevs = forests;
+                jump_tree(prevs.f1, leafs.it1);
+                jump_tree(prevs.f2, leafs.it2);
+                forests = prevs;
+                step(prevs.f1);
+                step(prevs.f2);
+            }
+        }
+    }
+    print_mapping();
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
