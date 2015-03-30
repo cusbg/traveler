@@ -244,7 +244,7 @@ private:
               T1_Hv;
 
 
-    struct t2_hw_partial_result{
+    struct t2_hw_partial_result {
         size_t subtree_size;
         size_t c_min;
         size_t H_value;

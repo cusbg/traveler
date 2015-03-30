@@ -31,7 +31,7 @@
 using namespace std;
 
 
-//#define NO_LOGGER_RTED_DEBUG_MESSAGES
+#define NO_LOGGER_RTED_DEBUG_MESSAGES
 
 #ifndef NO_LOGGER_RTED_DEBUG_MESSAGES
 

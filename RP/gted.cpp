@@ -229,6 +229,13 @@ size_t gted::biggest_subtree_child(tree_type::iterator root,
     return index;
 }
 
+void gted::print_TDist(tree_distance_table_type distances)
+{
+    APP_DEBUG_FNAME;
+    swap(tree_distances, distances);
+    print_TDist();
+    swap(tree_distances, distances);
+}
 void gted::print_TDist() const
 {
     APP_DEBUG_FNAME;
@@ -510,6 +517,8 @@ gted::gted(const tree_type& _t1, const tree_type& _t2)
 
     rted r(t1, t2);
     r.run_rted();
+
+    abort();
     strategies = r.get_strategies();
     t1_sizes = r.get_t1_sizes();
     t2_sizes = r.get_t2_sizes();
@@ -522,7 +531,7 @@ void gted::run_gted()
 
     precompute_heavy_paths();
     logger.notice("starting computing distances recursive");
-    compute_distances_recursive(t1.begin(), t2.begin());
+    compute_distances_recursive(++t1.begin(), ++t2.begin());
     logger.notice("computing mapping");
     compute_mapping();
 }
@@ -539,14 +548,16 @@ void gted::compute_distances_recursive(tree_type::iterator root1,
     //
     tree_type::iterator it;
     rted::strategy_map_type::mapped_type::mapped_type spair;
-    //spair = make_pair(T1, path_strategy::left);
+    spair = make_pair(T1, path_strategy::left);
     //spair = make_pair(T2, path_strategy::left);
     //spair = make_pair(T1, path_strategy::right);
-    spair = make_pair(T2, path_strategy::right);
+    //spair = make_pair(T2, path_strategy::right);
     //spair = make_pair(T1, path_strategy::heavy);
     //spair = make_pair(T2, path_strategy::heavy);
     //
     //spair = strategies.at(id(root1)).at(id(root2));
+    //if (spair.second == path_strategy::heavy)
+        //spair.second = path_strategy::left;
 
     if (spair.second == path_strategy::heavy)
     {
@@ -1043,8 +1054,9 @@ void gted::fill_table(forest_distance_table_type& forest_dist,
 
 void gted::compute_mapping()
 {
+    //return;
     APP_DEBUG_FNAME;
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     using iterator = tree_type::iterator;
 
@@ -1119,7 +1131,6 @@ void gted::compute_mapping()
                 label(other.left), label(other.right),
                 label(s.left), label(s.right));
     };
-
     auto jump_tree = [this](subforest& s, iterator leaf)
     {
         DEBUG("jump, %s", label(s.right));

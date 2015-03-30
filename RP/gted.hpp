@@ -154,6 +154,7 @@ private:
                                 const rted::map_type& t_sizes) const;
 
     void print_TDist() const;
+    void print_TDist(tree_distance_table_type distances);
     void print_FDist(const forest_distance_table_type& table) const;
     void print_subforest(const subforest& f);
 

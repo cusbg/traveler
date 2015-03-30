@@ -84,6 +84,8 @@ int main(int argc, char** argv)
     //l2 = "00";
     b2 = "(" + readbrackets() + ")";
     l2 = "0" + readseq() + "0";
+    b1 = b2;
+    l1 = l2;
 
     //l1 = "5142345";
     //b1 = "(.(..))";
