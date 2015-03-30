@@ -23,59 +23,6 @@
 
 using namespace std;
 
-bool Base::isBase(char ch)
-{
-    string s = "ACGUacgu";
-    return s.find(ch) != s.npos;
-}
-
-void Base::setBase(char ch)
-{
-    switch (ch)
-    {
-        case 'A':
-        case 'a':
-            b = _base::Adenin;
-            break;
-        case 'C':
-        case 'c':
-            b = _base::Cytosin;
-            break;
-        case 'G':
-        case 'g':
-            b = _base::Guanin;
-            break;
-        case 'U':
-        case 'u':
-            b = _base::Uracil;
-            break;
-        default:
-            throw "ERROR: not a base";
-    }
-}
-
-char Base::getBase() const
-{
-    switch (b)
-    {
-        case Adenin:
-            return 'A';
-        case Guanin:
-            return 'G';
-        case Uracil:
-            return 'U';
-        case Cytosin:
-            return 'C';
-    }
-    throw "";
-}
-
-Base::Base(char ch)
-{
-    setBase(ch);
-}
-
-
 std::string Global::HS_seq = "../InFiles/seq";
 std::string Global::HS_db = "../InFiles/homo_sapiens.ps";
 std::string Global::HS_bpseq = "../InFiles/homo_sapiens.bpseq";
@@ -96,19 +43,36 @@ std::string Global::zatvorky =  "((...).(.).).";
 #include <log4cpp/Priority.hh>
 #include <log4cpp/PatternLayout.hh>
 
+#include <sys/types.h>
+#include <unistd.h>
+
 log4cpp::Category& init_logger()
 {
-    log4cpp::Appender *appender = new log4cpp::OstreamAppender("console", &std::cout);
-    log4cpp::PatternLayout* layout = new log4cpp::PatternLayout();
-    layout->setConversionPattern("%d{%H:%M:%S:%l} %u:\t[%p] %m%n");
-    appender->setLayout(layout);
+    log4cpp::Appender* console_appender;
+    log4cpp::Appender* file_appender;
+    log4cpp::PatternLayout* console_layout;
+    log4cpp::PatternLayout* file_layout;
+    string logfile = "build/program-" + to_string(getpid()) + ".log";
+    string pattern = "%d{%H:%M:%S:%l} %u:\t[%p] %m%n";
 
+    console_appender = new log4cpp::OstreamAppender("console", &std::cout);
+    file_appender = new log4cpp::FileAppender("default", logfile, false);   // append=false=>truncate
+    
+    file_layout = new log4cpp::PatternLayout();
+    console_layout = new log4cpp::PatternLayout();
+    console_layout->setConversionPattern(pattern);
+    file_layout->setConversionPattern(pattern);
 
-    log4cpp::Category& logger = log4cpp::Category::getRoot();
-    logger.setPriority(log4cpp::Priority::DEBUG);
+    file_appender->setLayout(file_layout);
+    console_appender->setLayout(console_layout);
 
-    logger.addAppender(appender);
-    return logger;
+    log4cpp::Category& log = log4cpp::Category::getRoot();
+    log.setPriority(log4cpp::Priority::DEBUG);
+
+    log.addAppender(console_appender);
+    log.addAppender(file_appender);
+
+    return log;
 }
 
 log4cpp::Category& logger = init_logger();
