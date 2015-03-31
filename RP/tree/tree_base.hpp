@@ -23,12 +23,11 @@
 #ifndef TREE_BASE_HPP
 #define TREE_BASE_HPP
 
-#include "types.hpp"
+#include "../types.hpp"
 #include "tree_hh/tree.hh"
 #include "tree_hh/tree_util.hh"
 #include <memory>
 #include <sstream>
-#include <stdexcept>
 
 
 template <typename iterator>
@@ -42,16 +41,10 @@ template <typename node_type>
 class tree_base
 {
 private:
-    static size_t ID;
-    size_t id = ID++;
-    // do korena posadi vrchol ROOT_id
-
-private:
     typedef tree<node_type> tree_type;
     class _reverse_post_order_iterator;
 
 public:
-
     typedef typename tree_type::sibling_iterator sibling_iterator;
     typedef typename tree_type::post_order_iterator post_order_iterator;
     typedef _reverse_post_order_iterator reverse_post_order_iterator;
@@ -60,8 +53,6 @@ public:
     typedef std::vector<sibling_iterator> path_type;
     typedef tree_node_<node_type> tree_node;
 
-    std::shared_ptr<tree_type> tree_ptr;
-
 protected:
     tree_base() = default;
 
@@ -69,30 +60,30 @@ public:
     virtual ~tree_base() = default;
     template<typename labels_array>
         tree_base(const std::string& brackets, const labels_array& l);
-    /** for each node in postorder calls node.reset_id() => node_ids became post_ordered */
-    void set_ids_postorder();
+    inline size_t size() const;
+    /**
+     * for each node in postorder calls node.reset_id() => node_ids became post_ordered
+     */
+    inline void set_ids_postorder();
     void print_subtree(iterator root) const;
     void print_tree() const;
 
 public:
     // .begin() a .end() funkcie z tree<>
-    iterator begin() const;
-    iterator end() const;
-    post_order_iterator begin_post() const;
-    post_order_iterator end_post() const;
+    inline iterator begin() const;
+    inline iterator end() const;
+    inline post_order_iterator begin_post() const;
+    inline post_order_iterator end_post() const;
     // + reverzny post_order
-    reverse_post_order_iterator begin_post_reverse() const;
-    reverse_post_order_iterator end_post_reverse() const;
+    inline reverse_post_order_iterator begin_post_reverse() const;
+    inline reverse_post_order_iterator end_post_reverse() const;
 
-    //TODO: skontrolovat ci templaty funguju aj pre reverse_post_order_iterator.. 
 public: /* STATIC functions: */
-    // POZOR! treba brat/vracat take iste typy ako povodne funkcie pre tree_type..
+    // POZOR! treba brat/vracat take iste typy ako povodne funkcie pre tree_type
 
     /** return parent of it in tree */
     template <typename iter>
         static iter parent(iter it);
-    /** return parent of it in tree */
-    static reverse_post_order_iterator parent(reverse_post_order_iterator it);
     /** return n-th child of it */
     static sibling_iterator child(const base_iterator& it, size_t n);
 
@@ -118,6 +109,31 @@ public: /* STATIC functions: */
     static bool is_last_child(const base_iterator& it);
     /** has no children */
     static bool is_leaf(const base_iterator& it);
+
+private:
+    tree_type _tree;
+    static size_t ID;
+    size_t _size = 1;   // vzdy je tam aspon ROOT_id
+    size_t id = ID++;
+    // do korena posadi vrchol ROOT_id
+
+};
+
+
+/* inner class postorder iterator */
+template <typename node_type>
+class tree_base<node_type>::_reverse_post_order_iterator : public tree_base<node_type>::tree_type::iterator_base
+{
+    typedef typename tree_base<node_type>::tree_type::iterator_base iterator_base;
+public:
+    _reverse_post_order_iterator(const iterator_base&);
+    _reverse_post_order_iterator(tree_node* nodeptr = nullptr);
+    
+    bool operator==(const _reverse_post_order_iterator&) const;
+    bool operator!=(const _reverse_post_order_iterator&) const;
+    
+    _reverse_post_order_iterator   operator++(int);
+    _reverse_post_order_iterator&  operator++();
 };
 
 
@@ -137,25 +153,32 @@ tree_base<node_type>::tree_base(const std::string& brackets, const labels_array&
 {
     assert(brackets.size() == _labels.size());
     
-    tree_ptr = std::make_shared<tree_type>(node_type("ROOT_" + std::to_string(id), true));
-    auto iter = tree_ptr->begin();
+    _tree.set_head(node_type("ROOT_" + std::to_string(id), true));
+    //tree_ptr = std::make_shared<tree_type>(node_type("ROOT_" + std::to_string(id), true));
+    auto iter = begin();
     size_t i = 0;
     while(i < brackets.size())
     {
         switch (brackets[i])
         {
-            assert(tree_ptr->is_valid(iter));
+            assert(_tree.is_valid(iter));
+            //assert(tree_ptr->is_valid(iter));
             case '(':
-                iter = tree_ptr->append_child(iter, _labels[i]);
+                iter = _tree.append_child(iter, _labels[i]);
+                //iter = tree_ptr->append_child(iter, _labels[i]);
+                ++_size;
                 break;
             case ')':
                 assert(!iter->is_root());
                 iter->set_label(iter->get_label() + _labels[i].get_label());
                     //TODO: nieco ako set_base_pair(b1, b2)
-                iter = tree_ptr->parent(iter);
+                iter = parent(iter);
+                //iter = tree_ptr->parent(iter);
                 break;
             case '.':
-                tree_ptr->append_child(iter, _labels[i]);
+                _tree.append_child(iter, _labels[i]);
+                //tree_ptr->append_child(iter, _labels[i]);
+                ++_size;
                 break;
             default:
                 std::string s = std::string() + "Tree constructor: invalid bracket character '"
@@ -165,18 +188,27 @@ tree_base<node_type>::tree_base(const std::string& brackets, const labels_array&
         }
         ++i;
     }
+    assert(_tree.size() == size());
+    //assert(tree_ptr->size() == size());
     std::stringstream stream;
-    stream << "TREE WAS CONSTRUCTED, size = " << tree_ptr->size() << std::endl;
-    kptree::print_tree_bracketed(*tree_ptr, stream);
+    stream << "TREE WAS CONSTRUCTED, size = " << size() << std::endl;
+    kptree::print_tree_bracketed(_tree, stream);
+    //kptree::print_tree_bracketed(*tree_ptr, stream);
     logger.info(stream.str());
 }
 
 // PUBLIC FUNCTIONS:
 
 template <typename node_type>
+size_t tree_base<node_type>::size() const
+{
+    return _size;
+}
+
+template <typename node_type>
 void tree_base<node_type>::set_ids_postorder()
 {
-    for (auto it = tree_ptr->begin_post(); it != tree_ptr->end_post(); ++it)
+    for (auto it = _tree.begin_post(); it != _tree.end_post(); ++it)
         it->reset_id();
 }
 
@@ -184,7 +216,7 @@ template <typename node_type>
 void tree_base<node_type>::print_subtree(iterator root) const
 {
     std::stringstream stream;
-    kptree::print_subtree_bracketed(*tree_ptr, root, stream);
+    kptree::print_subtree_bracketed(_tree, root, stream);
     logger.debug("%s", stream.str().c_str());
 }
 
@@ -195,38 +227,39 @@ void tree_base<node_type>::print_tree() const
 }
 
 
+
 // ITERATORS:
 
 /* normal iterators + post_order iterators returns tree_ptr->FUNCT_NAME()..  */
 template <typename node_type>
 typename tree_base<node_type>::iterator tree_base<node_type>::begin() const
 {
-    return tree_ptr->begin();
+    return _tree.begin();
 }
 
 template <typename node_type>
 typename tree_base<node_type>::iterator tree_base<node_type>::end() const
 {
-    return tree_ptr->end();
+    return _tree.end();
 }
 
 template <typename node_type>
 typename tree_base<node_type>::post_order_iterator tree_base<node_type>::begin_post() const
 {
-    return tree_ptr->begin_post();
+    return _tree.begin_post();
 }
 
 template <typename node_type>
 typename tree_base<node_type>::post_order_iterator tree_base<node_type>::end_post() const
 {
-    return tree_ptr->end_post();
+    return _tree.end_post();
 }
 
 /* reverse iterator .begin() and .end(): */
 template <typename node_type>
 typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>::begin_post_reverse() const
 {
-    //// z tree<>::begin_post():
+    //// z _tree<>::begin_post():
     //
 	//tree_node *tmp=head->next_sibling;
 	//if(tmp!=feet) {
@@ -235,8 +268,8 @@ typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>:
 		//}
 	//return post_order_iterator(tmp);
     
-    tree_node* tmp = tree_ptr->head->next_sibling;
-    if (tmp != tree_ptr->feet)
+    tree_node* tmp = _tree.head->next_sibling;
+    if (tmp != _tree.feet)
     {
         while(tmp->last_child)
             tmp = tmp->last_child;
@@ -247,13 +280,13 @@ typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>:
 template <typename node_type>
 typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>::end_post_reverse() const
 {
-    //// z tree<>::end_post():
+    //// z _tree<>::end_post():
     //
 	//return post_order_iterator(feet);
     //
     //// Ja idem vzdy do .prev_sibling v ++ => nakoniec dojdem do .head
     
-    return reverse_post_order_iterator(base_iterator(tree_ptr->head));
+    return reverse_post_order_iterator(base_iterator(_tree.head));
 }
 
 
@@ -276,34 +309,28 @@ typename tree_base<node_type>::iterator tree_base<node_type>::rightmost_child(it
         it = last_child(it);
     return it;
 }
-
-/* static */
+/*
+[> static <]
 template <typename node_type>
 typename tree_base<node_type>::reverse_post_order_iterator tree_base<node_type>::parent(reverse_post_order_iterator it)
 {
+    //TODO
     return reverse_post_order_iterator(parent(iterator(it)));
 }
-
+*/
 /* static */
 template <typename node_type>
 template <typename iter>
 iter tree_base<node_type>::parent(iter it)
 {
-    return tree_type::parent(it);
+    return iter(it.node->parent);
 }
 
 /* static */
 template <typename node_type>
 typename tree_base<node_type>::sibling_iterator tree_base<node_type>::child(const base_iterator& it, size_t n)
 {
-    size_t ch_size = it.number_of_children();
-
-    if(ch_size == 0 || n >= ch_size)
-    {
-        logger.fatal("node '%s:%lu' dont have so much children, %lu < %lu",
-                label(it), it->get_id(), ch_size, n);
-        exit(1);
-    }
+    assert(it.number_of_children() > n);
 
     return tree_type::child(it, n);
 }
@@ -314,7 +341,7 @@ template <typename node_type>
 template <typename iter>
 iter tree_base<node_type>::first_child(iter it)
 {
-    return iter(child(it, 0));
+    return iter(it.node->first_child);
 }
 
 /* static */
@@ -322,75 +349,44 @@ template <typename node_type>
 template <typename iter>
 iter tree_base<node_type>::last_child(iter it)
 {
-    return iter(child(it, it.number_of_children() - 1));
+    return iter(it.node->last_child);
 }
 
 /* static */
 template <typename node_type>
 bool tree_base<node_type>::is_first_child(const base_iterator& it)
 {
-    // it == it.begin() nefunguje!!!
-    //return fist_child(parent(it)) == it;
-
-    return first_child(parent(it)).node == it.node;
-
-    //return tree_type::child(parent(it), 0) == it;
+    assert(it.node != nullptr);
+    return it.node->prev_sibling == nullptr;
 }
 
 /* static */
 template <typename node_type>
 bool tree_base<node_type>::is_last_child(const base_iterator& it)
 {
-    // TODO: neist cez number_of_children, ale radsej cez tree::node..
-    // .. nieje definovany operator==(base_it, base_it)..
-    
-    return last_child(parent(it)).node == it.node;
-    
-    //size_t n = parent(it).number_of_children();
-    //return tree_type::child(parent(it), n - 1) == it;
+    assert(it.node != nullptr);
+    return it.node->next_sibling == nullptr;
 }
 
 /* static */
 template <typename node_type>
 bool tree_base<node_type>::is_leaf(const base_iterator& it)
 {
-    return it.number_of_children() == 0;
+    assert(it.node != nullptr);
+    return it.node->last_child == nullptr;
 }
 
-
-/* inner class postorder iterator */
-template <typename node_type>
-class tree_base<node_type>::_reverse_post_order_iterator : public tree_base<node_type>::tree_type::iterator_base
-{
-    typedef typename tree_base<node_type>::tree_type::iterator_base iterator_base;
-    typedef typename tree_base<node_type>::tree_type::sibling_iterator sibling_iterator;
-public:
-    _reverse_post_order_iterator();
-    _reverse_post_order_iterator(const iterator_base&);
-    _reverse_post_order_iterator(const sibling_iterator&);
-    
-    bool operator==(const _reverse_post_order_iterator&) const;
-    bool operator!=(const _reverse_post_order_iterator&) const;
-    
-    _reverse_post_order_iterator   operator++(int);
-    _reverse_post_order_iterator&  operator++();
-};
 
 // REVERSE POST ORDER ITERATOR FUNCTIONS:
 
 /* _reverse_post_order_iterator class functions: */
 template <typename node_type>
-tree_base<node_type>::_reverse_post_order_iterator::_reverse_post_order_iterator()
-    : iterator_base(0)
+tree_base<node_type>::_reverse_post_order_iterator::_reverse_post_order_iterator(tree_node* nodeptr)
+    : iterator_base(nodeptr)
 {}
 
 template <typename node_type>
 tree_base<node_type>::_reverse_post_order_iterator::_reverse_post_order_iterator(const iterator_base& it)
-    : iterator_base(it.node)
-{}
-
-template <typename node_type>
-tree_base<node_type>::_reverse_post_order_iterator::_reverse_post_order_iterator(const sibling_iterator& it)
     : iterator_base(it.node)
 {}
 
@@ -417,7 +413,7 @@ typename tree_base<node_type>::_reverse_post_order_iterator tree_base<node_type>
 template <typename node_type>
 typename tree_base<node_type>::_reverse_post_order_iterator& tree_base<node_type>::_reverse_post_order_iterator::operator++()
 {
-    //// z tree<>::post_order_iterator::operator++():
+    //// z _tree<>::post_order_iterator::operator++():
     //
 	//assert(this->node!=0);
 	//if(this->node->next_sibling==0) {

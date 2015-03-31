@@ -24,13 +24,8 @@
 
 #include "tree_base.hpp"
 #include "node_base.hpp"
-#include <unordered_map>
 
-
-typedef tree_base<node_base<std::string> > RNA_tree_type;
-
-
-class rna_tree : public RNA_tree_type
+class rna_tree : public tree_base<node_base<std::string>>
 {
 public:
     virtual ~rna_tree() = default;

@@ -22,7 +22,7 @@
 #ifndef NODE_BASE_HPP
 #define NODE_BASE_HPP
 
-#include "types.hpp"
+#include "../types.hpp"
 
 
 template <typename label_type>
@@ -38,16 +38,16 @@ public:
     node_base() = default;
     node_base(const label_type& _label, bool _isroot = false);
 public:
-    size_t get_id() const;
-    const label_type& get_label() const;
+    inline size_t get_id() const;
+    inline const label_type& get_label() const;
 
-    void set_label(const label_type& _label);
-    void reset_id();
+    inline void set_label(const label_type& _label);
+    inline void reset_id();
 
-    virtual bool is_root() const;
-    bool operator==(const node_base<label_type>& other) const;
+    inline bool is_root() const;
     friend std::ostream& operator<<(std::ostream& out, const node_base<label_type>& n)
     {
+        // TODO vyhodit von z deklaracie...
         out << n.label;
         return out;
     }
@@ -97,11 +97,7 @@ bool node_base<label_type>::is_root() const
     return isroot;
 }
 
-template <typename label_type>
-bool node_base<label_type>::operator==(const node_base<label_type>& other) const
-{
-    return label == other.label;
-}
+
 
 #endif /* !NODE_BASE_HPP */
 
