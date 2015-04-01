@@ -28,10 +28,30 @@
 #include <vector>
 #include <sstream>
 #include <algorithm>
+#include <stdexcept>
 
 
-#include <log4cpp/Category.hh>
+#define PATH_STRATEGY_LEFT_T1   1
+#define PATH_STRAGEGY_RIGHT_T1  2
+#define PATH_STRATEGY_HEAVY_T1  4
+#define PATH_STRATEGY_LEFT_T2   8
+#define PATH_STRAGEGY_RIGHT_T2  16
+#define PATH_STRAGEGY_HEAVY_T2  32
 
+std::string graph_to_string(char ch);
+std::string path_to_string(char ch);
+std::string all_to_string(char ch);
+
+bool is_path_strategy(char ch);
+
+bool is_right_path(char ch);
+bool is_left_path (char ch);
+bool is_heavy_path(char ch);
+
+bool is_T1(char ch);
+bool is_T2(char ch);
+
+/*
 class Base
 {
 private:
@@ -56,6 +76,7 @@ enum path_strategy
 };
 
 
+
 struct Global
 {
     // definicie in-suborov:
@@ -69,9 +90,15 @@ struct Global
     static std::string rnaseq;
 };
 
+*/
 
 
+
+#include <log4cpp/Category.hh>
 extern log4cpp::Category& logger; // globalna premenna...
+
+
+
 
 
 class set_logger_priority_to_return_function
