@@ -6,7 +6,9 @@
 
 
 CC = g++
-CFLAGS = -std=c++11 -c -Wall -g
+#DEBUG = -g
+RELEASE = -DNDEBUG -O3
+CFLAGS = -std=c++11 -c -Wall $(DEBUG) $(RELEASE)
 LFLAGS = -std=c++11 -Wall $(shell pkg-config --libs log4cpp)
 SHELL = /bin/bash
 
@@ -37,7 +39,7 @@ debug: build
 
 $(BUILDDIR)/$(TARGET): $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES)) $(BUILDDIR)/Makefile
 
-$(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES)) Makefile
+$(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES))
 	@rm -f $@
 	@echo -e\
 			\\nbuild : $(TARGET) \\n \
@@ -68,7 +70,7 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 $(BUILDDIR)/%.mk: %.cpp
 	@mkdir -p $(BUILDDIR)
 	@rm -f $@
-	@$(MAKEDEPENDENCY) $(CFLAGS) $^ | sed 's@\([^. :]*.\([hc]pp\|hh\)\)@../\1@g' \
+	@$(MAKEDEPENDENCY) $(CFLAGS) $^ | sed 's@\([^ :]*\.\([hc]pp\|hh\)\)@../\1@g' \
 					>> $@
 	@echo '	$(CC) $(CFLAGS) $$< -o $$@ ' \
 					>> $@
