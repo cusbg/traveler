@@ -32,65 +32,26 @@
 
 
 #define PATH_STRATEGY_LEFT_T1   1
-#define PATH_STRAGEGY_RIGHT_T1  2
+#define PATH_STRATEGY_RIGHT_T1  2
 #define PATH_STRATEGY_HEAVY_T1  4
 #define PATH_STRATEGY_LEFT_T2   8
-#define PATH_STRAGEGY_RIGHT_T2  16
-#define PATH_STRAGEGY_HEAVY_T2  32
+#define PATH_STRATEGY_RIGHT_T2  16
+#define PATH_STRATEGY_HEAVY_T2  32
 
-std::string graph_to_string(char ch);
-std::string path_to_string(char ch);
-std::string all_to_string(char ch);
+typedef char strategy_pair;
 
-bool is_path_strategy(char ch);
+std::string graph_to_string(strategy_pair ch);
+std::string path_to_string(strategy_pair ch);
+std::string all_to_string(strategy_pair ch);
 
-bool is_right_path(char ch);
-bool is_left_path (char ch);
-bool is_heavy_path(char ch);
+bool is_path_strategy(strategy_pair ch);
 
-bool is_T1(char ch);
-bool is_T2(char ch);
+bool is_right_path(strategy_pair ch);
+bool is_left_path (strategy_pair ch);
+bool is_heavy_path(strategy_pair ch);
 
-/*
-class Base
-{
-private:
-    enum _base { Adenin, Cytosin, Guanin, Uracil } b;
-    void setBase(char ch);
-public:
-    Base(char ch);
-    static bool isBase(char ch);
-    char getBase() const;
-};
-
-
-struct Point
-{
-    float X;
-    float Y;
-};
-
-enum path_strategy
-{
-    left, heavy, right
-};
-
-
-
-struct Global
-{
-    // definicie in-suborov:
-    static std::string HS_seq; 
-    static std::string HS_db;
-    static std::string HS_bpseq;
-    static std::string HS_rnafold;
-    static std::string HS_zatvorky;
-
-    static std::string zatvorky;
-    static std::string rnaseq;
-};
-
-*/
+bool is_T1(strategy_pair ch);
+bool is_T2(strategy_pair ch);
 
 
 
@@ -127,6 +88,7 @@ private:
 #define APP_DEBUG_FNAME \
     logger.debug("Entering function: %s", __PRETTY_FUNCTION__)
 
+/*
 #define SUBTREE_DEBUG_PRINT(tree, iterator) \
         { \
             std::stringstream stream; \
@@ -140,6 +102,7 @@ private:
             kptree::print_tree_bracketed(tree, stream); \
             logger.debug("TREE: %s", stream.str().c_str()); \
         }
+*/
 
 #define LOGGER_PRINT_CONTAINER(container, name) \
         { \

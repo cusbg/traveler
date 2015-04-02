@@ -31,10 +31,9 @@
 class rted
 {
 public:
-    typedef char                                strategy_pair_type;
     typedef std::unordered_map<size_t,
                 std::unordered_map<size_t,
-                    strategy_pair_type>>        strategy_map_type;
+                    strategy_pair>>        strategy_map_type;
     typedef tree_base<node_base<std::string>>   tree_type;
     typedef std::unordered_map<size_t, size_t>  map_type;
 

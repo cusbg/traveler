@@ -379,16 +379,16 @@ size_t rted::update_STR_table(
             value = PATH_STRATEGY_LEFT_T2;
             break;
         case RTED_VECTOR_T1_RIGHT_INDEX:
-            value = PATH_STRAGEGY_RIGHT_T1;
+            value = PATH_STRATEGY_RIGHT_T1;
             break;
         case RTED_VECTOR_T2_RIGHT_INDEX:
-            value = PATH_STRAGEGY_RIGHT_T2;
+            value = PATH_STRATEGY_RIGHT_T2;
             break;
         case RTED_VECTOR_T1_HEAVY_INDEX:
             value = PATH_STRATEGY_HEAVY_T1;
             break;
         case RTED_VECTOR_T2_HEAVY_INDEX:
-            value = PATH_STRAGEGY_HEAVY_T2;
+            value = PATH_STRATEGY_HEAVY_T2;
             break;
         default:
             logger.error("i should not be there, %lu == c_min_index != 0..5", index);
