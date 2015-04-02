@@ -21,13 +21,9 @@
 
 
 #include <iostream>
-#include "types.hpp"
-#include "tree_hh/tree.hh"
-#include "tree_hh/tree_util.hh"
-#include "node_base.hpp"
-#include "tree_base.hpp"
-#include "rna_tree.hpp"
 #include <fstream>
+
+#include "types.hpp"
 #include "rted.hpp"
 #include "tests.hpp"
 #include "gted.hpp"
@@ -60,6 +56,7 @@ int main(int argc, char** argv)
 {
     cout << boolalpha;
 
+
     string b1, l1, b2, l2;
     l1 = LABELS1;
     b1 = BRACKETS1;
@@ -74,11 +71,11 @@ int main(int argc, char** argv)
     //l2 = "ABCDCA";
     //b2 = "(.(.))";
 
-    l1 = "5142345";
-    b1 = "(.(..))";
+    //l1 = "5142345";
+    //b1 = "(.(..))";
 
-    l2 = "EACBCDE";
-    b2 = "(.(.).)";
+    //l2 = "EACBCDE";
+    //b2 = "(.(.).)";
 
     //b2 = "()";
     //l2 = "00";
@@ -96,13 +93,15 @@ int main(int argc, char** argv)
 
     //rna_tree rna1("(" + b1 + ")", "." + l1 + ".");
     //rna_tree rna2("(" + b2 + ")", "," + l2 + ",");
+
     rna_tree rna1(b1, l1);
     rna_tree rna2(b2, l2);
     rna1.set_ids_postorder();
     rna2.set_ids_postorder();
 
-    //rted r(rna1, rna2);
-    //r.run_rted();
+    rted r(rna1, rna2);
+    r.run_rted();
+    //rted_tests();
     //return 0;
     //
     //auto s1 = r.get_t2_sizes();
@@ -110,8 +109,8 @@ int main(int argc, char** argv)
         //cout << val.second << endl;
 
 
-    gted g(rna1, rna2);
-    g.run_gted();
+    //gted g(rna1, rna2);
+    //g.run_gted();
     //g.test();
 
 

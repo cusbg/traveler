@@ -6,8 +6,8 @@
 
 
 CC = g++
-#DEBUG = -g
-RELEASE = -DNDEBUG -O3
+DEBUG = -g
+#RELEASE = -DNDEBUG -O3
 CFLAGS = -std=c++11 -c -Wall $(DEBUG) $(RELEASE)
 LFLAGS = -std=c++11 -Wall $(shell pkg-config --libs log4cpp)
 SHELL = /bin/bash

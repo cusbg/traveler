@@ -34,121 +34,22 @@ using namespace std;
 #define all_subforest_nodes_init(Subforest, value) \
     Subforest.left = Subforest.right = Subforest.path_node = value
 
-void gted::test()
-{
-    //return;
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
-    auto test_funct = [](rna_tree rna1, rna_tree rna2, vector<vector<size_t>> vec)
-    {
-        rna1.set_ids_postorder();
-        rna2.set_ids_postorder();
+#ifdef NDEBUG
+#define GTED_CHECKS_DISABLED
+#endif
 
-        gted g(rna1, rna2);
-        g.run_gted();
-        auto dist = g.tree_distances;
 
-        size_t i, j;
-        i = j = 0;
-        tree_type::post_order_iterator it1, it2;
-        for (it1 = g.t1.begin_post(); it1 != --g.t1.end_post(); ++it1)
-        {
-            for (it2 = g.t2.begin_post(); it2 != --g.t2.end_post(); ++it2)
-            {
-                if (dist.at(id(it1)).at(id(it2)) != vec[i][j])
-                {
-                    logger.fatal("zle vyratane");
-                    cout << *it1 << " " << *it2 << endl <<
-                        "indexy: " << i << " " << j << endl;
-                    abort();
-                }
-                ++j;
-            }
-            ++i;
-            j = 0;
-        }
-        logger.notice("TEST OK");
-    };
-    string l1, l2, b1, b2;
-    vector<vector<size_t>> vec;
-    rna_tree rna1, rna2;
+#define GTED_CHECKS_DISABLED
 
-    vec = { /*  A   B   CC  D   EE  */
-    /*  1   */{ 0,  0,  1,  0,  4   },
-    /*  2   */{ 0,  0,  1,  0,  4   },
-    /*  3   */{ 0,  0,  1,  0,  4   },
-    /*  44  */{ 2,  2,  1,  2,  2   },
-    /*  55  */{ 4,  4,  3,  4,  2   }
-    };
 
-    l1 = "5142345";
-    b1 = "(.(..))";
 
-    l2 = "EACBCDE";
-    b2 = "(.(.).)";
 
-    rna1 = rna_tree(b1, l1);
-    rna2 = rna_tree(b2, l2);
 
-    test_funct(rna1, rna2, vec);
 
-    vec = { /*  A   B   C   DD  */
-    /*  1   */{ 0,  0,  0,  3,  },
-    /*  2   */{ 0,  0,  0,  3,  },
-    /*  3   */{ 0,  0,  0,  3,  },
-    /*  44  */{ 2,  2,  2,  1,  },
-    /*  55  */{ 4,  4,  4,  1,  }
-    };
 
-    l1 = "5142345";
-    b1 = "(.(..))";
+#ifdef NODEF
 
-    l2 = "DABCD";
-    b2 = "(...)";
-
-    rna1 = rna_tree(b1, l1);
-    rna2 = rna_tree(b2, l2);
-
-    test_funct(rna1, rna2, vec);
-
-}
-
-bool gted::subforest::operator==(const gted::subforest& other) const
-{
-    return left == other.left &&
-        right == other.right;
-}
-
-size_t gted::subforest::hash::operator()(const gted::subforest& s) const
-{
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    // zdroj hash funkcie:
-    // http://stackoverflow.com/questions/682438/hash-function-providing-unique-uint-from-an-integer-coordinate-pair
-    auto hash_f = [](size_t x, size_t y) 
-    {
-        return (x * 0x1F1F1F1F) ^ y;
-    };
-    assert(s.right.node != NULL);
-
-    size_t out;
-    // TODO zmazat, zatial to je len na debug ucely...
-    if (s.left.node == NULL)
-        out = 0;
-    // id su jednoznacne... 
-    else if (s.left == s.right || s.left.node == NULL)
-        out = s.right->get_id();
-    else
-        out = hash_f(s.left->get_id(), s.right->get_id());
-
-    static vector<subforest> hashes;
-    if (find(hashes.begin(), hashes.end(), s) == hashes.end())
-    {
-        hashes.push_back(s);
-        DEBUG("HASH [%s, %s] = %i", label(s.left), label(s.right), out);
-    }
-    return out;
-}
 
 void gted::precompute_heavy_paths()
 {
@@ -1261,6 +1162,293 @@ void gted::compute_mapping()
 }
 
 
+bool gted::do_decompone_LR(tree_type::iterator& it_ref,
+                    tree_type::iterator root,
+                    path_strategy str) const
+{
+    /*
+     * podla strategie vracia keyroots
+     */
+    APP_DEBUG_FNAME;
+    DEBUG("it=%s, end=%s", label(it_ref), label(root));
+
+    assert(str != path_strategy::heavy && "only LR strategies");
+    assert(id(it_ref) <= id(root));
+
+    if (it_ref == root)
+    {
+        DEBUG("it_ref == root, return=false");
+        return false;
+    }
+
+    tree_type::sibling_iterator it = it_ref;
+    
+    if (str == path_strategy::left)
+    {
+        // prechadzam bratov zlava doprava
+        // ak som nakraji, idem do otca.
+        //
+        DEBUG("str == left");
+        
+        if (tree_type::is_last_child(it))
+            it = tree_type::parent(it);
+        else
+            ++it;
+
+        // sice som sa posunul, ale som na ceste, musim is to dalsieho vrcholu
+        while(it != root && tree_type::is_first_child(it))
+        {
+            DEBUG("while, it=%s", label(it));
+            assert(id(it) < id(root));
+
+            if (tree_type::is_last_child(it))
+                it = tree_type::parent(it);
+            else
+                ++it;
+        }
+    }
+    else
+    {
+        // prechadzam bratov zprava dolava, obdoba ::left
+        DEBUG("str == right");
+
+        if (tree_type::is_first_child(it))
+            it = tree_type::parent(it);
+        else
+            --it;
+
+        while(it != root && tree_type::is_last_child(it))
+        {
+            DEBUG("while, it=%s", label(it));
+            assert(id(it) < id(root));
+
+            if (tree_type::is_first_child(it))
+                it = tree_type::parent(it);
+            else
+                --it;
+        }
+    }
+
+    it_ref = it;
+
+    bool output = (root != it_ref);
+    DEBUG("itout=%s, return %s", label(it_ref), output?"true":"false");
+    return output;
+}
+
+bool gted::do_decompone_LR_recursive(tree_type::iterator& it_ref,
+                                tree_type::iterator& leaf,
+                                tree_type::iterator end,
+                                path_strategy str) const
+{
+    APP_DEBUG_FNAME;
+    DEBUG("it=%s, end=%s, str=%s",
+            label(it_ref), label(end), to_string(str));
+
+    assert(str != path_strategy::heavy && "only LR strategies");
+
+    if (str == path_strategy::left)
+    {
+        assert(id(end) < id(it_ref));
+
+        // idem zprava dolava
+        tree_type::reverse_post_order_iterator it = it_ref;
+        ++it;
+        while(it != end && tree_type::is_first_child(it))
+        {
+            if (tree_type::is_leaf(it))
+                leaf = it;
+
+            DEBUG("while, it=%s", label(it));
+            ++it;
+        }
+        it_ref = it;
+    }
+    else
+    {
+        DEBUG("right str");
+        // idem zlava doprava..
+        assert(id(end) > id(it_ref));
+
+        tree_type::post_order_iterator it = it_ref;
+        ++it;
+        while(it != end && tree_type::is_last_child(it))
+        {
+            if (tree_type::is_leaf(it))
+                leaf = it;
+
+            DEBUG("while, it=%s", label(it));
+            ++it;
+        }
+        it_ref = it;
+    }
+    // pripad ze while neprebehne ani raz..
+    if (tree_type::is_leaf(it_ref))
+        leaf = it_ref;
+
+    bool output = end != it_ref;
+    DEBUG("itout=%s, return %s", label(it_ref), output?"true":"false");
+    return output;
+}
+
+void gted::single_path_function_LR(tree_type::iterator root1,
+                                tree_type::iterator root2,
+                                path_strategy str,
+                                graph who_first)
+{
+    APP_DEBUG_FNAME;
+    DEBUG("roots: %s %s, str=%s, whofirst=%s", 
+            label(root1), label(root2), to_string(str), to_string(who_first));
+    
+    assert(str != path_strategy::heavy);
+
+    tree_type::iterator it;
+    tree_type::iterator end_it;
+    subforest_pair forests;
+    tree_type::iterator leaf;
+
+    init_subforest_pair(forests, root1, root2, str, who_first);
+    print_subforest(forests.f1);
+    print_subforest(forests.f2);
+
+    end_it = (str == path_strategy::left ? 
+            tree_type::leftmost_child (forests.f1.root) :
+            tree_type::rightmost_child(forests.f1.root));
+    it = forests.f1.path_node;
+    forests.f1.root = it;
+    leaf = it;
+
+    if ((str == path_strategy::left && !tree_type::is_first_child(it)) ||
+        (str == path_strategy::right && !tree_type::is_last_child(it)))
+    {
+        compute_distance(forests, who_first);
+    }
+
+    while(do_decompone_LR_recursive(it, leaf, end_it, str))
+    {
+        all_subforest_nodes_init(forests.f1, leaf);
+        forests.f1.root = it;
+
+        //print_subforest(forests.f1);
+
+        compute_distance(forests, who_first);
+    }
+    all_subforest_nodes_init(forests.f1, end_it);
+    forests.f1.root = (who_first == T1) ? root2 : root1;
+    DEBUG("compute between roots in single_path_f");
+    compute_distance(forests, who_first);
+}
+
+bool gted::do_decompone_H(tree_type::iterator& it_ref,
+                        tree_type::iterator root,
+                        tree_type::iterator& it_path_node) const
+{
+    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    APP_DEBUG_FNAME;
+
+    DEBUG("it=%s, pathnode=%s, root=%s",
+            label(it_ref), label(it_path_node), label(root));
+    
+    assert(id(it_ref) <= id(root) &&
+            id(it_path_node) <= id(root));
+
+    if (it_ref == root)
+    {
+        DEBUG("itref == root, return false");
+        assert(it_ref == it_path_node);
+        return false;
+    }
+
+    tree_type::sibling_iterator it = it_ref;
+
+    if (it == it_path_node)
+        // it <- 1. brat it.
+        it = tree_type::first_child(tree_type::parent(it));
+    else if (tree_type::is_last_child(it))
+    {
+        // it <- 1. brat od rodica..
+        it = tree_type::parent(it);
+        it_path_node = it;
+    }
+    else
+        ++it;
+
+    while(it != root && it == it_path_node)
+    {
+        DEBUG("while, it=%s", label(it));
+
+        if (tree_type::is_last_child(it))
+        {
+            // go to first sibling of parent..
+            it = tree_type::parent(it);
+            it_path_node = it;
+
+            // ak nieje root, tak ma este otca, a chcem jeho prveho syna..
+            // inac, root je jediny, takze to nepotrebujem riesit..
+            if (!it->is_root())
+                it = tree_type::first_child(tree_type::parent(it));
+        }
+        else
+            ++it;
+    }
+    it_ref = it;
+
+    bool output = root != it_ref;
+    DEBUG("itout=%s, return %s", label(it_ref), output?"true":"false");
+    return output;
+}
+
+bool gted::do_decompone_H_recursive(tree_type::iterator& it_ref,
+                                    tree_type::iterator& leaf,
+                                    tree_type::iterator end) const
+{
+    APP_DEBUG_FNAME;
+    DEBUG("it=%s, end=%s, str=heavy",
+            label(it_ref), label(end));
+
+    // budem vzdy zacinat v najlavejsom vrchole
+    // a postupne budem prechadzat strom a ak
+    //  heavy_node(parent(it_ref)) != leaf,
+    //      tak to znamena, ze it_ref nieje na heavy_path otca
+    //      a teda ze mam dany vrchol vyratat. inac pokracujem dalej.
+
+    tree_type::post_order_iterator it = it_ref;
+
+    ++it;
+
+    //while(it != end && leaf == 
+    //TODO: potrebujem tu aj tabulku heavy_paths...
+    //
+    //moznob y stalo zato zlucit T1/T2 heavy_paths do 1 tabulky
+    //.. iba najprv skontrolovat, ze IDcka v oboch stromoch su rozne...
+    //a usetri sa potom kopa roboty s parametramy a tak..
+
+    it_ref = it;
+
+    if (tree_type::is_leaf(it_ref))
+        leaf = it_ref;
+
+    return false;
+}
+
+void gted::single_path_function_H(tree_type::iterator root1,
+                                tree_type::iterator root2,
+                                graph who_first)
+{
+    APP_DEBUG_FNAME;
+    DEBUG("roots: %s %s, whofirst=%s", 
+            label(root1), label(root2), to_string(who_first));
+
+    tree_type::iterator it;
+    tree_type::iterator end_it;
+    subforest_pair forests;
+    tree_type::iterator leaf;
+
+    init_subforest_pair(forests, root1, root2, path_strategy::heavy, who_first);
+    print_subforest(forests.f1);
+    print_subforest(forests.f2);
+}
 
 
 
@@ -1270,6 +1458,173 @@ void gted::compute_mapping()
 
 
 
+
+
+
+
+
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+bool gted::subforest::operator==(const gted::subforest& other) const
+{
+    return left == other.left &&
+        right == other.right;
+}
+
+size_t gted::subforest::hash::operator()(const gted::subforest& s) const
+{
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    // zdroj hash funkcie:
+    // http://stackoverflow.com/questions/682438/hash-function-providing-unique-uint-from-an-integer-coordinate-pair
+    auto hash_f = [](size_t x, size_t y) 
+    {
+        return (x * 0x1F1F1F1F) ^ y;
+    };
+    assert(s.right.node != NULL);
+
+    size_t out;
+    if (s.left == s.right || s.left.node == NULL)
+        out = s.right->get_id();
+    else
+        out = hash_f(s.left->get_id(), s.right->get_id());
+
+#ifdef GTED_CHECKS_DISABLED
+    static vector<subforest> hashes;
+    if (find(hashes.begin(), hashes.end(), s) == hashes.end())
+    {
+        hashes.push_back(s);
+        DEBUG("HASH [%s, %s] = %i", label(s.left), label(s.right), out);
+    }
+#endif
+    return out;
+}
+
+
+
+void gted::compute_distances_recursive(
+                    tree_type::iterator root1,
+                    tree_type::iterator root2)
+{
+    APP_DEBUG_FNAME;
+
+    strategy_pair spair;
+
+    
+    spair = PATH_STRATEGY_LEFT_T1;
+    //spair = strategies.at(id(root1)).at(id(root2));
+    
+    if (is_T1(spair))
+    {
+
+    }
+    else
+    {
+
+    }
+}
+
+gted::gted(const tree_type& _t1, const tree_type& _t2)
+    : t1(_t1), t2(_t2)
+{
+    auto merge = [this](rted::map_type m1, rted::map_type m2)
+    {
+        if (t2.size() > t1.size())
+            m1.swap(m2);
+
+        t_sizes = std::move(m1);
+        t_sizes.insert(m2.begin(), m2.end());
+    };
+
+    APP_DEBUG_FNAME;
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    rted r(t1, t2);
+    r.run_rted();
+
+    abort();
+    strategies = r.get_strategies();
+
+    merge(r.get_t1_sizes(), r.get_t2_sizes());
+}
+
+void gted::run_gted()
+{
+    //APP_DEBUG_FNAME;
+    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    //precompute_heavy_paths();
+    //logger.notice("starting computing distances recursive");
+    //compute_distances_recursive(++t1.begin(), ++t2.begin());
+    //logger.notice("computing mapping");
+    //compute_mapping();
+}
+
+
+void gted::precompute_paths()
+{
+    auto comp_LR = [this](const tree_type t)
+    {
+        size_t it_id;
+        tree_type::iterator left, right;
+        tree_type::post_order_iterator it;
+
+        for (it = t.begin_post(); it != t.end_post(); ++it)
+        {
+            it_id = id(it);
+
+            if (tree_type::is_leaf(it))
+            {
+                left  = it;
+                right = it;
+            }
+            else
+            {
+                left = tree_type::first_child(it);
+                right = tree_type::last_child(it);
+            }
+            paths.left [it_id] = left;
+            paths.right[it_id] = right;
+        }
+    };
+
+    auto comp_H = [this](const tree_type t)
+    {
+        size_t it_id;
+        tree_type::iterator parent;
+        tree_type::post_order_iterator it;
+
+        for (it = t.begin_post(); !it->is_root(); ++it)
+        {
+            it_id = id(it);
+            parent = tree_type::parent(it);
+            tree_type::iterator heavy = paths.heavy[id(parent)];
+
+            if (tree_type::is_leaf(it))
+                paths.heavy[it_id] = it;
+            if (heavy == empty_iterator() ||
+                    t_sizes.at(id(heavy)) < t_sizes.at(it_id))
+                paths.heavy[id(parent)] = it;
+        }
+    };
+
+    comp_LR(t1);
+    comp_LR(t2);
+    comp_H(t1);
+    comp_H(t2);
+}
 
 
 
