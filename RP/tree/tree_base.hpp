@@ -65,6 +65,11 @@ public:
      * for each node in postorder calls node.reset_id() => node_ids became post_ordered
      */
     inline void set_ids_postorder();
+    /*
+     * find node with id
+     */
+    iterator find(size_t id) const;
+    iterator find(node_type node) const;
     void print_subtree(iterator root) const;
     void print_tree() const;
 
@@ -210,6 +215,26 @@ void tree_base<node_type>::set_ids_postorder()
 {
     for (auto it = _tree.begin_post(); it != _tree.end_post(); ++it)
         it->reset_id();
+}
+
+template <typename node_type>
+typename tree_base<node_type>::iterator tree_base<node_type>::find(size_t _id) const
+{
+    for (auto it = begin(); it != end(); ++it)
+        if (::id(it) == _id)
+            return it;
+
+    throw std::invalid_argument("id not found in tree");
+}
+
+template <typename node_type>
+typename tree_base<node_type>::iterator tree_base<node_type>::find(node_type node) const
+{
+    for (auto it = begin(); it != end(); ++it)
+        if (::label(it) == node.get_label())
+            return it;
+
+    throw std::invalid_argument("label not found in tree");
 }
 
 template <typename node_type>

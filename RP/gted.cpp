@@ -25,24 +25,32 @@
 
 using namespace std;
 
-
+/*
 #define F_str "F[%s, %s][%s, %s]"
 #define T_str "T[%s][%s]"
 
 #define labels_LR(s) label(s.left), label(s.right)
+*/
 
 #define all_subforest_nodes_init(Subforest, value) \
     Subforest.left = Subforest.right = Subforest.path_node = value
 
-
-#ifdef NDEBUG
-#define GTED_CHECKS_DISABLED
-#endif
-
-
 #define GTED_CHECKS_DISABLED
 
+#define BAD_INDEX 0xBADF00D
 
+#define is_heavy(iter) \
+        (!iter->is_root() && heavy_child(tree_type::parent(iter)) == iter)
+#define is_first(iter) \
+        (tree_type::is_first_child(iter))
+#define is_last(iter) \
+        (tree_type::is_last_child(iter))
+
+#define lies_on_path(iter, STR) \
+        (precomputed.leafs.at(id(iter)).STR == \
+         precomputed.leafs.at(id(tree_type::parent(iter))).STR)
+#define is_only_child(iter) \
+        (tree_type::leftmost_child(iter) == tree_type::rightmost_child(iter))
 
 
 
@@ -51,84 +59,6 @@ using namespace std;
 #ifdef NODEF
 
 
-void gted::precompute_heavy_paths()
-{
-    // TODO skontrolovat...
-    APP_DEBUG_FNAME;
-
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    tree_type::post_order_iterator it;
-    tree_type::sibling_iterator child;
-    int i;
-
-    it = t1.begin_post();
-    while (it != t1.end_post())
-    {
-        if (tree_type::is_leaf(it))
-        {
-            DEBUG("is leaf %s", label(it));
-            heavy_paths.T1_heavy[id(it)] = it;
-        }
-        else
-        {
-            i = biggest_subtree_child(it, t1, t1_sizes);
-            child = it.begin();
-            while(i--)
-                ++child;
-            DEBUG("heavy child %s", label(child));
-            heavy_paths.T1_heavy[id(it)] = heavy_paths.T1_heavy.at(id(child));
-        }
-        ++it;
-    }
-    it = t2.begin_post();
-    while(it != t2.end_post())
-    {
-        if (tree_type::is_leaf(it))
-        {
-            DEBUG("is leaf %s", label(it));
-            heavy_paths.T2_heavy[id(it)] = it;
-        }
-        else
-        {
-            i = biggest_subtree_child(it, t2, t2_sizes);
-            child = it.begin();
-            while(i--)
-                ++child;
-            DEBUG("heavy child %s", label(child));
-            heavy_paths.T2_heavy[id(it)] = heavy_paths.T2_heavy.at(id(child));
-        }
-        ++it;
-    }
-}
-
-size_t gted::biggest_subtree_child(tree_type::iterator root,
-                                const tree_type& t,
-                                const rted::map_type& t_sizes) const
-{
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    assert(!tree_type::is_leaf(root));
-    tree_type::sibling_iterator it(tree_type::first_child(root));
-    size_t index = 0;
-    size_t biggest_subtree = 0;
-    size_t i = 0;
-
-    while(it != it.end())
-    {
-        auto val = t_sizes.at(it->get_id());
-        if (val > biggest_subtree)
-        {
-            index = i;
-            biggest_subtree = val;
-        }
-        ++it;
-        ++i;
-    }
-    logger.debug("child no. '%lu' of node '%s' has biggest subtree (size == %lu)",
-            index, label(root), biggest_subtree);
-    return index;
-}
 
 void gted::print_TDist(tree_distance_table_type distances)
 {
@@ -403,39 +333,7 @@ void gted::init_FDist_table(forest_distance_table_type& forest_dist,
 
 
 
-gted::gted(const tree_type& _t1, const tree_type& _t2)
-    : t1(_t1), t2(_t2)
-{
-    //logger.info("FIRST TREE:");
-    //for (auto it = t1.begin(); it != t1.end(); ++it)
-        //logger.info("LABEL '%s'", label(it));
-    //logger.info("OTHER TREE:");
-    //for (auto it = t2.begin(); it != t2.end(); ++it)
-        //logger.info("LABEL '%s'", label(it));
 
-    APP_DEBUG_FNAME;
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    rted r(t1, t2);
-    r.run_rted();
-
-    abort();
-    strategies = r.get_strategies();
-    t1_sizes = r.get_t1_sizes();
-    t2_sizes = r.get_t2_sizes();
-}
-
-void gted::run_gted()
-{
-    APP_DEBUG_FNAME;
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    precompute_heavy_paths();
-    logger.notice("starting computing distances recursive");
-    compute_distances_recursive(++t1.begin(), ++t2.begin());
-    logger.notice("computing mapping");
-    compute_mapping();
-}
 
 
 
@@ -1452,125 +1350,416 @@ void gted::single_path_function_H(tree_type::iterator root1,
 
 
 
+/*
 
 
+#ifdef NODEF
 
-
-
-
-
-
-
-
-
-#endif
-
-
-
-
-
-
-
-
-
-
-
-
-
-bool gted::subforest::operator==(const gted::subforest& other) const
-{
-    return left == other.left &&
-        right == other.right;
-}
-
-size_t gted::subforest::hash::operator()(const gted::subforest& s) const
-{
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    // zdroj hash funkcie:
-    // http://stackoverflow.com/questions/682438/hash-function-providing-unique-uint-from-an-integer-coordinate-pair
-    auto hash_f = [](size_t x, size_t y) 
-    {
-        return (x * 0x1F1F1F1F) ^ y;
-    };
-    assert(s.right.node != NULL);
-
-    size_t out;
-    if (s.left == s.right || s.left.node == NULL)
-        out = s.right->get_id();
-    else
-        out = hash_f(s.left->get_id(), s.right->get_id());
-
-#ifdef GTED_CHECKS_DISABLED
-    static vector<subforest> hashes;
-    if (find(hashes.begin(), hashes.end(), s) == hashes.end())
-    {
-        hashes.push_back(s);
-        DEBUG("HASH [%s, %s] = %i", label(s.left), label(s.right), out);
-    }
-#endif
-    return out;
-}
-
-
-
-void gted::compute_distances_recursive(
-                    tree_type::iterator root1,
-                    tree_type::iterator root2)
+void gted::precompute_tables()
 {
     APP_DEBUG_FNAME;
+#define is_heavy(iter) \
+        (!iter->is_root() && heavy_child(tree_type::parent(iter)) == iter)
+#define is_first(iter) \
+        (tree_type::is_first_child(iter))
+#define is_last(iter) \
+        (tree_type::is_last_child(iter))
 
+    auto push_back = [&](tables::vector_type& vec,
+            tree_type::iterator val)
+    {
+        DEBUG("push_back: %s", label(val));
+        vec.push_back(val);
+    };
+    auto comp_leafs = [&](const tree_type& t)
+    {
+        LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+        size_t it_id;
+        tree_type::post_order_iterator it;
+        tables::LRH lrh;
+
+        for (it = t.begin_post(); it != t.end_post(); ++it)
+        {
+            it_id = id(it);
+
+            if (tree_type::is_leaf(it))
+            {
+                lrh = {it, it, it};
+            }
+            else
+            {
+                lrh.left  = table.leafs.at(id(
+                                tree_type::leftmost_child(it))).left;
+                lrh.right = table.leafs.at(id(
+                                tree_type::rightmost_child(it))).right;
+                lrh.heavy = table.leafs.at(id(
+                                heavy_child(it))).heavy;
+            }
+            DEBUG("leafs for '%s' = [%s, %s, %s]",
+                    label(it), label(lrh.left),
+                    label(lrh.right), label(lrh.heavy));
+            table.leafs[it_id] = lrh;
+        }
+    };
+    auto comp_keyroots = [&](const tree_type& t,
+            bool T1)
+    {
+        LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+        size_t i;
+        tree_type::iterator root, path_node;
+        tree_type::sibling_iterator sibling;
+        bool was_first = false;
+
+        tables::vector_type& left  = (T1 ? table.t1_t.key_left  : table.t2_t.key_left);
+        tables::vector_type& right = (T1 ? table.t1_t.key_right : table.t2_t.key_right);
+        tables::vector_type& heavy = (T1 ? table.t1_t.key_heavy : table.t2_t.key_heavy);
+
+        for (int j = 0; j < 3; ++j)
+        {
+            tables::vector_type& tbl = (j == 0 ? left :
+                                       (j == 1 ? right : heavy));
+            if (j == 0)
+                DEBUG("LEFT");
+            else if (j == 1)
+                DEBUG("RIGHT");
+            else
+                DEBUG("HEAVY");
+
+            tbl.push_back(++t.begin());
+            i = 0;
+
+            while(i != tbl.size())
+            {
+                root = tbl.at(i);
+                tables::LRH lrh = table.leafs.at(id(root));
+                path_node = (j == 0 ? lrh.left :
+                            (j == 1 ? lrh.right : lrh.heavy));
+
+                was_first = false;
+
+                DEBUG("root = %s, path_node = %s", label(root), label(path_node));
+
+                while(path_node != root)
+                {
+                    sibling = tree_type::first_child(tree_type::parent(path_node));
+
+                    while(sibling != sibling.end())
+                    {
+                        if (sibling != path_node)
+                        {
+                            push_back(tbl, sibling);
+                            if (!was_first)
+                            {
+#define GET_INDEX_TABLE \
+        (j == 0 ? table.ind_left[id(root)].keyroot : \
+        (j == 1 ? table.ind_right[id(root)].keyroot : \
+                  table.ind_heavy[id(root)].keyroot))
+
+                                GET_INDEX_TABLE = tbl.size() - 1;
+                                was_first = true;
+                            }
+                        }
+                        ++sibling;
+                    }
+                    path_node = tree_type::parent(path_node);
+                }
+                if (!was_first)
+                {
+                    //GET_INDEX_TABLE = id(path_node);
+                    //push_back(tbl, path_node);
+                    GET_INDEX_TABLE = BAD_INDEX;
+                    DEBUG("index %s -> %s", label(root), "null");
+                }
+                else
+                    DEBUG("index %s -> %s", label(root), label(tbl[GET_INDEX_TABLE]));
+                ++i;
+            }
+        }
+#undef GET_INDEX_TABLE
+    };
+    auto comp_subforests = [&](const tree_type& t,
+            bool T1)
+    {
+        LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+        tables::vector_type& left  = (T1 ? table.t1_t.sub_left : table.t2_t.sub_left);
+        tables::vector_type& right = (T1 ? table.t1_t.sub_right : table.t2_t.sub_right);
+        tables::vector_type& heavy = (T1 ? table.t1_t.sub_heavy : table.t2_t.sub_heavy);
+        tree_type::post_order_iterator it;
+        tree_type::iterator child;
+        size_t index;
+
+#define lies_on_path(iter, STR) \
+        (table.leafs.at(id(iter)).STR == \
+         table.leafs.at(id(tree_type::parent(iter))).STR)
+#define is_only_child(iter) \
+        (tree_type::leftmost_child(iter) == tree_type::rightmost_child(iter))
+
+        for (it = t.begin_post(); it != --t.end_post(); ++it)
+        {
+            DEBUG("%s", label(it));
+
+            if (!is_first(it))
+            {
+                DEBUG("left");
+                if (is_only_child(it))
+                    index = left.size();
+                else
+                {
+                    child = tree_type::leftmost_child(it);
+                    // now we want child that does not lie on my path
+
+                    if (lies_on_path(child, left))
+                        child = child.node->next_sibling;
+
+                    index = table.ind_left.at(id(child)).subforest;
+                }
+                left.push_back(it);
+                table.ind_left.at(id(it)).subforest = index;
+                DEBUG("sub %s -> %lu:%s", label(it), index, label(left.at(index)));
+            }
+            if (!is_last(it))
+            {
+                DEBUG("right");
+                if (is_only_child(it))
+                    index = right.size();
+                else
+                {
+                    child = tree_type::leftmost_child(it);
+                    // now we want child that does not lie on my path
+                    if (lies_on_path(child, right))
+                        child = child.node->next_sibling;
+
+                    index = table.ind_right.at(id(child)).subforest;
+                }
+                right.push_back(it);
+                table.ind_right.at(id(it)).subforest = index;
+                DEBUG("sub %s -> %lu:%s", label(it), index, label(right.at(index)));
+            }
+            if (!is_heavy(it))
+            {
+                DEBUG("heavy");
+                if (is_only_child(it))
+                    index = heavy.size();
+                else
+                {
+                    child = tree_type::leftmost_child(it);
+                    // now we want child that does not lie on my path
+                    if (lies_on_path(child, heavy))
+                        child = child.node->next_sibling;
+
+                    index = table.ind_heavy.at(id(child)).subforest;
+                }
+                heavy.push_back(it);
+                table.ind_heavy.at(id(it)).subforest = index;
+                DEBUG("sub %s -> %lu:%s", label(it), index, label(heavy.at(index)));
+            }
+        }
+    };
+    auto init_maps = [this]()
+    {
+        size_t size = t1.size() + t2.size();
+
+        table.leafs.reserve(size);
+        table.ind_left.reserve(size);
+        table.ind_right.reserve(size);
+        table.ind_heavy.reserve(size);
+
+#define reserve(N) \
+        table.t ##N## _t.sub_left.reserve (t ##N.size()); \
+        table.t ##N## _t.key_left.reserve (t ##N.size()); \
+        table.t ##N## _t.sub_right.reserve(t ##N.size()); \
+        table.t ##N## _t.key_right.reserve(t ##N.size()); \
+        table.t ##N## _t.sub_heavy.reserve(t ##N.size()); \
+        table.t ##N## _t.key_heavy.reserve(t ##N.size());
+
+        reserve(1);
+        reserve(2);
+
+        [>size_t it_id;
+        tree_type::post_order_iterator it;
+        tables::indexes_pair_type bad = {0xBADF00D, 0xBADF00D};
+        for (tree_type t : {t1, t2})
+        {
+            for (it = t.begin_post(); it != t.end_post(); ++it)
+            {
+                it_id = id(it);
+                table.ind_left[it_id]  = bad;
+                table.ind_right[it_id] = bad;
+                table.ind_heavy[it_id] = bad;
+            }
+        }<]
+    };
+    auto print_maps = [&]()
+    {
+        //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+        DEBUG("***************************************************");
+
+        for (auto val : table.ind_left)
+        {
+            try
+            {
+                auto node = t1.find(val.first);
+                if (val.second.keyroot == BAD_INDEX)
+                    DEBUG("node %s, \tsub %lu:%s, \tkey %lu:<null>", label(node),
+                            val.second.subforest, label(table.t1_t.sub_left.at(val.second.subforest)), val.second.keyroot);
+                else
+                    DEBUG("node %s, \tsub %lu:%s, \tkey %lu:%s", label(node),
+                            val.second.subforest, label(table.t1_t.sub_left.at(val.second.subforest)),
+                            val.second.keyroot, label(table.t1_t.key_left.at(val.second.keyroot)));
+            } catch (...){}
+        }
+        DEBUG("SECOND TREE");
+        for (auto val : table.ind_left)
+        {
+            try
+            {
+                auto node = t2.find(val.first);
+                if (val.second.keyroot == BAD_INDEX)
+                    DEBUG("node %s, \tsub %lu:%s, \tkey %lu:<null>", label(node),
+                            val.second.subforest, label(table.t2_t.sub_left.at(val.second.subforest)), val.second.keyroot);
+                else
+                    DEBUG("node %s, \tsub %lu:%s, \tkey %lu:%s", label(node),
+                            val.second.subforest, label(table.t2_t.sub_left.at(val.second.subforest)),
+                            val.second.keyroot, label(table.t2_t.key_left.at(val.second.keyroot)));
+            } catch (...){}
+        }
+        
+        DEBUG("***************************************************");
+        for (auto val : table.t1_t.key_left)
+            cout << label(val) << " ";
+        cout << endl;
+        for (auto val : table.t2_t.key_left)
+            cout << label(val) << " ";
+        cout << endl;
+
+    };
+
+
+
+
+
+    init_maps();
+    DEBUG("init OK");
+    comp_leafs(t1);
+    comp_leafs(t2);
+    DEBUG("leafs OK");
+    comp_keyroots(t1, true);
+    comp_keyroots(t2, false);
+    DEBUG("keyroots OK");
+    comp_subforests(t1, true);
+    comp_subforests(t2, false);
+    DEBUG("subforests OK");
+    print_maps();
+
+
+    DEBUG("OK");
+}
+
+void gted::compute_distances_recursive(iterator_pair roots)
+{
+    // rozkladam pomocou keyrootov
+    //
+    APP_DEBUG_FNAME;
+
+    DEBUG("pair: <%s, %s>", label(roots.it1), label(roots.it2));
+
+    tree_type::iterator it;
+    tree_type::iterator leaf;
+    size_t i;
     strategy_pair spair;
 
-    
+    spair = strategies.at(id(roots.it1)).at(id(roots.it2));
+
     spair = PATH_STRATEGY_LEFT_T1;
-    //spair = strategies.at(id(root1)).at(id(root2));
-    
-    if (is_T1(spair))
-    {
 
-    }
-    else
-    {
+    if (is_T2(spair))
+        swap(roots.it1, roots.it2);
 
+    i = table.get_indexes(roots.it1, spair).keyroot;
+    if (i != BAD_INDEX)
+    {
+        leaf = table.get_leaf(roots.it1, spair);
+        it = table.get_keyroot(i, spair);
+
+        while(leaf == table.get_leaf(tree_type::parent(it), spair))
+        {
+            iterator_pair p = {it, roots.it2};
+            if (is_T2(spair))
+            {
+                p.it1 = roots.it2;
+                p.it2 = it;
+            }
+            compute_distances_recursive(p);
+            it = table.get_keyroot(++i, spair);
+        }
     }
+    single_path_function(roots, spair);
 }
 
-gted::gted(const tree_type& _t1, const tree_type& _t2)
-    : t1(_t1), t2(_t2)
+void gted::single_path_function(iterator_pair roots, strategy_pair str)
 {
-    auto merge = [this](rted::map_type m1, rted::map_type m2)
-    {
-        if (t2.size() > t1.size())
-            m1.swap(m2);
-
-        t_sizes = std::move(m1);
-        t_sizes.insert(m2.begin(), m2.end());
-    };
-
     APP_DEBUG_FNAME;
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
-    rted r(t1, t2);
-    r.run_rted();
+    DEBUG("pair: <%s, %s>", label(roots.it1), label(roots.it2));
 
-    abort();
-    strategies = r.get_strategies();
+    subforest_pair forests;
+    size_t i;
+    tree_type::iterator it;
+    iterator_pair leafs;
 
-    merge(r.get_t1_sizes(), r.get_t2_sizes());
+    if (is_T1(str))
+        swap(roots.it1, roots.it2);
+
+    leafs.it1 = table.get_leaf(roots.it1, str);
+    leafs.it2 = table.get_leaf(roots.it2, str);
+
+    DEBUG("leafs: <%s, %s>", label(leafs.it1), label(leafs.it2));
+
+    i = table.get_indexes(roots.it1, str).subforest;
+    it = table.get_subforest(i, str);
+
+    while(id(it) < id(roots.it1))
+    {
+        cout << label(it) << endl;
+
+        all_subforest_nodes_init(forests.f1, table.get_leaf(it, str));
+        all_subforest_nodes_init(forests.f2, table.get_leaf(roots.it2, str));
+        forests.f1.last = subforest::undef;
+        forests.f1.root = it;
+        forests.f2.root = roots.it2;
+
+        compute_distance(forests, str);
+
+        ++i;
+        it = table.get_subforest(i, str);
+    }
+
+    //all_subforest_nodes_init(forests.f1, table.get_leaf(roots.it1, str));
+    //all_subforest_nodes_init(forests.f2, table.get_leaf(roots.it2, str));
+
+    //compute_distance(forests, str);
 }
 
-void gted::run_gted()
+void gted::compute_distance(subforest_pair forests, strategy_pair str)
 {
-    //APP_DEBUG_FNAME;
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    //precompute_heavy_paths();
-    //logger.notice("starting computing distances recursive");
-    //compute_distances_recursive(++t1.begin(), ++t2.begin());
-    //logger.notice("computing mapping");
-    //compute_mapping();
+    DEBUG("computing distance between roots <%s, %s>",
+            label(forests.f1.root), label(forests.f2.root));
 }
+
+#endif
+
+
+*/
+
+
+
+
+
+
 
 
 void gted::precompute_paths()
@@ -1625,6 +1814,597 @@ void gted::precompute_paths()
     comp_H(t1);
     comp_H(t2);
 }
+
+
+
+#endif
+
+
+
+bool gted::iterator_pair::operator==(const gted::iterator_pair& other) const
+{
+    return it1 == other.it1 &&
+        it2 == other.it2;
+}
+
+size_t gted::iterator_pair::hash::operator()(const gted::iterator_pair& s) const
+{
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    return 0;
+/*
+    // zdroj hash funkcie:
+    // http://stackoverflow.com/questions/682438/hash-function-providing-unique-uint-from-an-integer-coordinate-pair
+    auto hash_f = [](size_t x, size_t y) 
+    {
+        return (x * 0x1F1F1F1F) ^ y;
+    };
+    assert(s.right.node != NULL);
+
+    size_t out;
+    if (s.left == s.right || s.left.node == NULL)
+        out = s.right->get_id();
+    else
+        out = hash_f(s.left->get_id(), s.right->get_id());
+
+#ifdef GTED_CHECKS_DISABLED
+    static vector<subforest> hashes;
+    if (find(hashes.begin(), hashes.end(), s) == hashes.end())
+    {
+        hashes.push_back(s);
+        DEBUG("HASH [%s, %s] = %i", label(s.left), label(s.right), out);
+    }
+#endif
+    return out;*/
+}
+
+
+
+
+
+gted::gted(const tree_type& _t1, const tree_type& _t2)
+    : t1(_t1), t2(_t2)
+{
+    auto merge = [this](rted::map_type m1, rted::map_type m2)
+    {
+        if (t2.size() > t1.size())
+            m1.swap(m2);
+
+        t_sizes = std::move(m1);
+        t_sizes.insert(m2.begin(), m2.end());
+    };
+
+    APP_DEBUG_FNAME;
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    rted r(t1, t2);
+    r.run_rted();
+
+    strategies = r.get_strategies();
+    merge(r.get_t1_sizes(), r.get_t2_sizes());
+}
+
+void gted::run_gted()
+{
+    precompute_tables();
+
+    iterator_pair roots;
+    roots.it1 = ++t1.begin();
+    roots.it2 = ++t2.begin();
+
+    //compute_distances_recursive(roots);
+}
+
+gted::tree_type::iterator gted::heavy_child(tree_type::iterator root) const
+{
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    assert(!tree_type::is_leaf(root));
+    tree_type::sibling_iterator it(tree_type::first_child(root));
+    tree_type::iterator out;
+    size_t index = 0;
+    size_t biggest_subtree = 0;
+    size_t i = 0;
+
+    while(it != it.end())
+    {
+        auto val = t_sizes.at(id(it));
+        if (val > biggest_subtree)
+        {
+            index = i;
+            biggest_subtree = val;
+            out = it;
+        }
+        ++it;
+        ++i;
+    }
+    logger.debug("child # '%lu - %s' of node '%s' has biggest subtree (size == %lu)",
+            index, label(out), label(root), biggest_subtree);
+    return out;
+}
+
+void gted::precompute_tables()
+{
+    APP_DEBUG_FNAME;
+
+    auto push_back = [&](tables::vector_type& vec,
+            tree_type::iterator val)
+    {
+        DEBUG("push_back: %s", label(val));
+        vec.push_back(val);
+    };
+    auto comp_leafs = [&](const tree_type& t)
+    {
+        size_t it_id;
+        tree_type::post_order_iterator it;
+        tables::LRH lrh;
+
+        for (it = t.begin_post(); it != t.end_post(); ++it)
+        {
+            it_id = id(it);
+
+            if (tree_type::is_leaf(it))
+                lrh = {it, it, it};
+            else
+            {
+                lrh.left = precomputed.leafs.at(
+                        id(tree_type::leftmost_child(it))).left;
+                lrh.right = precomputed.leafs.at(
+                        id(tree_type::rightmost_child(it))).right;
+                lrh.heavy = precomputed.leafs.at(
+                        id(heavy_child(it))).heavy;
+            }
+            DEBUG("leafs for '%s' = [%s, %s, %s]",
+                    label(it), label(lrh.left),
+                    label(lrh.right), label(lrh.heavy));
+            precomputed.leafs[it_id] = lrh;
+        }
+    };
+    auto comp_keyroots = [&](const tree_type& t, bool T1)
+    {
+#define LEFT_INDEX    0
+#define RIGHT_INDEX   1
+#define HEAVY_INDEX   2
+        tree_type::iterator root, path_node;
+        tree_type::sibling_iterator sibling;
+        tables::vector_type& left = precomputed.keyroots[
+            (T1 ? PATH_STRATEGY_LEFT_T1 : PATH_STRATEGY_LEFT_T2)];
+        tables::vector_type& right = precomputed.keyroots[
+            (T1 ? PATH_STRATEGY_RIGHT_T1 : PATH_STRATEGY_RIGHT_T2)];
+        tables::vector_type& heavy = precomputed.keyroots[
+            (T1 ? PATH_STRATEGY_HEAVY_T1 : PATH_STRATEGY_HEAVY_T2)];
+
+        enum lrh_list
+        {
+            L, R, H
+        };
+        auto do_loop = [&push_back](tables::vector_type& tbl, tables::root_leaf_path_type& leafs, tables::indexes_type& indexes, lrh_list l)
+        {
+            bool was_first;
+            size_t i = 0;
+            tree_type::iterator root, path_node, prev;
+            tree_type::sibling_iterator sibling;
+            while(i != tbl.size())
+            {
+                root = tbl.at(i);
+                tables::LRH lrh = leafs.at(id(root));
+                path_node = (l == L ? lrh.left : 
+                        (l == R ? lrh.right : lrh.heavy));
+                was_first = false;
+                prev = empty_iterator();
+
+                //DEBUG("root = %s, path_node = %s", label(root), label(path_node));
+
+                indexes[id(root)].keyroot = BAD_INDEX;
+                if (path_node == root)
+                {}
+                else
+                {
+                    while(true)
+                    {
+                        // get first sibling..
+                        sibling = tree_type::first_child(tree_type::parent(path_node));
+                        indexes[id(path_node)].keyroot = BAD_INDEX;
+
+                        while(sibling != sibling.end())
+                        {
+                            if (sibling != path_node)
+                            {
+                                push_back(tbl, sibling);
+                                if (!was_first)
+                                {
+                                    indexes[id(root)].keyroot = tbl.size() - 1;
+                                    was_first = true;
+                                }
+                            }
+                            ++sibling;
+                        }
+                        prev = path_node;
+                        path_node = tree_type::parent(path_node);
+
+                        if (path_node == root)
+                            break;
+
+/*
+                        // set keyroot for pathnode
+                        if (is_only_child(prev))
+                        {
+                            //indexes[id(path_node)].keyroot = indexes[id(prev)].keyroot;
+                        }
+                        else
+                        {
+                            if (indexes[id(prev)].keyroot == BAD_INDEX)
+                            {
+                                cout << label(prev) << endl;
+                                if (!tree_type::is_last_child(prev))
+                                    prev = ++tree_type::sibling_iterator(prev);
+                                cout << label(prev) << endl;
+                            }
+                        }
+                        indexes[id(path_node)].keyroot = indexes[id(prev)].keyroot;
+                        cout << "PN, prev " << label(path_node) << ":" << label(prev) << endl;
+*/
+                    }
+                }
+                //DEBUG("index %s -> %s", label(root), "null");
+                //DEBUG("index %s -> %s", label(root), label(tbl.at(indexes.at(id(root)).keyroot)));
+                size_t j = indexes[id(root)].keyroot;
+                stringstream s;
+                if (j == BAD_INDEX)
+                    s << "<null>";
+                else
+                    while(j < tbl.size())
+                        s << label(tbl.at(j++)) << " ";
+                DEBUG("keyroots for %s: \t%s", label(root), s.str().c_str());
+
+                ++i;
+            }
+        };
+
+        auto begin = ++t.begin();
+        left.push_back( begin);
+        right.push_back(begin);
+        heavy.push_back(begin);
+
+        DEBUG("LEFT");
+        do_loop(left,  precomputed.leafs, precomputed.indexes.at(LEFT_INDEX), L);
+        DEBUG("RIGHT");
+        do_loop(right, precomputed.leafs, precomputed.indexes.at(RIGHT_INDEX), R);
+        DEBUG("HEAVY");
+        do_loop(heavy, precomputed.leafs, precomputed.indexes.at(HEAVY_INDEX), H);
+    };
+    auto comp_subforests = [&](const tree_type& t, bool T1)
+    {
+        tables::vector_type& left = precomputed.subforests[
+            (T1 ? PATH_STRATEGY_LEFT_T1 : PATH_STRATEGY_LEFT_T2)];
+        tables::vector_type& right = precomputed.subforests[
+            (T1 ? PATH_STRATEGY_RIGHT_T1 : PATH_STRATEGY_RIGHT_T2)];
+        tables::vector_type& heavy = precomputed.subforests[
+            (T1 ? PATH_STRATEGY_HEAVY_T1 : PATH_STRATEGY_HEAVY_T2)];
+
+        tables::indexes_type& ind_left  = precomputed.indexes.at(LEFT_INDEX);
+        tables::indexes_type& ind_right = precomputed.indexes.at(RIGHT_INDEX);
+        tables::indexes_type& ind_heavy = precomputed.indexes.at(HEAVY_INDEX);
+
+
+        tree_type::post_order_iterator it;
+        tree_type::sibling_iterator child;
+        size_t index;
+        
+        for (it = t.begin_post(); it != --t.end_post(); ++it)
+        {
+            // if it does not lie on path, we add it to vector
+            // Left  -> !is_first
+            // Right -> !is_last
+            // Heavy -> !is_heavy
+            //
+            // and then we copy value of first non-path-node (first/second child)
+            //
+            if (!is_first(it))
+            {
+                DEBUG("left");
+                if (is_only_child(it))
+                    index = left.size();
+                else
+                {
+                    // we want child that does not lie on my path
+                    child = tree_type::leftmost_child(it);
+                    if (lies_on_path(child, left))
+                        ++child;
+
+                    index = ind_left.at(id(child)).subforest;
+                }
+                left.push_back(it);
+                ind_left.at(id(it)).subforest = index;
+                DEBUG("sub %s -> %lu:%s", label(it), index, label(left.at(index)));
+            }
+            if (!is_last(it))
+            {
+                DEBUG("right");
+                if (is_only_child(it))
+                    index = right.size();
+                else
+                {
+                    child = tree_type::leftmost_child(it);
+                    if (lies_on_path(child, right))
+                        child = child.node->next_sibling;
+
+                    index = ind_right.at(id(child)).subforest;
+                }
+                right.push_back(it);
+                ind_right.at(id(it)).subforest = index;
+                DEBUG("sub %s -> %lu:%s", label(it), index, label(right.at(index)));
+            }
+            if (!is_heavy(it))
+            {
+                DEBUG("heavy");
+                if (is_only_child(it))
+                    index = heavy.size();
+                else
+                {
+                    child = tree_type::leftmost_child(it);
+                    if (lies_on_path(child, heavy))
+                        child = child.node->next_sibling;
+
+                    index = ind_heavy.at(id(child)).subforest;
+                }
+                heavy.push_back(it);
+                ind_heavy.at(id(it)).subforest = index;
+                DEBUG("sub %s -> %lu:%s", label(it), index, label(heavy.at(index)));
+            }
+        }
+        assert(it == --t.end_post());
+        it = tree_type::first_child(it);
+
+        left.push_back(it);
+        right.push_back(it);
+        heavy.push_back(it);
+
+        ind_left.at(id(it)).subforest = 0;
+        ind_right.at(id(it)).subforest = 0;
+        ind_heavy.at(id(it)).subforest = 0;
+
+        DEBUG("sub LRH %s -> <0:%s, 0:%s, 0:%s>",
+                label(it), label(left.at(0)),
+                label(right.at(0)), label(heavy.at(0)));
+    };
+    auto print_tables = [&]()
+    {
+        auto print = [](tables::vector_type& vec)
+        {
+            for (auto val : vec)
+                cout << label(val) << " ";
+            cout << endl;
+        };
+
+        DEBUG("SUBFORESTS:");
+        print(precomputed.subforests[PATH_STRATEGY_LEFT_T1]);
+        print(precomputed.subforests[PATH_STRATEGY_LEFT_T2]);
+        print(precomputed.subforests[PATH_STRATEGY_RIGHT_T1]);
+        print(precomputed.subforests[PATH_STRATEGY_RIGHT_T2]);
+        print(precomputed.subforests[PATH_STRATEGY_HEAVY_T1]);
+        print(precomputed.subforests[PATH_STRATEGY_HEAVY_T2]);
+        DEBUG("KEYROOTS:");
+        print(precomputed.keyroots[PATH_STRATEGY_LEFT_T1]);
+        print(precomputed.keyroots[PATH_STRATEGY_LEFT_T2]);
+        print(precomputed.keyroots[PATH_STRATEGY_RIGHT_T1]);
+        print(precomputed.keyroots[PATH_STRATEGY_RIGHT_T2]);
+        print(precomputed.keyroots[PATH_STRATEGY_HEAVY_T1]);
+        print(precomputed.keyroots[PATH_STRATEGY_HEAVY_T2]);
+    };
+
+    DEBUG("LEAFS T1:");
+    comp_leafs(t1);
+    DEBUG("LEAFS T2:");
+    comp_leafs(t2);
+    DEBUG("KEYROOTS T1:");
+    comp_keyroots(t1, true);
+    DEBUG("KEYROOTS T2:");
+    comp_keyroots(t2, false);
+
+    //DEBUG("SUBFORESTS T1:");
+    //comp_subforests(t1, true);
+    //DEBUG("SUBFORESTS T2:");
+    //comp_subforests(t2, false);
+
+    print_tables();
+
+    //cout << label(precomputed.keyroots.at(PATH_STRATEGY_LEFT_T1).at(precomputed.indexes.at(LEFT_INDEX).at(id(t1.find(string("55")))).keyroot)) << endl;
+    //cout << label(precomputed.subforests.at(PATH_STRATEGY_LEFT_T1).at(precomputed.indexes.at(LEFT_INDEX).at(id(t1.find(string("55")))).subforest)) << endl;
+}
+
+
+
+
+gted::tables::tables()
+{
+    subforests.resize(6);
+    keyroots.resize(6);
+    indexes.resize(3);
+}
+
+gted::tables::indexes_pair_type gted::tables::get_indexes(tree_type::iterator it, strategy_pair str) const
+{
+    //APP_DEBUG_FNAME;
+    assert(is_path_strategy(str));
+
+    size_t it_id = id(it);
+    if (is_left_path(str))
+        return indexes.at(LEFT_INDEX).at(it_id);
+    if (is_right_path(str))
+        return indexes.at(RIGHT_INDEX).at(it_id);
+    return indexes.at(HEAVY_INDEX).at(it_id);
+}
+
+gted::tree_type::iterator gted::tables::get_leaf(tree_type::iterator it, strategy_pair str) const
+{
+    //APP_DEBUG_FNAME;
+    assert(is_path_strategy(str));
+
+    LRH lrh = leafs.at(id(it));
+    if (is_left_path(str))
+        return lrh.left;
+    if (is_right_path(str))
+        return lrh.right;
+    return lrh.heavy;
+}
+
+gted::tree_type::iterator gted::tables::get_subforest(size_t index, strategy_pair str) const
+{
+    //APP_DEBUG_FNAME;
+    assert(is_path_strategy(str));
+
+    if (is_T1(str))
+    {
+        if (str == PATH_STRATEGY_LEFT_T1)
+            str = PATH_STRATEGY_LEFT_T2;
+        else if (str == PATH_STRATEGY_RIGHT_T1)
+            str = PATH_STRATEGY_RIGHT_T2;
+        else
+            str = PATH_STRATEGY_HEAVY_T2;
+    }
+    else
+    {
+        if (str == PATH_STRATEGY_LEFT_T2)
+            str = PATH_STRATEGY_LEFT_T1;
+        else if (str == PATH_STRATEGY_RIGHT_T2)
+            str = PATH_STRATEGY_RIGHT_T1;
+        else
+            str = PATH_STRATEGY_HEAVY_T1;
+    }
+
+    return subforests.at(str).at(index);
+}
+
+gted::tree_type::iterator gted::tables::get_keyroot(size_t index, strategy_pair str) const
+{
+    //APP_DEBUG_FNAME;
+    assert(is_path_strategy(str));
+
+    if (keyroots.at(str).size() > index)
+        return keyroots.at(str).at(index);
+    DEBUG("empty it");
+    return empty_iterator();
+}
+
+
+
+
+
+void gted::compute_distances_recursive(iterator_pair roots)
+{
+    // rozkladam pomocou keyrootov
+    //
+    APP_DEBUG_FNAME;
+
+    DEBUG("pair: <%s, %s>", label(roots.it1), label(roots.it2));
+
+    tree_type::iterator it;
+    tree_type::iterator leaf;
+    size_t i;
+    strategy_pair str;
+
+    str = strategies.at(id(roots.it1)).at(id(roots.it2));
+
+    //str = PATH_STRATEGY_LEFT_T1;
+    //str = PATH_STRATEGY_LEFT_T2;
+    //str = PATH_STRATEGY_RIGHT_T1;
+    //str = PATH_STRATEGY_RIGHT_T2;
+    //str = PATH_STRATEGY_HEAVY_T1;
+    //str = PATH_STRATEGY_HEAVY_T2;
+
+    logger.info("strategy: %s", strategy_to_string(str).c_str());
+
+    if (is_T2(str))
+        swap(roots.it1, roots.it2);
+
+    i = precomputed.get_indexes(roots.it1, str).keyroot;
+    if (i != BAD_INDEX)
+    {
+        leaf = precomputed.get_leaf(roots.it1, str);
+        it = precomputed.get_keyroot(i, str);
+        //cout << label(leaf) << ":" << label(it) << endl;
+        //cout << (it != empty_iterator()) << endl;
+        //cout << (leaf == precomputed.get_leaf(tree_type::parent(it), str)) << endl;
+
+        // while it is own keyroot => leaf(parent(it)) == leaf
+        while(it != empty_iterator() && leaf == precomputed.get_leaf(tree_type::parent(it), str))
+        {
+            iterator_pair p = {it, roots.it2};
+            if (is_T2(str))
+            {
+                p.it1 = roots.it2;
+                p.it2 = it;
+            }
+            compute_distances_recursive(p);
+            //cout << "while: " << label(leaf) << ":" << label(it) << endl;
+            it = precomputed.get_keyroot(++i, str);
+        }
+    }
+    else
+        DEBUG("BAD_INDEX");
+    single_path_function(roots, str);
+}
+
+void gted::single_path_function(iterator_pair roots, strategy_pair str)
+{
+    APP_DEBUG_FNAME;
+
+    DEBUG("SPF: pair: <%s, %s>", label(roots.it1), label(roots.it2));
+
+    subforest_pair forests;
+    size_t i;
+    tree_type::iterator it;
+    iterator_pair leafs;
+
+    swap(roots.it1, roots.it2);
+
+    leafs.it1 = precomputed.get_leaf(roots.it1, str);
+    leafs.it2 = precomputed.get_leaf(roots.it2, str);
+
+    DEBUG("leafs: <%s, %s>", label(leafs.it1), label(leafs.it2));
+
+    i = precomputed.get_indexes(roots.it1, str).subforest;
+    it = precomputed.get_subforest(i, str);
+
+    while(id(it) < id(roots.it1))
+    {
+        all_subforest_nodes_init(forests.f1, precomputed.get_leaf(it, str));
+        all_subforest_nodes_init(forests.f2, precomputed.get_leaf(roots.it2, str));
+        forests.f2.last = forests.f1.last = subforest::undef;
+        forests.f1.root = it;
+        forests.f2.root = roots.it2;
+
+        compute_distance(forests, str);
+
+        ++i;
+        it = precomputed.get_subforest(i, str);
+    }
+
+    all_subforest_nodes_init(forests.f1, precomputed.get_leaf(roots.it1, str));
+    all_subforest_nodes_init(forests.f2, precomputed.get_leaf(roots.it2, str));
+    forests.f1.root = roots.it1;
+    forests.f2.root = roots.it2;
+    forests.f2.last = forests.f1.last = subforest::undef;
+
+    compute_distance(forests, str);
+}
+
+void gted::compute_distance(subforest_pair forests, strategy_pair str)
+{
+    if (is_T1(str))
+        DEBUG("computing distance between roots <%s, %s>",
+                label(forests.f2.root), label(forests.f1.root));
+    else
+        DEBUG("computing distance between roots <%s, %s>",
+                label(forests.f1.root), label(forests.f2.root));
+}
+
+
+
+
+
+
+
 
 
 

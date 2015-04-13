@@ -30,7 +30,7 @@
 #define TESTS
 
 #include "rted.hpp"
-#include "gted.hpp"
+//#include "gted.hpp"
 
 using namespace std;
 

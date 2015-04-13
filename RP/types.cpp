@@ -64,7 +64,7 @@ std::string path_to_string(strategy_pair ch)
     throw invalid_argument("only LRH path strategies supported");
 }
 
-std::string all_to_string(strategy_pair ch)
+std::string strategy_to_string(strategy_pair ch)
 {
     return graph_to_string(ch) + "-" + path_to_string(ch);
 }

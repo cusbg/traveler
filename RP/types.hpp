@@ -31,18 +31,18 @@
 #include <stdexcept>
 
 
-#define PATH_STRATEGY_LEFT_T1   1
-#define PATH_STRATEGY_RIGHT_T1  2
-#define PATH_STRATEGY_HEAVY_T1  4
-#define PATH_STRATEGY_LEFT_T2   8
-#define PATH_STRATEGY_RIGHT_T2  16
-#define PATH_STRATEGY_HEAVY_T2  32
+#define PATH_STRATEGY_LEFT_T1   0
+#define PATH_STRATEGY_RIGHT_T1  1
+#define PATH_STRATEGY_HEAVY_T1  2
+#define PATH_STRATEGY_LEFT_T2   3
+#define PATH_STRATEGY_RIGHT_T2  4
+#define PATH_STRATEGY_HEAVY_T2  5
 
 typedef char strategy_pair;
 
 std::string graph_to_string(strategy_pair ch);
 std::string path_to_string(strategy_pair ch);
-std::string all_to_string(strategy_pair ch);
+std::string strategy_to_string(strategy_pair ch);
 
 bool is_path_strategy(strategy_pair ch);
 

@@ -40,31 +40,22 @@ public: // TODO << remove public >>
         tree_type::iterator                     path_node;
 
         enum last_added {Lnode, Rnode, undef}   last = undef;
-
-        bool operator==(const subforest& other) const;
-        // hashovacia funkcia do mapy..
-        struct hash
-        {
-            size_t operator()(const subforest& s) const;
-        };
     };
-    typedef std::unordered_map<subforest,
-                std::unordered_map<subforest, size_t, subforest::hash>,
-                    subforest::hash> forest_distance_table_type;
     struct subforest_pair
     {
         subforest f1;
         subforest f2;
     };
-    typedef std::unordered_map<size_t,
-            std::unordered_map<size_t, size_t>> tree_distance_table_type;
     struct iterator_pair
     {
         tree_type::iterator it1;
         tree_type::iterator it2;
 
         iterator_pair() = default;
-        iterator_pair(const subforest& other);
+        iterator_pair(std::initializer_list<tree_type::iterator> const list)
+            : it1(*list.begin()), it2(*(list.begin() + 1)) {}
+        iterator_pair(const subforest& other)
+            : it1(other.left), it2(other.right) {}
 
         bool operator==(const iterator_pair& other) const;
         struct hash
@@ -72,94 +63,207 @@ public: // TODO << remove public >>
             size_t operator()(const iterator_pair& other) const;
         };
     };
-    struct tables
+    typedef std::unordered_map<iterator_pair,
+                std::unordered_map<iterator_pair, size_t, iterator_pair::hash>,
+                    iterator_pair::hash> forest_distance_table_type;
+    typedef std::unordered_map<size_t,
+                std::unordered_map<size_t, size_t>> tree_distance_table_type;
+    typedef std::vector<iterator_pair> mapping_table_type;
+
+
+
+
+public:
+    gted(const tree_type& _t1, const tree_type& _t2);
+    void run_gted();
+
+private:
+
+    void precompute_tables();
+    void compute_distances_recursive(iterator_pair roots);
+    void single_path_function(iterator_pair roots, strategy_pair str);
+    void compute_distance(subforest_pair forests, strategy_pair str);
+    void fill_tables();
+    void compute_mapping();
+
+    tree_type::iterator heavy_child(tree_type::iterator) const;
+
+
+
+
+    using empty_iterator = tree_type::iterator;
+
+#ifdef TESTS
+public:
+    static void test();
+#endif
+
+private:
+    class tables
     {
+    public:
+        struct LRH
+        {
+            tree_type::iterator
+                    left,
+                    right,
+                    heavy;
+        };
+        struct indexes_pair_type
+        {
+            size_t
+                    subforest,
+                    keyroot;
+        };
+
+        typedef std::unordered_map<size_t, LRH>
+                                        root_leaf_path_type;
+        typedef std::unordered_map<size_t, indexes_pair_type>
+                                        indexes_type;
+        typedef std::vector<tree_type::iterator>
+                                        vector_type;
+
+
+        indexes_pair_type get_indexes(tree_type::iterator it, strategy_pair str) const;
+        tree_type::iterator get_leaf(tree_type::iterator it, strategy_pair str) const;
+        tree_type::iterator get_subforest(size_t index, strategy_pair str) const;
+        tree_type::iterator get_keyroot(size_t index, strategy_pair str) const;
+
+        friend void gted::precompute_tables();
+
+    private:
+        // indexovane pomocou PATH_STRATEGY_* makier, [0-5]
+        std::vector<vector_type>
+                    subforests,
+                    keyroots;
+
+        // Left/Right/Heavy
+        std::vector<indexes_type>
+                    indexes;
+
+        root_leaf_path_type
+                    leafs;
+
+    public:
+        tables();
+
+    /*struct tables
+    {
+        [>
+         * tabulky s predpocitanymi hodnotamy
+         *      subforests, keyroots
+         * pre stromy T1 a T2.
+         <]
+
+        struct LRH
+        {
+            tree_type::iterator
+                        left,
+                        right,
+                        heavy;
+        };
+        struct index_pair
+        {
+            size_t subforest, keyroot;
+        };
         typedef std::vector<tree_type::iterator>
                                         relevant_subforests_type;
         typedef std::vector<tree_type::iterator>
                                         keyroots_type;
-        typedef std::unordered_map<size_t, std::pair<size_t, size_t>>
+        typedef std::unordered_map<size_t, index_pair>
                                         vector_indexes_type;
-        typedef std::unordered_map<size_t, tree_type::iterator>
+        typedef std::unordered_map<size_t, LRH>
                                         root_leaf_path_type;
 
+        struct sub_key_tables
+        {
+            relevant_subforests_type
+                            sub_left,
+                            sub_right,
+                            sub_heavy;
+
+            keyroots_type
+                            key_left,
+                            key_right,
+                            key_heavy;
+
+        } t1_tables, t2_tables;
+
+        [>
+         * indexes to t*_tables vectors
+         <]
+        vector_indexes_type
+                            ind_left,
+                            ind_right,
+                            ind_heavy;
+
+        [>
+         * leafs on root-leaf path
+         * (left, right, heavy) tupples
+         <]
+        root_leaf_path_type
+                    leafs;
+
+[>
         struct
         {
-            /*
+            [>
              * relevant subforests for tree
              *  index, where we should start our computation, is
              *      i = indexes[id(path_leaf(node))].first
              *  and we compute while
              *      id(subforests[i]) <= id(node)
-             */
+             <]
             relevant_subforests_type
-                        subforests;
+                            t1_subforests,
+                            t2_subforests;
 
-            /*
+            [>
              * keyroots for tree
              *  indes, where we should start our computation, is
              *      i = indexes[id(path_leaf(node))].second
              *  and we compute while
              *      path_leaf(parent(keyroots[i])) == path_leaf(node)
-             */
+             <]
             keyroots_type
-                        keyroots;
+                            t1_keyroots,
+                            t2_keyroots;
 
-            /*
+            [>
              * indexes to subforests and keyroots tables
              *  .first  -> subforests
              *  .second -> keyroots
              * defined only for path_leaf nodes
-             */
+             <]
             vector_indexes_type
-                        indexes;
-
-            /*
-             * leafs on root-leaf path
-             * defined for all nodex in tree.
-             */
-            root_leaf_path_type
-                        leafs;
+                            t12_indexes;
 
         } left, right, heavy;
+<]
 
-    } t1_tables, t2_tables;
-    typedef std::vector<iterator_pair> mapping_table_type;
-public:
-    gted(const tree_type& _t1, const tree_type& _t2);
-    void run_gted();
+
+        size_t get_keyroot_index    (tree_type::iterator it, strategy_pair str) const;
+        size_t get_subforests_index (tree_type::iterator it, strategy_pair str) const;
+        tree_type::iterator get_leaf(tree_type::iterator it, strategy_pair str) const;
+        tree_type::iterator get_keyroot(size_t index, strategy_pair str) const;
+        tree_type::iterator get_subforest(size_t index, strategy_pair str) const;
+    };*/
+    };
+
 private:
-    void precompute_paths();
+    tree_type t1;
+    tree_type t2;
+    rted::map_type t_sizes;
+    rted::strategy_map_type strategies;
+    tree_distance_table_type tree_distances;
+    mapping_table_type mapping;
+    tables precomputed;
+};
+
+#endif /* !GTED_HPP */
 
 
 
-    /**
-     * rekurzivne rozkladam stromy podla strategie z rted-u
-     * nakoniec pustim single_path_function(root1, root2)
-     * ktora vyrata
-     *      T[root1][root2]
-     *      T[i][j], pre i, j vrcholy na root-leaf path
-     */
-    void compute_distances_recursive(
-                    tree_type::iterator root1,
-                    tree_type::iterator root2);
-    /*{
-        compute_distances_recursive(root1, root2);
-        single_path_function();
-    }*/
-
-    void single_path_function();
-    /*{
-        // decompone T2
-        compute_distance();
-    }*/
-    void compute_distance();
-    //{}
-
-
-    tree_type::iterator get_path_leaf(
-                    tree_type::iterator root,
-                    strategy_pair str);
 
 
 
@@ -248,23 +352,3 @@ private:
                     size_t value,
                     graph who_first);
 #endif
-
-    using empty_iterator = tree_type::iterator;
-
-#ifdef TESTS
-public:
-    static void test();
-#endif
-
-private:
-    tree_type t1;
-    tree_type t2;
-    rted::map_type t_sizes;
-    rted::strategy_map_type strategies;
-    tree_distance_table_type tree_distances;
-    path_tables paths;
-    mapping_table_type mapping;
-};
-
-#endif /* !GTED_HPP */
-

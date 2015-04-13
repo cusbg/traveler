@@ -55,6 +55,7 @@ string readbrackets()
 int main(int argc, char** argv)
 {
     cout << boolalpha;
+    srand(1);
 
 
     string b1, l1, b2, l2;
@@ -71,18 +72,19 @@ int main(int argc, char** argv)
     //l2 = "ABCDCA";
     //b2 = "(.(.))";
 
-    //l1 = "5142345";
-    //b1 = "(.(..))";
+    l1 = "5142345";
+    b1 = "(.(..))";
+    l2 = "EACBCDE";
+    b2 = "(.(.).)";
 
-    //l2 = "EACBCDE";
-    //b2 = "(.(.).)";
 
-    //b2 = "()";
-    //l2 = "00";
-    b2 = "(" + readbrackets() + ")";
-    l2 = "0" + readseq() + "0";
-    b1 = b2;
-    l1 = l2;
+    //l1 = "-51423456978089-";
+    //b1 = "((.(..)).(.(.)))";
+
+    //b2 = "(" + readbrackets() + ")";
+    //l2 = "0" + readseq() + "0";
+    //b1 = b2;
+    //l1 = l2;
 
     //l1 = "5142345";
     //b1 = "(.(..))";
@@ -99,8 +101,12 @@ int main(int argc, char** argv)
     rna1.set_ids_postorder();
     rna2.set_ids_postorder();
 
-    rted r(rna1, rna2);
-    r.run_rted();
+    gted g(rna1, rna2);
+    g.run_gted();
+
+
+    //rted r(rna1, rna2);
+    //r.run_rted();
     //rted_tests();
     //return 0;
     //
