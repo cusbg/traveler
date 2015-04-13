@@ -1926,11 +1926,103 @@ void gted::precompute_tables()
 {
     APP_DEBUG_FNAME;
 
+#define LEFT_INDEX    0
+#define RIGHT_INDEX   1
+#define HEAVY_INDEX   2
+
     auto push_back = [&](tables::vector_type& vec,
             tree_type::iterator val)
     {
         DEBUG("push_back: %s", label(val));
         vec.push_back(val);
+    };
+    auto print_tables = [&]()
+    {
+        auto print_vectors = [](tables::vector_type& vec)
+        {
+            for (auto val : vec)
+                cout << label(val) << " ";
+            cout << endl;
+        };
+        auto print_keyroots = [&](strategy_pair str, size_t indexes)
+        {
+            tables::vector_type& tbl = precomputed.keyroots[str];
+            print_vectors(tbl);
+            auto& t = (is_T1(str) ? t1 : t2);
+
+            stringstream out;
+            out << "keyroots:" << strategy_to_string(str) << endl;
+            for (auto val : precomputed.indexes.at(indexes))
+            {
+                stringstream s;
+                size_t j = val.second.keyroot;
+
+                try
+                {
+                    s << label(t.find(val.first)) << ":\t";
+                    if (j == BAD_INDEX)
+                        s << "<null>";
+                    while(j < tbl.size())
+                    {
+                        if (is_keyroot(t.find(val.first), tbl.at(j), str))
+                            s << label(tbl.at(j)) << " ";
+                        ++j;
+                    }
+                    out << s.str() << endl;
+                    //out << (string(label(t.find(val.first))) + s.str()) << endl;
+                }
+                catch(...){}
+            }
+            DEBUG("%s", out.str().c_str());
+        };
+
+        DEBUG("KEYROOTS:");
+        print_keyroots(PATH_STRATEGY_LEFT_T1, LEFT_INDEX);
+        print_keyroots(PATH_STRATEGY_LEFT_T2, LEFT_INDEX);
+        print_keyroots(PATH_STRATEGY_RIGHT_T1, RIGHT_INDEX);
+        print_keyroots(PATH_STRATEGY_RIGHT_T2, RIGHT_INDEX);
+        print_keyroots(PATH_STRATEGY_HEAVY_T1, HEAVY_INDEX);
+        print_keyroots(PATH_STRATEGY_HEAVY_T2, HEAVY_INDEX);
+        return;
+        
+
+        DEBUG("SUBFORESTS:");
+        print_vectors(precomputed.subforests[PATH_STRATEGY_LEFT_T1]);
+        print_vectors(precomputed.subforests[PATH_STRATEGY_LEFT_T2]);
+        print_vectors(precomputed.subforests[PATH_STRATEGY_RIGHT_T1]);
+        print_vectors(precomputed.subforests[PATH_STRATEGY_RIGHT_T2]);
+        print_vectors(precomputed.subforests[PATH_STRATEGY_HEAVY_T1]);
+        print_vectors(precomputed.subforests[PATH_STRATEGY_HEAVY_T2]);
+        DEBUG("KEYROOTS:");
+        print_vectors(precomputed.keyroots[PATH_STRATEGY_LEFT_T1]);
+        print_vectors(precomputed.keyroots[PATH_STRATEGY_LEFT_T2]);
+        print_vectors(precomputed.keyroots[PATH_STRATEGY_RIGHT_T1]);
+        print_vectors(precomputed.keyroots[PATH_STRATEGY_RIGHT_T2]);
+        print_vectors(precomputed.keyroots[PATH_STRATEGY_HEAVY_T1]);
+        print_vectors(precomputed.keyroots[PATH_STRATEGY_HEAVY_T2]);
+
+
+        for (auto val : precomputed.indexes.at(RIGHT_INDEX))
+        {
+            stringstream s;
+            size_t j = val.second.keyroot;
+            auto& tbl = precomputed.keyroots.at(PATH_STRATEGY_RIGHT_T1);
+
+            try
+            {
+            if (j == BAD_INDEX)
+                s << "<null>";
+            while(j < tbl.size())
+            {
+                if (is_in_subtree(t1.find(val.first), tbl.at(j)))
+                    s << label(tbl.at(j)) << " ";
+                ++j;
+            }
+                //s << label(tbl.at(j++)) << " ";
+                DEBUG("keyroots: %s: \t%s", label(t1.find(val.first)), s.str().c_str());
+            }
+            catch(...){}
+        }
     };
     auto comp_leafs = [&](const tree_type& t)
     {
@@ -1961,9 +2053,6 @@ void gted::precompute_tables()
     };
     auto comp_keyroots = [&](const tree_type& t, bool T1)
     {
-#define LEFT_INDEX    0
-#define RIGHT_INDEX   1
-#define HEAVY_INDEX   2
         tree_type::iterator root, path_node;
         tree_type::sibling_iterator sibling;
         tables::vector_type& left = precomputed.keyroots[
@@ -1977,11 +2066,11 @@ void gted::precompute_tables()
         {
             L, R, H
         };
-        auto do_loop = [&push_back](tables::vector_type& tbl, tables::root_leaf_path_type& leafs, tables::indexes_type& indexes, lrh_list l)
+        auto do_loop = [&push_back, &t](tables::vector_type& tbl, tables::root_leaf_path_type& leafs, tables::indexes_type& indexes, lrh_list l)
         {
             bool was_first;
             size_t i = 0;
-            tree_type::iterator root, path_node, prev;
+            tree_type::iterator root, path_node, it;
             tree_type::sibling_iterator sibling;
             while(i != tbl.size())
             {
@@ -1990,7 +2079,6 @@ void gted::precompute_tables()
                 path_node = (l == L ? lrh.left : 
                         (l == R ? lrh.right : lrh.heavy));
                 was_first = false;
-                prev = empty_iterator();
 
                 //DEBUG("root = %s, path_node = %s", label(root), label(path_node));
 
@@ -2018,31 +2106,22 @@ void gted::precompute_tables()
                             }
                             ++sibling;
                         }
-                        prev = path_node;
                         path_node = tree_type::parent(path_node);
 
                         if (path_node == root)
                             break;
-
-/*
-                        // set keyroot for pathnode
-                        if (is_only_child(prev))
-                        {
-                            //indexes[id(path_node)].keyroot = indexes[id(prev)].keyroot;
-                        }
-                        else
-                        {
-                            if (indexes[id(prev)].keyroot == BAD_INDEX)
-                            {
-                                cout << label(prev) << endl;
-                                if (!tree_type::is_last_child(prev))
-                                    prev = ++tree_type::sibling_iterator(prev);
-                                cout << label(prev) << endl;
-                            }
-                        }
-                        indexes[id(path_node)].keyroot = indexes[id(prev)].keyroot;
-                        cout << "PN, prev " << label(path_node) << ":" << label(prev) << endl;
-*/
+                    }
+                    path_node = (l == L ? lrh.left : 
+                            (l == R ? lrh.right : lrh.heavy));
+                    indexes[id(path_node)].keyroot = BAD_INDEX; // is leaf...
+                    path_node = tree_type::parent(path_node);
+                    while (tree_type::first_child(path_node) == tree_type::last_child(path_node) &&
+                            path_node != root)
+                        path_node = tree_type::parent(path_node);
+                    while (path_node != root)
+                    {
+                        indexes[id(path_node)].keyroot = indexes[id(root)].keyroot;
+                        path_node = tree_type::parent(path_node);
                     }
                 }
                 //DEBUG("index %s -> %s", label(root), "null");
@@ -2167,30 +2246,7 @@ void gted::precompute_tables()
                 label(it), label(left.at(0)),
                 label(right.at(0)), label(heavy.at(0)));
     };
-    auto print_tables = [&]()
-    {
-        auto print = [](tables::vector_type& vec)
-        {
-            for (auto val : vec)
-                cout << label(val) << " ";
-            cout << endl;
-        };
 
-        DEBUG("SUBFORESTS:");
-        print(precomputed.subforests[PATH_STRATEGY_LEFT_T1]);
-        print(precomputed.subforests[PATH_STRATEGY_LEFT_T2]);
-        print(precomputed.subforests[PATH_STRATEGY_RIGHT_T1]);
-        print(precomputed.subforests[PATH_STRATEGY_RIGHT_T2]);
-        print(precomputed.subforests[PATH_STRATEGY_HEAVY_T1]);
-        print(precomputed.subforests[PATH_STRATEGY_HEAVY_T2]);
-        DEBUG("KEYROOTS:");
-        print(precomputed.keyroots[PATH_STRATEGY_LEFT_T1]);
-        print(precomputed.keyroots[PATH_STRATEGY_LEFT_T2]);
-        print(precomputed.keyroots[PATH_STRATEGY_RIGHT_T1]);
-        print(precomputed.keyroots[PATH_STRATEGY_RIGHT_T2]);
-        print(precomputed.keyroots[PATH_STRATEGY_HEAVY_T1]);
-        print(precomputed.keyroots[PATH_STRATEGY_HEAVY_T2]);
-    };
 
     DEBUG("LEAFS T1:");
     comp_leafs(t1);
@@ -2213,7 +2269,17 @@ void gted::precompute_tables()
 }
 
 
+bool gted::is_keyroot(tree_type::iterator root, tree_type::iterator it, strategy_pair str) const
+{
+    return precomputed.get_leaf(root, str) ==
+        precomputed.get_leaf(tree_type::parent(it), str);
+}
 
+bool gted::is_in_subtree(tree_type::iterator root, tree_type::iterator it) const
+{
+    return id(root) > id(it) &&
+        id(it) >= id(precomputed.get_leafs(root).left);
+}
 
 gted::tables::tables()
 {
@@ -2240,12 +2306,19 @@ gted::tree_type::iterator gted::tables::get_leaf(tree_type::iterator it, strateg
     //APP_DEBUG_FNAME;
     assert(is_path_strategy(str));
 
-    LRH lrh = leafs.at(id(it));
+    LRH lrh = get_leafs(it);
     if (is_left_path(str))
         return lrh.left;
     if (is_right_path(str))
         return lrh.right;
     return lrh.heavy;
+}
+
+gted::tables::LRH gted::tables::get_leafs(tree_type::iterator it) const
+{
+    //APP_DEBUG_FNAME;
+
+    return leafs.at(id(it));
 }
 
 gted::tree_type::iterator gted::tables::get_subforest(size_t index, strategy_pair str) const

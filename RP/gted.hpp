@@ -89,6 +89,9 @@ private:
     tree_type::iterator heavy_child(tree_type::iterator) const;
 
 
+    inline bool is_in_subtree(tree_type::iterator root, tree_type::iterator it) const;
+    inline bool is_keyroot(tree_type::iterator root, tree_type::iterator it, strategy_pair str) const;
+
 
 
     using empty_iterator = tree_type::iterator;
@@ -126,6 +129,7 @@ private:
 
         indexes_pair_type get_indexes(tree_type::iterator it, strategy_pair str) const;
         tree_type::iterator get_leaf(tree_type::iterator it, strategy_pair str) const;
+        LRH get_leafs(tree_type::iterator it) const;
         tree_type::iterator get_subforest(size_t index, strategy_pair str) const;
         tree_type::iterator get_keyroot(size_t index, strategy_pair str) const;
 
