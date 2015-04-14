@@ -66,7 +66,7 @@ public:
      */
     inline void set_ids_postorder();
     /*
-     * find node with id
+     * find node with id/label
      */
     iterator find(size_t id) const;
     iterator find(node_type node) const;
@@ -94,10 +94,10 @@ public: /* STATIC functions: */
 
     /** return it.child(0) */
     template <typename iter>
-        static iter first_child(iter it);
+        static iter first_child(const iter& it);
     /** return it.child(it.number_of_children - 1) */
     template <typename iter>
-        static iter last_child(iter it);
+        static iter last_child(const iter& it);
 
     /**
      * return leftmost child in subtree rooted in it (=> it can be it itself)
@@ -114,6 +114,8 @@ public: /* STATIC functions: */
     static bool is_last_child(const base_iterator& it);
     /** has no children */
     static bool is_leaf(const base_iterator& it);
+    /** parent has no other children */
+    static bool is_only_child(const base_iterator& it);
 
 private:
     tree_type _tree;
@@ -121,7 +123,6 @@ private:
     size_t _size = 1;   // vzdy je tam aspon ROOT_id
     size_t id = ID++;
     // do korena posadi vrchol ROOT_id
-
 };
 
 
@@ -223,8 +224,10 @@ typename tree_base<node_type>::iterator tree_base<node_type>::find(size_t _id) c
     for (auto it = begin(); it != end(); ++it)
         if (::id(it) == _id)
             return it;
+    std::stringstream s;
+    s << "id '" << _id << "' not found in tree";
 
-    throw std::invalid_argument("id not found in tree");
+    throw std::invalid_argument(s.str());
 }
 
 template <typename node_type>
@@ -233,8 +236,10 @@ typename tree_base<node_type>::iterator tree_base<node_type>::find(node_type nod
     for (auto it = begin(); it != end(); ++it)
         if (::label(it) == node.get_label())
             return it;
+    std::stringstream s;
+    s << "label '" << node.get_label() << "' not found in tree";
 
-    throw std::invalid_argument("label not found in tree");
+    throw std::invalid_argument(s.str());
 }
 
 template <typename node_type>
@@ -364,7 +369,7 @@ typename tree_base<node_type>::sibling_iterator tree_base<node_type>::child(cons
 /* static */
 template <typename node_type>
 template <typename iter>
-iter tree_base<node_type>::first_child(iter it)
+iter tree_base<node_type>::first_child(const iter& it)
 {
     return iter(it.node->first_child);
 }
@@ -372,7 +377,7 @@ iter tree_base<node_type>::first_child(iter it)
 /* static */
 template <typename node_type>
 template <typename iter>
-iter tree_base<node_type>::last_child(iter it)
+iter tree_base<node_type>::last_child(const iter& it)
 {
     return iter(it.node->last_child);
 }
@@ -399,6 +404,15 @@ bool tree_base<node_type>::is_leaf(const base_iterator& it)
 {
     assert(it.node != nullptr);
     return it.node->last_child == nullptr;
+}
+
+/* static */
+template <typename node_type>
+bool tree_base<node_type>::is_only_child(const base_iterator& it)
+{
+    assert(it.node != nullptr);
+    return (it.node->parent == nullptr ||
+            it.node->parent->first_child == it.node->parent->last_child);
 }
 
 

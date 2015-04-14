@@ -30,7 +30,6 @@
 class gted
 {
 private:
-public: // TODO << remove public >>
     typedef rted::tree_type tree_type;
     struct subforest
     {
@@ -48,20 +47,21 @@ public: // TODO << remove public >>
     };
     struct iterator_pair
     {
-        tree_type::iterator it1;
-        tree_type::iterator it2;
-
         iterator_pair() = default;
         iterator_pair(std::initializer_list<tree_type::iterator> const list)
             : it1(*list.begin()), it2(*(list.begin() + 1)) {}
         iterator_pair(const subforest& other)
             : it1(other.left), it2(other.right) {}
 
-        bool operator==(const iterator_pair& other) const;
+        inline bool operator==(const iterator_pair& other) const;
         struct hash
         {
-            size_t operator()(const iterator_pair& other) const;
+            inline size_t operator()(const iterator_pair& other) const;
         };
+
+
+        tree_type::iterator it1;
+        tree_type::iterator it2;
     };
     typedef std::unordered_map<iterator_pair,
                 std::unordered_map<iterator_pair, size_t, iterator_pair::hash>,
@@ -71,30 +71,105 @@ public: // TODO << remove public >>
     typedef std::vector<iterator_pair> mapping_table_type;
 
 
-
-
 public:
     gted(const tree_type& _t1, const tree_type& _t2);
+    ~gted();
     void run_gted();
 
 private:
-
+    /**
+     * predpocita tabulky leafs, keyroots, subforests
+     */
     void precompute_tables();
-    void compute_distances_recursive(iterator_pair roots);
-    void single_path_function(iterator_pair roots, strategy_pair str);
-    void compute_distance(subforest_pair forests, strategy_pair str);
-    void fill_tables();
-    void compute_mapping();
 
-    tree_type::iterator heavy_child(tree_type::iterator) const;
+    /**
+     * hlavna funkcia, v danych korenoch sa pozrie do tabulky strategii
+     * a dekomponuje podla nej strom
+     *  -> vola compute_dustances_recursive(root_i, keyroot(root_i2))
+     *  pre nejake poradie vrcholov root_i, root_i2.
+     * takto prejde vsetky podstromy susediace s path_node podla strategie
+     */
+    void compute_distances_recursive(
+                    iterator_pair roots);
+    /**
+     * vyrata tree_distance(root1, root2)
+     * dekomponuje druhy strom (nie ten z rekurzie) pomocou tabulky subforests,
+     *  na tie vola compute_distance(root_i, subforest(root_i2))
+     */
+    void single_path_function(
+                    iterator_pair roots,
+                    strategy_pair str);
 
+    /**
+     * dopocita vzdialenost vsetkych vrcholov na path
+     * iteruje stromamy tak, ze zacne v liste,
+     *  pridava najprv lave vrcholy kym nedojde do otca
+     *  potom sa vrati o krok spat, a pridava prave vrcholy kym nedojde do otca
+     *  potom opakuje tie 2 body az kym niesom v root-och
+     */
+    forest_distance_table_type compute_distance(
+                    subforest_pair forests,
+                    strategy_pair str);
+    /**
+     * inicializacia tabulky, v podstate iteruje ako pri compute_distance
+     * ale pocita iba mazanie vrcholov.
+     */
+    void init_FDist_table(
+                    forest_distance_table_type& forest_dist,
+                    subforest_pair forests) const;
+    /**
+     * samotne hladanie vyslednej minimalnej hodnoty a dosadenie do tabuliek
+     *  (blizsie info priamo vo funkcii compute_distance())
+     */
+    void fill_table(
+                    forest_distance_table_type& table,
+                    const subforest_pair& roots,
+                    const subforest_pair& prevs,
+                    const iterator_pair& prev_roots,
+                    strategy_pair str);
 
-    inline bool is_in_subtree(tree_type::iterator root, tree_type::iterator it) const;
-    inline bool is_keyroot(tree_type::iterator root, tree_type::iterator it, strategy_pair str) const;
+    //void compute_mapping();
 
+    inline bool is_in_subtree(
+                    tree_type::iterator root,
+                    tree_type::iterator it) const;
+    inline bool is_keyroot(
+                    tree_type::iterator root,
+                    tree_type::iterator it,
+                    strategy_pair str) const;
 
+    inline size_t get_Fdist(
+                    forest_distance_table_type& table,
+                    const subforest& index1,
+                    const subforest& index2) const;
+    inline void set_Fdist(
+                    forest_distance_table_type& table,
+                    const subforest& index1,
+                    const subforest& index2,
+                    size_t value) const;
+    inline size_t get_Tdist(
+                    tree_type::iterator it1,
+                    tree_type::iterator it2,
+                    strategy_pair str);
+    inline void set_Tdist(
+                    tree_type::iterator it1,
+                    tree_type::iterator it2,
+                    strategy_pair str,
+                    size_t value);
 
-    using empty_iterator = tree_type::iterator;
+    inline void print_TDist() const;
+    inline void print_FDist(
+                    const forest_distance_table_type& table) const;
+
+    inline void print_precomputed() const;
+    inline void print_subforests(
+                    tree_type::iterator root,
+                    strategy_pair str) const;
+    inline void print_keyroots(
+                    tree_type::iterator root,
+                    strategy_pair str) const;
+    inline void print_subforest(
+                    const subforest& f);
 
 #ifdef TESTS
 public:
@@ -127,13 +202,14 @@ private:
                                         vector_type;
 
 
-        indexes_pair_type get_indexes(tree_type::iterator it, strategy_pair str) const;
-        tree_type::iterator get_leaf(tree_type::iterator it, strategy_pair str) const;
-        LRH get_leafs(tree_type::iterator it) const;
-        tree_type::iterator get_subforest(size_t index, strategy_pair str) const;
-        tree_type::iterator get_keyroot(size_t index, strategy_pair str) const;
+        inline indexes_pair_type get_indexes(const tree_type::iterator& it, strategy_pair str) const;
+        inline tree_type::iterator get_leaf(const tree_type::iterator& it, strategy_pair str) const;
+        inline LRH get_leafs(const tree_type::iterator& it) const;
+        inline tree_type::iterator get_subforest(size_t index, strategy_pair str) const;
+        inline tree_type::iterator get_keyroot(size_t index, strategy_pair str) const;
 
         friend void gted::precompute_tables();
+        friend void gted::print_precomputed() const;
 
     private:
         // indexovane pomocou PATH_STRATEGY_* makier, [0-5]
@@ -262,97 +338,9 @@ private:
     tree_distance_table_type tree_distances;
     mapping_table_type mapping;
     tables precomputed;
+
+    using empty_iterator = tree_type::iterator;
 };
 
 #endif /* !GTED_HPP */
 
-
-
-
-
-
-#ifdef NODEF
-
-    bool do_decompone_H(tree_type::iterator& it_ref,
-                        tree_type::iterator root,
-                        tree_type::iterator& it_path_node) const;
-    bool do_decompone_H_recursive(tree_type::iterator& it_ref,
-                                    tree_type::iterator& leaf,
-                                    tree_type::iterator end) const;
-    void single_path_function_H(tree_type::iterator root1,
-                                tree_type::iterator root2,
-                                graph who_first);
-
-
-    bool do_decompone_LR(tree_type::iterator& it_ref,
-                        tree_type::iterator root,
-                        path_strategy str) const;
-    bool do_decompone_LR_recursive(tree_type::iterator& it_ref,
-                                    tree_type::iterator& leaf,
-                                    tree_type::iterator end,
-                                    path_strategy str) const;
-    void single_path_function_LR(tree_type::iterator root1,
-                                    tree_type::iterator root2,
-                                    path_strategy str,
-                                    graph who_first);
-
-    void fill_table(forest_distance_table_type& forest_dist,
-                    const subforest_pair& roots,
-                    const subforest_pair& prevs,
-                    iterator_pair prev_roots,
-                    graph who_first);
-
-    forest_distance_table_type compute_distance(subforest_pair pair,
-                                                graph who_first);
-    void compute_mapping();
-
-
-
-    /**
-     * zinicializuje tabulku forest_dist na vzdialenosti pri mazani vrcholov
-     * teda pre kazdy f = podles T1 -> F[f][EMPTY] = |f|
-     * a naopak kazdy f = podles T2 -> F[EMPTY][f] = |f|
-     */
-    void init_FDist_table(forest_distance_table_type& forest_dist,
-                        subforest_pair subforests);
-
-    /**
-     * zinicializuje pair tak, ze
-     *  .left == .right == .path_node == list na root-leaf-path
-     *  .root == root
-     */
-    void init_subforest_pair(subforest_pair& pair,
-                        tree_type::iterator root1,
-                        tree_type::iterator root2,
-                        path_strategy str,
-                        graph who_first) const;
-
-    void precompute_heavy_paths();
-
-    /**
-     * vrati index potomka s najvacsim podstromom
-     */
-    size_t biggest_subtree_child(tree_type::iterator root,
-                                const tree_type& t,
-                                const rted::map_type& t_sizes) const;
-
-    void print_TDist() const;
-    void print_TDist(tree_distance_table_type distances);
-    void print_FDist(const forest_distance_table_type& table) const;
-    void print_subforest(const subforest& f);
-
-    size_t get_Fdist(const subforest& index1,
-                    const subforest& index2,
-                    const forest_distance_table_type& table) const;
-    size_t get_Tdist(tree_type::iterator index1,
-                    tree_type::iterator index2,
-                    graph who_first) const;
-    void set_Fdist(const subforest& index1,
-                    const subforest& index2,
-                    forest_distance_table_type& table,
-                    size_t value) const;
-    void set_Tdist(tree_type::iterator index1,
-                    tree_type::iterator index2,
-                    size_t value,
-                    graph who_first);
-#endif

@@ -372,6 +372,7 @@ size_t rted::update_STR_table(
 
     switch(index)
     {
+        // TODO: vyuzit to, ze PATH_STRATEGY* == *VECTOR_INDEX
         case RTED_VECTOR_T1_LEFT_INDEX:
             value = PATH_STRATEGY_LEFT_T1;
             break;

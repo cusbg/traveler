@@ -7,9 +7,10 @@
 
 CC = g++
 DEBUG = -g
-#RELEASE = -DNDEBUG -O3
-CFLAGS = -std=c++11 -c -Wall $(DEBUG) $(RELEASE)
-LFLAGS = -std=c++11 -Wall $(shell pkg-config --libs log4cpp)
+RELEASE = -DNDEBUG -O3
+CFLAGS = -std=c++11 -c -Wall -pg $(DEBUG) $(RELEASE)
+LFLAGS = -std=c++11 -Wall -ltbb -pg \
+		 $(shell pkg-config --libs log4cpp)
 SHELL = /bin/bash
 
 BUILDDIR = build
@@ -81,6 +82,9 @@ clean:
 
 cleanMK:
 	rm -f $(BUILDDIR)/*.mk Makefile
+
+cleanLog:
+	rm -f $(BUILDDIR)/*.log
 
 .PHONY: $(BUILDDIR)/Makefile clean cleanMK
 

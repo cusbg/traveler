@@ -59,9 +59,6 @@ bool is_T2(strategy_pair ch);
 extern log4cpp::Category& logger; // globalna premenna...
 
 
-
-
-
 class set_logger_priority_to_return_function
 {
 public:
@@ -83,33 +80,17 @@ private:
     logger.debug(__VA_ARGS__)
 
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
-    set_logger_priority_to_return_function __value(log4cpp::Priority::PRIORITY)
+    set_logger_priority_to_return_function __logger_priority(log4cpp::Priority::PRIORITY)
 
 #define APP_DEBUG_FNAME \
     logger.debug("Entering function: %s", __PRETTY_FUNCTION__)
-
-/*
-#define SUBTREE_DEBUG_PRINT(tree, iterator) \
-        { \
-            std::stringstream stream; \
-            kptree::print_subtree_bracketed(tree, iterator, stream); \
-            logger.debug("SUBTREE: %s", stream.str().c_str()); \
-        }
-
-#define TREE_DEBUG_PRINT(tree) \
-        { \
-            std::stringstream stream; \
-            kptree::print_tree_bracketed(tree, stream); \
-            logger.debug("TREE: %s", stream.str().c_str()); \
-        }
-*/
 
 #define LOGGER_PRINT_CONTAINER(container, name) \
         { \
             std::stringstream stream; \
             for (auto __value : container) \
                 stream << __value << " "; \
-            logger.debug(name": %s", stream.str().c_str()); \
+            DEBUG(name": %s", stream.str().c_str()); \
         }
 
 
