@@ -54,6 +54,11 @@ bool is_T1(strategy_pair ch);
 bool is_T2(strategy_pair ch);
 
 
+struct Point
+{
+    double x, y;
+};
+
 
 #include <log4cpp/Category.hh>
 extern log4cpp::Category& logger; // globalna premenna...

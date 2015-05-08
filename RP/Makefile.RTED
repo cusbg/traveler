@@ -1,0 +1,11 @@
+#
+# File: Makefile.RTED
+# Created: 2015-04-20 18:55
+# By: Richard Eliáš <richard@ba30.eu>
+#
+
+SHELL		= /bin/bash
+
+run:
+	make --directory=java_RTED/
+

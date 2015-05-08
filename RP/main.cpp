@@ -27,12 +27,95 @@
 #include "rted.hpp"
 #include "tests.hpp"
 #include "gted.hpp"
+#include "util.hpp"
+#include "app.hpp"
 
+
+#define INPUT_PS1   "../InFiles/homo_sapiens.ps"
+#define OUTPUT_PS   "build/out.ps"
 
 
 
 using namespace std;
 
+
+
+int main(int argc, char** argv)
+{
+    cout << boolalpha;
+    srand(1);
+
+    if (argc == 2)
+    {
+        generator::generate_files();
+        exit(0);
+    }
+
+    string l1, l2, b1, b2;
+    rna_tree rna1, rna2;
+    string ps_in, ps_out;
+
+    l1 = "-5142aba3456978089-";
+    b1 = "((.(.(.).)).(.(.)))";
+
+    rna1 = rna_tree(b1, l1);
+    rna_node_type node(rna_pair_label("ahoj"));
+    auto it = rna1.begin();
+    for (int i = 0; i < 4; ++i)
+        ++it;
+    rna1.print_tree();
+    it = rna1.modify(it, node);
+    rna1.print_tree();
+    cout << *it << endl;
+    it = rna1.remove(it);
+    cout << *it << endl;
+    rna1.print_tree();
+
+    rna1.print_tree();
+    for (auto it = rna1.begin_pre_post(); it != rna1.end_pre_post(); ++it)
+        cout << *it << " ";
+    cout << endl;
+
+    app a;
+    a.run_app();
+
+
+    return 0;
+}
+
+
+/*
+    string l1, l2, b1, b2;
+    rna_tree rna1, rna2;
+    string ps_in, ps_out;
+
+
+    l1 = "-51423456978089-";
+    b1 = "((.(..)).(.(.)))";
+
+    l2 = "abcdeca";
+    b2 = "(.(..))";
+
+    rna1 = rna_tree(b1, l1);
+    rna2 = rna_tree(b2, l2);
+
+
+    ps_in = INPUT_PS1;
+    ps_out = OUTPUT_PS;
+
+    //l1 = get_rna_seq_from_ps(ps_in);
+    //b1 = run_RNAfold(l1);
+
+    rna1 = rna_tree(b1, l1);
+
+    app a;
+    a.run_app(rna1, rna2);
+
+    assert(rna1.get_brackets() == b1 && rna1.get_labels() == l1);
+    cout << rna1.get_brackets() << endl;
+    cout << rna1.get_labels() << endl;
+    abort();
+*/
 
 
 
@@ -50,86 +133,3 @@ string readbrackets()
     input >> s;
     return s;
 }
-
-
-int main(int argc, char** argv)
-{
-    cout << boolalpha;
-    srand(1);
-
-
-    string b1, l1, b2, l2;
-    l1 = LABELS1;
-    b1 = BRACKETS1;
-    l2 = LABELS22;
-    b2 = BRACKETS22;
-
-    //l1 = "1231";
-    //b1 = "(..)";
-    //l1 = "1234351";
-    //b1 = "(.(.).)";
-
-    //l2 = "ABCDCA";
-    //b2 = "(.(.))";
-
-    l1 = "5142345";
-    b1 = "(.(..))";
-    l2 = "EACBCDE";
-    b2 = "(.(.).)";
-
-
-    l1 = "-51423456978089-";
-    b1 = "((.(..)).(.(.)))";
-    
-    b2 = b1;
-    l2 = l1;
-
-    b2 = "(.......)";
-    l2 = "abcdefghi";
-
-    b2 = "(" + readbrackets() + ")";
-    l2 = "0" + readseq() + "0";
-    b1 = b2;
-    l1 = l2;
-
-    //l1 = "5142345";
-    //b1 = "(.(..))";
-
-    //l2 = "DABCD";
-    //b2 = "(...)";
-
-
-    //rna_tree rna1("(" + b1 + ")", "." + l1 + ".");
-    //rna_tree rna2("(" + b2 + ")", "," + l2 + ",");
-
-    rna_tree rna1(b1, l1);
-    rna_tree rna2(b2, l2);
-    rna1.set_ids_postorder();
-    rna2.set_ids_postorder();
-
-    gted g(rna1, rna2);
-    g.run_gted();
-
-
-    //rted r(rna1, rna2);
-    //r.run_rted();
-    //rted_tests();
-    //return 0;
-    //
-    //auto s1 = r.get_t2_sizes();
-    //for (auto val : s1)
-        //cout << val.second << endl;
-
-
-    //gted g(rna1, rna2);
-    //g.run_gted();
-    //g.test();
-
-
-	return 0;
-}
-
-
-
-
-

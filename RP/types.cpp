@@ -134,7 +134,7 @@ log4cpp::Category& init_logger()
     log4cpp::Appender* file_appender;
     log4cpp::PatternLayout* console_layout;
     log4cpp::PatternLayout* file_layout;
-    string logfile = "build/program-" + to_string(getpid()) + ".log";
+    string logfile = "build/logs/program-" + to_string(getpid()) + ".log";
     string pattern = "%d{%H:%M:%S:%l} %u:\t[%p] %m%n";
 
     console_appender = new log4cpp::OstreamAppender("console", &std::cout);

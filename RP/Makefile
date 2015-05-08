@@ -5,31 +5,34 @@
 #
 
 
-CC = g++
-DEBUG = -g
-RELEASE = -DNDEBUG -O3
-CFLAGS = -std=c++11 -c -Wall -pg $(DEBUG) $(RELEASE)
-LFLAGS = -std=c++11 -Wall -ltbb -pg \
-		 $(shell pkg-config --libs log4cpp)
-SHELL = /bin/bash
+CC				= g++
+#DEBUG =		-pg
+DEBUG			= -g
+#RELEASE		= DNDEBUG -O3
+CFLAGS			= -std=c++11 -c -Wall $(DEBUG) $(RELEASE)
+LFLAGS			= -Wall $(shell pkg-config --libs log4cpp)
+SHELL			= /bin/bash
 
-BUILDDIR = build
+BUILDDIR		= build
+LOGDIR			= $(BUILDDIR)/logs
 
-TARGET = program
-SOURCES = $(shell find ./ -name "*.cpp" | sed 's@\./@@g')
-HEADERS = $(shell find ./ -name "*.hpp" | sed 's@\./@@g')
-OBJECTS = $(SOURCES:%.cpp=%.o)
-MAKEFILES = $(SOURCES:%.cpp=%.mk)
+TARGET			= program
+SOURCES			= $(shell find ./ -name "*.cpp" | sed 's@\./@@g')
+HEADERS			= $(shell find ./ -name "*.hpp" | sed 's@\./@@g')
+OBJECTS			= $(shell echo $(SOURCES) | sed 's@\.cpp@.o@ g; s@[^ ]*/@@g')
+MAKEFILES		= $(shell echo $(SOURCES) | sed 's@\.cpp@.mk@g; s@[^ ]*/@@g')
 
-MAKEDEPENDENCY = $(CC) -MM -E 
+MAKEDEPENDENCY	= $(CC) -MM -E 
 
 
-run: build
+ARGS			=
+run: build $(BUILDDIR)/generated
+	@mkdir -p $(BUILDDIR)/files $(LOGDIR)
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
 	@echo "**********************************************************************"
 	@echo
-	$(BUILDDIR)/$(TARGET)
+	$(BUILDDIR)/$(TARGET) $(ARGS)
 
 
 build: $(BUILDDIR)/$(TARGET)
@@ -37,8 +40,11 @@ build: $(BUILDDIR)/$(TARGET)
 debug: build
 	gdb $(BUILDDIR)/$(TARGET)
 
+analyse:
+	gprof $(BUILDDIR)/$(TARGET) | less
 
-$(BUILDDIR)/$(TARGET): $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES)) $(BUILDDIR)/Makefile
+
+$(BUILDDIR)/$(TARGET): TreeMk $(BUILDDIR)/Makefile
 
 $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES))
 	@rm -f $@
@@ -65,17 +71,34 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 			\\n \
 			\\ninclude $(MAKEFILES) \
 					>> $@
-	@make --directory=$(BUILDDIR) -f Makefile
+	@#@make --directory=$(BUILDDIR) -f Makefile
+	@make -j4 --directory=$(BUILDDIR) -f Makefile
 
+$(BUILDDIR)/generated:
+	@mkdir -p $(BUILDDIR)/files $(LOGDIR)
+	@touch $@
+	@echo "**********************************************************************"
+	@echo "********************* RUNNING  PROGRAM *******************************"
+	@echo "**********************************************************************"
+	@echo
+	@$(BUILDDIR)/$(TARGET) 1
 
 $(BUILDDIR)/%.mk: %.cpp
 	@mkdir -p $(BUILDDIR)
 	@rm -f $@
-	@$(MAKEDEPENDENCY) $(CFLAGS) $^ | sed 's@\([^ :]*\.\([hc]pp\|hh\)\)@../\1@g' \
+	@$(MAKEDEPENDENCY) $(CFLAGS) $^ | sed 's@\([^ :]*\.\([hc]pp\|hh\|h\)\)@../\1@g' \
 					>> $@
 	@echo '	$(CC) $(CFLAGS) $$< -o $$@ ' \
 					>> $@
 
+TreeMk:
+	@make -j4 --directory=./tree -f Makefile
+
+rnafold:
+	make -f ./Makefile.RNAfold
+
+rted:
+	make -f ./Makefile.RTED
 
 clean:
 	rm -rf $(BUILDDIR)
@@ -84,7 +107,7 @@ cleanMK:
 	rm -f $(BUILDDIR)/*.mk Makefile
 
 cleanLog:
-	rm -f $(BUILDDIR)/*.log
+	rm -f $(LOGDIR)
 
 .PHONY: $(BUILDDIR)/Makefile clean cleanMK
 
