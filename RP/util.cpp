@@ -25,11 +25,52 @@
 #include <fstream>
 #include "app.hpp"
 #include <unistd.h>
+#include "macros.hpp"
 
 
 using namespace std;
 
 
+void save_doc(const document& doc, const std::string& file)
+{
+    APP_DEBUG_FNAME;
+    ofstream out(file);
+
+    typedef rna_tree::pre_post_order_iterator pre_post_it;
+
+    auto format_string = [](pre_post_it it)
+    {
+        stringstream out;
+        size_t index;
+        if (it.is_preorder() || rna_tree::is_leaf(it))
+            index = 0;
+        else
+            index = 1;
+
+        auto label = it->get_label().labels.at(index);
+
+        out
+            << "("
+            << label.label
+            << ") "
+            << label.point.x
+            << " "
+            << label.point.y
+            << " lwstring";
+
+        return out.str();
+    };
+
+    out << doc.prolog << endl;
+    for (auto it = ++doc.rna.begin_pre_post();
+            ++pre_post_it(it) != doc.rna.end_pre_post(); ++it)
+    {
+        //cout << format_string(it) << endl;
+        out << format_string (it) << endl;
+    }
+    out << doc.epilog << endl;
+    assert(!out.fail());
+}
 
 document read_ps(
                 const std::string& file)
@@ -350,16 +391,6 @@ bool is_base_line(
 
 // GENERATOR: 
 
-#define FILES               {"human", "mouse", "rabbit", "frog"}
-#define PS_IN(val)          "build/files/" + val + ".ps"
-#define PS_OUT(val1, val2)  "build/files/" + val1 + "-" + val2 + ".out.ps"
-#define SEQ(val)            "build/files/" + val + ".seq"
-#define RNAFOLD(val)        "build/files/" + val + ".RNAfold.fold"
-//#define FOLD(val)           RNAFOLD(val)
-#define FOLD(val)           "build/files/" + val + ".fold"
-#define FOLD_IN(val)        "../InFiles/" + val + ".fold"
-#define MAP(val1, val2)     "build/files/" + val1 + "-" + val2 + ".map"
-
 /* static */ void generator::generate_seq_files()
 {
     APP_DEBUG_FNAME;
@@ -514,45 +545,5 @@ bool is_base_line(
 
 
 
-void save_doc(const document& doc, const std::string& file)
-{
-    APP_DEBUG_FNAME;
-    ofstream out(file);
-
-    typedef rna_tree::pre_post_order_iterator pre_post_it;
-
-    auto format_string = [](pre_post_it it)
-    {
-        stringstream out;
-        size_t index;
-        if (it.is_preorder() || rna_tree::is_leaf(it))
-            index = 0;
-        else
-            index = 1;
-
-        auto label = it->get_label().labels.at(index);
-
-        out
-            << "("
-            << label.label
-            << ") "
-            << label.point.x
-            << " "
-            << label.point.y
-            << " lwstring";
-
-        return out.str();
-    };
-
-    out << doc.prolog << endl;
-    for (auto it = ++doc.rna.begin_pre_post();
-            ++pre_post_it(it) != doc.rna.end_pre_post(); ++it)
-    {
-        //cout << format_string(it) << endl;
-        out << format_string (it) << endl;
-    }
-    out << doc.epilog << endl;
-    assert(!out.fail());
-}
 
 
