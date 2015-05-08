@@ -19,6 +19,8 @@
  * USA.
  */
 
+#ifdef NODEF
+
 #ifndef TESTS_HPP
 #define TESTS_HPP
 
@@ -43,4 +45,6 @@ void gted_tests();
 
 
 #endif /* !TESTS_HPP */
+
+#endif
 

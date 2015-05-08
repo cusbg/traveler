@@ -19,6 +19,8 @@
  * USA.
  */
 
+#ifdef NODEF
+
 #ifdef NDEBUG
 // always use asserts...
 #undef NDEBUG
@@ -169,4 +171,5 @@ void gted_tests()
 #endif
 
 
+#endif
 

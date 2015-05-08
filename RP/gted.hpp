@@ -19,6 +19,8 @@
  * USA.
  */
 
+#ifdef NODEF
+
 #ifndef GTED_HPP
 #define GTED_HPP
 
@@ -343,4 +345,6 @@ private:
 };
 
 #endif /* !GTED_HPP */
+
+#endif
 

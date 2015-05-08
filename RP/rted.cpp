@@ -19,6 +19,7 @@
  * USA.
  */
 
+#ifdef NODEF
 
 #include "rted.hpp"
 #include <unordered_map>
@@ -611,5 +612,6 @@ void rted::print_strategies() const
     logger.debugStream() << out.str();
 }
 
+#endif
 
 

@@ -19,21 +19,13 @@
  * USA.
  */
 
+#ifdef NODEF
 
 #undef NDEBUG
 #include "gted.hpp"
 #include <algorithm>
 #include <iomanip>
 
-/*
-#include <tbb/task_scheduler_init.h>
-#include <tbb/parallel_for.h>
-#include <tbb/atomic.h>
-#include <tbb/parallel_invoke.h>
-using namespace tbb;
-
-atomic<size_t> LEFT, RIGHT, HEAVY;
-*/
 
 
 using namespace std;
@@ -1718,5 +1710,5 @@ gted::tables::tables()
 }
 
 
-
+#endif
 
