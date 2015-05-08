@@ -24,6 +24,12 @@
 
 #include "../types.hpp"
 
+template <typename label_type>
+class node_base;
+
+template <typename label_type>
+std::ostream& operator<< (std::ostream& out, const node_base<label_type>& node);
+
 
 template <typename label_type>
 class node_base
@@ -45,12 +51,8 @@ public:
     inline void reset_id();
 
     inline bool is_root() const;
-    friend std::ostream& operator<<(std::ostream& out, const node_base<label_type>& n)
-    {
-        // TODO vyhodit von z deklaracie...
-        out << n.label;
-        return out;
-    }
+
+    friend std::ostream& operator<< <>(std::ostream& out, const node_base<label_type>& n);
 };
 
 
@@ -97,6 +99,12 @@ bool node_base<label_type>::is_root() const
     return isroot;
 }
 
+template <typename label_type>
+std::ostream& operator<<(std::ostream& out, const node_base<label_type>& n)
+{
+    out << n.label;
+    return out;
+}
 
 
 #endif /* !NODE_BASE_HPP */
