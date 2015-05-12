@@ -29,10 +29,7 @@
 #include "gted.hpp"
 #include "util.hpp"
 #include "app.hpp"
-
-
-#define INPUT_PS1   "../InFiles/homo_sapiens.ps"
-#define OUTPUT_PS   "build/out.ps"
+#include "generator.hpp"
 
 
 
@@ -51,6 +48,7 @@ int main(int argc, char** argv)
         exit(0);
     }
 
+/*
     string l1, l2, b1, b2;
     rna_tree rna1, rna2;
     string ps_in, ps_out;
@@ -58,26 +56,62 @@ int main(int argc, char** argv)
     l1 = "-5142aba3456978089-";
     b1 = "((.(.(.).)).(.(.)))";
 
+    l1 = "abcdedfbg";
+    b1 = ".(.(.).).";
+
     rna1 = rna_tree(b1, l1);
-    rna_node_type node(rna_pair_label("ahoj"));
+    rna_node_type node;
+    rna_pair_label label(".");
+    label = label + label;
+    
+    node.set_label(label);
     auto it = rna1.begin();
-    for (int i = 0; i < 4; ++i)
-        ++it;
-    rna1.print_tree();
-    it = rna1.modify(it, node);
-    rna1.print_tree();
-    cout << *it << endl;
-    it = rna1.remove(it);
-    cout << *it << endl;
+    it = move(rna1.begin(), 4);
+    //for (int i = 0; i < 4; ++i)
+        //++it;
+
+    DEBUG("it = %s", ::label(it));
     rna1.print_tree();
 
+    //it = rna1.modify(it, node);
+    //DEBUG("it = %s", ::label(it));
+    //rna1.print_tree();
+    //wait_for_input();
+
+    it = rna1.remove(it);
+    DEBUG("it = %s", ::label(it));
     rna1.print_tree();
-    for (auto it = rna1.begin_pre_post(); it != rna1.end_pre_post(); ++it)
-        cout << *it << " ";
-    cout << endl;
+    wait_for_input();
+
+    it = rna1.insert(it, node);
+    DEBUG("it = %s", ::label(it));
+    rna1.print_tree();
+    wait_for_input();
+
+    it = move(rna1.begin(), 3);
+    it = rna1.insert(it, node);
+    DEBUG("it = %s", ::label(it));
+    rna1.print_tree();
+    wait_for_input();
+
+    it = move(rna1.begin(), 2);
+    it = rna1.insert(it, node);
+    DEBUG("it = %s", ::label(it));
+    rna1.print_tree();
+    wait_for_input();
+
+
+    return 0;
+*/
+
+    //generator::generate_files();
+
+    //return 0;
+
 
     app a;
-    a.run_app();
+    a.run_between("human", "mouse");
+    //a.run_app();
 
 
     return 0;

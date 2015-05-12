@@ -24,10 +24,8 @@
 
 #include "tree/tree_base.hpp"
 #include "tree/node_base.hpp"
+#include "rna_tree_labels.hpp"
 
-struct rna_label;
-class rna_pair_label;
-class rna_tree;
 typedef node_base<rna_pair_label> rna_node_type;
 
 
@@ -51,57 +49,6 @@ public:
 
 
 
-struct rna_label
-{
-#define BAD_POINT     Point({0xBADF00D, 0xBADF00D})
-    Point point = BAD_POINT;
-    std::string label;
-
-#define IS_BAD_POINT(p) (p.x == 0xBADF00D && p.y == 0xBADF00D)
-    friend std::ostream& operator<< (std::ostream& out, rna_label l)
-    {
-        //if (IS_BAD_POINT(l.point))
-            //logger.warn("BAD_POINT");
-        out << l.label << ": x=" << l.point.x << "; y=" << l.point.y;
-        return out;
-    }
-};
-
-class rna_pair_label
-{
-public:
-    friend std::ostream& operator<< (std::ostream& out, const rna_pair_label& l);
-    rna_pair_label operator+(const rna_pair_label& other) const;
-    std::string to_string() const
-    {
-        std::stringstream str;
-        str << *this;
-        return str.str();
-    }
-    std::string get_points() const
-    {
-        std::stringstream str;
-        for (const auto& val : labels)
-            str << val << "|";
-        return str.str();
-    }
-    void change_label_string(const std::string& str, size_t index)
-    {
-        assert(index < labels.size());
-        labels.at(index).label = str;
-    }
-    void change_point(Point p, size_t index)
-    {
-        assert(index < labels.size());
-        labels.at(index).point = p;
-    }
-
-    rna_pair_label(const std::string& s);
-    rna_pair_label() = default;
-
-
-    std::vector<rna_label> labels;
-};
 
 
 #endif /* !RNA_TREE_HPP */

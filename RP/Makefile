@@ -15,6 +15,7 @@ SHELL			= /bin/bash
 
 BUILDDIR		= build
 LOGDIR			= $(BUILDDIR)/logs
+FILESDIR		= $(BUILDDIR)/files
 
 TARGET			= program
 SOURCES			= $(shell find ./ -name "*.cpp" | sed 's@\./@@g')
@@ -26,7 +27,7 @@ MAKEDEPENDENCY	= $(CC) -MM -E
 
 
 ARGS			=
-run: build $(BUILDDIR)/generated
+run: build $(FILESDIR)/generated
 	@mkdir -p $(BUILDDIR)/files $(LOGDIR)
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
@@ -74,14 +75,15 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 	@#@make --directory=$(BUILDDIR) -f Makefile
 	@make -j4 --directory=$(BUILDDIR) -f Makefile
 
-$(BUILDDIR)/generated:
-	@mkdir -p $(BUILDDIR)/files $(LOGDIR)
-	@touch $@
+MK_DIRECTORIES		= $(LOGDIR) $(FILESDIR) $(FILESDIR)/mappings $(FILESDIR)/rted
+$(FILESDIR)/generated:
+	@mkdir -p $(MK_DIRECTORIES)
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
 	@echo "**********************************************************************"
 	@echo
 	@$(BUILDDIR)/$(TARGET) 1
+	@touch $@
 
 $(BUILDDIR)/%.mk: %.cpp
 	@mkdir -p $(BUILDDIR)

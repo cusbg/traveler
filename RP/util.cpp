@@ -31,46 +31,6 @@
 using namespace std;
 
 
-void save_doc(const document& doc, const std::string& file)
-{
-    APP_DEBUG_FNAME;
-    ofstream out(file);
-
-    typedef rna_tree::pre_post_order_iterator pre_post_it;
-
-    auto format_string = [](pre_post_it it)
-    {
-        stringstream out;
-        size_t index;
-        if (it.is_preorder() || rna_tree::is_leaf(it))
-            index = 0;
-        else
-            index = 1;
-
-        auto label = it->get_label().labels.at(index);
-
-        out
-            << "("
-            << label.label
-            << ") "
-            << label.point.x
-            << " "
-            << label.point.y
-            << " lwstring";
-
-        return out.str();
-    };
-
-    out << doc.prolog << endl;
-    for (auto it = ++doc.rna.begin_pre_post();
-            ++pre_post_it(it) != doc.rna.end_pre_post(); ++it)
-    {
-        //cout << format_string(it) << endl;
-        out << format_string (it) << endl;
-    }
-    out << doc.epilog << endl;
-    assert(!out.fail());
-}
 
 document read_ps(
                 const std::string& file)
@@ -96,6 +56,8 @@ document read_ps(
             other == "setrgbcolor";
     };
 
+    // nacita prolog suboru
+    // vsetko az po bazy s bodmi..
     while(true)
     {
         getline(in, line);
@@ -112,6 +74,7 @@ document read_ps(
         DEBUG("prolog '%s'", line.c_str());
     }
 
+    // nacita bazy..
     while(true)
     {
         getline(in, line);
@@ -142,6 +105,8 @@ document read_ps(
         DEBUG("base_line '%s'", line.c_str());
     }
 
+    // nacita epilog suboru
+    // vsetko od baz az po koniec suboru
     while(true)
     {
         getline(in, line);
@@ -200,10 +165,17 @@ std::string convert_to_java_format(
     return stream.str();
 }
 
+
+
+
+// do not use:
 std::string run_RNAfold(
                 const std::string& labels)
 {
     APP_DEBUG_FNAME;
+
+    logger.error("do not use!");
+    abort();
 
     string out;
     string command;
@@ -238,82 +210,6 @@ std::string run_RNAfold(
 
 
 
-/* static */ std::vector<mapping> mapping::compute_mapping(
-                const rna_tree& rna1,
-                const rna_tree& rna2)
-{
-    APP_DEBUG_FNAME;
-
-    vector<mapping> vec;
-    string line;
-    string filename;
-    string distance;
-
-    filename = "build/files/mapping_" + rna1.name + "-" + rna2.name;
-
-    run_rted(rna1, rna2, filename);
-
-    ifstream in(filename);
-    getline(in, line);
-    getline(in, distance);
-    mapping map;
-
-    assert(!in.fail());
-    while(true)
-    {
-        getline(in, line);
-        if (in.fail())
-            break;
-        auto i = line.find("->");
-        if (i == string::npos)
-            continue;
-        string s1, s2;
-        s1 = line.substr(0, i);
-        s2 = line.substr(i + 2);
-        map.from = atoi(s1.c_str());
-        map.to = atoi(s2.c_str());
-        vec.push_back(map);
-    }
-
-    DEBUG("distance: %s", distance.c_str());
-
-    return vec;
-}
-
-/* static */ void mapping::run_rted(
-                const rna_tree& rna1,
-                const rna_tree& rna2,
-                const std::string& filename)
-{
-    APP_DEBUG_FNAME;
-
-    string s1, s2;
-    string command;
-
-    if(exist_file(filename))
-    {
-        DEBUG("RTED: file %s exist, return", filename.c_str());
-        return;
-    }
-
-    s1 = convert_to_java_format(rna1);
-    s2 = convert_to_java_format(rna2);
-
-    command =
-                "java -cp java_RTED util.RTEDCommandLine "
-                    "--costs 1 1 0 "
-                    "-m "
-                    "--trees "
-                " '" + s1 + "' "
-                " '" + s2 + "' " +
-                " > " + filename;
-
-    logger.debugStream() << "RUN COMMAND: " << command;
-    
-    system(command.c_str());
-    assert(exist_file(filename));
-}
-
 
 bool exist_file(
                 const std::string& filename)
@@ -329,38 +225,34 @@ std::string read_file(
     assert(exist_file(filename));
 
     ifstream in(filename);
-    string out;
-    string line;
-
-    while(true)
-    {
-        getline(in, line, '\0');
-        if (in.fail())
-            break;
-        out += line;
-    }
-    return out;
+    stringstream s;
+    s << in.rdbuf();
+    return s.str();
  }
 
 
 
-std::vector<mapping> read_mapping_file(
+mapping read_mapping_file(
                 const std::string& filename)
 {
     APP_DEBUG_FNAME;
 
-    vector<mapping> vec;
     ifstream in(filename);
-    mapping m;
+    mapping map;
+    mapping_pair m;
+
+    string distance;
+    getline(in, distance);
+    map.distance = atoi(distance.c_str());
 
     while(true)
     {
         in >> m.from >> m.to;
         if (in.fail())
             break;
-        vec.push_back(m);
+        map.map.push_back(m);
     }
-    return vec;
+    return map;
 }
 
 bool is_base_line(
@@ -379,163 +271,115 @@ bool is_base_line(
 
     return
         !(
-            line.size() < 3 ||
-            find(bases.begin(), bases.end(), line.at(1)) == bases.end() ||
-            line.find("lwstring") == string::npos ||
-            str.fail() ||
-            other != "lwstring" ||
-            !str.eof()
-        );
+            false
+            || line.size() < 3
+            || find(bases.begin(), bases.end(), line.at(1)) == bases.end()
+            || line.find("lwstring") == string::npos
+            || str.fail()
+            || other != "lwstring"
+            || !str.eof()
+         );
 }
 
 
-// GENERATOR: 
 
-/* static */ void generator::generate_seq_files()
+
+// MAPPING:
+
+/* static */ mapping mapping::compute_mapping(
+                const rna_tree& rna1,
+                const rna_tree& rna2)
 {
     APP_DEBUG_FNAME;
 
-    vector<string> vec = FILES;
+    string filename;
+    string line;
+    string distance;
+    mapping out_mapping;
+    mapping_pair m;
 
-    for (auto val : vec)
+    filename = RTED_MAP_FILE(rna1, rna2);
+    run_rted(rna1, rna2, filename);
+
+    ifstream in(filename);
+
+    getline(in, line);
+    getline(in, distance);
+    assert(!in.fail());
+
+    out_mapping.distance = atoi(distance.c_str());
+    while(true)
     {
-        string fileIn = PS_IN(val);
-        string fileOut = SEQ(val);
-        string labels = read_ps(fileIn).labels;
-        ofstream out(fileOut);
-        out << labels;
-        assert(!out.fail());
-    }
-}
-
-/* static */ void generator::generate_fold_files()
-{
-    APP_DEBUG_FNAME;
-
-    vector<string> vec = FILES;
-
-    for (auto val : vec)
-    {
-        string fileIn = FOLD_IN(val);
-        string fileOut = FOLD(val);
-        
-        if (!exist_file(fileIn))
+        getline(in, line);
+        if (in.fail())
+            break;
+        auto i = line.find("->");
+        if (i == string::npos)
         {
-            logger.error("FILE %s does not exist", fileIn.c_str());
-            abort();
+            WARN("pattern '->' not found in line '%s'",
+                    line.c_str());
+            continue;
         }
-        string brackets = read_file(fileIn);
 
-        ofstream out(fileOut);
-        out << brackets;
-        assert(!out.fail());
+        string s1, s2;
+        s1 = line.substr(0, i);
+        s2 = line.substr(i + 2);
+        m.from = atoi(s1.c_str());
+        m.to = atoi(s2.c_str());
+        out_mapping.map.push_back(m);
     }
+
+    DEBUG("distance: %lu", out_mapping.distance);
+
+    return out_mapping;
 }
 
-/* static */ void generator::generate_ps_files()
+/* static */ void mapping::run_rted(
+                const rna_tree& rna1,
+                const rna_tree& rna2,
+                const std::string& filename)
 {
     APP_DEBUG_FNAME;
 
-    vector<string> vec = FILES;
+    string command;
+    string f1, f2;
 
-    for (auto val : vec)
+    if(exist_file(filename))
     {
-        string fileIn = "../InFiles/" + val + ".ps";
-        string fileOut = PS_IN(val);
-        string command = "cp " + fileIn + " " + fileOut;
-
-        if (!exist_file(fileIn))
-        {
-            logger.error("FILE %s does not exist", fileIn.c_str());
-            abort();
-        }
-        system(command.c_str());
-        assert(exist_file(fileOut));
+        DEBUG("RTED: file %s exist, return", filename.c_str());
+        return;
     }
-}
 
-/* static */ void generator::generate_RNAfold_fold_files()
-{
-    APP_DEBUG_FNAME;
+    f1 = RTED_RUN_FILE(1, rna1.name);
+    f2 = RTED_RUN_FILE(2, rna2.name);
 
-    logger.error("do not use!!!");
-    abort();
+    ofstream out;
+    out.open(f1);
+    out << convert_to_java_format(rna1);
+    out.close();
+    out.open(f2);
+    out << convert_to_java_format(rna2);
+    out.close();
 
-    vector<string> vec = FILES;
+    command =
+                "java -cp java_RTED util.RTEDCommandLine "
+                    "--costs 1 1 0 "
+                    "-m "
+                    "--files "
+                    " '" + f1 + "' "
+                    " '" + f2 + "' "
+                    " > " + filename;
 
-    for (auto val : vec)
+    DEBUG("RUN COMMAND: %s", command.c_str());
+    
+    if (system(command.c_str()) != 0)
     {
-        string fileIn = SEQ(val);
-        string fileOut = FOLD(val);
-        
-        assert(exist_file(fileIn));
-        string labels = read_file(fileIn);
-
-        string brackets = run_RNAfold(labels);
-
-        ofstream out(fileOut);
-        out << brackets;
-        assert(!out.fail());
+        ERR("rted command failed");
+        abort();
     }
 }
 
-/* static */ void generator::generate_mapping()
-{
-    APP_DEBUG_FNAME;
-
-    vector<string> vec;
-    vec = FILES;
-
-    for (auto val1 : vec)
-    {
-        string labels1, brackets1;
-        labels1     = read_file(SEQ(val1));
-        brackets1   = read_file(FOLD(val1));
-
-        rna_tree rna1(brackets1, labels1, val1);
-
-        for (auto val2 : vec)
-        {
-            if (val1 == val2)
-                continue;
-
-            string labels2, brackets2;
-            labels2     = read_file(SEQ(val2));
-            brackets2   = read_file(FOLD(val2));
-
-            rna_tree rna2(brackets2, labels2, val2);
-
-            auto map = mapping::compute_mapping(rna1, rna2);
-
-            sort(map.begin(), map.end(), [](mapping m1, mapping m2) { return m1.from < m2.from; });
-
-            string fileOut = MAP(val1, val2);
-            ofstream out(fileOut);
-
-            DEBUG("^^ mapping-> %s", fileOut.c_str());
-
-            for (auto val : map)
-                out << val.from << "\t" << val.to << endl;
-
-            assert(!out.fail());
-        }
-    }
-}
-
-/* static */ void generator::generate_files()
-{
-    APP_DEBUG_FNAME;
-
-    generate_ps_files();
-    generate_seq_files();
-    generate_fold_files();
-    generate_mapping();
-}
-
-
-
-
-
+// MAPPING END
 
 
 

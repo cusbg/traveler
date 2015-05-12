@@ -83,6 +83,13 @@ private:
 
 #define DEBUG(...) \
     logger.debug(__VA_ARGS__)
+#define INFO(...) \
+    logger.info(__VA_ARGS__)
+#define ERR(...) \
+    logger.error(__VA_ARGS__)
+#define WARN(...) \
+    logger.warn(__VA_ARGS__)
+
 
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
     set_logger_priority_to_return_function __logger_priority(log4cpp::Priority::PRIORITY)
@@ -98,6 +105,23 @@ private:
             DEBUG(name": %s", stream.str().c_str()); \
         }
 
+
+inline void wait_for_input()
+{
+    APP_DEBUG_FNAME;
+    char ch;
+    std::cin.read(&ch, 1);
+}
+
+template <typename iter>
+inline iter move(iter it, size_t count)
+{
+    APP_DEBUG_FNAME;
+
+    while (count -- != 0)
+        ++it;
+    return it;
+}
 
 #endif /* !TYPES_HPP */
 

@@ -20,6 +20,7 @@
  */
 
 #include "rna_tree.hpp"
+#include "rna_tree_labels.hpp"
 
 using namespace std;
 
@@ -28,7 +29,6 @@ rna_tree::rna_tree(const std::string& brackets, const std::string& labels, const
 {
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
-    set_ids_postorder();
     std::stringstream stream;
     stream
         << "TREE '"
@@ -50,60 +50,106 @@ std::vector<rna_node_type> rna_tree::convert(const std::string& labels)
 }
 
 
+
+
+// MODIFY/REMOVE/INSERT operations:
+
 rna_tree::iterator rna_tree::modify(iterator it, rna_node_type node)
 {
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    //APP_DEBUG_FNAME;
 
-    APP_DEBUG_FNAME;
+    DEBUG("modify node %s to %s",
+            it->get_label().to_string().c_str(), node.get_label().to_string().c_str());
 
-    DEBUG("modify node %s to %s", label(it), node.get_label().to_string().c_str());
+    assert(it->get_label().status == rna_pair_label::untouched);
 
     auto l1 = it->get_label();
     auto l2 = node.get_label();
     
-    typedef vector<rna_label> labelvec;
-    auto set_label_str = [](labelvec& l1, const labelvec l2, size_t i)
-    {
-        if (l1.size() <= i || l2.size() <= i)
-        {
-            DEBUG("size < %lu, returning", i);
-            return;
-        }
-        DEBUG("modify %s -> %s", l1.at(i).label.c_str(), l2.at(i).label.c_str());
-        l1.at(i).label = l2.at(i).label;
-    };
-
-    //l1.labels.at(0).point = Point({0, 1});
-    //cout << l1.get_points() << endl;
-    set_label_str(l1.labels, l2.labels, 0);
-    set_label_str(l1.labels, l2.labels, 1);
-    //cout << l1.get_points() << endl;
-
-    //cout << *it << endl;
+    l1.set_label_strings(l2);
     it->set_label(l1);
-    //cout << *it << endl;
 
     return it;
 }
 
 rna_tree::iterator rna_tree::remove(iterator it)
 {
+    // iba zapise do vrhcolu status deleted
+    //
     APP_DEBUG_FNAME;
+    DEBUG("removing node %s", it->get_label().to_string().c_str());
 
-    DEBUG("removing node %s", label(it));
-    // vsetky child-y da za dany uzol
-    it = _tree.flatten(it);
-    assert(is_leaf(it));
-    it = _tree.erase(it);
+    assert(it->get_label().status == rna_pair_label::untouched);
 
+    auto label = it->get_label();
+    label.status = rna_pair_label::deleted;
+    it->set_label(label);
     return it;
+
+/*
+    rna_tree::post_order_iterator it2 = it;
+    ++it2;
+
+    rna_pair_label label = it->get_label();
+    label.status = rna_pair_label::deleted;
+    it->set_label(label);
+    _tree.flatten(it);
+    assert(rna_tree::is_leaf(it));
+    //_tree.erase(it);
+    --it2;
+    return it2;
+*/
 }
 
 rna_tree::iterator rna_tree::insert(iterator it, rna_node_type node)
 {
+    return it;
+
     APP_DEBUG_FNAME;
 
-    throw "ex";
+    DEBUG("inserting node %s to %s",
+            node.get_label().to_string().c_str(), it->get_label().to_string().c_str());
+    cout << it->get_label().to_string() << endl;
+    print_subtree(it);
+
+    wait_for_input();
+    return it;
+
+    auto compute_points = [&](iterator iter)
+    {
+        auto label = iter->get_label();
+        auto par = parent(iter);
+        label.status = rna_pair_label::inserted;
+
+        label.set_points(par->get_label());
+        iter->set_label(label);
+    };
+
+    if (node.get_label().is_paired())
+    {
+        WARN("paired");
+        wait_for_input();
+        abort();
+    }
+
+    iterator iter;
+
+    if (rna_tree::is_leaf(it))
+    {
+        DEBUG("is_leaf");
+        iter = it = _tree.insert_after(it, node);
+    }
+    else
+    {
+        DEBUG("else");
+        iter = _tree.append_child(it, node);
+    }
+
+    compute_points(iter);
+    wait_for_input();
+
+    return it;
 }
 
 
@@ -114,31 +160,4 @@ rna_tree::iterator rna_tree::insert(iterator it, rna_node_type node)
 
 
 
-std::ostream& operator<<(std::ostream& out, const rna_pair_label& l)
-{
-    for (auto val : l.labels)
-        out << val.label;
-
-    return out;
-}
-
-rna_pair_label rna_pair_label::operator+(const rna_pair_label& other) const
-{
-    assert(labels.size() == 1 && other.labels.size() == 1);
-
-    rna_pair_label out;
-    out.labels.push_back(labels.back());
-    out.labels.push_back(other.labels.back());
-
-    assert(out.labels.size() == 2);
-
-    return out;
-}
-
-rna_pair_label::rna_pair_label(const std::string& s)
-{
-    rna_label l;
-    l.label = s;
-    labels.push_back(l);
-}
 

@@ -28,17 +28,10 @@
 
 
 
-class generator
-{
-public:
-    static void generate_files();
 
-private:
-    static void generate_seq_files();
-    static void generate_fold_files();
-    static void generate_ps_files();
-    static void generate_RNAfold_fold_files();
-    static void generate_mapping();
+struct mapping_pair
+{
+    size_t from, to;
 };
 
 class mapping
@@ -46,9 +39,10 @@ class mapping
 private:
     static void run_rted(const rna_tree& rna1, const rna_tree& rna2, const std::string& filename);
 public:
-    static std::vector<mapping> compute_mapping(const rna_tree& rna1, const rna_tree& rna2);
+    static mapping compute_mapping(const rna_tree& rna1, const rna_tree& rna2);
 
-    size_t from, to;
+    size_t distance;
+    std::vector<mapping_pair> map;
 };
 
 struct document
@@ -60,8 +54,6 @@ struct document
     std::string epilog;
 };
 
-
-void save_doc(const document& doc, const std::string& file);
 
 
 document read_ps(const std::string& file);
@@ -75,7 +67,7 @@ bool exist_file(const std::string& filename);
 
 std::string read_file(const std::string& filename);
 
-std::vector<mapping> read_mapping_file(const std::string& filename);
+mapping read_mapping_file(const std::string& filename);
 
 bool is_base_line(const std::string& line);
 

@@ -23,6 +23,7 @@
 #define APP_HPP
 
 #include "types.hpp"
+#include "rna_tree.hpp"
 
 class rna_tree;
 class mapping;
@@ -30,19 +31,29 @@ struct document;
 
 class app
 {
+    typedef rna_tree::pre_post_order_iterator pre_post_it;
 public:
     void run_app();
+    void run_between(
+                const std::string& first,
+                const std::string& second);
 
 private:
     void transform(
                 const rna_tree& rna1,
                 const rna_tree& rna2,
-                std::vector<mapping> map,
+                const mapping& map,
                 const std::string& fileIn,
                 const std::string& fileOut);
-    void update_tree_points(
-                rna_tree& rna,
+    void save_doc(
+                const document& doc,
+                const std::string& file);
+
+    rna_tree update_tree_points(
+                const rna_tree& rna,
                 document doc);
+
+    std::string format_string(pre_post_it it);
 };
 
 
