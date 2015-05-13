@@ -31,6 +31,164 @@
 
 using namespace std;
 
+void posun_vrcholy(rna_tree::iterator it, Point vector);
+
+
+
+std::string app::format_string(pre_post_it it)
+{
+#define CHANGED_STR     "********************** CHANGED **********************"
+#define DELETED_STR     "********************** DELETED **********************"
+#define INSERTED_STR    "********************* INSERTED **********************"
+#define UNTOUCHED_STR   "********************* UNTOUCHED *********************"
+
+    enum RGB
+    {
+        red, green, blue, other, black
+    };
+    auto set_rgbb =     [](RGB value)
+    {
+        string out;
+
+        switch (value)
+        {
+            case red:
+                out = "1.00 0.00 0.00 setrgbcolor";
+                break;
+            case green:
+                out = "0.00 1.00 0.00 setrgbcolor";
+                break;
+            case blue:
+                out = "0.00 0.00 1.00 setrgbcolor";
+                break;
+            case black:
+                out = "0.00 0.00 0.00 setrgbcolor";
+                break;
+            case other:
+                out = "0.00 0.50 0.50 setrgbcolor";
+                break;
+        }
+        return out;
+    };
+    auto get_index =    [](const pre_post_it& iter)
+    {
+        if (iter.is_preorder() || !iter->get_label().is_paired())
+            return 0;
+        else
+            return 1;
+    };
+    auto print =        [](const rna_label& label)
+    {
+        stringstream out;
+        out
+            << "("
+            << label.label
+            << ") "
+            << label.point.x
+            << " "
+            << label.point.y
+            << " lwstring";
+        return out.str();
+    };
+    auto print_colored = [&](const pre_post_it& iter, RGB value)
+    {
+        string out;
+
+        size_t index = get_index(iter);
+        auto label = iter->get_label().labels.at(index);
+
+        //for (auto label : iter->get_label().labels)
+        out = out
+            + set_rgbb(value)
+            + "\n"
+            + print(label)
+            + "\n"
+            + set_rgbb(black)
+            + "\n";
+
+        return out;
+    };
+    auto print_normal = [&](const pre_post_it& iter, bool colored = false)
+    {
+        string out;
+
+        if (colored)
+            out = print_colored(iter, other);
+        else
+        {
+            size_t index = get_index(iter);
+            auto label = iter->get_label().labels.at(index);
+            out = print(label);
+        }
+        out += "\n";
+
+        return out;
+    };
+
+    string out;
+
+    auto status = it->get_label().status;
+
+#define DELETE_COLOR    red
+#define INSERT_COLOR    blue
+#define EDITED_COLOR    green
+#define OTHER_COLOR     other
+
+    if (status == rna_pair_label::untouched)
+    {
+        ERR("untouched");
+        abort();
+    }
+
+    switch (status)
+    {
+        case rna_pair_label::deleted:
+            out = print_colored(it, DELETE_COLOR);
+            wait_for_input();
+            break;
+        case rna_pair_label::edited:
+            out = print_colored(it, EDITED_COLOR);
+            break;
+        case rna_pair_label::touched:
+            out = print_normal(it);
+            break;
+
+        default:
+            //break;
+            abort();
+
+
+
+/*
+        case rna_pair_label::pair_changed:
+            WARN("changed size");
+            out = print_colored(it, OTHER_COLOR);
+            abort();
+            break;
+        case rna_pair_label::inserted:
+            abort();
+            wait_for_input();
+            out = print_colored(it, INSERT_COLOR);
+            break;
+        case rna_pair_label::untouched:
+            abort();
+            {
+            auto label = it->get_label();
+            label.labels.at(0).label = UNTOUCHED_STR;
+            it->set_label(label);
+            }
+            //out = print_colored(it, OTHER_COLOR);
+            break;
+        default:
+            assert(status == rna_pair_label::touched);
+            out = print_normal(it);
+            break;
+*/
+    }
+
+    return out;
+};
+
 
 rna_tree app::update_tree_points(
                 const rna_tree& rnain,
@@ -113,24 +271,22 @@ void app::save_doc(const document& doc, const std::string& file)
 {
     APP_DEBUG_FNAME;
     DEBUG("doc: %s", file.c_str());
-    ofstream out(file);
-    out.setf(ios_base::unitbuf);
 
+    wait_for_input();
     typedef rna_tree::pre_post_order_iterator pre_post_it;
 
-    out << doc.prolog << endl;
+    print_ps(doc.prolog);
+
+    //posun_vrcholy(doc.rna.begin(), Point({10, 10}));
+    
     for (auto it = ++doc.rna.begin_pre_post();
             ++pre_post_it(it) != doc.rna.end_pre_post(); ++it)
     {
-        out << format_string (it) << endl;
+        print_ps(format_string(it));
     }
-    out << doc.epilog << endl;
-    assert(!out.fail());
-
+    print_ps(doc.epilog);
 
     DEBUG("document %s was saved", file.c_str());
-
-    //wait_for_input();
 }
 
 
@@ -143,105 +299,104 @@ void app::transform(
 {
     APP_DEBUG_FNAME;
     DEBUG("in: %s, out: %s", fileIn.c_str(), fileOut.c_str());
-
     assert(is_sorted(map.map.begin(), map.map.end(), [](mapping_pair m1, mapping_pair m2) { return m1.from < m2.from; }));
 
-    ofstream out(fileOut);
-    out.setf(ios_base::unitbuf);
-
-    document doc;
-    rna_tree rnaout;
+    document doc = read_ps(fileIn);
+    doc.rna = update_tree_points(rna1, doc);
     rna_tree::post_order_iterator it;
-    vector<rna_tree::iterator> labels2;
-
-    doc = read_ps(fileIn);
-    rnaout = update_tree_points(rna1, doc);
-
-
-    for (rna_tree::post_order_iterator it = rna2.begin_post(); it != rna2.end_post(); ++it)
-        labels2.push_back(it);
-
-    it = rnaout.begin_post();
-
-/*
-    rna_tree::post_order_iterator it2;
     auto move_it = [](rna_tree::post_order_iterator iter, size_t count)
     {
-        for (size_t i = 0; i < count; ++i)
+        while(count--)
             ++iter;
         return iter;
     };
 
-    out << doc.prolog << endl;
+    it = doc.rna.begin_post();
     for (auto m : map.map)
     {
         if (m.from == 0)
             continue;
-
+        
         if (m.to == 0)
-        {
-        }
+            //it = doc.rna.erase(it);
+            it = doc.rna.remove(it);
         else
-        {
-        }
-    }
-    out << doc.epilog << endl;
-    return;
-
-*/
-
-/*
-    vector<size_t> to_insert;
-    for (auto m : map.map)
-    {
-        if (m.from != 0)
-            break;
-        else
-            to_insert.push_back(m.to - 1);
-    }
-    to_insert.push_back(-1);
-    sort(to_insert.begin(), to_insert.end(), std::greater<size_t>());
-*/
-
-    out << doc.prolog << endl;
-    size_t it_index = 0;
-    for (size_t i = 5; i < map.map.size(); ++i)
-    {
-        mapping_pair m = map.map.at(i);
-
-        assert(m.from - 1 == it_index);
-        assert(m.from != 0);
-
-        if (m.to == 0)
-        {
-            auto iter = rnaout.remove(it);
-            assert(iter == it);
-
-            rnaout.print_subtree(rna_tree::parent(it));
-        }
-        else
-        {
-            auto label = *labels2.at(m.to - 1);
-            auto iter = rnaout.modify(it, label);
-            assert(iter == it);
-        }
-
-        out << format_string (it) << endl;
-        cout << it_index << endl;
+            it = doc.rna.modify(it, *move_it(rna2.begin_post(), m.to - 1));
 
         ++it;
-        ++it_index;
     }
 
-    out << doc.epilog << endl;
-    
-    return;
-    doc.rna = rnaout;
-
-    DEBUG("end");
-    rnaout.print_tree();
-
+    print_ps(doc.prolog, fileOut);
+    make_compact(doc.rna);
     save_doc(doc, fileOut);
+}
+
+void posun_vrcholy(rna_tree::iterator it, Point vector)
+{
+    cout << "posunutie o " << vector << endl;
+
+    auto label = it->get_label();
+    for (size_t i = 0; i < label.labels.size(); ++i)
+    {
+        cout << label.labels.at(i).point << endl;
+        label.labels.at(i).point = label.labels.at(i).point + vector;
+        cout << label.labels.at(i).point << endl;
+    }
+    it->set_label(label);
+
+    // prejdi vsetky deti, a tie posun tiez.
+    for (rna_tree::sibling_iterator sib = it.begin(); sib != it.end(); ++sib)
+        posun_vrcholy(sib, vector);
+}
+
+void app::make_compact(
+                rna_tree& rna)
+{
+    typedef rna_tree::iterator iterator;
+
+    APP_DEBUG_FNAME;
+
+    auto stred = [](iterator iter)
+    {
+        auto label = iter->get_label();
+        assert(label.is_paired());
+
+        Point p1 = label.labels.at(0).point;
+        Point p2 = label.labels.at(1).point;
+
+        return Point({(p1.x + p2.x) / 2, (p1.y + p2.y) / 2});
+    };
+
+    //rna_tree::post_order_iterator it = rna.begin_post();
+    rna_tree::iterator it, end;
+    it = rna.begin();
+    end = rna.end();
+
+    for (; it != end; ++it)
+    {
+        if (it->get_label().status != rna_pair_label::deleted)
+        {
+            print_ps(format_string(rna_tree::pre_post_order_iterator(it, false)));
+            print_ps(format_string(it));
+            continue;
+        }
+
+        if (it->get_label().is_paired())
+        {
+            rna.print_subtree(it);
+            Point parent_str = stred(rna_tree::parent(it));
+            Point my_str = stred(it);
+
+            //print_ps(format_string(it));
+            posun_vrcholy(it, parent_str - my_str);
+            //wait_for_input();
+            //print_ps(format_string(it));
+        }
+    }
+
+
+    INFO("exit compact funct");
+    abort();
 }
 
 
@@ -249,159 +404,14 @@ void app::transform(
 
 
 
-std::string app::format_string(pre_post_it it)
+
+void app::print_ps(const std::string& line, const string& filename)
 {
-#define CHANGED_STR     "********************** CHANGED **********************"
-#define DELETED_STR     "********************** DELETED **********************"
-#define INSERTED_STR    "********************* INSERTED **********************"
-#define UNTOUCHED_STR   "********************* UNTOUCHED *********************"
+    static ofstream out(filename);
 
-    enum RGBB
-    {
-        red, green, blue, other, black
-    };
-    auto set_rgbb =     [](RGBB value)
-    {
-        string out;
-
-        switch (value)
-        {
-            case red:
-                out = "1.00 0.00 0.00 setrgbcolor";
-                break;
-            case green:
-                out = "0.00 1.00 0.00 setrgbcolor";
-                break;
-            case blue:
-                out = "0.00 0.00 1.00 setrgbcolor";
-                break;
-            case black:
-                out = "0.00 0.00 0.00 setrgbcolor";
-                break;
-            case other:
-                out = "0.00 0.50 0.50 setrgbcolor";
-                break;
-        }
-        return out;
-    };
-    auto get_index =    [](const pre_post_it& iter)
-    {
-        if (iter.is_preorder() || !iter->get_label().is_paired())
-            return 0;
-        else
-            return 1;
-    };
-    auto print =        [](const rna_label& label)
-    {
-        stringstream out;
-        out
-            << "("
-            << label.label
-            << ") "
-            << label.point.x
-            << " "
-            << label.point.y
-            << " lwstring";
-        return out.str();
-    };
-    auto print_colored = [&](const pre_post_it& iter, RGBB value)
-    {
-        string out;
-
-        for (auto label : iter->get_label().labels)
-        out = out
-            + set_rgbb(value)
-            + "\n"
-            + print(label)
-            + "\n"
-            + set_rgbb(black)
-            + "\n";
-
-        logger.debugStream() << "PRINT LABELS: " << iter->get_label();
-
-        return out;
-    };
-    auto print_normal = [&](const pre_post_it& iter, bool colored = true)
-    {
-        string out;
-
-        if (colored)
-        {
-            out += print_colored(iter, blue);
-        }
-        else
-        {
-            size_t index = get_index(iter);
-            auto label = iter->get_label().labels.at(index);
-            out += print(label);
-            out += "\n";
-        }
-
-        return out;
-    };
-
-    string out;
-
-    auto status = it->get_label().status;
-
-#define DELETE_COLOR    red
-#define INSERT_COLOR    blue
-#define EDITED_COLOR    green
-#define OTHER_COLOR     other
-//#define EDITED_COLOR    other
-//#define OTHER_COLOR     green
-    switch (status)
-    {
-        case rna_pair_label::deleted:
-            out = print_colored(it, DELETE_COLOR);
-            wait_for_input();
-            break;
-        case rna_pair_label::edited:
-            out = print_colored(it, EDITED_COLOR);
-            break;
-        case rna_pair_label::touched:
-            out = print_colored(it, black);
-            break;
-        default:
-            //break;
-            abort();
-
-
-
-/*
-        case rna_pair_label::pair_changed:
-            WARN("changed size");
-            out = print_colored(it, OTHER_COLOR);
-            abort();
-            break;
-        case rna_pair_label::inserted:
-            abort();
-            wait_for_input();
-            out = print_colored(it, INSERT_COLOR);
-            break;
-        case rna_pair_label::untouched:
-            abort();
-            {
-            auto label = it->get_label();
-            label.labels.at(0).label = UNTOUCHED_STR;
-            it->set_label(label);
-            }
-            //out = print_colored(it, OTHER_COLOR);
-            break;
-        default:
-            assert(status == rna_pair_label::touched);
-            out = print_normal(it);
-            break;
-*/
-    }
-    cout << out << endl;
-
-    return out;
-};
-
-
-
-
+    out << line << endl;
+    assert(!out.fail());
+}
 
 
 

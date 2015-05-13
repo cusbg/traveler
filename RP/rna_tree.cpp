@@ -24,6 +24,8 @@
 
 using namespace std;
 
+#define label_str(node) (node).get_label().to_string().c_str()
+
 rna_tree::rna_tree(const std::string& brackets, const std::string& labels, const std::string& _name)
     : tree_base<rna_node_type>(brackets, convert(labels)), name(_name)
 {
@@ -60,7 +62,7 @@ rna_tree::iterator rna_tree::modify(iterator it, rna_node_type node)
     //APP_DEBUG_FNAME;
 
     DEBUG("modify node %s to %s",
-            it->get_label().to_string().c_str(), node.get_label().to_string().c_str());
+            label_str(*it), label_str(node));
 
     assert(it->get_label().status == rna_pair_label::untouched);
 
@@ -69,6 +71,8 @@ rna_tree::iterator rna_tree::modify(iterator it, rna_node_type node)
     
     l1.set_label_strings(l2);
     it->set_label(l1);
+
+    assert(it->get_label().status != rna_pair_label::untouched);
 
     return it;
 }
@@ -85,21 +89,13 @@ rna_tree::iterator rna_tree::remove(iterator it)
     auto label = it->get_label();
     label.status = rna_pair_label::deleted;
     it->set_label(label);
+
+    assert(it->get_label().status != rna_pair_label::untouched);
+    
     return it;
 
-/*
-    rna_tree::post_order_iterator it2 = it;
-    ++it2;
 
-    rna_pair_label label = it->get_label();
-    label.status = rna_pair_label::deleted;
-    it->set_label(label);
-    _tree.flatten(it);
-    assert(rna_tree::is_leaf(it));
-    //_tree.erase(it);
-    --it2;
-    return it2;
-*/
+
 }
 
 rna_tree::iterator rna_tree::insert(iterator it, rna_node_type node)
@@ -109,7 +105,7 @@ rna_tree::iterator rna_tree::insert(iterator it, rna_node_type node)
     APP_DEBUG_FNAME;
 
     DEBUG("inserting node %s to %s",
-            node.get_label().to_string().c_str(), it->get_label().to_string().c_str());
+            label_str(node), label_str(*it));
     cout << it->get_label().to_string() << endl;
     print_subtree(it);
 
@@ -152,6 +148,19 @@ rna_tree::iterator rna_tree::insert(iterator it, rna_node_type node)
     return it;
 }
 
+rna_tree::iterator rna_tree::erase(iterator it)
+{
+    APP_DEBUG_FNAME;
+
+    rna_tree::post_order_iterator it2 = it;
+    ++it2;
+
+    _tree.flatten(it);
+    assert(rna_tree::is_leaf(it));
+    _tree.erase(it);
+    --it2;
+    return it2;
+}
 
 
 

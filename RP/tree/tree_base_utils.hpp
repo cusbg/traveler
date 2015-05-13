@@ -50,8 +50,8 @@ class tree_base<node_type>::_pre_post_order_iterator : public tree_base<node_typ
 {
     typedef typename tree_base<node_type>::tree_type::iterator_base iterator_base;
 public:
-    _pre_post_order_iterator(const iterator_base&);
-    _pre_post_order_iterator(tree_node* nodeptr = nullptr);
+    _pre_post_order_iterator(const iterator_base&, bool _preorder = true);
+    _pre_post_order_iterator(tree_node* nodeptr = nullptr, bool _preorder = true);
     
     bool operator==(const _pre_post_order_iterator&) const;
     bool operator!=(const _pre_post_order_iterator&) const;
@@ -65,7 +65,7 @@ public:
     bool is_preorder() const;
 
 private:
-    bool preorder = true;
+    bool preorder;
 };
 
 
@@ -77,13 +77,13 @@ private:
 
 /* _pre_post_order_iterator class functions: */
 template <typename node_type>
-tree_base<node_type>::_pre_post_order_iterator::_pre_post_order_iterator(tree_node* nodeptr)
-    : iterator_base(nodeptr)
+tree_base<node_type>::_pre_post_order_iterator::_pre_post_order_iterator(tree_node* nodeptr, bool _preorder)
+    : iterator_base(nodeptr), preorder(_preorder)
 {}
 
 template <typename node_type>
-tree_base<node_type>::_pre_post_order_iterator::_pre_post_order_iterator(const iterator_base& it)
-    : iterator_base(it.node)
+tree_base<node_type>::_pre_post_order_iterator::_pre_post_order_iterator(const iterator_base& it, bool _preorder)
+    : iterator_base(it.node), preorder(_preorder)
 {}
 
 template <typename node_type>

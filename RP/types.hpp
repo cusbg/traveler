@@ -57,7 +57,22 @@ bool is_T2(strategy_pair ch);
 struct Point
 {
     double x, y;
+
+    friend inline std::ostream& operator<< (std::ostream& out, Point p)
+    {
+        out << p.x << ":" << p.y;
+        return out;
+    }
+    Point operator+(Point other) const
+    {
+        return Point({x + other.x, y + other.y});
+    }
+    Point operator-(Point other) const
+    {
+        return Point({x - other.x, y - other.y});
+    }
 };
+
 
 
 #include <log4cpp/Category.hh>

@@ -53,6 +53,10 @@ private:
                 const rna_tree& rna,
                 document doc);
 
+    void make_compact(
+                rna_tree& rna);
+    void print_ps(const std::string& line, const std::string& filename = "");
+
     std::string format_string(pre_post_it it);
 };
 

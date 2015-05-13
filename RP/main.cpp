@@ -104,13 +104,9 @@ int main(int argc, char** argv)
     return 0;
 */
 
-    //generator::generate_files();
-
-    //return 0;
-
 
     app a;
-    a.run_between("human", "mouse");
+    a.run_between("human", "frog");
     //a.run_app();
 
 

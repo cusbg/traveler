@@ -44,6 +44,19 @@ document read_ps(
     Point p;
     auto stream_pos = in.tellg();
 
+    auto ignore_line = [](const std::string& line)
+    {
+        auto contains = [](const std::string& str, const std::string& what)
+        {
+            return str.find(what) == str.size() - what.size();
+        };
+        return
+            contains(line, "lwline") ||
+            contains(line, "lwfarc") ||
+            contains(line, "lwarc") ||
+            contains(line, "lwstring");
+
+    };
     auto is_rgb_funct = [](const std::string& line)
     {
         stringstream str(line);
@@ -70,6 +83,9 @@ document read_ps(
             break;
         }
         stream_pos = in.tellg();
+
+        if (ignore_line(line))
+            continue;
         doc.prolog += line + "\n";
         DEBUG("prolog '%s'", line.c_str());
     }

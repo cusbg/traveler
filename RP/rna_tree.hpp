@@ -37,8 +37,9 @@ public:
     rna_tree(const std::string& brackets, const std::string& labels, const std::string& _name = "");
 
     iterator modify(iterator it, rna_node_type node);
-    iterator remove(iterator it);
     iterator insert(iterator it, rna_node_type node);
+    iterator remove(iterator it);
+    iterator erase(iterator it);
 private:
     inline std::vector<rna_node_type> convert(const std::string& labels);
 

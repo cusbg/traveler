@@ -133,16 +133,21 @@ void rna_pair_label::set_label_strings(const rna_pair_label& from)
     size_t m = 1;
     if (is_paired() && from.is_paired())
         m = 2;
-    if (status == edited)
-    {
-        for (size_t i = 0; i < m; ++i)
-            labels.at(i).label += "|" + from.labels.at(i).label;
-    }
-    else
-    {
-        for (size_t i = 0; i < m; ++i)
-            labels.at(i).label = from.labels.at(i).label;
-    }
+
+    for (size_t i = 0; i < m; ++i)
+        labels.at(i).label = from.labels.at(i).label;
+    
+    //return;
+    //if (status == edited)
+    //{
+        //for (size_t i = 0; i < m; ++i)
+            //labels.at(i).label += "|" + from.labels.at(i).label;
+    //}
+    //else
+    //{
+        //for (size_t i = 0; i < m; ++i)
+            //labels.at(i).label = from.labels.at(i).label;
+    //}
 }
 
 
