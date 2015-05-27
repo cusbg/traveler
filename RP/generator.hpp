@@ -33,10 +33,13 @@ private:
     static void generate_fold_files();
     static void generate_ps_files();
     static void generate_mapping();
+};
+
+/*
     //static void generate_in_human();
     //static void generate_in_mouse();
     //static void generate_mapping_human_mouse();
-
+*/
 /*
     static void generate_RNAfold_fold_files()
     {
@@ -63,9 +66,6 @@ private:
         }
     }
 */
-};
-
-
 /*
 void generator::generate_in_human()
 {

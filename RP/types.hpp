@@ -29,54 +29,49 @@
 #include <sstream>
 #include <algorithm>
 #include <stdexcept>
+#include <utility>
+
+using namespace std::rel_ops;
 
 
-#define PATH_STRATEGY_LEFT_T1   0
-#define PATH_STRATEGY_RIGHT_T1  1
-#define PATH_STRATEGY_HEAVY_T1  2
-#define PATH_STRATEGY_LEFT_T2   3
-#define PATH_STRATEGY_RIGHT_T2  4
-#define PATH_STRATEGY_HEAVY_T2  5
+#include <log4cpp/Category.hh>
+extern log4cpp::Category& logger; // globalna premenna...
 
-typedef char strategy_pair;
 
-std::string graph_to_string(strategy_pair ch);
-std::string path_to_string(strategy_pair ch);
-std::string strategy_to_string(strategy_pair ch);
+enum RGB
+{
+    red,
+    green,
+    blue,
+    black,
+    gray,
 
-bool is_path_strategy(strategy_pair ch);
+    other,
+};
 
-bool is_right_path(strategy_pair ch);
-bool is_left_path (strategy_pair ch);
-bool is_heavy_path(strategy_pair ch);
 
-bool is_T1(strategy_pair ch);
-bool is_T2(strategy_pair ch);
+inline void wait_for_input()
+{
+    logger.notice("%s", __PRETTY_FUNCTION__);
+    char ch;
+    std::cin.read(&ch, 1);
+}
+
 
 
 struct Point
 {
     double x, y;
 
-    friend inline std::ostream& operator<< (std::ostream& out, Point p)
-    {
-        out << p.x << ":" << p.y;
-        return out;
-    }
-    Point operator+(Point other) const
-    {
-        return Point({x + other.x, y + other.y});
-    }
-    Point operator-(Point other) const
-    {
-        return Point({x - other.x, y - other.y});
-    }
+    friend std::ostream& operator<< (std::ostream& out, Point p);
+    Point operator+(Point other) const;
+    Point operator-(Point other) const;
+    Point operator/(size_t value) const;
+    Point swap() const;
 };
+Point stred(Point p1, Point p2);
 
 
-
-#include <log4cpp/Category.hh>
-extern log4cpp::Category& logger; // globalna premenna...
 
 
 class set_logger_priority_to_return_function
@@ -121,22 +116,6 @@ private:
         }
 
 
-inline void wait_for_input()
-{
-    APP_DEBUG_FNAME;
-    char ch;
-    std::cin.read(&ch, 1);
-}
-
-template <typename iter>
-inline iter move(iter it, size_t count)
-{
-    APP_DEBUG_FNAME;
-
-    while (count -- != 0)
-        ++it;
-    return it;
-}
 
 #endif /* !TYPES_HPP */
 

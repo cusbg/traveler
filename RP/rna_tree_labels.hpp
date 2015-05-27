@@ -24,6 +24,8 @@
 
 #include "types.hpp"
 
+#define label_str(node) (node).get_label().to_string().c_str()
+
 struct rna_label
 {
 #define BAD_POINT     Point({0xBADF00D, 0xBADF00D})
@@ -31,11 +33,13 @@ struct rna_label
     std::string label;
 
     std::string point_to_string() const;
+    bool operator==(const rna_label& other) const;
 };
 
 class rna_pair_label
 {
 public:
+    bool operator==(const rna_pair_label& other) const;
     rna_pair_label operator+(const rna_pair_label& other) const;
     friend std::ostream& operator<<(std::ostream& out, const rna_pair_label& label);
     std::string to_string() const;

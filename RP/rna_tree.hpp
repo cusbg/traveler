@@ -34,12 +34,18 @@ class rna_tree : public tree_base<rna_node_type>
 public:
     virtual ~rna_tree() = default;
     rna_tree() = default;
+    bool operator==(rna_tree& other)
+    {
+        return _tree.equal_subtree(begin(), other.begin());
+    }
     rna_tree(const std::string& brackets, const std::string& labels, const std::string& _name = "");
 
     iterator modify(iterator it, rna_node_type node);
-    iterator insert(iterator it, rna_node_type node);
+    iterator insert_pre(iterator it, rna_node_type node);
+    iterator insert_post(iterator it, rna_node_type node);
     iterator remove(iterator it);
-    iterator erase(iterator it);
+    template <typename iter>
+    iter erase(iter it);
 private:
     inline std::vector<rna_node_type> convert(const std::string& labels);
 
@@ -48,7 +54,38 @@ public:
 };
 
 
+template <typename iter>
+iter rna_tree::erase(iter it)
+{
+    // zmaze vrchol zo stromu
+    //APP_DEBUG_FNAME;
+    DEBUG("erasing node %s", label_str(*it));
 
+    it = _tree.flatten(it);
+    assert(rna_tree::is_leaf(it));
+    iter del = it++;
+    _tree.erase(del);
+
+    --_size;
+    return --it;
+}
+
+template <typename iter>
+iter move_it_plus(iter it, size_t count)
+{
+    while(count--)
+        ++it;
+    return it;
+}
+template <typename iter>
+iter move_it_minus(iter it, size_t count)
+{
+    while(count--)
+        --it;
+    return it;
+}
+
+size_t get_label_index(rna_tree::pre_post_order_iterator iter);
 
 
 

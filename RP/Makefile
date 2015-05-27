@@ -6,11 +6,10 @@
 
 
 CC				= g++
-#DEBUG =		-pg
-DEBUG			= -g
+DEBUG			= -g -Wall
 #RELEASE		= DNDEBUG -O3
-CFLAGS			= -std=c++11 -c -Wall $(DEBUG) $(RELEASE)
-LFLAGS			= -Wall $(shell pkg-config --libs log4cpp)
+CFLAGS			= -std=c++11 -c $(DEBUG) $(RELEASE)
+LFLAGS			= $(DEBUG) $(RELEASE) $(shell pkg-config --libs log4cpp)
 SHELL			= /bin/bash
 
 BUILDDIR		= build
@@ -44,8 +43,10 @@ debug: build
 analyse:
 	gprof $(BUILDDIR)/$(TARGET) | less
 
+generate: $(FILESDIR)/generated
 
-$(BUILDDIR)/$(TARGET): TreeMk $(BUILDDIR)/Makefile
+
+$(BUILDDIR)/$(TARGET): OtherMks $(BUILDDIR)/Makefile
 
 $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES))
 	@rm -f $@
@@ -76,13 +77,13 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 	@make -j4 --directory=$(BUILDDIR) -f Makefile
 
 MK_DIRECTORIES		= $(LOGDIR) $(FILESDIR) $(FILESDIR)/mappings $(FILESDIR)/rted
-$(FILESDIR)/generated:
+$(FILESDIR)/generated: build
 	@mkdir -p $(MK_DIRECTORIES)
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
 	@echo "**********************************************************************"
 	@echo
-	@$(BUILDDIR)/$(TARGET) 1
+	$(BUILDDIR)/$(TARGET) "generate" || rm -r $(FILESDIR)
 	@touch $@
 
 $(BUILDDIR)/%.mk: %.cpp
@@ -93,8 +94,9 @@ $(BUILDDIR)/%.mk: %.cpp
 	@echo '	$(CC) $(CFLAGS) $$< -o $$@ ' \
 					>> $@
 
-TreeMk:
-	@make -j4 --directory=./tree -f Makefile
+OtherMks:
+	@make -j4 --directory=./tree -f Makefile build
+	@make -j4 --directory=./ted	 -f Makefile build
 
 rnafold:
 	make -f ./Makefile.RNAfold

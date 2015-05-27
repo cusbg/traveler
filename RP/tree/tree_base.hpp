@@ -237,9 +237,13 @@ typename tree_base<node_type>::iterator tree_base<node_type>::find(node_type nod
 template <typename node_type>
 void tree_base<node_type>::print_subtree(iterator root) const
 {
-    APP_DEBUG_FNAME;
-
     std::stringstream stream;
+    stream
+        << "PRINT SUBTREE("
+        << label(root)
+        << ":"
+        << ::id(root)
+        << "): \t";
     kptree::print_subtree_bracketed(_tree, root, stream);
     logger.debugStream() << stream.str();
 }

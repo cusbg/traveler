@@ -19,12 +19,10 @@
  * USA.
  */
 
-#include "util.hpp"
-#include <cstdlib>
-#include <iostream>
 #include <fstream>
+
+#include "util.hpp"
 #include "app.hpp"
-#include <unistd.h>
 #include "macros.hpp"
 
 
@@ -46,16 +44,26 @@ document read_ps(
 
     auto ignore_line = [](const std::string& line)
     {
-        auto contains = [](const std::string& str, const std::string& what)
+        // ignorovanie parovacich hran a pod
+        //
+        auto ends_with = [](const std::string& str, const std::string& what)
         {
             return str.find(what) == str.size() - what.size();
         };
-        return
-            contains(line, "lwline") ||
-            contains(line, "lwfarc") ||
-            contains(line, "lwarc") ||
-            contains(line, "lwstring");
-
+        auto vec = {
+            "lwline",
+            "lwfarc",
+            "lwarc",
+            //"lwstring",
+            "lineto",
+            "moveto",
+            "setlinewidth",
+            "setlinecap",
+        };
+        for (auto val : vec)
+            if (ends_with(line, val))
+                return true;
+        return false;
     };
     auto is_rgb_funct = [](const std::string& line)
     {
@@ -297,6 +305,15 @@ bool is_base_line(
          );
 }
 
+Point stred(rna_tree::iterator iter)
+{
+    auto label = iter->get_label();
+    if (!label.is_paired())
+        return label.labels.at(0).point;
+    else
+        return stred(label.labels.at(0).point,
+                    label.labels.at(1).point);
+}
 
 
 
@@ -398,7 +415,28 @@ bool is_base_line(
 // MAPPING END
 
 
+void document::update_rna_points()
+{
+    APP_DEBUG_FNAME;
 
+    typedef rna_tree::pre_post_order_iterator pre_post_it;
+
+    // test ci ma rovnako labelov/pointov/baz
+    size_t i = 0;
+    for (pre_post_it it = ++rna.begin_pre_post(); ++pre_post_it(it) != rna.end_pre_post(); ++it)
+        ++i;
+    assert(i == labels.size() && i == points.size());
+
+    i = 0;
+    for (pre_post_it it = ++rna.begin_pre_post(); ++pre_post_it(it) != rna.end_pre_post(); ++it, ++i)
+    {
+        auto label = it->get_label();
+        size_t index = get_label_index(it);
+
+        label.labels.at(index).point = points.at(i);
+        it->set_label(label);
+    }
+}
 
 
 

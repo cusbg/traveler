@@ -29,8 +29,11 @@ class rna_tree;
 class mapping;
 struct document;
 
+
+
 class app
 {
+private:
     typedef rna_tree::pre_post_order_iterator pre_post_it;
 public:
     void run_app();
@@ -45,19 +48,22 @@ private:
                 const mapping& map,
                 const std::string& fileIn,
                 const std::string& fileOut);
+    void remove(rna_tree& rna, const mapping& map);
+    void erase(rna_tree& rna);
+    void modify(rna_tree& rna, const rna_tree& temp, const mapping& map);
+    void insert(rna_tree& rna, rna_tree& temp, const mapping& map);
     void save_doc(
-                const document& doc,
-                const std::string& file);
-
-    rna_tree update_tree_points(
-                const rna_tree& rna,
-                document doc);
+                const document& doc);
 
     void make_compact(
                 rna_tree& rna);
-    void print_ps(const std::string& line, const std::string& filename = "");
+    void print_default(const rna_tree& tree);
 
-    std::string format_string(pre_post_it it);
+    void print_deleted(const rna_tree& rna);
+    void print_other(const rna_tree& rna);
+    void print_inserted(const rna_tree& rna);
+
+    bool contains(const rna_tree& rna, rna_pair_label::label_status status);
 };
 
 

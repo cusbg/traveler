@@ -1,7 +1,7 @@
 #
 # File: Makefile
-# Created: 2015-05-04 14:04
-# By: eliasr <eliasr@u-pl22>
+# Created: 2015-05-27 15:39
+# By: Richard Eliáš <richard@ba30.eu>
 #
 
 
@@ -29,7 +29,7 @@ debug: build
 $(BUILDDIR)/%.mk: %.cpp
 	@mkdir -p $(BUILDDIR)
 	@rm -f $@
-	@$(MAKEDEPENDENCY) $(CFLAGS) $^ | sed 's@\([^ :]*\.\([hc]pp\|hh\|h\)\)@../tree/\1@g' \
+	@$(MAKEDEPENDENCY) $(CFLAGS) $^ | sed 's@\([^ :]*\.\([hc]pp\|hh\|h\)\)@../ted/\1@g' \
 					>> $@
 	@echo '	$(CC) $(CFLAGS) $$< -o $$@ ' \
 					>> $@

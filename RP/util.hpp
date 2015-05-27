@@ -22,10 +22,7 @@
 #ifndef UTIL_HPP
 #define UTIL_HPP
 
-#include "types.hpp"
 #include "rna_tree.hpp"
-
-
 
 
 
@@ -52,6 +49,8 @@ struct document
     rna_tree rna;
     std::string prolog;
     std::string epilog;
+
+    void update_rna_points();
 };
 
 
@@ -71,6 +70,7 @@ mapping read_mapping_file(const std::string& filename);
 
 bool is_base_line(const std::string& line);
 
+Point stred(rna_tree::iterator iter);
 
 #endif /* !UTIL_HPP */
 

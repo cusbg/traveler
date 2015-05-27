@@ -1,6 +1,5 @@
 
 #define FILES                       {"human", "mouse", "rabbit", "frog"}
-//#define FILES                       {"mouse", "human", "rabbit", "frog"}
 #define PS_IN(val)                  "build/files/" + val + ".ps"
 #define PS_OUT(val1, val2)          "build/files/" + val1 + "-" + val2 + ".out.ps"
 #define SEQ(val)                    "build/files/" + val + ".seq"

@@ -24,8 +24,6 @@
 
 using namespace std;
 
-#define label_str(node) (node).get_label().to_string().c_str()
-
 rna_tree::rna_tree(const std::string& brackets, const std::string& labels, const std::string& _name)
     : tree_base<rna_node_type>(brackets, convert(labels)), name(_name)
 {
@@ -58,11 +56,8 @@ std::vector<rna_node_type> rna_tree::convert(const std::string& labels)
 
 rna_tree::iterator rna_tree::modify(iterator it, rna_node_type node)
 {
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
     //APP_DEBUG_FNAME;
-
-    DEBUG("modify node %s to %s",
-            label_str(*it), label_str(node));
+    DEBUG("modify node %s to %s", label_str(*it), label_str(node));
 
     assert(it->get_label().status == rna_pair_label::untouched);
 
@@ -80,8 +75,7 @@ rna_tree::iterator rna_tree::modify(iterator it, rna_node_type node)
 rna_tree::iterator rna_tree::remove(iterator it)
 {
     // iba zapise do vrhcolu status deleted
-    //
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
     DEBUG("removing node %s", it->get_label().to_string().c_str());
 
     assert(it->get_label().status == rna_pair_label::untouched);
@@ -91,82 +85,86 @@ rna_tree::iterator rna_tree::remove(iterator it)
     it->set_label(label);
 
     assert(it->get_label().status != rna_pair_label::untouched);
-    
+
     return it;
-
-
-
 }
 
-rna_tree::iterator rna_tree::insert(iterator it, rna_node_type node)
-{
-    return it;
+// erase je v hlavicke, je templatovany... 
 
-    APP_DEBUG_FNAME;
+
+
+
+
+rna_tree::iterator rna_tree::insert_post(iterator it, rna_node_type node)
+{
+    //APP_DEBUG_FNAME;
 
     DEBUG("inserting node %s to %s",
             label_str(node), label_str(*it));
-    cout << it->get_label().to_string() << endl;
-    print_subtree(it);
 
-    wait_for_input();
-    return it;
+    auto label = node.get_label();
+    label.set_points(it->get_label());
+    label.status = rna_pair_label::inserted;
 
-    auto compute_points = [&](iterator iter)
-    {
-        auto label = iter->get_label();
-        auto par = parent(iter);
-        label.status = rna_pair_label::inserted;
-
-        label.set_points(par->get_label());
-        iter->set_label(label);
-    };
-
-    if (node.get_label().is_paired())
-    {
-        WARN("paired");
-        wait_for_input();
-        abort();
-    }
-
-    iterator iter;
-
-    if (rna_tree::is_leaf(it))
+    node.set_label(label);
+    
+    _tree.insert(it, node);
+/*
+    if (is_leaf(it))
     {
         DEBUG("is_leaf");
-        iter = it = _tree.insert_after(it, node);
+        it = _tree.insert_after(it, node);
     }
     else
     {
-        DEBUG("else");
-        iter = _tree.append_child(it, node);
+        DEBUG("else append_child");
+        _tree.insert(it, node);
     }
-
-    compute_points(iter);
-    wait_for_input();
+*/
+    ++_size;
 
     return it;
 }
 
-rna_tree::iterator rna_tree::erase(iterator it)
+rna_tree::iterator rna_tree::insert_pre(iterator it, rna_node_type node)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
-    rna_tree::post_order_iterator it2 = it;
-    ++it2;
+    DEBUG("inserting node %s to %s",
+            label_str(node), label_str(*it));
 
-    _tree.flatten(it);
-    assert(rna_tree::is_leaf(it));
-    _tree.erase(it);
-    --it2;
-    return it2;
+    auto label = node.get_label();
+    label.set_points(it->get_label());
+    label.status = rna_pair_label::inserted;
+
+    node.set_label(label);
+    
+    _tree.insert(it, node);
+/*
+    if (is_leaf(it))
+    {
+        DEBUG("is_leaf");
+        it = _tree.insert_after(it, node);
+    }
+    else
+    {
+        DEBUG("else append_child");
+        _tree.insert(it, node);
+    }
+*/
+    ++_size;
+
+    return it;
 }
 
 
 
 
-
-
-
-
+size_t get_label_index(rna_tree::pre_post_order_iterator iter)
+{
+    if (iter.is_preorder() || !iter->get_label().is_paired())
+        return 0;
+    else
+        return 1;
+}
 

@@ -53,6 +53,7 @@ public:
     inline bool is_root() const;
 
     friend std::ostream& operator<< <>(std::ostream& out, const node_base<label_type>& n);
+    bool operator==(const node_base& other) const;
 };
 
 
@@ -106,6 +107,11 @@ std::ostream& operator<<(std::ostream& out, const node_base<label_type>& n)
     return out;
 }
 
+template <typename label_type>
+bool node_base<label_type>::operator==(const node_base& other) const
+{
+    return label == other.label;
+}
 
 #endif /* !NODE_BASE_HPP */
 

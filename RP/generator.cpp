@@ -19,16 +19,13 @@
  * USA.
  */
 
+#include <fstream>
+
 #include "generator.hpp"
 #include "types.hpp"
-
-#include "util.hpp"
-#include <cstdlib>
-#include <iostream>
-#include <fstream>
-#include "app.hpp"
-#include <unistd.h>
 #include "macros.hpp"
+#include "util.hpp"
+
 
 using namespace std;
 
@@ -145,8 +142,6 @@ using namespace std;
     APP_DEBUG_FNAME;
 
     generate_ps_files();
-    //generate_in_human();
-    //generate_in_mouse();
     generate_seq_files();
     generate_fold_files();
     generate_mapping();

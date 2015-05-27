@@ -77,7 +77,6 @@ void rted::test()
 
 
 
-#ifdef NODEF
 void gted::test()
 {
     APP_DEBUG_FNAME;
@@ -168,7 +167,6 @@ void gted_tests()
     logger.setPriority(priority);
     logger.info("END tests");
 }
-#endif
 
 
 #endif

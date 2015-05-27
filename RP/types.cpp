@@ -23,97 +23,40 @@
 
 using namespace std;
 
-/*
-std::string Global::HS_seq = "../InFiles/seq";
-std::string Global::HS_db = "../InFiles/homo_sapiens.ps";
-std::string Global::HS_bpseq = "../InFiles/homo_sapiens.bpseq";
-std::string Global::HS_rnafold = "../InFiles/homo_sapiens_RNAfold.ps";
-std::string Global::HS_zatvorky = "../InFiles/zatvorky";
 
-std::string Global::rnaseq =    "ABCDEFGHIJKLM";
-std::string Global::zatvorky =  "((...).(.).).";
-*/
-
-//#define PATH_STRATEGY_LEFT_T1   1
-//#define PATH_STRATEGY_RIGHT_T1  2
-//#define PATH_STRATEGY_HEAVY_T1  4
-//#define PATH_STRATEGY_LEFT_T2   8
-//#define PATH_STRATEGY_RIGHT_T2  16
-//#define PATH_STRATEGY_HEAVY_T2  32
-
-
-std::string graph_to_string(strategy_pair ch)
+// POINT functions
+//
+std::ostream& operator<< (std::ostream& out, Point p)
 {
-    if (is_T1(ch))
-        return "T1";
-    if (is_T2(ch))
-        return "T2";
-
-    throw invalid_argument("only T1/T2 supported");
+    out << p.x << " " << p.y;
+    return out;
+}
+Point Point::operator+(Point other) const
+{
+    return Point({x + other.x, y + other.y});
+}
+Point Point::operator-(Point other) const
+{
+    return Point({x - other.x, y - other.y});
+}
+Point Point::operator/(size_t val) const
+{
+    return Point({x / val, y / val});
+}
+Point Point::swap() const
+{
+    return Point({y, x});
+}
+Point stred(Point p1, Point p2)
+{
+    return (p1 + p2) / 2;
 }
 
-std::string path_to_string(strategy_pair ch)
-{
-    if (is_left_path(ch))
-        return "left";
-    if (is_right_path(ch))
-        return "right";
-    if (is_heavy_path(ch))
-        return "heavy";
 
-    throw invalid_argument("only LRH path strategies supported");
-}
 
-std::string strategy_to_string(strategy_pair ch)
-{
-    return graph_to_string(ch) + "-" + path_to_string(ch);
-}
 
-bool is_path_strategy(strategy_pair ch)
-{
-    return is_T1(ch) || is_T2(ch);
-}
 
-bool is_right_path(strategy_pair ch)
-{
-    return ch == PATH_STRATEGY_RIGHT_T1 ||
-        ch == PATH_STRATEGY_RIGHT_T2;
-}
-bool is_left_path (strategy_pair ch)
-{
-    return ch == PATH_STRATEGY_LEFT_T1 ||
-        ch == PATH_STRATEGY_LEFT_T2;
-}
-bool is_heavy_path(strategy_pair ch)
-{
-    return ch == PATH_STRATEGY_HEAVY_T1 ||
-        ch == PATH_STRATEGY_HEAVY_T2;
-}
 
-bool is_T1(strategy_pair ch)
-{
-    switch (ch)
-    {
-        case PATH_STRATEGY_LEFT_T1:
-        case PATH_STRATEGY_RIGHT_T1:
-        case PATH_STRATEGY_HEAVY_T1:
-            return true;
-        default:
-            return false;
-    }
-}
-bool is_T2(strategy_pair ch)
-{
-    switch (ch)
-    {
-        case PATH_STRATEGY_LEFT_T2:
-        case PATH_STRATEGY_RIGHT_T2:
-        case PATH_STRATEGY_HEAVY_T2:
-            return true;
-        default:
-            return false;
-    }
-}
 
 
 #include <log4cpp/Appender.hh>

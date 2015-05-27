@@ -32,6 +32,20 @@ rna_pair_label::rna_pair_label(const std::string& s)
     labels.push_back(l);
 }
 
+bool rna_pair_label::operator==(const rna_pair_label& other) const
+{
+    bool ret = true;
+    if (labels.size() != other.labels.size())
+        ret = false;
+    else
+    {
+        for (size_t i = 0; i < labels.size(); ++i)
+            if (labels.at(i) != other.labels.at(i))
+                ret = false;
+    }
+    return ret;
+}
+
 rna_pair_label rna_pair_label::operator+(const rna_pair_label& other) const
 {
     assert(labels.size() == 1 && other.labels.size() == 1);
@@ -62,6 +76,7 @@ void rna_pair_label::set_points(const rna_pair_label& from)
     APP_DEBUG_FNAME;
 
     double posunutie = 5 + rand() % 10;
+    posunutie = 5;
 
     //posunutie = 10;
 
@@ -164,4 +179,12 @@ std::string rna_label::point_to_string() const
     out << point.x << " " << point.y;
     return out.str();
 }
+
+bool rna_label::operator==(const rna_label& other) const
+{
+    return label == other.label;
+}
+
+
+
 
