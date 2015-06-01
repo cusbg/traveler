@@ -25,7 +25,7 @@
 
 #include "../types.hpp"
 #include "tree_hh/tree.hh"
-#include "tree_hh/tree_util.hh"
+//#include "tree_hh/tree_util.hh"
 #include <memory>
 #include <sstream>
 
@@ -73,8 +73,8 @@ public:
      */
     iterator find(size_t id) const;
     iterator find(node_type node) const;
-    void print_subtree(iterator root) const;
-    void print_tree() const;
+    static std::string print_subtree(iterator root);
+    std::string print_tree() const;
 
 public:
     // .begin() a .end() funkcie z tree<>
@@ -234,24 +234,52 @@ typename tree_base<node_type>::iterator tree_base<node_type>::find(node_type nod
     throw std::invalid_argument(s.str());
 }
 
+/* static */
 template <typename node_type>
-void tree_base<node_type>::print_subtree(iterator root) const
+std::string tree_base<node_type>::print_subtree(iterator root)
 {
     std::stringstream stream;
     stream
-        << "PRINT SUBTREE("
+        << "SUBTREE("
         << label(root)
         << ":"
         << ::id(root)
         << "): \t";
-    kptree::print_subtree_bracketed(_tree, root, stream);
-    logger.debugStream() << stream.str();
+
+    std::function<void(iterator it, std::stringstream& out)> print_recursive =
+        [&print_recursive](iterator it, std::stringstream& out)
+        {
+            if (is_leaf(it))
+            {
+                out << *it;
+            }
+            else
+            {
+                out
+                    << *it
+                    << "(";
+                sibling_iterator sib = first_child(it);
+                while (!is_last_child(sib))
+                {
+                    print_recursive(sib, out);
+                    out << ", ";
+                    ++sib;
+                }
+                assert(is_last_child(sib));
+                print_recursive(sib, out);
+                out << ")";
+            }
+        };
+
+    print_recursive(root, stream);
+    //logger.debugStream() << stream.str();
+    return stream.str();
 }
 
 template <typename node_type>
-void tree_base<node_type>::print_tree() const
+std::string tree_base<node_type>::print_tree() const
 {
-    print_subtree(begin());
+    return print_subtree(begin());
 }
 
 

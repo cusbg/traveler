@@ -34,7 +34,8 @@ struct document;
 class app
 {
 private:
-    typedef rna_tree::pre_post_order_iterator pre_post_it;
+    typedef rna_tree::pre_post_order_iterator   pre_post_it;
+    typedef std::vector<size_t>                 indexes;
 public:
     void run_app();
     void run_between(
@@ -48,22 +49,35 @@ private:
                 const mapping& map,
                 const std::string& fileIn,
                 const std::string& fileOut);
-    void remove(rna_tree& rna, const mapping& map);
-    void erase(rna_tree& rna);
-    void modify(rna_tree& rna, const rna_tree& temp, const mapping& map);
-    void insert(rna_tree& rna, rna_tree& temp, const mapping& map);
+
+    void modify(
+                rna_tree& rna,
+                const rna_tree& template_rna,
+                const mapping& map);
+    void erase(
+                rna_tree& rna);
+    void remove(
+                rna_tree& rna,
+                const indexes& to_remove);
+    void insert(
+                rna_tree& rna,
+                rna_tree& temp,
+                const indexes& to_insert);
     void save_doc(
                 const document& doc);
 
     void make_compact(
                 rna_tree& rna);
+
+
     void print_default(const rna_tree& tree);
+    void print_pair(const rna_tree::iterator it);
 
     void print_deleted(const rna_tree& rna);
     void print_other(const rna_tree& rna);
     void print_inserted(const rna_tree& rna);
 
-    bool contains(const rna_tree& rna, rna_pair_label::label_status status);
+    size_t contains(const rna_tree& rna, rna_pair_label::label_status status);
 };
 
 

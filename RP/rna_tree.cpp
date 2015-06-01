@@ -35,8 +35,8 @@ rna_tree::rna_tree(const std::string& brackets, const std::string& labels, const
         << name
         << "' WAS CONSTRUCTED, size = "
         << size()
-        << std::endl;
-    kptree::print_tree_bracketed(_tree, stream);
+        << std::endl
+        << print_tree();
     logger.debugStream() << stream.str();
 }
 

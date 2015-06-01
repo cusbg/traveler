@@ -412,6 +412,39 @@ Point stred(rna_tree::iterator iter)
     }
 }
 
+mapping::indexes mapping::get_to_insert() const
+{
+    APP_DEBUG_FNAME;
+
+    indexes vec;
+    for (auto m : map)
+    {
+        if (m.from == 0)
+            vec.push_back(m.to);
+        cout << m.from << " " << m.to << endl;
+    }
+    sort(vec.begin(), vec.end(), less<size_t>());
+    LOGGER_PRINT_CONTAINER(vec, "to_insert");
+
+    return vec;
+}
+mapping::indexes mapping::get_to_remove() const
+{
+    APP_DEBUG_FNAME;
+
+    indexes vec;
+    for (auto m : map)
+    {
+        if (m.to == 0)
+            vec.push_back(m.from);
+    }
+    sort(vec.begin(), vec.end(), less<size_t>());
+    LOGGER_PRINT_CONTAINER(vec, "to_insert");
+
+    return vec;
+}
+
+
 // MAPPING END
 
 
@@ -433,7 +466,10 @@ void document::update_rna_points()
         auto label = it->get_label();
         size_t index = get_label_index(it);
 
-        label.labels.at(index).point = points.at(i);
+        Point p = points.at(i);
+        //p = p + Point({1000, 1000});
+        label.labels.at(index).point = p;
+
         it->set_label(label);
     }
 }

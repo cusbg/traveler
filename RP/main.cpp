@@ -27,6 +27,7 @@
 #include "util.hpp"
 #include "app.hpp"
 #include "generator.hpp"
+#include "svg.hpp"
 
 
 
@@ -101,7 +102,11 @@ int main(int argc, char** argv)
     return 0;
 */
 
-    //rna_tree rna1("((.(.(.).)).(.(.)))", "-5142aba3456978089-");
+    //rna_tree rna1(
+            //"((.(.(.).)).(.(.)))",
+            //"-5142aba3456978089-");
+    //rna1.print_tree();
+    //return 0;
     //auto it = rna1.begin_post();
     //rna1.print_tree();
     //rna1.erase(it);

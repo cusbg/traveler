@@ -35,7 +35,7 @@ run: build $(FILESDIR)/generated
 	$(BUILDDIR)/$(TARGET) $(ARGS)
 
 
-build: $(BUILDDIR)/$(TARGET)
+build: mk_dirs $(BUILDDIR)/$(TARGET)
 
 debug: build
 	gdb $(BUILDDIR)/$(TARGET)
@@ -77,8 +77,10 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 	@make -j4 --directory=$(BUILDDIR) -f Makefile
 
 MK_DIRECTORIES		= $(LOGDIR) $(FILESDIR) $(FILESDIR)/mappings $(FILESDIR)/rted
-$(FILESDIR)/generated: build
+mk_dirs:
 	@mkdir -p $(MK_DIRECTORIES)
+
+$(FILESDIR)/generated:
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
 	@echo "**********************************************************************"

@@ -33,10 +33,14 @@ struct mapping_pair
 
 class mapping
 {
+public:
+    typedef std::vector<size_t> indexes;
 private:
     static void run_rted(const rna_tree& rna1, const rna_tree& rna2, const std::string& filename);
 public:
     static mapping compute_mapping(const rna_tree& rna1, const rna_tree& rna2);
+    indexes get_to_insert() const;
+    indexes get_to_remove() const;
 
     size_t distance;
     std::vector<mapping_pair> map;

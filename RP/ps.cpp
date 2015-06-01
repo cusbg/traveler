@@ -209,14 +209,18 @@ void ps::print_to_ps(const std::string& line)
             break;
 
         case rna_pair_label::inserted:
-            DEBUG("inserted");
+            //DEBUG("inserted %s",
+                    //rna_tree::print_subtree(rna_tree::parent(it)).c_str());
             out = print_colored(it, INSERT_COLOR);
             break;
 
+        case rna_pair_label::untouched:
+            WARN("UNTOUCHED!!");
+            wait_for_input();
+            out = print_normal(it);
         default:
             WARN("default status!!!");
             out = print_normal(it);
-            //abort();
             break;
     }
 

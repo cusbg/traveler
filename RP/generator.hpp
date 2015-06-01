@@ -32,6 +32,7 @@ private:
     static void generate_seq_files();
     static void generate_fold_files();
     static void generate_ps_files();
+    static void generate_svg_files();
     static void generate_mapping();
 };
 

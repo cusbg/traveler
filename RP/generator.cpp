@@ -25,6 +25,7 @@
 #include "types.hpp"
 #include "macros.hpp"
 #include "util.hpp"
+//#include "svg.hpp"
 
 
 using namespace std;
@@ -95,6 +96,32 @@ using namespace std;
     }
 }
 
+#ifdef NODEF
+/* static */ void generator::generate_svg_files()
+{
+    APP_DEBUG_FNAME;
+
+    vector<string> vec = FILES;
+    document doc;
+    
+    for (auto val : vec)
+    {
+        doc = read_ps(PS_IN(val));
+        string labels   = doc.labels;
+        string brackets = read_file(FOLD(val));
+        doc.rna = rna_tree(brackets, labels, val);
+        doc.update_rna_points();
+
+        svg s;
+
+        s = svg::init(SVG_OUT(val));
+        s.print_default(doc.rna);
+    }
+}
+#else
+/* static */ void generator::generate_svg_files() {}
+#endif
+
 /* static */ void generator::generate_mapping()
 {
     APP_DEBUG_FNAME;
@@ -145,6 +172,8 @@ using namespace std;
     generate_seq_files();
     generate_fold_files();
     generate_mapping();
+
+    generate_svg_files();
 }
 
 // GENERATOR END

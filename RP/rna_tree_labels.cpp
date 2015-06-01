@@ -76,7 +76,7 @@ void rna_pair_label::set_points(const rna_pair_label& from)
     APP_DEBUG_FNAME;
 
     double posunutie = 5 + rand() % 10;
-    posunutie = 5;
+    //posunutie = 5;
 
     //posunutie = 10;
 
@@ -92,7 +92,7 @@ void rna_pair_label::set_points(const rna_pair_label& from)
             Point& to = labels.at(i).point;
             to = p;
 
-            to.x = p.x + posunutie;
+            //to.x = p.x + posunutie;
             to.y = p.y + posunutie;
         }
     }
