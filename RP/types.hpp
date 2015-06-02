@@ -100,15 +100,6 @@ private:
 #define WARN(...) \
     logger.warn(__VA_ARGS__)
 
-//#define DEBUGS \
-    //logger.debugStream()
-//#define INFOS \
-    //logger.infoStream()
-//#define ERRS \
-    //logger.errorStream()
-//#define WARNS \
-    //logger.warnStream()
-
 
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
     set_logger_priority_to_return_function __logger_priority(log4cpp::Priority::PRIORITY)

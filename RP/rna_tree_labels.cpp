@@ -71,12 +71,32 @@ bool rna_pair_label::is_paired() const
     return labels.size() == 2;
 }
 
-void rna_pair_label::set_points(const rna_pair_label& from)
+void rna_pair_label::set_points_exact(const rna_pair_label& from)
+{
+    APP_DEBUG_FNAME;
+
+    for (size_t i = 0; i < 2; ++i)
+    {
+        if (labels.size() <= i || from.labels.size() <= i)
+        {
+            //DEBUG("size < %lu", i);
+        }
+        else
+        {
+            Point p = from.labels.at(i).point;
+            Point& to = labels.at(i).point;
+            to = p;
+        }
+    }
+}
+
+void rna_pair_label::set_points_nearby(const rna_pair_label& from)
 {
     APP_DEBUG_FNAME;
 
     double posunutie = 5 + rand() % 10;
-    //posunutie = 5;
+    
+    posunutie = 5;
 
     //posunutie = 10;
 

@@ -35,6 +35,7 @@ class app
 {
 private:
     typedef rna_tree::pre_post_order_iterator   pre_post_it;
+    typedef rna_tree::post_order_iterator       post_it;
     typedef std::vector<size_t>                 indexes;
 public:
     void run_app();
@@ -50,6 +51,18 @@ private:
                 const std::string& fileIn,
                 const std::string& fileOut);
 
+    void update(
+                document& doc,
+                const mapping& map);
+    void mark_removed(
+                post_it it);
+    void mark_inserted(
+                post_it it);
+    void mark_modifyied(
+                post_it from,
+                post_it to);
+
+/*
     void modify(
                 rna_tree& rna,
                 const rna_tree& template_rna,
@@ -63,6 +76,8 @@ private:
                 rna_tree& rna,
                 rna_tree& temp,
                 const indexes& to_insert);
+*/
+
     void save_doc(
                 const document& doc);
 
@@ -72,11 +87,11 @@ private:
 
     void print_default(const rna_tree& tree);
     void print_pair(const rna_tree::iterator it);
-
+/*
     void print_deleted(const rna_tree& rna);
     void print_other(const rna_tree& rna);
     void print_inserted(const rna_tree& rna);
-
+*/
     size_t contains(const rna_tree& rna, rna_pair_label::label_status status);
 };
 

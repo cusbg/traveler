@@ -45,7 +45,8 @@ public:
     std::string to_string() const;
     std::string get_points_string() const;
     void set_label_strings(const rna_pair_label& from);
-    void set_points(const rna_pair_label& from);
+    void set_points_nearby(const rna_pair_label& from);
+    void set_points_exact(const rna_pair_label& from);
     bool is_paired() const;
 
     rna_pair_label(const std::string& s);

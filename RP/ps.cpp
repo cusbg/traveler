@@ -25,13 +25,19 @@
 
 using namespace std;
 
+#define PS_COLUMNS_WIDTH 15
+
 ps& ps::operator=(ps&& other)
 {
     other.out.close();
 
     filename = move(other.filename);
     out.open(filename, std::ios::app);
-    out << std::unitbuf;
+    out
+        << std::unitbuf
+        << std::setprecision(4)
+        << std::scientific;
+
     assert(out.good());
 
     return *this;
@@ -71,53 +77,69 @@ void ps::print_to_ps(const std::string& line)
 /* static */ std::string ps::print(const rna_label& label)
 {
     stringstream out;
-    size_t odsadenie = 8;
     out
-        << "("
-        << label.label
-        << ")";
-    out << std::setw(odsadenie)
+        << std::left
+        << std::setw(PS_COLUMNS_WIDTH)
+        << ("(" + label.label + ")")
+        << std::setw(PS_COLUMNS_WIDTH)
         << label.point.x
-        << " ";
-    out << std::setw(odsadenie)
+        << std::setw(PS_COLUMNS_WIDTH)
         << label.point.y
-        << " lwstring"
+        << std::setw(PS_COLUMNS_WIDTH)
+        << "lwstring"
         << endl;
     return out.str();
 }
 
-/* static */ std::string ps::print(RGB rgb)
+/* static */ std::string ps::print(RGB color)
 {
-    string out;
+    struct
+    {
+        double r, g, b;
+    } rgb;
 
-    switch (rgb)
+    stringstream out;
+
+    switch (color)
     {
         case red:
-            out = "1.00 0.00 0.00 setrgbcolor";
+            rgb = {1, 0, 0};
             break;
         case green:
-            out = "0.00 1.00 0.00 setrgbcolor";
+            rgb = {0, 1, 0};
             break;
         case blue:
-            out = "0.00 0.00 1.00 setrgbcolor";
+            rgb = {0, 0, 1};
             break;
         case black:
-            out = "0.00 0.00 0.00 setrgbcolor";
+            rgb = {0, 0, 0};
             break;
         case gray:
-            out = "0.33 0.33 0.33 setrgbcolor";
+            rgb = {0.33, 0.33, 0.33};
             break;
 
 
         case other:
-            out = "0.00 0.50 0.50 setrgbcolor";
+            rgb = {0, 0.5, 0.5};
             break;
         default:
             ERR("no default value for rgb");
             abort();
     }
-    out += "\n";
-    return out;
+
+    out
+        << std::left
+        << std::setw(PS_COLUMNS_WIDTH)
+        << rgb.r
+        << std::setw(PS_COLUMNS_WIDTH)
+        << rgb.g
+        << std::setw(PS_COLUMNS_WIDTH)
+        << rgb.b
+        << std::setw(PS_COLUMNS_WIDTH)
+        << "setrgbcolor"
+        << endl;
+
+    return out.str();
 }
 
 /* static */ std::string ps::print_normal(const pre_post_it& iter, bool colored)
@@ -143,7 +165,7 @@ void ps::print_to_ps(const std::string& line)
     size_t index = get_label_index(iter);
     auto label = iter->get_label().labels.at(index);
 
-    out = out
+    out = ""
         + print(rgb)
         + print(label)
         + print(black);
@@ -162,9 +184,15 @@ void ps::print_to_ps(const std::string& line)
     p1 = iter->get_label().labels.at(0).point;
     p2 = iter->get_label().labels.at(1).point;
     out
-        << p1
-        << " "
-        << p2
+        << std::left
+        << std::setw(PS_COLUMNS_WIDTH)
+        << p1.x
+        << std::setw(PS_COLUMNS_WIDTH)
+        << p1.y
+        << std::setw(PS_COLUMNS_WIDTH)
+        << p2.x
+        << std::setw(PS_COLUMNS_WIDTH)
+        << p2.y
         << " lwline"
         << endl;
 
@@ -227,7 +255,7 @@ void ps::print_to_ps(const std::string& line)
     bool edge = false;
     edge = true;
     if (edge)
-        out += "\n" + print_edge(it) + "\n";
+        out += print_edge(it);
 
     return out;
 };

@@ -421,7 +421,6 @@ mapping::indexes mapping::get_to_insert() const
     {
         if (m.from == 0)
             vec.push_back(m.to);
-        cout << m.from << " " << m.to << endl;
     }
     sort(vec.begin(), vec.end(), less<size_t>());
     LOGGER_PRINT_CONTAINER(vec, "to_insert");
@@ -450,18 +449,21 @@ mapping::indexes mapping::get_to_remove() const
 
 void document::update_rna_points()
 {
+    // TODO: prerobit funkciu.. zbytocne ++.. 
     APP_DEBUG_FNAME;
 
     typedef rna_tree::pre_post_order_iterator pre_post_it;
 
+    rna_tree& r = template_rna;
+
     // test ci ma rovnako labelov/pointov/baz
     size_t i = 0;
-    for (pre_post_it it = ++rna.begin_pre_post(); ++pre_post_it(it) != rna.end_pre_post(); ++it)
+    for (pre_post_it it = ++r.begin_pre_post(); ++pre_post_it(it) != r.end_pre_post(); ++it)
         ++i;
     assert(i == labels.size() && i == points.size());
 
     i = 0;
-    for (pre_post_it it = ++rna.begin_pre_post(); ++pre_post_it(it) != rna.end_pre_post(); ++it, ++i)
+    for (pre_post_it it = ++r.begin_pre_post(); ++pre_post_it(it) != r.end_pre_post(); ++it, ++i)
     {
         auto label = it->get_label();
         size_t index = get_label_index(it);

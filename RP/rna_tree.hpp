@@ -39,13 +39,14 @@ public:
         return _tree.equal_subtree(begin(), other.begin());
     }
     rna_tree(const std::string& brackets, const std::string& labels, const std::string& _name = "");
-
+/*
     iterator modify(iterator it, rna_node_type node);
     iterator insert_pre(iterator it, rna_node_type node);
     iterator insert_post(iterator it, rna_node_type node);
     iterator remove(iterator it);
     template <typename iter>
     iter erase(iter it);
+*/
 private:
     inline std::vector<rna_node_type> convert(const std::string& labels);
 
@@ -53,7 +54,7 @@ public:
     std::string name;
 };
 
-
+/*
 template <typename iter>
 iter rna_tree::erase(iter it)
 {
@@ -69,6 +70,7 @@ iter rna_tree::erase(iter it)
     --_size;
     return --it;
 }
+*/
 
 template <typename iter>
 iter move_it_plus(iter it, size_t count)

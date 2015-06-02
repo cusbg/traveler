@@ -95,9 +95,11 @@ void posun_vrcholy(rna_tree::iterator it, Point vector)
 void app::save_doc(const document& doc)
 {
     APP_DEBUG_FNAME;
+
+    auto& r = doc.rna_out;
     
-    for (auto it = ++doc.rna.begin_pre_post();
-            ++pre_post_it(it) != doc.rna.end_pre_post(); ++it)
+    for (auto it = ++r.begin_pre_post();
+            ++pre_post_it(it) != r.end_pre_post(); ++it)
     {
         psout.print_to_ps(ps::format_string(it));
     }
@@ -111,178 +113,117 @@ void app::print_default(const rna_tree& rna)
     for (auto it = rna.begin_pre_post(); it != rna.end_pre_post(); ++it)
     {
         psout.print_to_ps(ps::print_normal(it));
-        //if (it->get_label().is_paired() && !it.is_preorder())
-            //psout.print_to_ps(ps::print_edge(it));
+        //psout.print_to_ps(ps::print_edge(it));
     }
     psout.print_to_ps(ps::print(black));
 }
 
-
-
-void app::modify(rna_tree& rna, const rna_tree& temp, const mapping& map)
+void app::print_pair(rna_tree::iterator it)
 {
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    APP_DEBUG_FNAME;
-
-    auto it = rna.begin_post();
-    for (auto m : map.map)
+    string out;
+    if (it->get_label().is_paired())
     {
-        if (m.from == 0)
-            continue;
-        if (m.to != 0)
-            it = rna.modify(it, *move_it_plus(temp.begin_post(), m.to - 1));
-        ++it;
+        rna_tree::pre_post_order_iterator it1(it, true);
+        rna_tree::pre_post_order_iterator it2(it, false);
+
+        out = ps::format_string(it1) + ps::format_string(it2);
     }
+    else
+        out = ps::format_string(it);
+
+    psout.print_to_ps(out);
 }
 
-void app::remove(rna_tree& rna, const indexes& to_remove)
+size_t app::contains(const rna_tree& rna, rna_pair_label::label_status status)
 {
-    APP_DEBUG_FNAME;
-
-    rna.print_tree();
-    auto it = rna.begin_post();
-    size_t i = 0;
-
-    for (auto index : to_remove)
-    {
-        index -= 1;
-        size_t to_move = index - i;
-        it = move_it_plus(it, to_move);
-        it = rna.remove(it);
-        i = index;
-    }
-
-    DEBUG("zmazanych (soft) %lu vrcholov", to_remove.size());
-    logger.debugStream() << rna.print_tree();
+    return count_if(rna.begin(), rna.end(),
+            [status](rna_node_type node) { return node.get_label().status == status; });
 }
 
-void app::erase(rna_tree& rna)
+
+
+
+
+void app::update(
+                document& doc,
+                const mapping& map)
 {
     APP_DEBUG_FNAME;
 
-    rna.print_tree();
-    size_t i = 0;
-    for (auto it = rna.begin_post(); it != rna.end_post(); ++it)
-    {
-        if (it->get_label().status == rna_pair_label::deleted)
+    auto to_ins = map.get_to_insert();
+    auto to_rem = map.get_to_remove();
+
+    {   // mark as removed.. (in rna template)
+        post_it it = doc.template_rna.begin_post();
+        size_t i = 0;
+        for (size_t index : to_rem)
         {
-            it = --rna.erase(it);
-            ++i;
+            --index;
+            size_t to_move = index - i;
+            it = move_it_plus(it, to_move);
+            mark_removed(it);
+            i = index;
         }
     }
-    DEBUG("zmazanych (hard) %lu vrcholov", i);
-    logger.debugStream() << rna.print_tree();
-}
-
-void app::insert(rna_tree& rna1, rna_tree& rna2, const indexes& to_insert)
-{
-    APP_DEBUG_FNAME;
-
-    for (auto val : to_insert)
-    {
-        auto it = move_it_plus(rna2.begin_post(), val-1);
-        auto label = it->get_label();
-        label.status = rna_pair_label::inserted;
-        it->set_label(label);
-    }
-    size_t in_count = to_insert.size();
-    size_t del_count = contains(rna1, rna_pair_label::deleted);
-    DEBUG("rna1 %lu, rna2 %lu, inserted # %lu, deleted # %lu", rna1.size(), rna2.size(), in_count, del_count);
-    assert(rna1.size() + to_insert.size() == rna2.size() + del_count);
-
-    {
-        rna_tree::post_order_iterator it1, it2;
-        it1 = rna1.begin_post();
-        it2 = rna2.begin_post();
-
-        while(it2 != rna2.end_post())
+    {   // mark as inserted.. (in rna output)
+        post_it it = doc.rna_out.begin_post();
+        size_t i = 0;
+        for (size_t index : to_ins)
         {
-            auto label1 = it1->get_label();
-            auto label2 = it2->get_label();
-            if (label2.status == rna_pair_label::inserted)
-            {
-                cout << label2 << endl;
-                ++it2;
-                continue;
-            }
-            if (label1.status == rna_pair_label::deleted)
-            {
-                cout << label1 << endl;
-                ++it1;
-                continue;
-            }
-
-            if (label1 == label2)
-            {
-                cout << label1 << "\t" << label2 << endl;
-                it2->set_label(it1->get_label());
-                ++it1;
-                ++it2;
-            }
-            else
-            {
-                cout << label1 << endl << label2 << endl;
-                abort();
-            }
+            --index;
+            size_t to_move = index - i;
+            it = move_it_plus(it, to_move);
+            mark_inserted(it);
+            i = index;
         }
     }
 
+    struct
     {
-        rna_tree::iterator it = rna2.begin();
-        while(it != rna2.end())
+        size_t inserted, removed, modified;
+    } stats = {0, 0, 0};
+    
+    {   // update rna output points from rna template.. (going preorder)
+        rna_tree::iterator it1, it2;
+        it1 = doc.template_rna.begin();
+        it2 = doc.rna_out.begin();
+        while (it2 != doc.rna_out.end())
         {
-            auto label = it->get_label();
-            if (label.status == rna_pair_label::inserted)
+            if (it1->get_label().status == rna_pair_label::deleted)
             {
-                label.set_points(rna_tree::parent(it)->get_label());
-                it->set_label(label);
-            }
-            //print_pair(it);
-            ++it;
-        }
-    }
+                DEBUG("deleted");
+                print_pair(it1);
 
-    {
-        rna_tree::post_order_iterator it1, it2;
-        it1 = rna1.begin_post();
-        it2 = rna2.begin_post();
-
-        while (it2 != rna2.end_post())
-        {
-            auto label1 = it1->get_label();
-            auto label2 = it2->get_label();
-            if (label2.status == rna_pair_label::inserted)
-            {
-                //print_pair(it2);
-                //cout << label2 << endl;
-                //wait_for_input();
-                ++it2;
-                continue;
-            }
-            if (label1.status == rna_pair_label::deleted)
-            {
-                //print_pair(it1);
-                //cout << label1 << endl;
                 ++it1;
+                ++stats.removed;
+                continue;
+            }
+            if (it2->get_label().status == rna_pair_label::inserted)
+            {
+                DEBUG("inserted");
+                print_pair(it2);
+
+                ++it2;
+                ++stats.inserted;
                 continue;
             }
 
-            assert(label1 == label2);
+            mark_modifyied(it1, it2);
+            print_pair(it2);
 
-            //print_pair(it2);
-            //cout << label1 << "\t" << label2 << endl;
             ++it1;
             ++it2;
+            ++stats.modified;
         }
+        assert (it1 == doc.template_rna.end() && it2 == doc.rna_out.end());
     }
-
-    swap(rna1, rna2);
+    DEBUG("stats: ins %lu, del %lu, mod %lu",
+            stats.inserted, stats.removed, stats.modified);
+    assert(stats.inserted == to_ins.size()
+            && stats.removed == to_rem.size());
+    assert(doc.template_rna.size() + stats.inserted ==
+            doc.rna_out.size() + stats.removed);
 }
-
-
-
-
 
 
 
@@ -299,12 +240,16 @@ void app::transform(
                 [](mapping_pair m1, mapping_pair m2) { return m1.from < m2.from; }));
 
     document doc = read_ps(fileIn);
-    doc.rna = rna1;
+    doc.template_rna = rna1;
+    doc.rna_out = rna2;
     doc.update_rna_points();
 
     psout = ps::init(fileOut);
     psout.print_to_ps(doc.prolog);
 
+    update(doc, map);
+
+/*
     modify(doc.rna, rna2, map);
     remove(doc.rna, map.get_to_remove());
 
@@ -317,74 +262,13 @@ void app::transform(
     insert(doc.rna, other, map.get_to_insert());
     assert(!contains(doc.rna, rna_pair_label::untouched));
     print_inserted(doc.rna);
-
+*/
     DEBUG("document %s was saved", fileOut.c_str());
 }
 
 
-void app::print_pair(rna_tree::iterator it)
-{
-    string out;
-    if (it->get_label().is_paired())
-    {
-        rna_tree::pre_post_order_iterator it1(it);
-        rna_tree::pre_post_order_iterator it2(it, false);
-        out =
-            ps::format_string(it1) + ps::format_string(it2);
-    }
-    else
-        out = ps::format_string(it);
 
-    psout.print_to_ps(out);
-}
-
-void app::print_deleted(const rna_tree& rna)
-{
-    APP_DEBUG_FNAME;
-
-    for (auto it = ++rna.begin_pre_post();
-            ++pre_post_it(it) != rna.end_pre_post(); ++it)
-    {
-        if (it->get_label().status == rna_pair_label::deleted)
-            psout.print_to_ps(ps::format_string(it));
-    }
-}
-
-void app::print_other(const rna_tree& rna)
-{
-    APP_DEBUG_FNAME;
-
-    for (auto it = ++rna.begin_pre_post();
-            ++pre_post_it(it) != rna.end_pre_post(); ++it)
-    {
-        if (it->get_label().status != rna_pair_label::deleted &&
-                it->get_label().status != rna_pair_label::inserted)
-            psout.print_to_ps(ps::format_string(it));
-    }
-}
-
-void app::print_inserted(const rna_tree& rna)
-{
-    APP_DEBUG_FNAME;
-
-    for (auto it = ++rna.begin_pre_post();
-            ++pre_post_it(it) != rna.end_pre_post(); ++it)
-    {
-        if (it->get_label().status == rna_pair_label::inserted)
-        {
-            psout.print_to_ps(ps::format_string(it));
-            //rna.print_subtree(rna.parent(it));
-        }
-    }
-}
-
-size_t app::contains(const rna_tree& rna, rna_pair_label::label_status status)
-{
-    return count_if(rna.begin(), rna.end(),
-            [status](rna_node_type node) { return node.get_label().status == status; });
-}
-
-
+#ifdef NODEF
 void app::make_compact(
                 rna_tree& rna)
 {
@@ -474,9 +358,93 @@ void app::make_compact(
     INFO("exit compact funct");
     //abort();
 }
+#endif
+
+void app::mark_removed(
+                post_it it)
+{
+    APP_DEBUG_FNAME;
+
+    auto label = it->get_label();
+    label.status = rna_pair_label::deleted;
+    it->set_label(label);
+}
+void app::mark_inserted(
+                post_it it)
+{
+    APP_DEBUG_FNAME;
+
+    auto label = it->get_label();
+    label.status = rna_pair_label::inserted;
+    it->set_label(label);
+}
+void app::mark_modifyied(
+                post_it from,
+                post_it to)
+{
+    APP_DEBUG_FNAME;
+
+    auto label = to->get_label();
+    auto flabel = from->get_label();
+
+    label.set_points_exact(flabel);
+
+    if (label.is_paired() != flabel.is_paired())
+        label.status = rna_pair_label::pair_changed;
+    else if (label == flabel)
+        label.status = rna_pair_label::touched;
+    else
+        label.status = rna_pair_label::edited;
+
+    to->set_label(label);
+}
 
 
 
+
+
+
+/*
+void app::print_deleted(const rna_tree& rna)
+{
+    APP_DEBUG_FNAME;
+
+    for (auto it = ++rna.begin_pre_post();
+            ++pre_post_it(it) != rna.end_pre_post(); ++it)
+    {
+        if (it->get_label().status == rna_pair_label::deleted)
+            psout.print_to_ps(ps::format_string(it));
+    }
+}
+
+void app::print_other(const rna_tree& rna)
+{
+    APP_DEBUG_FNAME;
+
+    for (auto it = ++rna.begin_pre_post();
+            ++pre_post_it(it) != rna.end_pre_post(); ++it)
+    {
+        if (it->get_label().status != rna_pair_label::deleted &&
+                it->get_label().status != rna_pair_label::inserted)
+            psout.print_to_ps(ps::format_string(it));
+    }
+}
+
+void app::print_inserted(const rna_tree& rna)
+{
+    APP_DEBUG_FNAME;
+
+    for (auto it = ++rna.begin_pre_post();
+            ++pre_post_it(it) != rna.end_pre_post(); ++it)
+    {
+        if (it->get_label().status == rna_pair_label::inserted)
+        {
+            psout.print_to_ps(ps::format_string(it));
+            //rna.print_subtree(rna.parent(it));
+        }
+    }
+}
+*/
 
 
 

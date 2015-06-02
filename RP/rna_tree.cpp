@@ -50,7 +50,7 @@ std::vector<rna_node_type> rna_tree::convert(const std::string& labels)
 }
 
 
-
+/*
 
 // MODIFY/REMOVE/INSERT operations:
 
@@ -91,10 +91,6 @@ rna_tree::iterator rna_tree::remove(iterator it)
 
 // erase je v hlavicke, je templatovany... 
 
-
-
-
-
 rna_tree::iterator rna_tree::insert_post(iterator it, rna_node_type node)
 {
     //APP_DEBUG_FNAME;
@@ -109,7 +105,7 @@ rna_tree::iterator rna_tree::insert_post(iterator it, rna_node_type node)
     node.set_label(label);
     
     _tree.insert(it, node);
-/*
+[>
     if (is_leaf(it))
     {
         DEBUG("is_leaf");
@@ -120,7 +116,7 @@ rna_tree::iterator rna_tree::insert_post(iterator it, rna_node_type node)
         DEBUG("else append_child");
         _tree.insert(it, node);
     }
-*/
+<]
     ++_size;
 
     return it;
@@ -140,7 +136,7 @@ rna_tree::iterator rna_tree::insert_pre(iterator it, rna_node_type node)
     node.set_label(label);
     
     _tree.insert(it, node);
-/*
+[>
     if (is_leaf(it))
     {
         DEBUG("is_leaf");
@@ -151,13 +147,13 @@ rna_tree::iterator rna_tree::insert_pre(iterator it, rna_node_type node)
         DEBUG("else append_child");
         _tree.insert(it, node);
     }
-*/
+<]
     ++_size;
 
     return it;
 }
 
-
+*/
 
 
 size_t get_label_index(rna_tree::pre_post_order_iterator iter)
