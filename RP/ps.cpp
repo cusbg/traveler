@@ -27,30 +27,40 @@ using namespace std;
 
 #define PS_COLUMNS_WIDTH 15
 
-ps& ps::operator=(ps&& other)
+/* global */ ps psout;
+
+
+ps::ps(
+                const std::string& _filename)
+    : filename(_filename), out(filename, ios::out)
+{
+    set_io_flags();
+    assert(out.good());
+}
+
+ps& ps::operator=(
+                ps&& other)
 {
     other.out.close();
 
     filename = move(other.filename);
-    out.open(filename, std::ios::app);
-    out
-        << std::unitbuf
-        << std::setprecision(4)
-        << std::scientific;
+    out.open(filename, ios::out | ios::in);
+    set_io_flags();
 
     assert(out.good());
 
     return *this;
 }
 
-ps::ps(const std::string& _filename)
-    : filename(_filename), out(filename)
+void ps::set_io_flags()
 {
-    out << std::unitbuf;
-    assert(out.good());
+    out
+        << std::unitbuf
+        << std::scientific;
 }
 
-/* static */ ps&& ps::init(const std::string& filename)
+/* static */ ps&& ps::init(
+                const std::string& filename)
 {
     APP_DEBUG_FNAME;
     assert(!filename.empty());
@@ -62,19 +72,67 @@ ps::ps(const std::string& _filename)
 }
 
 
+// PRINT FUNCTIONS:
+//
 
-
-void ps::print_to_ps(const std::string& line)
+/* static */ std::string ps::format_string(
+                const pre_post_it& it)
 {
-    out << line;
-    if (out.fail())
-    {
-        ERR("ps print fail");
-        abort();
-    }
-}
+#define CHANGED_STR     "********************** CHANGED **********************"
+#define DELETED_STR     "********************** DELETED **********************"
+#define INSERTED_STR    "********************* INSERTED **********************"
+#define UNTOUCHED_STR   "********************* UNTOUCHED *********************"
 
-/* static */ std::string ps::print(const rna_label& label)
+#define DELETE_COLOR    blue
+#define INSERT_COLOR    red
+#define EDITED_COLOR    green
+#define OTHER_COLOR     other
+
+    string out;
+
+    auto status = it->get_label().status;
+
+    switch (status)
+    {
+        case rna_pair_label::deleted:
+            out = print_colored(it, DELETE_COLOR);
+            //wait_for_input();
+            break;
+        case rna_pair_label::edited:
+            out = print_colored(it, EDITED_COLOR);
+            break;
+        case rna_pair_label::touched:
+            out = print_normal(it);
+            break;
+
+        case rna_pair_label::inserted:
+        case rna_pair_label::reinserted:
+            out = print_colored(it, INSERT_COLOR);
+            wait_for_input();
+            break;
+
+        case rna_pair_label::untouched:
+            WARN("UNTOUCHED!!");
+            out = print_normal(it);
+            wait_for_input();
+            break;
+        default:
+            WARN("default status!!!");
+            out = print_normal(it);
+            wait_for_input();
+            break;
+    }
+
+    bool edge = false;
+    //edge = true;
+    if (edge)
+        out += print_edge(it);
+
+    return out;
+};
+
+/* static */ std::string ps::print(
+                const rna_label& label)
 {
     stringstream out;
     out
@@ -88,10 +146,12 @@ void ps::print_to_ps(const std::string& line)
         << std::setw(PS_COLUMNS_WIDTH)
         << "lwstring"
         << endl;
+
     return out.str();
 }
 
-/* static */ std::string ps::print(RGB color)
+/* static */ std::string ps::print(
+                RGB color)
 {
     struct
     {
@@ -142,7 +202,9 @@ void ps::print_to_ps(const std::string& line)
     return out.str();
 }
 
-/* static */ std::string ps::print_normal(const pre_post_it& iter, bool colored)
+/* static */ std::string ps::print_normal(
+                const pre_post_it& iter,
+                bool colored)
 {
     string out;
 
@@ -158,7 +220,9 @@ void ps::print_to_ps(const std::string& line)
     return out;
 }
 
-/* static */ std::string ps::print_colored(const pre_post_it& iter, RGB rgb)
+/* static */ std::string ps::print_colored(
+                const pre_post_it& iter,
+                RGB rgb)
 {
     string out;
 
@@ -173,7 +237,8 @@ void ps::print_to_ps(const std::string& line)
     return out;
 }
 
-/* static */ std::string ps::print_edge(const pre_post_it& iter)
+/* static */ std::string ps::print_edge(
+                const pre_post_it& iter)
 {
     stringstream out;
 
@@ -181,8 +246,19 @@ void ps::print_to_ps(const std::string& line)
         return out.str();
 
     Point p1, p2;
+
     p1 = iter->get_label().labels.at(0).point;
     p2 = iter->get_label().labels.at(1).point;
+
+    return print_line(p1, p2);
+}
+
+/* static */ std::string ps::print_line(
+                Point p1,
+                Point p2)
+{
+    stringstream out;
+
     out
         << std::left
         << std::setw(PS_COLUMNS_WIDTH)
@@ -199,66 +275,76 @@ void ps::print_to_ps(const std::string& line)
     return out.str();
 }
 
-/* static */ std::string ps::format_string(const pre_post_it& it)
+
+streampos ps::save(
+                const rna_tree& rna)
 {
-#define CHANGED_STR     "********************** CHANGED **********************"
-#define DELETED_STR     "********************** DELETED **********************"
-#define INSERTED_STR    "********************* INSERTED **********************"
-#define UNTOUCHED_STR   "********************* UNTOUCHED *********************"
+    APP_DEBUG_FNAME;
 
-#define DELETE_COLOR    blue
-#define INSERT_COLOR    red
-#define EDITED_COLOR    green
-#define OTHER_COLOR     other
+    streampos pos = get_pos();
 
-    string out;
-
-    auto status = it->get_label().status;
-
-/*
-    if (status == rna_pair_label::untouched)
+    for (auto it = ++rna.begin_pre_post();
+            ++pre_post_it(it) != rna.end_pre_post(); ++it)
     {
-        ERR("untouched");
+        psout.print_to_ps(ps::format_string(it));
+        //wait_for_input();
+    }
+
+    return pos;
+}
+
+
+streampos ps::print_to_ps(
+                const std::string& line)
+{
+    streampos pos = get_pos();
+
+    out << line;
+
+#define ps_end_str      "showpage\n"
+#define ps_end_length   (ARRAY_LENGTH(ps_end_str) - 1)
+
+    out << ps_end_str;
+    out.seekp(-ps_end_length, out.end);
+
+    if (out.fail())
+    {
+        ERR("ps print fail");
         abort();
     }
-*/
 
-    switch (status)
-    {
-        case rna_pair_label::deleted:
-            out = print_colored(it, DELETE_COLOR);
-            //wait_for_input();
-            break;
-        case rna_pair_label::edited:
-            out = print_colored(it, EDITED_COLOR);
-            break;
-        case rna_pair_label::touched:
-            out = print_normal(it);
-            break;
+    return pos;
+}
 
-        case rna_pair_label::inserted:
-            //DEBUG("inserted %s",
-                    //rna_tree::print_subtree(rna_tree::parent(it)).c_str());
-            out = print_colored(it, INSERT_COLOR);
-            break;
+void ps::seek(
+                streampos pos)
+{
+    out.seekp(pos);
 
-        case rna_pair_label::untouched:
-            WARN("UNTOUCHED!!");
-            wait_for_input();
-            out = print_normal(it);
-        default:
-            WARN("default status!!!");
-            out = print_normal(it);
-            break;
-    }
+    assert(out.good());
+}
 
-    bool edge = false;
-    edge = true;
-    if (edge)
-        out += print_edge(it);
+streampos ps::get_pos()
+{
+    streampos pos = out.tellp();
+    assert(pos != -1);
 
-    return out;
-};
+    return pos;
+}
 
+
+streampos ps::print_pair(rna_tree::iterator it)
+{
+    string out;
+
+    if (it->get_label().is_paired())
+        out =
+            format_string(rna_tree::pre_post_order_iterator(it, true)) +
+            format_string(rna_tree::pre_post_order_iterator(it, false));
+    else
+        out = ps::format_string(it);
+
+    return psout.print_to_ps(out);
+}
 
 

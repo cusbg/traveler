@@ -24,7 +24,12 @@
 
 using namespace std;
 
-rna_tree::rna_tree(const std::string& brackets, const std::string& labels, const std::string& _name)
+inline std::vector<rna_node_type> convert(const std::string& labels);
+
+rna_tree::rna_tree(
+                const std::string& brackets,
+                const std::string& labels,
+                const std::string& _name)
     : tree_base<rna_node_type>(brackets, convert(labels)), name(_name)
 {
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
@@ -40,15 +45,11 @@ rna_tree::rna_tree(const std::string& brackets, const std::string& labels, const
     logger.debugStream() << stream.str();
 }
 
-std::vector<rna_node_type> rna_tree::convert(const std::string& labels)
+bool rna_tree::operator==(
+                rna_tree& other)
 {
-    std::vector<rna_node_type> vec;
-    vec.reserve(labels.size());
-    for (size_t i = 0; i < labels.size(); ++i)
-        vec.emplace_back(labels.substr(i, 1));
-    return vec;
+    return _tree.equal_subtree(begin(), other.begin());
 }
-
 
 /*
 
@@ -156,7 +157,18 @@ rna_tree::iterator rna_tree::insert_pre(iterator it, rna_node_type node)
 */
 
 
-size_t get_label_index(rna_tree::pre_post_order_iterator iter)
+std::vector<rna_node_type> convert(
+                const std::string& labels)
+{
+    std::vector<rna_node_type> vec;
+    vec.reserve(labels.size());
+    for (size_t i = 0; i < labels.size(); ++i)
+        vec.emplace_back(labels.substr(i, 1));
+    return vec;
+}
+
+size_t get_label_index(
+                rna_tree::pre_post_order_iterator iter)
 {
     if (iter.is_preorder() || !iter->get_label().is_paired())
         return 0;

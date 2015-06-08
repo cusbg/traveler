@@ -33,21 +33,19 @@
 
 using namespace std::rel_ops;
 
+#define ARRAY_LENGTH(x)     ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
+
+#define radians_to_degrees(x)   (x * 180 / M_PI)
+#define degrees_to_radians(x)   (x * M_PI / 180)
+
+#define double_equals(val1, val2, precision) \
+    (abs(val1 - val2) < abs(precision))
+
+
 
 #include <log4cpp/Category.hh>
 extern log4cpp::Category& logger; // globalna premenna...
 
-
-enum RGB
-{
-    red,
-    green,
-    blue,
-    black,
-    gray,
-
-    other,
-};
 
 
 inline void wait_for_input()
@@ -57,20 +55,11 @@ inline void wait_for_input()
     std::cin.read(&ch, 1);
 }
 
-
-
-struct Point
+template <typename T>
+inline T squared(T t)
 {
-    double x, y;
-
-    friend std::ostream& operator<< (std::ostream& out, Point p);
-    Point operator+(Point other) const;
-    Point operator-(Point other) const;
-    Point operator/(size_t value) const;
-    Point swap() const;
-};
-Point stred(Point p1, Point p2);
-
+    return t * t;
+}
 
 
 

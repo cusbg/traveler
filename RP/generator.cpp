@@ -31,8 +31,6 @@
 using namespace std;
 
 
-// GENERATOR: 
-
 /* static */ void generator::generate_seq_files()
 {
     APP_DEBUG_FNAME;
@@ -96,35 +94,11 @@ using namespace std;
     }
 }
 
-#ifdef NODEF
-/* static */ void generator::generate_svg_files()
-{
-    APP_DEBUG_FNAME;
-
-    vector<string> vec = FILES;
-    document doc;
-    
-    for (auto val : vec)
-    {
-        doc = read_ps(PS_IN(val));
-        string labels   = doc.labels;
-        string brackets = read_file(FOLD(val));
-        doc.rna = rna_tree(brackets, labels, val);
-        doc.update_rna_points();
-
-        svg s;
-
-        s = svg::init(SVG_OUT(val));
-        s.print_default(doc.rna);
-    }
-}
-#else
-/* static */ void generator::generate_svg_files() {}
-#endif
-
 /* static */ void generator::generate_mapping()
 {
     APP_DEBUG_FNAME;
+
+    typedef mapping::mapping_pair mapping_pair;
 
     vector<string> vec;
     vec = FILES;
@@ -150,7 +124,8 @@ using namespace std;
 
             auto map = mapping::compute_mapping(rna1, rna2);
 
-            sort(map.map.begin(), map.map.end(), [](mapping_pair m1, mapping_pair m2) { return m1.from < m2.from; });
+            sort(map.map.begin(), map.map.end(),
+                    [](mapping_pair m1, mapping_pair m2) { return m1.from < m2.from; });
 
             string fileOut = MAP(val1, val2);
             ofstream out(fileOut);
@@ -176,5 +151,30 @@ using namespace std;
     generate_svg_files();
 }
 
-// GENERATOR END
+
+/* static */ void generator::generate_svg_files()
+#ifdef NODEF
+{
+    APP_DEBUG_FNAME;
+
+    vector<string> vec = FILES;
+    document doc;
+    
+    for (auto val : vec)
+    {
+        doc = read_ps(PS_IN(val));
+        string labels   = doc.labels;
+        string brackets = read_file(FOLD(val));
+        doc.rna = rna_tree(brackets, labels, val);
+        doc.update_rna_points();
+
+        svg s;
+
+        s = svg::init(SVG_OUT(val));
+        s.print_default(doc.rna);
+    }
+}
+#else
+{}
+#endif
 

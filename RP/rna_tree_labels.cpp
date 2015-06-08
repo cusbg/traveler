@@ -24,15 +24,17 @@
 using namespace std;
 
 
-
-rna_pair_label::rna_pair_label(const std::string& s)
+// RNA_PAIR_LABEL:
+rna_pair_label::rna_pair_label(
+                const std::string& s)
 {
     rna_label l;
     l.label = s;
     labels.push_back(l);
 }
 
-bool rna_pair_label::operator==(const rna_pair_label& other) const
+bool rna_pair_label::operator==(
+                const rna_pair_label& other) const
 {
     bool ret = true;
     if (labels.size() != other.labels.size())
@@ -46,7 +48,8 @@ bool rna_pair_label::operator==(const rna_pair_label& other) const
     return ret;
 }
 
-rna_pair_label rna_pair_label::operator+(const rna_pair_label& other) const
+rna_pair_label rna_pair_label::operator+(
+                const rna_pair_label& other) const
 {
     assert(labels.size() == 1 && other.labels.size() == 1);
 
@@ -59,7 +62,9 @@ rna_pair_label rna_pair_label::operator+(const rna_pair_label& other) const
     return out;
 }
 
-std::ostream& operator<<(std::ostream& out, const rna_pair_label& label)
+std::ostream& operator<<(
+                std::ostream& out,
+                const rna_pair_label& label)
 {
     out << label.to_string();
     return out;
@@ -71,58 +76,54 @@ bool rna_pair_label::is_paired() const
     return labels.size() == 2;
 }
 
-void rna_pair_label::set_points_exact(const rna_pair_label& from)
+void rna_pair_label::set_points_exact(
+                const rna_pair_label& from)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
     for (size_t i = 0; i < 2; ++i)
-    {
-        if (labels.size() <= i || from.labels.size() <= i)
-        {
-            //DEBUG("size < %lu", i);
-        }
-        else
-        {
-            Point p = from.labels.at(i).point;
-            Point& to = labels.at(i).point;
-            to = p;
-        }
-    }
+        if (i < labels.size() && i < from.labels.size())
+            set_points_exact(from.labels.at(i).point, i);
 }
 
-void rna_pair_label::set_points_nearby(const rna_pair_label& from)
+void rna_pair_label::set_points_nearby(
+                const rna_pair_label& from)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
-    double posunutie = 5 + rand() % 10;
-    
+    for (size_t i = 0; i < 2; ++i)
+        if (i < labels.size() && i < from.labels.size())
+            set_points_nearby(from.labels.at(i).point, i);
+}
+
+void rna_pair_label::set_points_nearby(
+                Point p,
+                size_t which)
+{
+    double posunutie;
+    //posunutie = 5 + rand() % 10;
     posunutie = 5;
+    p.x += posunutie;
+    //p.y += posunutie;
 
-    //posunutie = 10;
-
-    for (size_t i = 0; i < 2; ++i)
-    {
-        if (labels.size() <= i || from.labels.size() <= i)
-        {
-            //DEBUG("size < %lu", i);
-        }
-        else
-        {
-            Point p = from.labels.at(i).point;
-            Point& to = labels.at(i).point;
-            to = p;
-
-            //to.x = p.x + posunutie;
-            to.y = p.y + posunutie;
-        }
-    }
+    labels.at(which).point = p;
 }
+
+void rna_pair_label::set_points_exact(
+                Point p,
+                size_t which)
+{
+    labels.at(which).point = p;
+}
+
+
+
 
 std::string rna_pair_label::get_points_string() const
 {
     string out;
     for (const auto& val : labels)
-        out += val.label + ":" + val.point_to_string() + "|";
+        out += val.label + ":" + val.point.to_string() + "|";
     return out;
 }
 
@@ -133,70 +134,79 @@ std::string rna_pair_label::to_string() const
         out += "__ins`";
     if (status == deleted)
         out += "__del`";
+    if (status == reinserted)
+        out += "__reins`";
 
     for (auto val : labels)
         out += val.label;
 
-    if (status == inserted || status == deleted)
+    if (status == inserted || status == deleted || status == reinserted)
         out += "`";
 
     return out;
 }
 
 
-void rna_pair_label::set_label_strings(const rna_pair_label& from)
+void rna_pair_label::set_label_strings(
+                const rna_pair_label& from)
 {
     // 3 druhy statusu:
     //  touched         - uz len tym, ze sme vosli do funkcie
     //  edited          - ak labels su rozne
     //  pair_changed    - ak sa par zmenil na nepar, resp. naopak.
     //
+
     //APP_DEBUG_FNAME;
 
     DEBUG("changing labels from %s to %s", to_string().c_str(), from.to_string().c_str());
 
-    status = touched;
+    assert(status == untouched);
 
     if (to_string() != from.to_string())
         status = edited;
-    if (labels.size() != from.labels.size())
+    else if (labels.size() != from.labels.size())
     {
         DEBUG("pair_changed");
         status = pair_changed;
     }
+    else
+        status = touched;
 
-    size_t m = 1;
+    size_t max = 1;
     if (is_paired() && from.is_paired())
-        m = 2;
+        max = 2;
 
-    for (size_t i = 0; i < m; ++i)
+    for (size_t i = 0; i < max; ++i)
         labels.at(i).label = from.labels.at(i).label;
-    
-    //return;
-    //if (status == edited)
-    //{
-        //for (size_t i = 0; i < m; ++i)
-            //labels.at(i).label += "|" + from.labels.at(i).label;
-    //}
-    //else
-    //{
-        //for (size_t i = 0; i < m; ++i)
-            //labels.at(i).label = from.labels.at(i).label;
-    //}
+}
+
+bool rna_pair_label::inited_points() const
+{
+    for (const auto& val : labels)
+        if (val.point.bad())
+            return true;
+    return false;
+}
+
+Point rna_pair_label::get_centre() const
+{
+    if (is_paired())
+        return centre(labels.at(0).point, labels.at(1).point);
+    else
+        return labels.at(0).point;
 }
 
 
 
 
-std::string rna_label::point_to_string() const
+// RNA_LABEL:
+std::string rna_label::to_string() const
 {
-    if (point.x == 0xBADF00D && point.y == 0xBADF00D)
-    {
-        WARN("BAD_POINT");
-        abort();
-    }
     std::stringstream out;
-    out << point.x << " " << point.y;
+    out 
+        << label
+        << ": "
+        << point;
     return out.str();
 }
 
@@ -204,7 +214,6 @@ bool rna_label::operator==(const rna_label& other) const
 {
     return label == other.label;
 }
-
 
 
 

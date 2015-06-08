@@ -25,36 +25,78 @@
 #include "types.hpp"
 #include "rna_tree.hpp"
 #include <fstream>
+#include "point.hpp"
+
+enum RGB
+{
+    red,
+    green,
+    blue,
+    black,
+    gray,
+
+    other,
+};
 
 class ps
 {
 public:
-    typedef rna_tree::pre_post_order_iterator pre_post_it;
+    typedef rna_tree::pre_post_order_iterator   pre_post_it;
+    typedef std::fstream::streampos             streampos;
+
+private:
+    ps(const std::string& filename);
 
 public:
     ps& operator=(ps&& other);
     ps() = default;
 
-    static ps&& init(const std::string& _filename);
-    void print_to_ps(const std::string& line);
+    static ps&& init(
+                const std::string& _filename);
+
+    void seek(
+                streampos pos);
+    streampos get_pos();
+
+    // returns position in stream before appending line...
+    streampos print_to_ps(
+                const std::string& line);
+    streampos print_pair(
+                rna_tree::iterator it);
+    streampos save(
+                const rna_tree& rna);
 
     // vv budu vracat len stringy na vypisanie..
-    static std::string print(const rna_label& label);
-    static std::string print(RGB rgb);
-    static std::string print_normal(const pre_post_it& iter, bool colored = false);
-    static std::string print_colored(const pre_post_it& iter, RGB rgb);
-    static std::string print_edge(const pre_post_it& iter);
-    static std::string format_string(const pre_post_it& iter);
+    static std::string print(
+                const rna_label& label);
+    static std::string print(
+                RGB rgb);
+    static std::string print_normal(
+                const pre_post_it& iter,
+                bool colored = false);
+    static std::string print_colored(
+                const pre_post_it& iter,
+                RGB rgb);
+    static std::string print_edge(
+                const pre_post_it& iter);
+    static std::string format_string(
+                const pre_post_it& iter);
+    static std::string print_line(
+                Point p1,
+                Point p2);
     // ^^ 
 
 private:
-    ps(const std::string& filename);
+    void set_io_flags();
 
 private:
     std::string filename;
-    std::ofstream out;
+    std::fstream out;
 };
 
+void print_pair(rna_tree::iterator it);
+
+extern ps psout;
 
 #endif /* !PS_HPP */
 

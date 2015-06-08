@@ -54,6 +54,10 @@ private:
     void update(
                 document& doc,
                 const mapping& map);
+
+    void make_compact(
+                rna_tree& rna);
+
     void mark_removed(
                 post_it it);
     void mark_inserted(
@@ -62,37 +66,11 @@ private:
                 post_it from,
                 post_it to);
 
-/*
-    void modify(
-                rna_tree& rna,
-                const rna_tree& template_rna,
-                const mapping& map);
-    void erase(
-                rna_tree& rna);
-    void remove(
-                rna_tree& rna,
-                const indexes& to_remove);
-    void insert(
-                rna_tree& rna,
-                rna_tree& temp,
-                const indexes& to_insert);
-*/
-
-    void save_doc(
-                const document& doc);
-
-    void make_compact(
-                rna_tree& rna);
-
-
-    void print_default(const rna_tree& tree);
-    void print_pair(const rna_tree::iterator it);
-/*
-    void print_deleted(const rna_tree& rna);
-    void print_other(const rna_tree& rna);
-    void print_inserted(const rna_tree& rna);
-*/
-    size_t contains(const rna_tree& rna, rna_pair_label::label_status status);
+    void print_default(
+                const rna_tree& tree);
+    size_t contains(
+                const rna_tree& rna,
+                rna_pair_label::label_status status);
 };
 
 

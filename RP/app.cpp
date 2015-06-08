@@ -27,12 +27,12 @@
 #include "types.hpp"
 #include "macros.hpp"
 #include "ps.hpp"
+#include "compact_maker.hpp"
 
 
 using namespace std;
 
 
-ps psout;
 
 
 void app::run_app()
@@ -52,6 +52,7 @@ void app::run_app()
         }
     }
 }
+
 void app::run_between(
                 const std::string& first,
                 const std::string& second)
@@ -64,45 +65,17 @@ void app::run_between(
     string labels2      = read_file(SEQ(second));
     string brackets2    = read_file(FOLD(second));
 
-    auto map = read_mapping_file(MAP(first, second));
+    string fileIn       = PS_IN(first);
+    string fileOut      = PS_OUT(first, second);
+
+    psout = ps::init(fileOut);
+
+    auto map = mapping::read_mapping_file(MAP(first, second));
 
     rna_tree rna1(brackets1, labels1, first);
     rna_tree rna2(brackets2, labels2, second);
 
-    transform(rna1, rna2, map, PS_IN(first), PS_OUT(first, second));
-}
-
-
-
-
-void posun_vrcholy(rna_tree::iterator it, Point vector)
-{
-    //cout << "posunutie o " << vector << endl;
-
-    auto label = it->get_label();
-    for (size_t i = 0; i < label.labels.size(); ++i)
-    {
-        label.labels.at(i).point = label.labels.at(i).point + vector;
-    }
-    it->set_label(label);
-
-    // prejdi vsetky deti, a tie posun tiez.
-    for (rna_tree::sibling_iterator sib = it.begin(); sib != it.end(); ++sib)
-        posun_vrcholy(sib, vector);
-}
-
-
-void app::save_doc(const document& doc)
-{
-    APP_DEBUG_FNAME;
-
-    auto& r = doc.rna_out;
-    
-    for (auto it = ++r.begin_pre_post();
-            ++pre_post_it(it) != r.end_pre_post(); ++it)
-    {
-        psout.print_to_ps(ps::format_string(it));
-    }
+    transform(rna1, rna2, map, fileIn, fileOut);
 }
 
 void app::print_default(const rna_tree& rna)
@@ -118,22 +91,6 @@ void app::print_default(const rna_tree& rna)
     psout.print_to_ps(ps::print(black));
 }
 
-void app::print_pair(rna_tree::iterator it)
-{
-    string out;
-    if (it->get_label().is_paired())
-    {
-        rna_tree::pre_post_order_iterator it1(it, true);
-        rna_tree::pre_post_order_iterator it2(it, false);
-
-        out = ps::format_string(it1) + ps::format_string(it2);
-    }
-    else
-        out = ps::format_string(it);
-
-    psout.print_to_ps(out);
-}
-
 size_t app::contains(const rna_tree& rna, rna_pair_label::label_status status)
 {
     return count_if(rna.begin(), rna.end(),
@@ -141,6 +98,38 @@ size_t app::contains(const rna_tree& rna, rna_pair_label::label_status status)
 }
 
 
+void app::mark_removed(
+                post_it it)
+{
+    //APP_DEBUG_FNAME;
+
+    it->get_label().status = rna_pair_label::deleted;
+}
+void app::mark_inserted(
+                post_it it)
+{
+    //APP_DEBUG_FNAME;
+
+    it->get_label().status = rna_pair_label::inserted;
+}
+void app::mark_modifyied(
+                post_it from,
+                post_it to)
+{
+    //APP_DEBUG_FNAME;
+
+    auto& label = to->get_label();
+    const auto& flabel = from->get_label();
+
+    label.set_points_exact(flabel);
+
+    if (label.is_paired() != flabel.is_paired())
+        label.status = rna_pair_label::pair_changed;
+    else if (label == flabel)
+        label.status = rna_pair_label::touched;
+    else
+        label.status = rna_pair_label::edited;
+}
 
 
 
@@ -180,9 +169,11 @@ void app::update(
 
     struct
     {
-        size_t inserted, removed, modified;
+        size_t inserted, deleted, modified;
     } stats = {0, 0, 0};
     
+#define print_pair(x)   // vyskrtne funkciu ak je definovane..
+
     {   // update rna output points from rna template.. (going preorder)
         rna_tree::iterator it1, it2;
         it1 = doc.template_rna.begin();
@@ -195,7 +186,7 @@ void app::update(
                 print_pair(it1);
 
                 ++it1;
-                ++stats.removed;
+                ++stats.deleted;
                 continue;
             }
             if (it2->get_label().status == rna_pair_label::inserted)
@@ -217,15 +208,14 @@ void app::update(
         }
         assert (it1 == doc.template_rna.end() && it2 == doc.rna_out.end());
     }
+#undef print_pair
     DEBUG("stats: ins %lu, del %lu, mod %lu",
-            stats.inserted, stats.removed, stats.modified);
+            stats.inserted, stats.deleted, stats.modified);
     assert(stats.inserted == to_ins.size()
-            && stats.removed == to_rem.size());
+            && stats.deleted == to_rem.size());
     assert(doc.template_rna.size() + stats.inserted ==
-            doc.rna_out.size() + stats.removed);
+            doc.rna_out.size() + stats.deleted);
 }
-
-
 
 void app::transform(
                 const rna_tree& rna1,
@@ -235,6 +225,9 @@ void app::transform(
                 const std::string& fileOut)
 {
     APP_DEBUG_FNAME;
+
+    typedef mapping::mapping_pair mapping_pair;
+
     DEBUG("in: %s, out: %s", fileIn.c_str(), fileOut.c_str());
     assert(is_sorted(map.map.begin(), map.map.end(),
                 [](mapping_pair m1, mapping_pair m2) { return m1.from < m2.from; }));
@@ -244,207 +237,24 @@ void app::transform(
     doc.rna_out = rna2;
     doc.update_rna_points();
 
-    psout = ps::init(fileOut);
     psout.print_to_ps(doc.prolog);
+
+    //print_default(doc.template_rna);
 
     update(doc, map);
 
-/*
-    modify(doc.rna, rna2, map);
-    remove(doc.rna, map.get_to_remove());
+    compact c(doc.rna_out);
+    c.make_compact();
 
-    wait_for_input();
-
-    print_deleted(doc.rna);
-    print_other(doc.rna);
-
-    rna_tree other = rna2;
-    insert(doc.rna, other, map.get_to_insert());
-    assert(!contains(doc.rna, rna_pair_label::untouched));
-    print_inserted(doc.rna);
-*/
     DEBUG("document %s was saved", fileOut.c_str());
 }
 
 
 
-#ifdef NODEF
-void app::make_compact(
-                rna_tree& rna)
-{
-    typedef rna_tree::iterator iterator;
-
-    APP_DEBUG_FNAME;
-
-    auto vyrataj_posunutie = [&](iterator par, iterator it)
-    {
-        if (par.number_of_children() == 1)
-            return stred(par) - stred(it);
-        else
-        {
-            Point it_str = stred(it);
-            Point other_str;
-            if(!rna_tree::is_first_child(it) && !rna_tree::is_last_child(it))
-            {
-                Point p1, p2;
-                auto sib1 = --rna_tree::sibling_iterator(it);
-                auto sib2 = ++rna_tree::sibling_iterator(it);
-                cout << *sib1 << " " << *sib2 << endl;
-                p1 = stred(sib1);
-                p2 = stred(sib2);
-
-                other_str = stred(p1, p2);
-            }
-            else
-            {
-                DEBUG("else");
-                other_str = stred(par);
-            }
-
-            return other_str - it_str;
-        }
-    };
-
-    //rna_tree::post_order_iterator it = rna.begin_post();
-    rna_tree::iterator it, end;
-    it = rna.begin();
-    end = rna.end();
-
-    for (; it != end; ++it)
-    {
-        if (it->get_label().status != rna_pair_label::deleted)
-        {
-            //psout.print_to_ps(ps::format_string(rna_tree::pre_post_order_iterator(it, false)));
-            //psout.print_to_ps(ps::format_string(it));
-            continue;
-        }
-
-        Point p = stred(it);
-        if (it->get_label().is_paired())
-        {
-            DEBUG("deleting node %s", label_str(*it));
-            Point posun = vyrataj_posunutie(rna_tree::parent(it), it);
-            //wait_for_input();
-            posun_vrcholy(it, posun);
-            it = --rna.erase(it);
-            //wait_for_input();
-        }
-        else
-            it = --rna.erase(it);
-
-        bool printx = false;
-        printx = true;
-        if (printx)
-        {
-            stringstream str;
-            str 
-                << ps::print(red)
-                << endl
-                << "(x) "
-                << p
-                << " lwstring"
-                << endl
-                << ps::print(black)
-                << endl;
-            psout.print_to_ps(str.str());
-        }
-
-    }
-
-    rna.print_tree();
-    //wait_for_input();
-
-
-    INFO("exit compact funct");
-    //abort();
-}
-#endif
-
-void app::mark_removed(
-                post_it it)
-{
-    APP_DEBUG_FNAME;
-
-    auto label = it->get_label();
-    label.status = rna_pair_label::deleted;
-    it->set_label(label);
-}
-void app::mark_inserted(
-                post_it it)
-{
-    APP_DEBUG_FNAME;
-
-    auto label = it->get_label();
-    label.status = rna_pair_label::inserted;
-    it->set_label(label);
-}
-void app::mark_modifyied(
-                post_it from,
-                post_it to)
-{
-    APP_DEBUG_FNAME;
-
-    auto label = to->get_label();
-    auto flabel = from->get_label();
-
-    label.set_points_exact(flabel);
-
-    if (label.is_paired() != flabel.is_paired())
-        label.status = rna_pair_label::pair_changed;
-    else if (label == flabel)
-        label.status = rna_pair_label::touched;
-    else
-        label.status = rna_pair_label::edited;
-
-    to->set_label(label);
-}
 
 
 
 
-
-
-/*
-void app::print_deleted(const rna_tree& rna)
-{
-    APP_DEBUG_FNAME;
-
-    for (auto it = ++rna.begin_pre_post();
-            ++pre_post_it(it) != rna.end_pre_post(); ++it)
-    {
-        if (it->get_label().status == rna_pair_label::deleted)
-            psout.print_to_ps(ps::format_string(it));
-    }
-}
-
-void app::print_other(const rna_tree& rna)
-{
-    APP_DEBUG_FNAME;
-
-    for (auto it = ++rna.begin_pre_post();
-            ++pre_post_it(it) != rna.end_pre_post(); ++it)
-    {
-        if (it->get_label().status != rna_pair_label::deleted &&
-                it->get_label().status != rna_pair_label::inserted)
-            psout.print_to_ps(ps::format_string(it));
-    }
-}
-
-void app::print_inserted(const rna_tree& rna)
-{
-    APP_DEBUG_FNAME;
-
-    for (auto it = ++rna.begin_pre_post();
-            ++pre_post_it(it) != rna.end_pre_post(); ++it)
-    {
-        if (it->get_label().status == rna_pair_label::inserted)
-        {
-            psout.print_to_ps(ps::format_string(it));
-            //rna.print_subtree(rna.parent(it));
-        }
-    }
-}
-*/
 
 
 

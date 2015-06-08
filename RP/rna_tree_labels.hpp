@@ -23,34 +23,59 @@
 #define RNA_TREE_LABELS_HPP
 
 #include "types.hpp"
+#include "point.hpp"
 
-#define label_str(node) (node).get_label().to_string().c_str()
+
+#define label_str(node) \
+    (node).get_label().to_string().c_str()
 
 struct rna_label
 {
-#define BAD_POINT     Point({0xBADF00D, 0xBADF00D})
-    Point point = BAD_POINT;
-    std::string label;
-
-    std::string point_to_string() const;
     bool operator==(const rna_label& other) const;
+
+    std::string to_string() const;
+
+    Point point = Point::bad_point();
+    std::string label;
 };
+
+
 
 class rna_pair_label
 {
 public:
-    bool operator==(const rna_pair_label& other) const;
-    rna_pair_label operator+(const rna_pair_label& other) const;
-    friend std::ostream& operator<<(std::ostream& out, const rna_pair_label& label);
+    rna_pair_label() = default;
+    rna_pair_label(
+                const std::string& s);
+
+    bool operator==(
+                const rna_pair_label& other) const;
+    rna_pair_label operator+(
+                const rna_pair_label& other) const;
+    friend std::ostream& operator<<(
+                std::ostream& out,
+                const rna_pair_label& label);
+
+    void set_label_strings(
+                const rna_pair_label& from);
+
+    void set_points_nearby(
+                const rna_pair_label& from);
+    void set_points_exact(
+                const rna_pair_label& from);
+    void set_points_nearby(
+                Point p,
+                size_t which);
+    void set_points_exact(
+                Point p,
+                size_t which);
+
+    Point get_centre() const;
+
     std::string to_string() const;
     std::string get_points_string() const;
-    void set_label_strings(const rna_pair_label& from);
-    void set_points_nearby(const rna_pair_label& from);
-    void set_points_exact(const rna_pair_label& from);
     bool is_paired() const;
-
-    rna_pair_label(const std::string& s);
-    rna_pair_label() = default;
+    bool inited_points() const;
 
 public:
     enum label_status
@@ -60,6 +85,7 @@ public:
         edited,
         deleted,
         inserted,
+        reinserted,
         pair_changed
 
     } status = untouched;

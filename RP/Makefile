@@ -80,7 +80,7 @@ MK_DIRECTORIES		= $(LOGDIR) $(FILESDIR) $(FILESDIR)/mappings $(FILESDIR)/rted
 mk_dirs:
 	@mkdir -p $(MK_DIRECTORIES)
 
-$(FILESDIR)/generated:
+$(FILESDIR)/generated: build
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
 	@echo "**********************************************************************"

@@ -24,41 +24,13 @@
 using namespace std;
 
 
-// POINT functions
-//
-std::ostream& operator<< (std::ostream& out, Point p)
-{
-    out << p.x << " " << p.y;
-    return out;
-}
-Point Point::operator+(Point other) const
-{
-    return Point({x + other.x, y + other.y});
-}
-Point Point::operator-(Point other) const
-{
-    return Point({x - other.x, y - other.y});
-}
-Point Point::operator/(size_t val) const
-{
-    return Point({x / val, y / val});
-}
-Point Point::swap() const
-{
-    return Point({y, x});
-}
-Point stred(Point p1, Point p2)
-{
-    return (p1 + p2) / 2;
-}
 
 
 
 
 
 
-
-
+#include <log4cpp/Category.hh>
 #include <log4cpp/Appender.hh>
 #include <log4cpp/FileAppender.hh>
 #include <log4cpp/OstreamAppender.hh>

@@ -23,25 +23,37 @@
 #define UTIL_HPP
 
 #include "rna_tree.hpp"
+#include "types.hpp"
 
 
 
-struct mapping_pair
-{
-    size_t from, to;
-};
 
 class mapping
 {
 public:
     typedef std::vector<size_t> indexes;
+    struct mapping_pair
+    {
+        size_t from, to;
+    };
+
 private:
-    static void run_rted(const rna_tree& rna1, const rna_tree& rna2, const std::string& filename);
+    static void run_rted(
+                const rna_tree& rna1,
+                const rna_tree& rna2,
+                const std::string& filename);
+
 public:
-    static mapping compute_mapping(const rna_tree& rna1, const rna_tree& rna2);
+    static mapping compute_mapping(
+                const rna_tree& rna1,
+                const rna_tree& rna2);
+    static mapping read_mapping_file(
+                const std::string& filename);
+
     indexes get_to_insert() const;
     indexes get_to_remove() const;
 
+public:
     size_t distance;
     std::vector<mapping_pair> map;
 };
@@ -60,22 +72,27 @@ struct document
 
 
 
-document read_ps(const std::string& file);
+// other functions:
+//
+document read_ps(
+                const std::string& file);
 
-std::string convert_to_java_format(const rna_tree& rna);
+std::string convert_to_java_format(
+                const rna_tree& rna);
 
-std::string run_RNAfold(const std::string& labels);
+std::string run_RNAfold(
+                const std::string& labels);
 
 
-bool exist_file(const std::string& filename);
+bool exist_file(
+                const std::string& filename);
 
-std::string read_file(const std::string& filename);
+std::string read_file(
+                const std::string& filename);
 
-mapping read_mapping_file(const std::string& filename);
+bool is_base_line(
+                const std::string& line);
 
-bool is_base_line(const std::string& line);
-
-Point stred(rna_tree::iterator iter);
 
 #endif /* !UTIL_HPP */
 

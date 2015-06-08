@@ -27,12 +27,12 @@
 #include "util.hpp"
 #include "app.hpp"
 #include "generator.hpp"
-#include "svg.hpp"
+
+#include "point.hpp"
 
 
 
 using namespace std;
-
 
 
 int main(int argc, char** argv)
@@ -46,7 +46,17 @@ int main(int argc, char** argv)
         exit(0);
     }
 
+
+    app a;
+    a.run_between("human", "frog");
+    //a.run_app();
+
+
+    return 0;
+}
+
 /*
+[>
     string l1, l2, b1, b2;
     rna_tree rna1, rna2;
     string ps_in, ps_out;
@@ -100,7 +110,7 @@ int main(int argc, char** argv)
 
 
     return 0;
-*/
+<]
 
     //rna_tree rna1(
             //"((.(.(.).)).(.(.)))",
@@ -113,20 +123,7 @@ int main(int argc, char** argv)
     //rna1.print_tree();
     //abort();
 
-    //std::multiplies<size_t> m;
-    //cout << m(1, 5) << endl;
-    //abort();
-
-
-
-    app a;
-    a.run_between("human", "frog");
-    //a.run_app();
-
-
-    return 0;
-}
-
+*/
 
 /*
     string l1, l2, b1, b2;
@@ -162,18 +159,3 @@ int main(int argc, char** argv)
 */
 
 
-
-string readseq()
-{
-    ifstream input("../InFiles/seq");
-    string s;
-    input >> s;
-    return s;
-}
-string readbrackets()
-{
-    ifstream input("../InFiles/zatvorky");
-    string s;
-    input >> s;
-    return s;
-}

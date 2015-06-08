@@ -50,7 +50,8 @@ document read_ps(
         {
             return str.find(what) == str.size() - what.size();
         };
-        auto vec = {
+
+        auto endings = {
             "lwline",
             "lwfarc",
             "lwarc",
@@ -60,8 +61,15 @@ document read_ps(
             "setlinewidth",
             "setlinecap",
         };
-        for (auto val : vec)
+        auto lines = {
+            "newpath",
+            "stroke",
+        };
+        for (auto val : endings)
             if (ends_with(line, val))
+                return true;
+        for (auto val : lines)
+            if (line == val)
                 return true;
         return false;
     };
@@ -190,51 +198,6 @@ std::string convert_to_java_format(
 }
 
 
-
-
-// do not use:
-std::string run_RNAfold(
-                const std::string& labels)
-{
-    APP_DEBUG_FNAME;
-
-    logger.error("do not use!");
-    abort();
-
-    string out;
-    string command;
-    string filename;
-
-    filename = "build/rna_fold_out" + to_string(labels.size());
-
-#define RNAFOLD_PATH    "/afs/ms.mff.cuni.cz/u/e/eliasr/Projects/RocnikovyProjekt/RNAPlot/bin/RNAfold"
-
-    command = "echo '" +
-        labels +
-        "' | " RNAFOLD_PATH " --noPS > " +
-        filename;
-
-    logger.debugStream() << "RUN COMMAND: " << command;
-
-    system(command.c_str());
-
-    ifstream in(filename);
-    getline(in, out);
-
-    in >> out;
-
-    if (in.fail())
-    {
-        logger.error("fold_rna input failed");
-        abort();
-    }
-    
-    return out;
-}
-
-
-
-
 bool exist_file(
                 const std::string& filename)
 {
@@ -256,33 +219,10 @@ std::string read_file(
 
 
 
-mapping read_mapping_file(
-                const std::string& filename)
-{
-    APP_DEBUG_FNAME;
-
-    ifstream in(filename);
-    mapping map;
-    mapping_pair m;
-
-    string distance;
-    getline(in, distance);
-    map.distance = atoi(distance.c_str());
-
-    while(true)
-    {
-        in >> m.from >> m.to;
-        if (in.fail())
-            break;
-        map.map.push_back(m);
-    }
-    return map;
-}
-
 bool is_base_line(
                 const std::string& line)
 {
-    static vector<char> bases = {'A', 'C', 'G', 'U'};
+    const static vector<char> bases = {'A', 'C', 'G', 'U'};
     Point p;
     string other;
     stringstream str(line);
@@ -305,19 +245,32 @@ bool is_base_line(
          );
 }
 
-Point stred(rna_tree::iterator iter)
-{
-    auto label = iter->get_label();
-    if (!label.is_paired())
-        return label.labels.at(0).point;
-    else
-        return stred(label.labels.at(0).point,
-                    label.labels.at(1).point);
-}
-
 
 
 // MAPPING:
+
+/* static */ mapping mapping::read_mapping_file(
+                const std::string& filename)
+{
+    APP_DEBUG_FNAME;
+
+    ifstream in(filename);
+    mapping map;
+    mapping::mapping_pair m;
+
+    string distance;
+    getline(in, distance);
+    map.distance = stoi(distance);
+
+    while(true)
+    {
+        in >> m.from >> m.to;
+        if (in.fail())
+            break;
+        map.map.push_back(m);
+    }
+    return map;
+}
 
 /* static */ mapping mapping::compute_mapping(
                 const rna_tree& rna1,
@@ -340,7 +293,7 @@ Point stred(rna_tree::iterator iter)
     getline(in, distance);
     assert(!in.fail());
 
-    out_mapping.distance = atoi(distance.c_str());
+    out_mapping.distance = stoi(distance);
     while(true)
     {
         getline(in, line);
@@ -351,6 +304,7 @@ Point stred(rna_tree::iterator iter)
         {
             WARN("pattern '->' not found in line '%s'",
                     line.c_str());
+            wait_for_input();
             continue;
         }
 
@@ -427,6 +381,7 @@ mapping::indexes mapping::get_to_insert() const
 
     return vec;
 }
+
 mapping::indexes mapping::get_to_remove() const
 {
     APP_DEBUG_FNAME;
@@ -438,7 +393,7 @@ mapping::indexes mapping::get_to_remove() const
             vec.push_back(m.from);
     }
     sort(vec.begin(), vec.end(), less<size_t>());
-    LOGGER_PRINT_CONTAINER(vec, "to_insert");
+    LOGGER_PRINT_CONTAINER(vec, "to_remove");
 
     return vec;
 }
@@ -449,30 +404,29 @@ mapping::indexes mapping::get_to_remove() const
 
 void document::update_rna_points()
 {
-    // TODO: prerobit funkciu.. zbytocne ++.. 
     APP_DEBUG_FNAME;
 
     typedef rna_tree::pre_post_order_iterator pre_post_it;
 
     rna_tree& r = template_rna;
+    pre_post_it next = ++r.begin_pre_post();
+    pre_post_it it;
 
     // test ci ma rovnako labelov/pointov/baz
     size_t i = 0;
-    for (pre_post_it it = ++r.begin_pre_post(); ++pre_post_it(it) != r.end_pre_post(); ++it)
-        ++i;
+    for (it = next++; next != r.end_pre_post(); it = next++, ++i)
+        ;
     assert(i == labels.size() && i == points.size());
 
     i = 0;
-    for (pre_post_it it = ++r.begin_pre_post(); ++pre_post_it(it) != r.end_pre_post(); ++it, ++i)
+    next = ++r.begin_pre_post();
+    for (it = next++; next != r.end_pre_post(); it = next++, ++i)
     {
-        auto label = it->get_label();
+        rna_pair_label& label = it->get_label();
         size_t index = get_label_index(it);
 
         Point p = points.at(i);
-        //p = p + Point({1000, 1000});
         label.labels.at(index).point = p;
-
-        it->set_label(label);
     }
 }
 
@@ -482,4 +436,50 @@ void document::update_rna_points()
 
 
 
+
+#ifdef NODEF
+// do not use:
+std::string run_RNAfold(
+                const std::string& labels)
+{
+    APP_DEBUG_FNAME;
+
+    ERR("do not use!");
+    abort();
+
+    string out;
+    string command;
+    string filename;
+
+    filename = "build/rna_fold_out" + to_string(labels.size());
+
+#define RNAFOLD_PATH    "RNAfold"
+
+    command = "echo '" +
+        labels +
+        "' | " RNAFOLD_PATH " --noPS > " +
+        filename;
+
+    logger.debugStream() << "RUN COMMAND: " << command;
+
+    if (system(command.c_str()) != 0)
+    {
+        ERR("RNAfold command failed");
+        abort();
+    }
+
+    ifstream in(filename);
+    getline(in, out);
+
+    in >> out;
+
+    if (in.fail())
+    {
+        ERR("fold_rna input failed");
+        abort();
+    }
+    
+    return out;
+}
+#endif
 
