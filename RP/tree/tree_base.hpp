@@ -25,16 +25,26 @@
 
 #include "../types.hpp"
 #include "tree_hh/tree.hh"
-//#include "tree_hh/tree_util.hh"
-#include <memory>
-#include <sstream>
+
+//#include "tree_base_utils.hpp" // include in the end of file...
 
 
+// global functions:
 template <typename iterator>
 inline const char* label(iterator it);
 
 template <typename iterator>
 inline size_t id(iterator it);
+
+template <typename iter>
+inline iter move_it_plus(iter it, size_t count);
+
+template <typename iter>
+inline iter move_it_minus(iter it, size_t count);
+
+template <typename iter, typename funct>
+inline bool has_child(iter it);
+
 
 
 template <typename node_type>
@@ -78,6 +88,7 @@ public:
 
 public:
     // .begin() a .end() funkcie z tree<>
+    // POZOR: iteratory mozu dalej menit obsah stromu.. 
     inline iterator begin() const;
     inline iterator end() const;
     inline post_order_iterator begin_post() const;
@@ -119,7 +130,7 @@ public: /* STATIC functions: */
     static bool is_last_child(const base_iterator& it);
     /** has no children */
     static bool is_leaf(const base_iterator& it);
-    /** parent has no other children */
+    /** has no siblings */
     static bool is_only_child(const base_iterator& it);
 
 private:
@@ -272,7 +283,7 @@ std::string tree_base<node_type>::print_subtree(iterator root)
         };
 
     print_recursive(root, stream);
-    //logger.debugStream() << stream.str();
+    logger.debugStream() << stream.str();
     return stream.str();
 }
 
@@ -284,35 +295,7 @@ std::string tree_base<node_type>::print_tree() const
 
 
 
-
-// GLOBAL FUNCTIONS:
-
-/* global function */
-template <typename iterator>
-const char* label(iterator it)
-{
-    if (it.node == NULL)
-        return "<null>";
-    // TODO: zmenit to, vraciam pointer do mazaneho objektu
-    std::stringstream out;
-    out << (*it);
-    return out.str().c_str();
-}
-
-/* global function */
-template <typename iterator>
-size_t id(iterator it)
-{
-    if (it.node == NULL)
-        throw std::invalid_argument("id(): NULL iterator");
-    return it->get_id();
-}
-
-
-
-
-
-#include "tree_base_utils.hpp"
+#include "tree_base_utils.hpp"  // iterators_functions + global functions
 
 #endif /* !TREE_BASE_HPP */
 

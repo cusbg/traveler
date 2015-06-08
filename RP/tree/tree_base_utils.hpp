@@ -70,6 +70,65 @@ private:
 
 
 
+
+// GLOBAL FUNCTIONS:
+
+/* global function */
+template <typename iterator>
+const char* label(iterator it)
+{
+    if (it.node == NULL)
+        return "<null>";
+    // TODO: zmenit to, vraciam pointer do mazaneho objektu
+    std::stringstream out;
+    out << (*it);
+    return out.str().c_str();
+}
+
+/* global function */
+template <typename iterator>
+size_t id(iterator it)
+{
+    if (it.node == NULL)
+        throw std::invalid_argument("id(): NULL iterator");
+    return it->get_id();
+}
+
+
+/* global function */
+template <typename iter>
+iter move_it_plus(iter it, size_t count)
+{
+    while(count--)
+        ++it;
+    return it;
+}
+
+/* global function */
+template <typename iter>
+iter move_it_minus(iter it, size_t count)
+{
+    while(count--)
+        --it;
+    return it;
+}
+
+
+template <typename iter, typename funct>
+inline bool has_child(iter it)
+{
+    auto sib = it.begin();
+    while (sib != it.end())
+    {
+        if (funct(sib))
+            return true;
+        ++sib;
+    }
+    return false;
+}
+
+
+
 // ITERATORS:
 
 

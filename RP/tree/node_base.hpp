@@ -45,7 +45,9 @@ public:
     node_base(const label_type& _label, bool _isroot = false);
 public:
     inline size_t get_id() const;
+    // TODO aj nekonstantnu referenciu urobit..
     inline const label_type& get_label() const;
+    inline label_type& get_label();
 
     inline void set_label(const label_type& _label);
     inline void reset_id();
@@ -78,6 +80,12 @@ size_t node_base<label_type>::get_id() const
 
 template <typename label_type>
 const label_type& node_base<label_type>::get_label() const
+{
+    return label;
+}
+
+template <typename label_type>
+label_type& node_base<label_type>::get_label()
 {
     return label;
 }
