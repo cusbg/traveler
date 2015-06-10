@@ -21,12 +21,26 @@
 
 
 #include <iomanip>
+#include <cmath>
+
 #include "point.hpp"
 #include "types.hpp"
 
 using namespace std;
 
 #define BAD_POINT     Point({0xBADF00D, 0xBADF00D})
+
+
+Point::Point()
+{
+    *this = BAD_POINT;
+}
+
+Point::Point(std::initializer_list<double> l)
+{
+    x = *l.begin();
+    y = *(l.begin() + 1);
+}
 
 
 Point Point::operator+(Point other) const
@@ -61,8 +75,10 @@ std::ostream& operator<< (std::ostream& out, Point p)
         out << "0xBADF00D 0xBADF00D";
     else
         out 
+            << std::fixed
             << std::setprecision(2)
             << p.x
+            << " "
             << std::setprecision(2)
             << p.y;
 
@@ -117,6 +133,12 @@ Point normalize(Point p)
 
 double angle(Point p)
 {
-    return atan(degrees_to_radians(p.y / p.x));
+    // pre 3., 4. kvadrant vracia zaporne cisla.. takto sa to vyriesi..
+    double out = fmod(radians_to_degrees(atan2(p.y, p.x)) + 360, 360);
+
+    DEBUG("angle(%s)=\t%f", p.to_string().c_str(), out);
+    assert(isnormal(out) || out == 0);
+
+    return out;
 }
 

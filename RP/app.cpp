@@ -243,8 +243,13 @@ void app::transform(
 
     update(doc, map);
 
+
     compact c(doc.rna_out);
     c.make_compact();
+
+    return;
+    //compact c(doc.rna_out);
+    //c.make_compact();
 
     DEBUG("document %s was saved", fileOut.c_str());
 }

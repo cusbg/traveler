@@ -43,7 +43,7 @@ template <typename iter>
 inline iter move_it_minus(iter it, size_t count);
 
 template <typename iter, typename funct>
-inline bool has_child(iter it);
+inline size_t count_if(iter it, funct f);
 
 
 

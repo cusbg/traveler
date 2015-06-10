@@ -115,16 +115,17 @@ iter move_it_minus(iter it, size_t count)
 
 
 template <typename iter, typename funct>
-inline bool has_child(iter it)
+size_t count_if(iter it, funct f)
 {
+    size_t count = 0;
     auto sib = it.begin();
     while (sib != it.end())
     {
-        if (funct(sib))
-            return true;
+        if (f(sib))
+            ++count;
         ++sib;
     }
-    return false;
+    return count;
 }
 
 

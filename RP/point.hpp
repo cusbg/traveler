@@ -29,6 +29,9 @@ struct Point
 {
     double x, y;
 
+    Point();
+    Point(std::initializer_list<double>);
+
     friend std::ostream& operator<< (std::ostream& out, Point p);
     Point operator+(Point other) const;
     Point operator-(Point other) const;
@@ -44,7 +47,7 @@ struct Point
 
 Point centre(Point p1, Point p2);
 
-//double distance(Point p1, Point p2);
+double distance(Point p1, Point p2);
 
 double size(Point vector);
 

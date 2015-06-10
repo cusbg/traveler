@@ -29,23 +29,59 @@
 #include "generator.hpp"
 
 #include "point.hpp"
-
+#include "compact_maker.hpp"
 
 
 using namespace std;
 
+void tests()
+{
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    vector<Point> vecp = {
+        {100,   0},
+        {0,     100},
+
+        {100,   100},
+        {-100,  100},
+        {-100,  -100},
+        {100,   -100},
+    };
+    vector<double> vecv = {
+        0,
+        90,
+
+        45,
+        135,
+        225,
+        315,
+    };
+    assert(vecp.size() == vecv.size());
+
+    for (size_t i = 0; i < vecp.size(); ++i)
+    {
+        double x = angle(vecp[i]);
+        double y = vecv[i];
+        if (!double_equals(x, y))
+        {
+            ERR("not equal in %s: %f != %f",
+                    vecp[i].to_string().c_str(), x, y);
+        }
+    }
+}
 
 int main(int argc, char** argv)
 {
     cout << boolalpha;
     srand(1);
 
+    tests();
+
     if (argc == 2)
     {
         generator::generate_files();
         exit(0);
     }
-
 
     app a;
     a.run_between("human", "frog");
