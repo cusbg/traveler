@@ -108,7 +108,7 @@ void ps::set_io_flags()
         case rna_pair_label::inserted:
         case rna_pair_label::reinserted:
             out = print_colored(it, INSERT_COLOR);
-            wait_for_input();
+            //wait_for_input();
             break;
 
         case rna_pair_label::untouched:
@@ -132,22 +132,29 @@ void ps::set_io_flags()
 };
 
 /* static */ std::string ps::print(
-                const rna_label& label)
+                const Point p,
+                const std::string& text)
 {
     stringstream out;
     out
         << std::left
         << std::setw(PS_COLUMNS_WIDTH)
-        << ("(" + label.label + ")")
+        << ("(" + text + ")")
         << std::setw(PS_COLUMNS_WIDTH)
-        << label.point.x
+        << p.x
         << std::setw(PS_COLUMNS_WIDTH)
-        << label.point.y
+        << p.y
         << std::setw(PS_COLUMNS_WIDTH)
         << "lwstring"
         << endl;
 
     return out.str();
+}
+
+/* static */ std::string ps::print(
+                const rna_label& label)
+{
+    return print(label.point, label.label);
 }
 
 /* static */ std::string ps::print(
@@ -331,7 +338,6 @@ streampos ps::get_pos()
 
     return pos;
 }
-
 
 streampos ps::print_pair(rna_tree::iterator it)
 {

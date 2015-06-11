@@ -38,8 +38,10 @@ using namespace std::rel_ops;
 #define radians_to_degrees(x)   (x * 180 / M_PI)
 #define degrees_to_radians(x)   (x * M_PI / 180)
 
+#define double_equals_precision(val1, val2, precision) \
+    (abs(val1 - val2) < abs(precision))
 #define double_equals(val1, val2) \
-    (abs(val1 - val2) < abs(0.0001))
+    double_equals_precision(val1, val2, 0.0001)
 
 
 
@@ -59,6 +61,11 @@ template <typename T>
 inline T squared(T t)
 {
     return t * t;
+}
+
+inline std::string to_string(bool b)
+{
+    return b ? "true" : "false";
 }
 
 

@@ -142,3 +142,9 @@ double angle(Point p)
     return out;
 }
 
+double angle(Point p1, Point centre, Point p2)
+{
+    return fmod(angle(p2 - centre) - angle(p1 - centre) + 360, 360);
+}
+
+

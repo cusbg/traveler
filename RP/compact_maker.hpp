@@ -1,5 +1,5 @@
 /*
- * File: point.hpp
+ * File: compact_maker.hpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
@@ -19,45 +19,44 @@
  * USA.
  */
 
-#ifndef POINT_HPP
-#define POINT_HPP
+#ifndef COMPACT_MAKER_HPP
+#define COMPACT_MAKER_HPP
+
+#include "rna_tree.hpp"
+#include "point.hpp"
 
 
-#include <iostream>
 
-struct Point
+class compact
 {
-    double x, y;
+public: //TODO: remove
+    using iterator = rna_tree::iterator;
+    using sibling_iterator = rna_tree::sibling_iterator;
+    struct interval;
+    struct circle;
+public:
+    compact(const rna_tree& _rna) : rna(_rna) {}
+    void make_compact();
 
-    Point();
-    Point(std::initializer_list<double>);
+private:
+    void shift_nodes(iterator it, Point vector);
 
-    friend std::ostream& operator<< (std::ostream& out, Point p);
-    Point operator+(Point other) const;
-    Point operator-(Point other) const;
-    Point operator/(double value) const;
-    Point operator*(double value) const;
-    bool operator==(Point other) const;
+    void make_pairs();
+    void make_inserted();
 
-    Point swap_xy() const;
-    std::string to_string() const;
-    bool bad() const;
-    static Point bad_point();
+    circle make_circle(iterator i);
+
+
+    size_t bases_count(iterator it);
+
+
+    bool is_normalized_dist(iterator it);
+    void normalize_distance(iterator it);
+
+private:
+    rna_tree rna;
 };
 
-Point centre(Point p1, Point p2);
 
-double distance(Point p1, Point p2);
-
-double size(Point vector);
-
-Point normalize(Point p);
-
-double angle(Point p);
-
-double angle(Point p1, Point centre, Point p2);
-
-
-
-#endif /* !POINT_HPP */
+#endif /* !COMPACT_MAKER_HPP */
 

@@ -70,6 +70,9 @@ public:
     static std::string print(
                 const rna_label& label);
     static std::string print(
+                const Point p,
+                const std::string& text);
+    static std::string print(
                 RGB rgb);
     static std::string print_normal(
                 const pre_post_it& iter,
@@ -94,7 +97,6 @@ private:
     std::fstream out;
 };
 
-void print_pair(rna_tree::iterator it);
 
 extern ps psout;
 

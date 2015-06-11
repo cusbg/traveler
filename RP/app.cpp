@@ -182,7 +182,7 @@ void app::update(
         {
             if (it1->get_label().status == rna_pair_label::deleted)
             {
-                DEBUG("deleted");
+                //DEBUG("deleted");
                 print_pair(it1);
 
                 ++it1;
@@ -191,7 +191,7 @@ void app::update(
             }
             if (it2->get_label().status == rna_pair_label::inserted)
             {
-                DEBUG("inserted");
+                //DEBUG("inserted");
                 print_pair(it2);
 
                 ++it2;
