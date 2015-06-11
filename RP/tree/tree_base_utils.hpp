@@ -401,6 +401,7 @@ template <typename node_type>
 template <typename iter>
 iter tree_base<node_type>::parent(iter it)
 {
+    assert(it.node->parent != nullptr);
     return iter(it.node->parent);
 }
 
@@ -419,6 +420,7 @@ template <typename node_type>
 template <typename iter>
 iter tree_base<node_type>::first_child(const iter& it)
 {
+    assert(!is_leaf(it));
     return iter(it.node->first_child);
 }
 
@@ -427,6 +429,7 @@ template <typename node_type>
 template <typename iter>
 iter tree_base<node_type>::last_child(const iter& it)
 {
+    assert(!is_leaf(it));
     return iter(it.node->last_child);
 }
 
