@@ -124,7 +124,7 @@ void ps::set_io_flags()
     }
 
     bool edge = false;
-    //edge = true;
+    edge = true;
     if (edge)
         out += print_edge(it);
 
@@ -220,7 +220,7 @@ void ps::set_io_flags()
     else
     {
         size_t index = get_label_index(iter);
-        auto label = iter->get_label().labels.at(index);
+        auto label = iter->get_label().lbl(index);
         out = print(label);
     }
 
@@ -234,7 +234,7 @@ void ps::set_io_flags()
     string out;
 
     size_t index = get_label_index(iter);
-    auto label = iter->get_label().labels.at(index);
+    auto label = iter->get_label().lbl(index);
 
     out = ""
         + print(rgb)
@@ -254,8 +254,8 @@ void ps::set_io_flags()
 
     Point p1, p2;
 
-    p1 = iter->get_label().labels.at(0).point;
-    p2 = iter->get_label().labels.at(1).point;
+    p1 = iter->get_label().lbl(0).point;
+    p2 = iter->get_label().lbl(1).point;
 
     return print_line(p1, p2);
 }
@@ -306,12 +306,12 @@ streampos ps::print_to_ps(
 {
     streampos pos = get_pos();
 
-    out << line;
-
 #define ps_end_str      "showpage\n"
 #define ps_end_length   (ARRAY_LENGTH(ps_end_str) - 1)
+    out
+        << line
+        << ps_end_str;
 
-    out << ps_end_str;
     out.seekp(-ps_end_length, out.end);
 
     if (out.fail())

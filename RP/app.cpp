@@ -244,7 +244,7 @@ void app::transform(
     update(doc, map);
 
 
-    compact c(doc.rna_out);
+    compact c(doc);
     c.make_compact();
 
     return;

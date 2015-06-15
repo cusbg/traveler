@@ -35,6 +35,7 @@ struct Point
     friend std::ostream& operator<< (std::ostream& out, Point p);
     Point operator+(Point other) const;
     Point operator-(Point other) const;
+    Point operator-() const;
     Point operator/(double value) const;
     Point operator*(double value) const;
     bool operator==(Point other) const;
@@ -56,6 +57,8 @@ Point normalize(Point p);
 double angle(Point p);
 
 double angle(Point p1, Point centre, Point p2);
+
+Point orthogonal(Point p);
 
 
 

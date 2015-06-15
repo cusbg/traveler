@@ -196,6 +196,21 @@ Point rna_pair_label::get_centre() const
         return labels.at(0).point;
 }
 
+rna_label& rna_pair_label::lbl(size_t index)
+{
+    return labels.at(index);
+}
+
+const rna_label& rna_pair_label::lbl(size_t index) const
+{
+    return labels.at(index);
+}
+
+size_t rna_pair_label::size() const
+{
+    assert(labels.size() <= 2);
+    return labels.size();
+}
 
 
 

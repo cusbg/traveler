@@ -70,6 +70,10 @@ public:
                 Point p,
                 size_t which);
 
+    rna_label& lbl(size_t index);
+    const rna_label& lbl(size_t index) const;
+    size_t size() const;
+
     Point get_centre() const;
 
     std::string to_string() const;
@@ -90,6 +94,7 @@ public:
 
     } status = untouched;
 
+private:
     std::vector<rna_label> labels;
 };
 

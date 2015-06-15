@@ -426,7 +426,7 @@ void document::update_rna_points()
         size_t index = get_label_index(it);
 
         Point p = points.at(i);
-        label.labels.at(index).point = p;
+        label.lbl(index).point = p;
     }
 }
 

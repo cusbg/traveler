@@ -53,6 +53,11 @@ Point Point::operator-(Point other) const
     return Point({x - other.x, y - other.y});
 }
 
+Point Point::operator-() const
+{
+    return Point({-x, -y});
+}
+
 Point Point::operator*(double val) const
 {
     return Point({ x * val, y * val});
@@ -147,4 +152,8 @@ double angle(Point p1, Point centre, Point p2)
     return fmod(angle(p2 - centre) - angle(p1 - centre) + 360, 360);
 }
 
+Point orthogonal(Point p)
+{
+    return Point({p.y, -p.x});
+}
 
