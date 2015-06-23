@@ -82,7 +82,7 @@ public:
     bool inited_points() const;
 
 public:
-    enum label_status
+    enum label_status_type
     {
         untouched,
         touched,

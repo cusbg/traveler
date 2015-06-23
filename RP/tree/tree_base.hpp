@@ -43,7 +43,10 @@ template <typename iter>
 inline iter move_it_minus(iter it, size_t count);
 
 template <typename iter, typename funct>
-inline size_t count_if(iter it, funct f);
+inline size_t count_children_if(iter it, funct f);
+
+template <typename iter, typename funct>
+inline size_t count_if(iter begin, iter end, funct f);
 
 
 
@@ -83,8 +86,8 @@ public:
      */
     iterator find(size_t id) const;
     iterator find(node_type node) const;
-    static std::string print_subtree(iterator root);
-    std::string print_tree() const;
+    static std::string print_subtree(iterator root, bool debug_out = true);
+    std::string print_tree(bool debug_out = true) const;
 
 public:
     // .begin() a .end() funkcie z tree<>
@@ -247,7 +250,7 @@ typename tree_base<node_type>::iterator tree_base<node_type>::find(node_type nod
 
 /* static */
 template <typename node_type>
-std::string tree_base<node_type>::print_subtree(iterator root)
+std::string tree_base<node_type>::print_subtree(iterator root, bool debug_out)
 {
     std::stringstream stream;
     stream
@@ -260,6 +263,8 @@ std::string tree_base<node_type>::print_subtree(iterator root)
     std::function<void(iterator it, std::stringstream& out)> print_recursive =
         [&print_recursive](iterator it, std::stringstream& out)
         {
+            assert(it.node != nullptr);
+
             if (is_leaf(it))
             {
                 out << *it;
@@ -283,14 +288,15 @@ std::string tree_base<node_type>::print_subtree(iterator root)
         };
 
     print_recursive(root, stream);
-    logger.debugStream() << stream.str();
+    if (debug_out)
+        logger.debugStream() << stream.str();
     return stream.str();
 }
 
 template <typename node_type>
-std::string tree_base<node_type>::print_tree() const
+std::string tree_base<node_type>::print_tree(bool debug_out) const
 {
-    return print_subtree(begin());
+    return print_subtree(begin(), debug_out);
 }
 
 

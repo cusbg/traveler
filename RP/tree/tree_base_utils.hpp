@@ -113,9 +113,9 @@ iter move_it_minus(iter it, size_t count)
     return it;
 }
 
-
+/* global function */
 template <typename iter, typename funct>
-size_t count_if(iter it, funct f)
+size_t count_children_if(iter it, funct f)
 {
     size_t count = 0;
     auto sib = it.begin();
@@ -124,6 +124,20 @@ size_t count_if(iter it, funct f)
         if (f(sib))
             ++count;
         ++sib;
+    }
+    return count;
+}
+
+/* global function */
+template <typename iter, typename funct>
+inline size_t count_if(iter begin, iter end, funct f)
+{
+    size_t count = 0;
+    while (begin != end)
+    {
+        if (f(begin))
+            ++count;
+        ++begin;
     }
     return count;
 }

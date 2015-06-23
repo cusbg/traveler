@@ -156,6 +156,8 @@ void rna_pair_label::set_label_strings(
     //  pair_changed    - ak sa par zmenil na nepar, resp. naopak.
     //
 
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
     //APP_DEBUG_FNAME;
 
     DEBUG("changing labels from %s to %s", to_string().c_str(), from.to_string().c_str());
@@ -184,14 +186,22 @@ bool rna_pair_label::inited_points() const
 {
     for (const auto& val : labels)
         if (val.point.bad())
-            return true;
-    return false;
+            return false;
+    return true;
 }
 
 Point rna_pair_label::get_centre() const
 {
     if (is_paired())
-        return centre(labels.at(0).point, labels.at(1).point);
+    {
+        if (!inited_points())
+        {
+            WARN("::get_centre() -> not inited");
+            return Point::bad_point();
+        }
+        else
+            return centre(labels.at(0).point, labels.at(1).point);
+    }
     else
         return labels.at(0).point;
 }

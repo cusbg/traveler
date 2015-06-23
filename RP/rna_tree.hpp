@@ -28,6 +28,7 @@
 
 typedef node_base<rna_pair_label> rna_node_type;
 
+class mapping;
 
 class rna_tree : public tree_base<rna_node_type>
 {
@@ -42,6 +43,15 @@ public:
                 const std::string& labels,
                 const std::string& _name = "");
 
+
+
+    iterator insert(sibling_iterator it, rna_node_type node, size_t steal_children = 0);
+    void merge(rna_tree other, const mapping& m);
+
+private:
+    void mark(std::vector<size_t> node_ids, rna_pair_label::label_status_type status);
+    void modify(const rna_tree& other);
+
 public:
     std::string name;
 };
@@ -49,6 +59,9 @@ public:
 
 size_t get_label_index(
                 rna_tree::pre_post_order_iterator iter);
+
+size_t get_label_index(
+                rna_tree::base_iterator iter);
 
 
 #endif /* !RNA_TREE_HPP */
