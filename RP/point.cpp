@@ -154,6 +154,15 @@ double angle(Point p1, Point centre, Point p2)
 
 Point orthogonal(Point p)
 {
-    return Point({p.y, -p.x});
+    return normalize(Point({p.y, -p.x}));
+}
+
+Point orthogonal(Point p, Point direction)
+{
+    Point o = orthogonal(p);
+    if (distance(o, direction) < distance(-o, direction))
+        return o;
+    else
+        return -o;
 }
 

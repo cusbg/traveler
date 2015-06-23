@@ -60,6 +60,8 @@ double angle(Point p1, Point centre, Point p2);
 
 Point orthogonal(Point p);
 
+Point orthogonal(Point p, Point direction);
+
 
 
 #endif /* !POINT_HPP */

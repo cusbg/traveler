@@ -62,8 +62,8 @@ struct document
 {
     std::string labels;
     std::vector<Point> points;
-    rna_tree template_rna;
-    rna_tree rna_out;
+    rna_tree rna;
+
     std::string prolog;
     std::string epilog;
 

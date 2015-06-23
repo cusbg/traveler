@@ -408,7 +408,7 @@ void document::update_rna_points()
 
     typedef rna_tree::pre_post_order_iterator pre_post_it;
 
-    rna_tree& r = template_rna;
+    rna_tree& r = rna;
     pre_post_it next = ++r.begin_pre_post();
     pre_post_it it;
 

@@ -22,6 +22,7 @@
 #include "compact_maker.hpp"
 #include "ps.hpp"
 
+
 using namespace std;
 
 std::ostream& operator<<(std::ostream& out, const compact::circle& c)
@@ -210,6 +211,20 @@ void compact::circle::init(size_t n)
     //wait_for_input();
 }
 
+/* static */ double compact::circle::min_circle_length(size_t nodes_count)
+{
+    return nodes_count * ( BASES_DISTANCE + BASES_RATIO);
+}
+
+/* static */ double compact::circle::min_circle_radius(size_t nodes_count)
+{
+    return nodes_count * 0.5 * BASES_DISTANCE;
+}
+
+/* static */ double compact::circle::max_circle_radius(size_t nodes_count)
+{
+    return nodes_count * 1.5 * BASES_DISTANCE;
+}
 
 
 
