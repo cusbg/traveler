@@ -44,33 +44,9 @@ public:
                 const std::string& second);
 
 private:
-    void transform(
-                const rna_tree& rna1,
-                const rna_tree& rna2,
-                const mapping& map,
-                const std::string& fileIn,
-                const std::string& fileOut);
-
-    void update(
-                document& doc,
-                const mapping& map);
-
-    void make_compact(
-                rna_tree& rna);
-
-    void mark_removed(
-                post_it it);
-    void mark_inserted(
-                post_it it);
-    void mark_modifyied(
-                post_it from,
-                post_it to);
 
     void print_default(
                 const rna_tree& tree);
-    size_t contains(
-                const rna_tree& rna,
-                rna_pair_label::label_status status);
 };
 
 
