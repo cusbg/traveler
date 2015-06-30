@@ -46,6 +46,8 @@ public:
 
 
     iterator insert(sibling_iterator it, rna_node_type node, size_t steal_children = 0);
+    template <typename iter>
+        iter remove(iter it);
     void merge(rna_tree other, const mapping& m);
 
 private:
@@ -56,6 +58,19 @@ public:
     std::string name;
 };
 
+template <typename iter>
+    iter rna_tree::remove(iter it)
+{
+    DEBUG("erasing node %s", label_str(*it));
+
+    it = _tree.flatten(it);
+    assert(is_leaf(it));
+    iter del = it++;
+    _tree.erase(del);
+    --_size;
+    return --it;
+}
+
 
 size_t get_label_index(
                 rna_tree::pre_post_order_iterator iter);
@@ -63,6 +78,12 @@ size_t get_label_index(
 size_t get_label_index(
                 rna_tree::base_iterator iter);
 
+bool is(
+                rna_tree::iterator it,
+                rna_pair_label::label_status_type status);
+bool has_child(
+                rna_tree::iterator it,
+                rna_pair_label::label_status_type status);
 
 #endif /* !RNA_TREE_HPP */
 

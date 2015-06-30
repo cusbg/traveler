@@ -33,10 +33,10 @@
 
 using namespace std::rel_ops;
 
-#define ARRAY_LENGTH(x)     ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
-
 #define radians_to_degrees(x)   (x * 180 / M_PI)
 #define degrees_to_radians(x)   (x * M_PI / 180)
+
+#define ARRAY_LENGTH(x)     ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
 
 #define double_equals_precision(val1, val2, precision) \
     (abs(val1 - val2) < abs(precision))

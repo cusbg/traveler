@@ -30,9 +30,41 @@
 
 #include "point.hpp"
 #include "compact_maker.hpp"
+#include "ps.hpp"
 
 
 using namespace std;
+
+void tests();
+void m();
+
+int main(int argc, char** argv)
+{
+    cout << boolalpha;
+    srand(1);
+
+    //m();
+    tests();
+
+    if (argc == 2)
+    {
+        generator::generate_files();
+        exit(0);
+    }
+
+    string from, to;
+
+    from = "human";
+    to = "frog";
+
+    to = "rabbit";
+
+    app a;
+    a.run_between(from, to);
+    //a.run_app();
+
+    return 0;
+}
 
 void tests()
 {
@@ -70,27 +102,47 @@ void tests()
     }
 }
 
-int main(int argc, char** argv)
+void m()
 {
-    cout << boolalpha;
-    srand(1);
 
-    tests();
+    psout = ps::init("/tmp/file");
 
-    if (argc == 2)
-    {
-        generator::generate_files();
-        exit(0);
-    }
-
-    app a;
-    a.run_between(
-            "human",
-            "frog");
-    //a.run_app();
+    auto pos = psout.print_to_ps("ahoj\n");
+    wait_for_input();
+    psout.print_to_ps("AHOJ\n");
+    psout.seek(pos);
+    psout.print_to_ps(".\n");
+    wait_for_input();
+    psout.print_to_ps("___________________________\n");
 
 
-    return 0;
+
+    abort();
+
+
+
+    string l1, l2, b1, b2;
+    rna_tree rna1, rna2;
+    string ps_in, ps_out;
+
+    l1 = "-5142aba3456978089-";
+    b1 = "((.(.(.).)).(.(.)))";
+
+    l2 = "abcdedfbg";
+    b2 = ".(.(.).).";
+
+    rna1 = rna_tree(b1, l1);
+    rna2 = rna_tree(b2, l2);
+
+    auto it = ++rna1.begin();
+
+    it = rna1.insert(it.end(), *rna2.begin(), 0);
+
+    cout << *++it << endl;
+
+    rna1.print_tree();
+    
+    abort();
 }
 
 /*

@@ -26,7 +26,6 @@
 #include "point.hpp"
 
 
-
 class compact
 {
 public: //TODO: remove
@@ -41,72 +40,26 @@ public:
 private:
     void shift_nodes(iterator it, Point vector);
 
-    void make_pairs();
+    void init();
+    void init_points(iterator it);
+    void normalize_pair_distance(iterator it);
+
     void make_inserted();
     void make_deleted();
-    void rebase(iterator it);
 
-    circle make_circle(iterator i);
+    void make_pairs();
+    void make(std::vector<interval> vec);
 
+    void normalize_branch_distance(iterator parent, iterator child, size_t bases_count);
 
-    std::vector<sibling_iterator> get_branches(iterator it);
-    size_t bases_count(iterator from, iterator to);
-
-
-    void reinsert(iterator it, size_t index, Point p);
-
-    bool is_normalized_dist(iterator it);
-    void normalize_distance(iterator it);
+    void reinsert(interval i, circle& c);
 
 private:
     document doc;
 };
 
-
-
-struct compact::circle
-{
-    void compute_sgn();
-
-    void inited() const;
-    void init(size_t n);
-    Point rotate(double angle) const;
-    std::vector<Point> split(size_t n) const;
-    bool lies_in_segment(Point p) const;
-
-    double radius() const;
-    double segment_angle() const;
-    double segment_length() const;
-
-    static double min_length(size_t nodes_count);
-
-public:
-    Point centre;
-    Point p1, p2;
-    Point direction;
-
-private:
-    /*
-     * sgn =  1 ~> v protismere hod. ruciciek
-     * sgn = -1 ~> v smere hodinovych ruciciek
-     */
-    char sgn = 0;
-};
-
-void print(compact::circle c);
-
-#define PAIRS_DISTANCE      20
-#define BASES_DISTANCE      8
-#define BASES_RATIO         1.5
-
-#define min_circle_length(nodes_count) \
-    (nodes_count * ( BASES_DISTANCE + BASES_RATIO))
-#define min_circle_radius(nodes_count) \
-    (nodes_count * 0.5 * BASES_DISTANCE)
-#define max_circle_radius(nodes_count) \
-    (nodes_count * 1.5 * BASES_DISTANCE)
-
-std::ostream& operator<<(std::ostream& out, const compact::circle& c);
+#define branches_count(_iter) \
+    (count_children_if(_iter, [](iterator _sib) {return _sib->get_label().is_paired();}))
 
 #endif /* !COMPACT_MAKER_HPP */
 

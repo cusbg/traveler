@@ -91,6 +91,7 @@ public:
 
 private:
     void set_io_flags();
+    size_t fill(char ch = ' ');
 
 private:
     std::string filename;

@@ -22,14 +22,11 @@
 #include "rna_tree.hpp"
 #include "rna_tree_labels.hpp"
 #include "util.hpp"
-#include "ps.hpp"
+//#include "ps.hpp"
 
 #include <unordered_map>
 
 using namespace std;
-
-#define is(_iter, _status) \
-    (_iter->get_label().status == rna_pair_label::_status)
 
 inline std::vector<rna_node_type> convert(const std::string& labels);
 
@@ -70,9 +67,8 @@ bool rna_tree::operator==(
 
 rna_tree::iterator rna_tree::insert(sibling_iterator it, rna_node_type node, size_t steal)
 {
-    APP_DEBUG_FNAME;
-
-    DEBUG("insert(%s, %lu) <- %s", label(it), steal, label_str(node));
+    //APP_DEBUG_FNAME;
+    //DEBUG("insert(%s, %lu) <- %s", label(it), steal, label_str(node));
 
     sibling_iterator in, next;
     rna_node_type n(node.get_label());
@@ -117,12 +113,12 @@ void rna_tree::modify(const rna_tree& other)
 
     while (it1 != end() && it2 != other.end())
     {
-        if (is(it1, inserted) || is(it1, deleted))
+        if (is(it1, rna_pair_label::inserted) || is(it1, rna_pair_label::deleted))
         {
             ++it1;
             continue;
         }
-        if (is(it2, inserted) || is(it2, deleted))
+        if (is(it2, rna_pair_label::inserted) || is(it2, rna_pair_label::deleted))
         {
             ++it2;
             continue;
@@ -157,20 +153,13 @@ struct iter_hash
 void rna_tree::merge(rna_tree other, const mapping& m)
 {   // this <- by mala byt template rna, s inicializovanymi bodmi..
     APP_DEBUG_FNAME;
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     iterator it1, it2;
     iterator end1, end2;
     sibling_iterator sib1, sib2;
-    auto has_ins = [](rna_tree::iterator iter)
-    {
-        return count_children_if(iter,
-                [](rna_tree::iterator _iter)
-                {
-                    return is(_iter, inserted);
-                }) != 0;
-    };
-    auto m_del = iter_hash::compute_sizes(*this, [](sibling_iterator sib) { return !is(sib, deleted); });
-    auto m_ins = iter_hash::compute_sizes(other, [](sibling_iterator sib) { return !is(sib, inserted); });
+    auto m_del = iter_hash::compute_sizes(*this, [](sibling_iterator sib) { return !is(sib, rna_pair_label::deleted); });
+    auto m_ins = iter_hash::compute_sizes(other, [](sibling_iterator sib) { return !is(sib, rna_pair_label::inserted); });
 
     mark      (m.get_to_remove(), rna_pair_label::deleted);
     other.mark(m.get_to_insert(), rna_pair_label::inserted);
@@ -183,7 +172,7 @@ void rna_tree::merge(rna_tree other, const mapping& m)
 
     while(it2 != end2)
     {
-        if (has_ins(it2))
+        if (has_child(it2, rna_pair_label::inserted))
         {
             sib1 = it1.begin();
             sib2 = it2.begin();
@@ -194,7 +183,7 @@ void rna_tree::merge(rna_tree other, const mapping& m)
 
             while (sib1 != it1.end())
             {
-                if (is(sib2, inserted))
+                if (is(sib2, rna_pair_label::inserted))
                 {
                     size_t n;
 
@@ -229,7 +218,7 @@ void rna_tree::merge(rna_tree other, const mapping& m)
 
             while (sib2 != it2.end())
             {   // insert all right brothers of sib2
-                if (is(sib2, inserted))
+                if (is(sib2, rna_pair_label::inserted))
                 {
                     assert(!sib2->get_label().is_paired());
                     sib1 = insert(sib1, *sib2, 0);
@@ -242,7 +231,7 @@ void rna_tree::merge(rna_tree other, const mapping& m)
             print_subtree(it1);
             print_subtree(it2);
         }
-        if (is(it1, deleted))
+        if (is(it1, rna_pair_label::deleted))
         {
             ++it1;
             continue;
@@ -251,8 +240,6 @@ void rna_tree::merge(rna_tree other, const mapping& m)
         ++it2;
     }
 
-    print_tree();
-    psout.save(*this);
     assert(it1 == end1 && it2 == end2);
 }
 
@@ -313,6 +300,20 @@ size_t get_label_index(
 }
 
 
+bool is(
+                rna_tree::iterator it,
+                rna_pair_label::label_status_type status)
+{
+    return it->get_label().status == status;
+}
+
+bool has_child(
+                rna_tree::iterator it,
+                rna_pair_label::label_status_type status)
+{
+    return count_children_if(it,
+            [status](rna_tree::iterator _iter) {return is(_iter, status);}) != 0;
+}
 
 
 

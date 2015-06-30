@@ -32,9 +32,8 @@ using namespace std;
 
 
 Point::Point()
-{
-    *this = BAD_POINT;
-}
+    : Point(BAD_POINT)
+{ }
 
 Point::Point(std::initializer_list<double> l)
 {
@@ -127,7 +126,7 @@ double distance(Point p1, Point p2)
 
 double size(Point vector)
 {
-    return sqrt(vector.x * vector.x + vector.y * vector.y);
+    return sqrt(squared(vector.x) + squared(vector.y));
 }
 
 Point normalize(Point p)
@@ -138,10 +137,8 @@ Point normalize(Point p)
 
 double angle(Point p)
 {
-    // pre 3., 4. kvadrant vracia zaporne cisla.. takto sa to vyriesi..
     double out = fmod(radians_to_degrees(atan2(p.y, p.x)) + 360, 360);
 
-    DEBUG("angle(%s)=\t%f", p.to_string().c_str(), out);
     assert(isnormal(out) || out == 0);
 
     return out;
@@ -149,7 +146,11 @@ double angle(Point p)
 
 double angle(Point p1, Point centre, Point p2)
 {
-    return fmod(angle(p2 - centre) - angle(p1 - centre) + 360, 360);
+    double out = fmod(angle(p2 - centre) - angle(p1 - centre) + 360, 360);
+
+    assert(isnormal(out) || out == 0);
+
+    return out;
 }
 
 Point orthogonal(Point p)
@@ -160,6 +161,9 @@ Point orthogonal(Point p)
 Point orthogonal(Point p, Point direction)
 {
     Point o = orthogonal(p);
+
+    assert(!double_equals(distance(o, direction), distance(-o, direction)));
+
     if (distance(o, direction) < distance(-o, direction))
         return o;
     else

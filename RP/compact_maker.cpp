@@ -22,61 +22,69 @@
 #include "compact_maker.hpp"
 #include "util.hpp"
 #include "ps.hpp"
+#include "compact_maker_utils.hpp"
 
 
 using namespace std;
 
-#define is_inserted(iter) \
-    (iter->get_label().status == rna_pair_label::inserted)
-#define count_inserted(iter) \
-    count_if(iter, [](sibling_iterator sib) { return is_inserted(sib); })
-#define count_branches(iter) \
-    count_if(iter, [](sibling_iterator sib) { return sib->get_label().is_paired(); })
 
-#define is(_iter, _status) \
-    (_iter->get_label().status == rna_pair_label::_status)
-
-
-void f();
-
-
-
-
+#define PAIRS_DISTANCE              20
+#define PAIRS_DISTANCE_PRECISION    1
+#define BASES_DISTANCE              8
 
 
 void compact::make_compact()
 {
     APP_DEBUG_FNAME;
 
-    make_pairs();
-    make_inserted();
-    make_deleted();
+    init();
 
-    psout.save(doc.rna_out);
+    psout.seek(psout.save(doc.rna));
+    wait_for_input();
+
+    make_inserted();
 }
 
-void compact::make_pairs()
+void compact::normalize_pair_distance(iterator it)
 {
-    APP_DEBUG_FNAME;
+    assert(it->get_label().is_paired());
 
-    auto& rna = doc.rna_out;
-    for (iterator it = rna.begin(); it != rna.end(); ++it)
+    auto& label = it->get_label();
+    Point& p1 = label.lbl(0).point;
+    Point& p2 = label.lbl(1).point;
+
+    if (!double_equals_precision(distance(p1, p2),
+                PAIRS_DISTANCE, PAIRS_DISTANCE_PRECISION))
     {
-        if (rna_tree::is_only_child(it) && it->get_label().is_paired() && !is_normalized_dist(it))
-            normalize_distance(it);
+        DEBUG("distance=%f", distance(p1, p2));
+        if (!rna_tree::parent(it)->is_root() &&
+                (rna_tree::is_only_child(it) || branches_count(rna_tree::parent(it)) == 1))
+        {   // => predok je uz nakresleny...
+            auto plabel = rna_tree::parent(it)->get_label();
+            Point vec = normalize(orthogonal(plabel.lbl(0).point - plabel.lbl(1).point, p1));
+            p1 = plabel.lbl(0).point + vec * BASES_DISTANCE;
+            p2 = plabel.lbl(1).point + vec * BASES_DISTANCE;
+        }
+        else
+        {   // predok nieje nakresleny... 
+            WARN("make_pairs() -> parent is root / iter is not only child, init by centre of p1,p2..");
+            Point p = centre(p1, p2);
+            p1 = p + (normalize(p1 - p2) * (PAIRS_DISTANCE / 2));
+            p2 = p + (normalize(p2 - p1) * (PAIRS_DISTANCE / 2));
+        }
     }
 }
 
-void compact::normalize_distance(iterator it)
+void compact::init_points(iterator it)
 {
-    APP_DEBUG_FNAME;
-    iterator p = rna_tree::parent(it);
-    iterator pp = rna_tree::parent(p);
-
+    // TODO: hladat inicializovane vrcholy, predkov/potomkov... nie len parent(parent(iter))
     auto& label = it->get_label();
-    const auto& plabel  = p->get_label();
-    const auto& pplabel = pp->get_label();
-    Point vec = normalize(plabel.lbl(0).point - pplabel.lbl(0).point) * BASES_DISTANCE;
+    iterator par = rna_tree::parent(it);
+    auto plabel = par->get_label();
+    Point vec = normalize(plabel.get_centre() - rna_tree::parent(par)->get_label().get_centre());
+
+    assert(is(it, rna_pair_label::inserted));
+    assert(label.get_centre().bad());
 
     if (label.is_paired())
     {
@@ -84,32 +92,43 @@ void compact::normalize_distance(iterator it)
         label.lbl(1).point = plabel.lbl(1).point + vec;
     }
     else
-        label.lbl(0).point = centre(plabel.lbl(0).point, plabel.lbl(1).point) + vec;
-}
+        label.lbl(0).point = plabel.lbl(0).point + vec;
+};
 
-bool compact::is_normalized_dist(iterator it)
-{
-    const auto& label = it->get_label();
-    return double_equals_precision(distance(label.lbl(0).point,
-                label.lbl(1).point), PAIRS_DISTANCE, 0.1);
-}
-
-size_t compact::bases_count(iterator from, iterator to)
+void compact::init()
 {
     APP_DEBUG_FNAME;
 
-    size_t n = 0;
-    while (from != to)
+    for (iterator it = ++doc.rna.begin(); it != doc.rna.end(); ++it)
     {
-        if (from->get_label().is_paired())
-            n += 2;
-        else
-            ++n;
-        ++from;
+        auto& label = it->get_label();
+
+        if (!label.inited_points())
+        {
+            init_points(it);
+        }
+        if (label.is_paired())
+        {
+            normalize_pair_distance(it);
+        }
     }
-    return n;
 }
 
+
+void compact::reinsert(interval in, circle& c)
+{
+    auto points = c.split(in.vec.size());
+
+    for (size_t i = 0; i < points.size(); ++i)
+    {
+        auto it = in.vec.at(i);
+        auto& label = it->get_label();
+
+        assert(!label.is_paired());
+        label.status = rna_pair_label::reinserted;
+        label.set_points_exact(points.at(i), 0);
+    }
+};
 
 void compact::shift_nodes(iterator it, Point vector)
 {
@@ -126,192 +145,110 @@ void compact::shift_nodes(iterator it, Point vector)
 }
 
 
-
-
-
-
-
-
-
-compact::circle compact::make_circle(iterator it)
-{
-    APP_DEBUG_FNAME;
-
-    const auto& label = it->get_label();
-    circle c;
-    c.p1 = label.lbl(0).point;
-    c.p2 = label.lbl(1).point;
-    c.direction = rna_tree::parent(it)->get_label().get_centre();
-
-    return c;
-}
-
 void compact::make_inserted()
 {
     APP_DEBUG_FNAME;
 
-    iterator it;
-    sibling_iterator sib;
+    iterator it = doc.rna.begin();
 
-    auto& rna = doc.rna_out;
-    for (it = ++rna.begin(); it != rna.end(); ++it)
+    while (it != doc.rna.end())
     {
-        if (count_inserted(it) == 0)
-            continue;
-        else
-            rebase(it);
+        if (has_child(it, rna_pair_label::inserted))
+        {
+            auto i = interval::create(it);
+            make(i);
+        }
+
+        ++it;
     }
 }
 
-std::vector<compact::sibling_iterator> compact::get_branches(iterator it)
-{
-    vector<sibling_iterator> vec;
-    sibling_iterator sib = it.begin();
-
-    while (sib != it.end())
-    {
-        if (sib->get_label().is_paired())
-            vec.push_back(sib);
-        ++sib;
-    }
-    return vec;
-}
-
-void compact::rebase(iterator it)
+void compact::make(vector<interval> vec)
 {
     APP_DEBUG_FNAME;
-
-    auto vec = get_branches(it);
-    Point prev = it->get_label().lbl(0).point;
-    sibling_iterator beg = it.begin();
     circle c;
-    Point dir = rna_tree::parent(it)->get_label().get_centre();
+    size_t n;
+    size_t minl, len;
+    iterator b, e;
 
-    auto run = [this](sibling_iterator beg, sibling_iterator end, circle c)
+    if (vec.size() > 2)
     {
-        LOGGER_PRIORITY_ON_FUNCTION(INFO);
+        ERR("vec.size > 2");
+        return;
+        abort();
+    }
+    auto init_c = [&c](interval i)
+    {
+        //LOGGER_PRIORITY_ON_FUNCTION(WARN);
 
-        size_t index = 0;
-        size_t n = bases_count(beg, end);
-
-        c.init(n);
-        cout << c << endl;
-        auto points = c.split(n);
-
-        while (beg != end)
-        {
-            if (beg->get_label().is_paired())
-            {
-                ERR("is_paired");
-                abort();
-            }
-
-            reinsert(beg, 0, points.at(index));
-            ++index;
-            ++beg;
-        }
-        //print(c);
-        //wait_for_input();
+        c.p1 = i.begin->get_label().lbl(i.b_index).point;
+        c.p2 = i.end->get_label().lbl(i.e_index).point;
+        c.centre = centre(c.p1, c.p2);
+        if (i.begin != i.end)
+            c.direction = i.begin->get_label().get_centre();
+        else
+            c.direction = rna_tree::parent(i.begin)->get_label().get_centre();
+        c.compute_sgn();
+        c.init(i.vec.size());
     };
 
-    for (size_t i = 0; i < vec.size(); ++i)
+#define update psout.seek(psout.save(doc.rna)); wait_for_input()
+    if (vec.size() == 2)
     {
-        const auto& val = vec.at(i);
-        const auto& label = val->get_label();
-
-        if (label.get_centre().bad())
+        for (auto i : vec)
         {
-            ERR("not initialized child point");
-            abort();
+            if (i.vec.empty())
+                continue;
+
+            i.print();
+            n = i.vec.size();
+            minl = circle::min_circle_length(n);
+
+            init_c(i);
+            len = c.segment_length();
+
+            b = i.begin;
+            e = i.end;
+
+            if (i.e_index == 1)
+                swap(b, e);
+
+            cout << *b << " " << *e << endl;
+
+            if (minl < len && len < minl + n)
+                normalize_branch_distance(b, e, n);
         }
-
-        c = circle();
-        c.p1 = prev;
-        c.p2 = label.lbl(0).point;
-        c.direction = dir;
-
-        run(beg, val, c);
-
-        beg = val;
-        prev = beg->get_label().lbl(1).point;
-        ++beg;
     }
-
-    c.p1 = prev;
-    c.p2 = it->get_label().lbl(1).point;
-    c.direction = rna_tree::parent(it)->get_label().get_centre();
-
-    run(beg, it.end(), c);
-}
-
-void compact::reinsert(iterator it, size_t index, Point p)
-{
-    APP_DEBUG_FNAME;
-
-    auto& label = it->get_label();
-
-    label.lbl(index).point = p;
-    if (label.status != rna_pair_label::inserted)
-        label.status = rna_pair_label::reinserted;
-}
-
-
-
-void compact::make_deleted()
-{
-    APP_DEBUG_FNAME;
-
-    iterator it1, it2;
-    sibling_iterator sib1, sib2;
-
-    it1 = doc.rna_out.begin();
-    it2 = doc.template_rna.begin();
-
-    while (it1 != doc.rna_out.end())
+    for (auto i : vec)
     {
-        if (is(it1, inserted))
-        {
-            ++it1;
-            continue;
-        }
-        if (is(it2, deleted))
-        {
-                    psout.print_to_ps(ps::print(blue));
-                    psout.print_to_ps(ps::print(it2->get_label().get_centre(), "x"));
-                    psout.print_to_ps(ps::print(black));
-            ++it2;
-            continue;
-        }
-
-        size_t del = count_if(it2, [](sibling_iterator ch) { 
-                if (is(ch, deleted))
-                {
-                    psout.print_to_ps(ps::print(blue));
-                    psout.print_to_ps(ps::print(ch->get_label().get_centre(), "x"));
-                    psout.print_to_ps(ps::print(black));
-                }
-                return is(ch, deleted); });
-        if (del != 0)
-        {
-            DEBUG("DELETED");
-            //cout << *it2 << endl;
-            //rebase(it1);
-        }
-        ++it1;
-        ++it2;
+        init_c(i);
+        n = i.vec.size();
+        reinsert(i, c);
+        cout << n << endl;
+        //print(c);
+        //wait_for_input();
+        update;
     }
 }
 
+void compact::normalize_branch_distance(iterator parent, iterator child, size_t n)
+{
+    APP_DEBUG_FNAME;
 
+    Point v;
+    double dist_final, dist_actual;
 
+    v = parent->get_label().get_centre() - child->get_label().get_centre();
+    dist_actual = size(v);
+    dist_final = (circle::min_circle_radius(n) + circle::max_circle_radius(n)) / 2;
+    DEBUG("final %f, actual %f", dist_final, dist_actual);
+    v = normalize(v) * (dist_final - dist_actual);
 
+    shift_nodes(child, v);
 
-
-
-
-
-
-
+    psout.print_pair(child);
+    //abort();
+}
 
 
 

@@ -33,8 +33,11 @@
 using namespace std;
 
 
+
 #define is(_iter, _status) \
     (_iter->get_label().status == rna_pair_label::_status)
+#define has(_iter, _status) \
+    (count_children_if(_iter, [](rna_tree::iterator __iter) {return is(__iter, rna_pair_label::_status);}) != 0)
 
 
 void app::run_app()
@@ -83,6 +86,9 @@ void app::run_between(
 
     psout.print_to_ps(doc.prolog);
     doc.rna.merge(rna2, map);
+
+    compact c(doc);
+    c.make_compact();
 }
 
 void app::print_default(const rna_tree& rna)

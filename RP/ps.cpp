@@ -44,6 +44,7 @@ ps& ps::operator=(
     other.out.close();
 
     filename = move(other.filename);
+    out.close();
     out.open(filename, ios::out | ios::in);
     set_io_flags();
 
@@ -95,6 +96,7 @@ void ps::set_io_flags()
     switch (status)
     {
         case rna_pair_label::deleted:
+            return "";
             out = print_colored(it, DELETE_COLOR);
             //wait_for_input();
             break;
@@ -306,13 +308,15 @@ streampos ps::print_to_ps(
 {
     streampos pos = get_pos();
 
+    fill();
+
 #define ps_end_str      "showpage\n"
 #define ps_end_length   (ARRAY_LENGTH(ps_end_str) - 1)
     out
         << line
         << ps_end_str;
 
-    out.seekp(-ps_end_length, out.end);
+    out.seekp(-ps_end_length, out.cur);
 
     if (out.fail())
     {
@@ -353,4 +357,24 @@ streampos ps::print_pair(rna_tree::iterator it)
     return psout.print_to_ps(out);
 }
 
+size_t ps::fill(char ch)
+{
+    streampos pos, end;
+
+    pos = get_pos();
+    out.seekp(0, out.end);
+    end = get_pos();
+
+    size_t n = end - pos;
+
+    if (n != 0)
+    {
+        seek(pos);
+        out
+            << string(n - 1, ch)
+            << endl;
+    }
+    seek(pos);
+    return n;
+}
 

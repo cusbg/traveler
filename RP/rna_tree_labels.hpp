@@ -93,6 +93,11 @@ public:
         pair_changed
 
     } status = untouched;
+    enum todo_type
+    {
+        ignore,
+        undefined
+    } todo = undefined;
 
 private:
     std::vector<rna_label> labels;
