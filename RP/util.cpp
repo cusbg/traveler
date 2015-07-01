@@ -148,6 +148,8 @@ document read_ps(
         DEBUG("epilog '%s'", line.c_str());
     }
 
+    doc.prolog = document::default_prologue();
+
     return doc;
 }
 
@@ -430,6 +432,17 @@ void document::update_rna_points()
     }
 }
 
+/* static */ std::string document::default_prologue()
+{
+    return
+        "%!\n"
+        "/lwline {newpath moveto lineto stroke} def\n"
+        "/lwstring {moveto show} def\n"
+        "306.00 396.00 translate\n"
+        "0.54 0.54 scale\n"
+        "-182.50 481.00 translate\n"
+        "/Helvetica findfont 8.00 scalefont setfont\n";
+}
 
 
 

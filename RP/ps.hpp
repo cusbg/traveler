@@ -56,6 +56,7 @@ public:
 
     void seek(
                 streampos pos);
+    void seek_end();
     streampos get_pos();
 
     // returns position in stream before appending line...

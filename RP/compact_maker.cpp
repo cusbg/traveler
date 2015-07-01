@@ -32,17 +32,22 @@ using namespace std;
 #define PAIRS_DISTANCE_PRECISION    1
 #define BASES_DISTANCE              8
 
+#define UPDATE_PS psout.seek(psout.save(doc.rna)); wait_for_input()
+
 
 void compact::make_compact()
 {
     APP_DEBUG_FNAME;
 
+    UPDATE_PS;
+
     init();
 
     psout.seek(psout.save(doc.rna));
-    wait_for_input();
+    //wait_for_input();
 
     make_inserted();
+    make_deleted();
 }
 
 void compact::normalize_pair_distance(iterator it)
@@ -115,17 +120,18 @@ void compact::init()
 }
 
 
-void compact::reinsert(interval in, circle& c)
+void compact::reinsert(vector<sibling_iterator> nodes, const circle& c)
 {
-    auto points = c.split(in.vec.size());
+    auto points = c.split(nodes.size());
 
     for (size_t i = 0; i < points.size(); ++i)
     {
-        auto it = in.vec.at(i);
+        auto it = nodes.at(i);
         auto& label = it->get_label();
 
         assert(!label.is_paired());
-        label.status = rna_pair_label::reinserted;
+        if (label.status == rna_pair_label::touched)
+            label.status = rna_pair_label::reinserted;
         label.set_points_exact(points.at(i), 0);
     }
 };
@@ -134,15 +140,74 @@ void compact::shift_nodes(iterator it, Point vector)
 {
     APP_DEBUG_FNAME;
 
-    cout << "posunutie o " << vector << endl;
+    function<size_t(iterator, Point)> recursion = [&recursion](iterator iter, Point vec)
+    {
+        size_t out = 1;
+        auto& label = iter->get_label();
+        for (size_t i = 0; i < label.size(); ++i)
+            label.lbl(i).point = label.lbl(i).point + vec;
+        for (sibling_iterator sib = iter.begin(); sib != iter.end(); ++sib)
+            out += recursion(sib, vec);
+        return out;
+    };
 
-    auto& label = it->get_label();
-    for (size_t i = 0; i < label.size(); ++i)
-        label.lbl(i).point = label.lbl(i).point + vector;
-
-    for (sibling_iterator sib = it.begin(); sib != it.end(); ++sib)
-        shift_nodes(sib, vector);
+    size_t n = recursion(it, vector);
+    DEBUG("posunutie o %s, #vrcholov=%lu", vector.to_string().c_str(), n);
 }
+
+
+
+compact::circle compact::create(const interval& in)
+{
+    circle c;
+
+    c.p1 = in.begin->get_label().lbl(in.b_index).point;
+    c.p2 = in.end->get_label().lbl(in.e_index).point;
+    c.centre = centre(c.p1, c.p2);
+    if (in.begin != in.end) // hairpin
+        c.direction = in.begin->get_label().get_centre();
+    else
+        c.direction = rna_tree::parent(in.begin)->get_label().get_centre();
+    c.compute_sgn();
+
+    return c;
+}
+
+void compact::remake(const interval& in, bool is_hairpin)
+{
+    APP_DEBUG_FNAME;
+
+#define MAX_NODES_MOVE 10
+
+    if (is_hairpin || in.vec.size() < MAX_NODES_MOVE)
+    {
+        circle c = create(in);
+        c.init(in.vec.size());
+        reinsert(in.vec, c);
+    }
+    else
+    {
+        WARN("skipping, #nodes = %lu > max = %lu",
+                in.vec.size(), MAX_NODES_MOVE);
+    }
+}
+
+void compact::set_distance(iterator parent, iterator child, double dist)
+{
+    APP_DEBUG_FNAME;
+
+    Point p1, p2, vec, shift;
+    double actual;
+
+    p1 = parent->get_label().get_centre();
+    p2 = child->get_label().get_centre();
+    vec = normalize(p2 - p1);
+    actual = distance(p1, p2);
+    shift = vec * (dist - actual);
+
+    shift_nodes(child, shift);
+}
+
 
 
 void compact::make_inserted()
@@ -155,100 +220,109 @@ void compact::make_inserted()
     {
         if (has_child(it, rna_pair_label::inserted))
         {
-            auto i = interval::create(it);
-            make(i);
+            auto intervals = interval::create(it);
+            switch(intervals.size())
+            {
+                case 1: // hairpin
+                    remake(intervals[0], true);
+                    break;
+                case 2: // interial loop/bulge
+                    remake_interial_loops(intervals);
+                default:
+                    break;
+            }
+            //UPDATE_PS;
         }
-
         ++it;
     }
+
+    UPDATE_PS;
 }
 
-void compact::make(vector<interval> vec)
+void compact::remake_interial_loops(const std::vector<interval> vec)
 {
     APP_DEBUG_FNAME;
-    circle c;
-    size_t n;
-    size_t minl, len;
-    iterator b, e;
 
-    if (vec.size() > 2)
-    {
-        ERR("vec.size > 2");
-        return;
-        abort();
-    }
-    auto init_c = [&c](interval i)
-    {
-        //LOGGER_PRIORITY_ON_FUNCTION(WARN);
+    assert(vec.size() == 2);
+    assert(vec[0].begin == vec[1].end && vec[1].begin == vec[0].end);
 
-        c.p1 = i.begin->get_label().lbl(i.b_index).point;
-        c.p2 = i.end->get_label().lbl(i.e_index).point;
-        c.centre = centre(c.p1, c.p2);
-        if (i.begin != i.end)
-            c.direction = i.begin->get_label().get_centre();
-        else
-            c.direction = rna_tree::parent(i.begin)->get_label().get_centre();
-        c.compute_sgn();
-        c.init(i.vec.size());
+    vector<double> def_len(2, 0xDEADBEEF);
+    double avg, actual;
+    sibling_iterator parent, child;
+
+    parent = vec[0].begin;
+    child =  vec[0].end;
+    actual = distance(parent->get_label().get_centre(), child->get_label().get_centre());
+
+    for (size_t i = 0; i < 2; ++i)
+        def_len[i] = circle::min_circle_length(vec[i].vec.size());
+    LOGGER_PRINT_CONTAINER(def_len, "lengths");
+
+    sort(def_len.begin(), def_len.end());
+
+    avg = def_len[0] + sqrt(def_len[1] - def_len[0]);
+    if (avg < BASES_DISTANCE)
+        avg = BASES_DISTANCE * 1.25;
+
+    DEBUG("actual %f, avg %f", actual, avg);
+
+    if (!double_equals_precision(actual, avg, 1))
+        set_distance(parent, child, avg);
+
+    remake(vec[0]);
+    remake(vec[1]);
+}
+
+
+void compact::make_deleted()
+{
+    APP_DEBUG_FNAME;
+
+    iterator it = doc.rna.begin();
+
+    auto is_untouched_del = [](iterator iter)
+    {
+        return is(iter, rna_pair_label::deleted) &&
+            iter->get_label().todo == rna_pair_label::undefined;
     };
 
-#define update psout.seek(psout.save(doc.rna)); wait_for_input()
-    if (vec.size() == 2)
+    while (it != doc.rna.end())
     {
-        for (auto i : vec)
+        if (count_children_if(it, is_untouched_del) != 0)
         {
-            if (i.vec.empty())
-                continue;
+            auto intervals = interval::create(it);
+            switch(intervals.size())
+            {
+                case 1: // hairpin
+                    remake(intervals[0], true);
+                    break;
+                case 2: // interial loop/bulge
+                    remake_interial_loops(intervals);
+                default:
+                    remake_multibranch_loops(intervals);
+                    break;
+            }
 
-            i.print();
-            n = i.vec.size();
-            minl = circle::min_circle_length(n);
-
-            init_c(i);
-            len = c.segment_length();
-
-            b = i.begin;
-            e = i.end;
-
-            if (i.e_index == 1)
-                swap(b, e);
-
-            cout << *b << " " << *e << endl;
-
-            if (minl < len && len < minl + n)
-                normalize_branch_distance(b, e, n);
+            //UPDATE_PS;
         }
+        ++it;
     }
-    for (auto i : vec)
-    {
-        init_c(i);
-        n = i.vec.size();
-        reinsert(i, c);
-        cout << n << endl;
-        //print(c);
-        //wait_for_input();
-        update;
-    }
+    UPDATE_PS;
 }
 
-void compact::normalize_branch_distance(iterator parent, iterator child, size_t n)
+void compact::remake_multibranch_loops(const std::vector<interval> vec)
 {
     APP_DEBUG_FNAME;
 
-    Point v;
-    double dist_final, dist_actual;
+    for (auto in : vec)
+    {
+        if (!in.has_del)
+            continue;
 
-    v = parent->get_label().get_centre() - child->get_label().get_centre();
-    dist_actual = size(v);
-    dist_final = (circle::min_circle_radius(n) + circle::max_circle_radius(n)) / 2;
-    DEBUG("final %f, actual %f", dist_final, dist_actual);
-    v = normalize(v) * (dist_final - dist_actual);
-
-    shift_nodes(child, v);
-
-    psout.print_pair(child);
-    //abort();
+        remake(in);
+    }
 }
+
 
 
 

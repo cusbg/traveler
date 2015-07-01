@@ -47,12 +47,18 @@ private:
     void make_inserted();
     void make_deleted();
 
-    void make_pairs();
-    void make(std::vector<interval> vec);
+    circle create(const interval& in);
 
-    void normalize_branch_distance(iterator parent, iterator child, size_t bases_count);
+    void reinsert(std::vector<sibling_iterator> nodes, const circle& c);
 
-    void reinsert(interval i, circle& c);
+    void set_distance(iterator parent, iterator child, double dist);
+
+    void remake(const interval& in, bool is_hairpin = false);
+    void remake_interial_loops(const std::vector<interval> vec);
+    void remake_multibranch_loops(const std::vector<interval> vec);
+
+
+
 
 private:
     document doc;

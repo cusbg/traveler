@@ -28,7 +28,7 @@ using namespace std;
 #define PAIRS_DISTANCE              20
 #define PAIRS_DISTANCE_PRECISION    1
 #define BASES_DISTANCE              8
-#define BASES_RATIO                 1.8
+#define BASES_RATIO                 1.4
 
 
 #define CIRCLE_INITED()             assert(!centre.bad() || !p1.bad() || !p2.bad() || !direction.bad())
@@ -62,8 +62,6 @@ std::ostream& operator<<(
 Point compact::circle::rotate(
                 double delta) const
 {
-    APP_DEBUG_FNAME;
-
     CIRCLE_INITED();
     CIRCLE_SGN_INITED();
     assert(double_equals(size(p1 - centre), size(p2 - centre)));
@@ -173,81 +171,91 @@ void compact::circle::init(
     CIRCLE_INITED();
     CIRCLE_SGN_INITED();
 
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
     if (n == 0)
         return;
 
-    size_t max_iterations = 50;
+    size_t max_iterations = 100;
     double needed_length, actual_length, shift_size, difference_precision;
     Point shift_vector;
 
-    difference_precision = (max_circle_length(n) - min_circle_length(n));
+    difference_precision = 2;
     needed_length = min_circle_length(n) + difference_precision;
     actual_length = segment_length();
-    shift_size = needed_length / actual_length;
+    shift_size = 15;
     shift_vector = -normalize(orthogonal(p2 - p1, direction - p1));
 
-    INFO("max %f, min %f", max_circle_length(n), min_circle_length(n));
-    INFO("START init, need %f, has %f, diff %f, n %lu", needed_length, actual_length, difference_precision, n);
+    INFO("START circle::init(%lu), need %f, has %f, diff %f, n %lu",
+            n, needed_length, actual_length, difference_precision, n);
 
-    while (true)
+    while(true)
     {
         if (double_equals_precision(actual_length, needed_length, difference_precision))
         {
-            INFO("circle::init(n) OK, length %f, iterations to end %lu", actual_length, max_iterations);
+            INFO("init OK, length %f, iterations to end %lu", actual_length, max_iterations);
             break;
         }
+        bool lt = true;
         if (actual_length < needed_length)
         {
-            DEBUG("A");
+            DEBUG("<");
             centre = centre + shift_vector * shift_size;
         }
         else
         {
-            DEBUG("B");
+            DEBUG(">");
             centre = centre - shift_vector * shift_size;
+            lt = false;
         }
         actual_length = segment_length();
-        shift_size = needed_length / actual_length / 100;
+
+        if ((lt && actual_length > needed_length) ||
+                (!lt && actual_length < needed_length))
+        {
+            DEBUG("<>");
+            shift_size = shift_size / 2;
+        }
 
         if (--max_iterations == 0)
         {
-            INFO("max_iterations reached when finding circle, returning, need %f, has %f",
-                    needed_length, actual_length);
+            INFO("init X, max_iterations reached when finding circle");
             break;
         }
     }
+    INFO("END init, need %f, has %f, diff %f, n %lu", needed_length, actual_length, difference_precision, n);
 }
 
-// TODO: vv
 /* static */ double compact::circle::min_circle_length(size_t nodes_count)
 {
-    return nodes_count * ( BASES_DISTANCE * BASES_RATIO);
-}
-
-/* static */ double compact::circle::max_circle_length(size_t nodes_count)
-{
-    return min_circle_length(nodes_count) + nodes_count;
-}
-
-/* static */ double compact::circle::min_circle_radius(size_t nodes_count)
-{
-#define MIN_RAD_DIFF    0.6
-    double out = nodes_count * MIN_RAD_DIFF * BASES_DISTANCE;
-    if (nodes_count == 1)
-        out = 2 * out;
+    double out = nodes_count * BASES_DISTANCE * BASES_RATIO;
+    if (nodes_count < 3)
+        out += 3;
     return out;
 }
 
-/* static */ double compact::circle::max_circle_radius(size_t nodes_count)
+/*
+// TODO: vv
+[> static <] double compact::circle::min_circle_radius(size_t nodes_count)
+{
+#define MIN_RAD_DIFF    0.6
+    double out;
+    out = sqrt(nodes_count) * nodes_count * MIN_RAD_DIFF * BASES_DISTANCE;
+    //if (nodes_count == 1)
+        //out = 2 * out;
+    return out;
+}
+
+[> static <] double compact::circle::max_circle_radius(size_t nodes_count)
 {
 #define MAX_RAD_DIFF    0.8
     double out = nodes_count * MAX_RAD_DIFF * BASES_DISTANCE;
-    if (nodes_count == 1)
-        out = 2 * out;
+    //if (nodes_count == 1)
+        //out = 2 * out;
     return out;
 }
 // TODO: ^^
-
+*/
 
 void compact::circle::draw()
 {
@@ -340,7 +348,10 @@ void compact::interval::print()
     if (!it->get_label().is_paired()) // is leaf
     {
         if (is(it, rna_pair_label::deleted))
+        {
             it->get_label().todo = rna_pair_label::ignore;
+            i.has_del = true;
+        }
         else
         {
             DEBUG("!paired");

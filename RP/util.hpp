@@ -68,6 +68,7 @@ struct document
     std::string epilog;
 
     void update_rna_points();
+    static std::string default_prologue();
 };
 
 

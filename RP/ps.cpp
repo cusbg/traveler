@@ -84,8 +84,9 @@ void ps::set_io_flags()
 #define INSERTED_STR    "********************* INSERTED **********************"
 #define UNTOUCHED_STR   "********************* UNTOUCHED *********************"
 
-#define DELETE_COLOR    blue
+#define DELETE_COLOR    gray
 #define INSERT_COLOR    red
+#define REINSERT_COLOR  blue
 #define EDITED_COLOR    green
 #define OTHER_COLOR     other
 
@@ -96,7 +97,8 @@ void ps::set_io_flags()
     switch (status)
     {
         case rna_pair_label::deleted:
-            return "";
+            if (it->get_label().todo == rna_pair_label::ignore)
+                return "";
             out = print_colored(it, DELETE_COLOR);
             //wait_for_input();
             break;
@@ -108,15 +110,16 @@ void ps::set_io_flags()
             break;
 
         case rna_pair_label::inserted:
-        case rna_pair_label::reinserted:
             out = print_colored(it, INSERT_COLOR);
-            //wait_for_input();
+            break;
+        case rna_pair_label::reinserted:
+            out = print_colored(it, REINSERT_COLOR);
             break;
 
         case rna_pair_label::untouched:
             WARN("UNTOUCHED!!");
             out = print_normal(it);
-            wait_for_input();
+            //wait_for_input();
             break;
         default:
             WARN("default status!!!");
@@ -184,7 +187,7 @@ void ps::set_io_flags()
             rgb = {0, 0, 0};
             break;
         case gray:
-            rgb = {0.33, 0.33, 0.33};
+            rgb = {0.8, 0.8, 0.8};
             break;
 
 
@@ -296,7 +299,6 @@ streampos ps::save(
             ++pre_post_it(it) != rna.end_pre_post(); ++it)
     {
         psout.print_to_ps(ps::format_string(it));
-        //wait_for_input();
     }
 
     return pos;
@@ -331,6 +333,13 @@ void ps::seek(
                 streampos pos)
 {
     out.seekp(pos);
+
+    assert(out.good());
+}
+
+void ps::seek_end()
+{
+    out.seekp(0, out.end);
 
     assert(out.good());
 }

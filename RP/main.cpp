@@ -30,13 +30,18 @@
 
 #include "point.hpp"
 #include "compact_maker.hpp"
+#include "compact_maker_utils.hpp"
 #include "ps.hpp"
 
 
 using namespace std;
 
+typedef compact::circle circle;
 void tests();
 void m();
+void g();
+void h();
+void def_ps_init();
 
 int main(int argc, char** argv)
 {
@@ -52,12 +57,16 @@ int main(int argc, char** argv)
         exit(0);
     }
 
+    //h();
+
     string from, to;
 
     from = "human";
     to = "frog";
 
-    to = "rabbit";
+    //from = "mouse";
+    //to = "human";
+    //to = "rabbit";
 
     app a;
     a.run_between(from, to);
@@ -247,5 +256,116 @@ void m()
     cout << rna1.get_labels() << endl;
     abort();
 */
+
+void def_ps_init()
+{
+    APP_DEBUG_FNAME;
+
+    string s = document::default_prologue();
+    psout = ps::init("build/files/ps.ps");
+    psout.print_to_ps(s);
+}
+
+void g()
+{
+
+    circle c1, c2;
+    string s(10, 'A');
+
+    auto posun = [](circle c)
+    {
+        Point p = {50, 50};
+        c.p1 = c.p1 + p;
+        c.p2 = c.p2 + p;
+        c.centre = c.centre + p;
+        return c;
+    };
+    auto print_c = [](circle c, string s)
+    {
+        psout.print_to_ps(ps::print(c.p1, "B"));
+        psout.print_to_ps(ps::print(c.p2, "E"));
+
+        auto points = c.split(s.size());
+
+        for (size_t i = 0; i < s.size(); ++i)
+            psout.print_to_ps(ps::print(points[i], s.substr(i, 1)));
+    };
+    auto print = [&]()
+    {
+        auto pos = psout.get_pos();
+
+        c1.draw();
+        c2 = posun(c1);
+        print_c(c2, s);
+
+        psout.seek(pos);
+        wait_for_input();
+    };
+
+    c1.p1 = {0.98, -1008.84};
+    c1.p2 = {-13.16, -1022,98};
+    c1.centre = centre(c1.p1, c1.p2);
+    c1.direction = {0, 0};
+    c1.compute_sgn();
+
+    print();
+
+    while (!cin.fail())
+    {
+        c1.init(s.size());
+        print();
+    }
+
+    abort();
+}
+
+void h()
+{
+    string l, b;
+    rna_tree rna;
+    Point v;
+    struct
+    {
+        Point p1, p2;
+    } pairs;
+
+    def_ps_init();
+
+    l = "ABAAAGGGAAACCCCCCCCCCCUUUGGGGGGGGGUUUU";
+    b = "(.(((...(((...........))).........))))";
+    rna = rna_tree(b, l);
+
+    pairs.p1 = {10, 10};
+    pairs.p2 = {30, 10};
+    v = {0, 8};
+
+    for (auto it = rna.begin(); it != rna.end(); ++it)
+    {
+        auto& lbl = it->get_label();
+        if (lbl.is_paired())
+        {
+            lbl.set_points_exact(pairs.p1, 0);
+            lbl.set_points_exact(pairs.p2, 1);
+            lbl.status = rna_pair_label::touched;
+
+            pairs.p1 = pairs.p1 + v;
+            pairs.p2 = pairs.p2 + v;
+        }
+        else
+        {
+            lbl.status = rna_pair_label::inserted;
+        }
+    }
+
+    document doc;
+    doc.rna = rna;
+    compact c(doc);
+    c.make_compact();
+
+    INFO("END");
+
+    exit(0);
+}
+
 
 

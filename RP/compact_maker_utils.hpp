@@ -73,6 +73,7 @@ public:
     char b_index, e_index;
     sibling_iterator begin, end;
     std::vector<sibling_iterator> vec;
+    bool has_del;
 };
 
 std::ostream& operator<<(std::ostream& out, const compact::circle& c);
