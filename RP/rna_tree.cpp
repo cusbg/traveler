@@ -30,6 +30,22 @@ using namespace std;
 
 inline std::vector<rna_node_type> convert(const std::string& labels);
 
+struct iter_hash
+{
+    typedef unordered_map<
+                        rna_tree::iterator,
+                        size_t,
+                        iter_hash> iterator_hash_map;
+
+    inline size_t operator()(
+                rna_tree::iterator it) const;
+
+    template <typename funct>
+    static iterator_hash_map compute_sizes(
+                const rna_tree& rna, funct f);
+};
+
+
 rna_tree::rna_tree(
                 const std::string& brackets,
                 const std::string& labels,
@@ -68,6 +84,7 @@ bool rna_tree::operator==(
 rna_tree::iterator rna_tree::insert(sibling_iterator it, rna_node_type node, size_t steal)
 {
     //APP_DEBUG_FNAME;
+    logger.debugStream() << "insert(" << label(it) << ", " << steal << ") <- " << label_str(node);
     //DEBUG("insert(%s, %lu) <- %s", label(it), steal, label_str(node));
 
     sibling_iterator in, next;
@@ -134,36 +151,25 @@ void rna_tree::modify(const rna_tree& other)
 
 
 
-struct iter_hash
-{
-    typedef unordered_map<
-                        rna_tree::iterator,
-                        size_t,
-                        iter_hash> iterator_hash_map;
-
-    inline size_t operator()(
-                rna_tree::iterator it) const;
-
-    template <typename funct>
-    static iterator_hash_map compute_sizes(
-                const rna_tree& rna, funct f);
-};
-
 
 void rna_tree::merge(rna_tree other, const mapping& m)
 {   // this <- by mala byt template rna, s inicializovanymi bodmi..
     APP_DEBUG_FNAME;
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     iterator it1, it2;
     iterator end1, end2;
-    sibling_iterator sib1, sib2;
-    auto m_del = iter_hash::compute_sizes(*this, [](sibling_iterator sib) { return !is(sib, rna_pair_label::deleted); });
-    auto m_ins = iter_hash::compute_sizes(other, [](sibling_iterator sib) { return !is(sib, rna_pair_label::inserted); });
+    sibling_iterator sib1, sib2, ins;
+    iter_hash::iterator_hash_map m_del, m_ins;
 
     mark      (m.get_to_remove(), rna_pair_label::deleted);
     other.mark(m.get_to_insert(), rna_pair_label::inserted);
     modify(other);
+
+    m_del = iter_hash::compute_sizes(*this, [](sibling_iterator sib) { return !is(sib, rna_pair_label::deleted); });
+    m_ins = iter_hash::compute_sizes(other, [](sibling_iterator sib) { return !is(sib, rna_pair_label::inserted); });
+    
+    assert(m_del.at(begin()) == m_ins.at(other.begin()));
 
     it1 = begin();
     it2 = other.begin();
@@ -186,6 +192,7 @@ void rna_tree::merge(rna_tree other, const mapping& m)
                 if (is(sib2, rna_pair_label::inserted))
                 {
                     size_t n;
+                    ins = sib1;
 
                     if (!sib2->get_label().is_paired())
                         n = 0;
@@ -197,17 +204,25 @@ void rna_tree::merge(rna_tree other, const mapping& m)
                         size_t actual_size = m_del.at(sib1);
                         n = 1;
 
+                        DEBUG("need %lu, actual %lu", needed_size, actual_size);
                         while (needed_size > actual_size)
                         {
-                            assert(sib1 != it1.end());
-                            actual_size += m_del.at(sib1);
                             ++sib1;
                             ++n;
+                            assert(sib1 != it1.end());
+                            actual_size += m_del.at(sib1);
+                        }
+                        DEBUG("need %lu, actual %lu", needed_size, actual_size);
+                        if (needed_size != actual_size)
+                        {
+                            print_subtree(sib1);
+                            print_subtree(sib2);
+                            sib1 = insert(ins, *sib2, n);
+                            print_subtree(sib1);
                         }
                         assert(needed_size == actual_size);
-                        --sib1;
                     }
-                    sib1 = insert(sib1, *sib2, n);
+                    sib1 = insert(ins, *sib2, n);
                 }
 
                 ++sib1;
@@ -220,6 +235,12 @@ void rna_tree::merge(rna_tree other, const mapping& m)
             {   // insert all right brothers of sib2
                 if (is(sib2, rna_pair_label::inserted))
                 {
+                    if (sib2->get_label().is_paired())
+                    {
+                        print_subtree(it1);
+                        print_subtree(it2);
+                        abort();
+                    }
                     assert(!sib2->get_label().is_paired());
                     sib1 = insert(sib1, *sib2, 0);
                     ++sib1;
