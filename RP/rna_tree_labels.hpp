@@ -95,8 +95,9 @@ public:
     } status = untouched;
     enum todo_type
     {
+        redraw,
+        undefined,
         ignore,
-        undefined
     } todo = undefined;
 
 private:

@@ -271,6 +271,18 @@ void ps::set_io_flags()
 {
     stringstream out;
 
+    if (p1.bad() || p2.bad())
+    {
+        ERR("bad_point, cannot draw line");
+        return "";
+    }
+
+    Point pa;
+    pa = base_pair_edge_point(p1, p2);
+
+    p2 = base_pair_edge_point(p2, p1);
+    p1 = pa;
+
     out
         << std::left
         << std::setw(PS_COLUMNS_WIDTH)
@@ -385,5 +397,59 @@ size_t ps::fill(char ch)
     }
     seek(pos);
     return n;
+}
+
+/* global */ std::string to_string(RGB color)
+{
+    string out;
+
+    switch (color)
+    {
+        case red:
+            out = "RED";
+            break;
+        case green:
+            out = "GREEN";
+            break;
+        case blue:
+            out = "BLUE";
+            break;
+        case black:
+            out = "BLACK";
+            break;
+        case gray:
+            out = "GRAY";
+            break;
+
+        case other:
+        default:
+            ERR("no default value for rgb");
+            abort();
+    }
+    return out;
+}
+
+void print_color_help()
+{
+    APP_DEBUG_FNAME;
+    Point p = {350, -800};
+    Point vec = {0, -20};
+
+    std::vector<std::pair<RGB, std::string>> colors = 
+    {
+        {black, "normal"},
+        {gray, "delete"},
+        {red, "insert"},
+        {blue, "reinsert"},
+        {green, "edited"},
+    };
+
+    for (auto c : colors)
+    {
+        psout.print_to_ps(ps::print(c.first));
+        psout.print_to_ps(ps::print(p, c.second));
+        p = p + vec;
+    }
+    psout.print_to_ps(ps::print(black));
 }
 

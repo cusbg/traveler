@@ -89,6 +89,8 @@ public:
                 Point p1,
                 Point p2);
     // ^^ 
+    static std::string print_color_help();
+
 
 private:
     void set_io_flags();
@@ -99,6 +101,8 @@ private:
     std::fstream out;
 };
 
+std::string to_string(RGB color);
+void print_color_help();
 
 extern ps psout;
 

@@ -38,10 +38,9 @@ using namespace std;
 
 typedef compact::circle circle;
 void tests();
-void m();
+void def_ps_init();
 void g();
 void h();
-void def_ps_init();
 
 int main(int argc, char** argv)
 {
@@ -67,6 +66,11 @@ int main(int argc, char** argv)
     //from = "mouse";
     //to = "human";
     //to = "rabbit";
+
+    //from = "rabbit";
+    //to = "human";
+    from = "frog";
+    to = "rabbit";
 
     app a;
     a.run_between(from, to);
@@ -111,48 +115,6 @@ void tests()
     }
 }
 
-void m()
-{
-
-    psout = ps::init("/tmp/file");
-
-    auto pos = psout.print_to_ps("ahoj\n");
-    wait_for_input();
-    psout.print_to_ps("AHOJ\n");
-    psout.seek(pos);
-    psout.print_to_ps(".\n");
-    wait_for_input();
-    psout.print_to_ps("___________________________\n");
-
-
-
-    abort();
-
-
-
-    string l1, l2, b1, b2;
-    rna_tree rna1, rna2;
-    string ps_in, ps_out;
-
-    l1 = "-5142aba3456978089-";
-    b1 = "((.(.(.).)).(.(.)))";
-
-    l2 = "abcdedfbg";
-    b2 = ".(.(.).).";
-
-    rna1 = rna_tree(b1, l1);
-    rna2 = rna_tree(b2, l2);
-
-    auto it = ++rna1.begin();
-
-    it = rna1.insert(it.end(), *rna2.begin(), 0);
-
-    cout << *++it << endl;
-
-    rna1.print_tree();
-    
-    abort();
-}
 
 /*
 [>

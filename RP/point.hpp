@@ -62,6 +62,7 @@ Point orthogonal(Point p);
 
 Point orthogonal(Point p, Point direction);
 
+Point base_pair_edge_point(Point from, Point to);
 
 
 #endif /* !POINT_HPP */

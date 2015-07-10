@@ -25,7 +25,6 @@
 #include "app.hpp"
 #include "rna_tree.hpp"
 #include "types.hpp"
-#include "macros.hpp"
 #include "ps.hpp"
 #include "compact_maker.hpp"
 
@@ -64,28 +63,33 @@ void app::run_between(
 {
     APP_DEBUG_FNAME;
 
-    string labels1      = read_file(SEQ(first));
-    string brackets1    = read_file(FOLD(first));
+    string labels1, labels2, brackets1, brackets2, fileIn, fileOut;
+    rna_tree rna1, rna2;
+    document doc;
 
-    string labels2      = read_file(SEQ(second));
-    string brackets2    = read_file(FOLD(second));
+    labels1      = read_file(SEQ(first));
+    brackets1    = read_file(FOLD(first));
 
-    string fileIn       = PS_IN(first);
-    string fileOut      = PS_OUT(first, second);
+    labels2      = read_file(SEQ(second));
+    brackets2    = read_file(FOLD(second));
+
+    fileIn       = PS_IN(first);
+    fileOut      = PS_OUT(first, second);
+
+    rna1 = rna_tree(brackets1, labels1, first);
+    rna2 = rna_tree(brackets2, labels2, second);
 
     psout = ps::init(fileOut);
 
     auto map = mapping::read_mapping_file(MAP(first, second));
 
-    rna_tree rna1(brackets1, labels1, first);
-    rna_tree rna2(brackets2, labels2, second);
-
-    document doc = read_ps(fileIn);
+    doc = read_ps(fileIn);
     doc.rna = rna1;
     doc.update_rna_points();
 
     psout.print_to_ps(doc.prolog);
-    doc.rna.merge(rna2, map);
+    print_color_help();
+    rna_tree::merge(doc.rna, rna2, map);
 
     compact c(doc);
     c.make_compact();

@@ -23,9 +23,7 @@
 
 #include "generator.hpp"
 #include "types.hpp"
-#include "macros.hpp"
 #include "util.hpp"
-//#include "svg.hpp"
 
 
 using namespace std;

@@ -170,3 +170,11 @@ Point orthogonal(Point p, Point direction)
         return -o;
 }
 
+Point base_pair_edge_point(Point from, Point to)
+{
+    Point vec = {3, 3};
+    vec = vec + normalize(to - from) * 4;
+    return from + vec;
+}
+
+

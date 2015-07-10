@@ -29,33 +29,59 @@
 class compact
 {
 public: //TODO: remove
-    using iterator = rna_tree::iterator;
-    using sibling_iterator = rna_tree::sibling_iterator;
+    using iterator          = rna_tree::iterator;
+    using sibling_iterator  = rna_tree::sibling_iterator;
     struct interval;
     struct circle;
 public:
-    compact(const document& _doc) : doc(_doc) {}
+    compact(
+                const document& _doc);
     void make_compact();
 
 private:
-    void shift_nodes(iterator it, Point vector);
+    /*
+     * shift all nodes in it-subtree
+     */
+    void shift_branch(
+                iterator it,
+                Point vector);
+    void set_distance(
+                iterator parent,
+                iterator child,
+                double dist);
+    /*
+     * set points to lie on circle
+     */
+    void reinsert(
+                std::vector<sibling_iterator> nodes,
+                const circle& c);
+
 
     void init();
-    void init_points(iterator it);
-    void normalize_pair_distance(iterator it);
+    void init_points(
+                iterator it);
+    /*
+     * normalize distance between base pairs
+     * from     G --- C
+     * to       G - C
+     */
+    void normalize_pair_distance(
+                iterator it);
 
     void make_inserted();
     void make_deleted();
 
-    circle create(const interval& in);
+    circle create(
+                const interval& in);
 
-    void reinsert(std::vector<sibling_iterator> nodes, const circle& c);
 
-    void set_distance(iterator parent, iterator child, double dist);
-
-    void remake(const interval& in, bool is_hairpin = false);
-    void remake_interial_loops(const std::vector<interval> vec);
-    void remake_multibranch_loops(const std::vector<interval> vec);
+    void remake(
+                const interval& in,
+                bool is_hairpin = false);
+    void remake_interial_loops(
+                const std::vector<interval> vec);
+    void remake_multibranch_loops(
+                const std::vector<interval> vec);
 
 
 

@@ -35,48 +35,65 @@ class rna_tree : public tree_base<rna_node_type>
 public:
     virtual ~rna_tree() = default;
     rna_tree() = default;
-
-    bool operator==(
-                rna_tree& other);
     rna_tree(
                 const std::string& brackets,
                 const std::string& labels,
                 const std::string& _name = "");
 
+    bool operator==(
+                const rna_tree& other) const;
 
-
-    iterator insert(sibling_iterator it, rna_node_type node, size_t steal_children = 0);
-    template <typename iter>
-        iter remove(iter it);
-    void merge(rna_tree other, const mapping& m);
+    /*
+     * merge 2 rna-s, inserts inserted-nodes from other.
+     *
+     * ATTENTION:
+     *      could delete some nodes from templated-rna,
+     *      because of similar situation:
+     *          templ: (..del(..))
+     *          other: (.ins(..).)
+     *          -> output should be (.(..).), so we need to remove del-node
+     */
+    static void merge(
+                rna_tree& templated,
+                rna_tree other,
+                const mapping& m);
 
 private:
-    void mark(std::vector<size_t> node_ids, rna_pair_label::label_status_type status);
-    void modify(const rna_tree& other);
+    /*
+     * inserts node(label) before it and steal steal_children next it siblings
+     */
+    iterator insert(
+                sibling_iterator it,
+                rna_pair_label label,
+                size_t steal_children = 0);
+    /*
+     * remove it from tree, returns next node-iter
+     */
+    template <typename iter>
+        iter erase(
+                iter it);
+    /*
+     * marks nodes in vector with status
+     */
+    void mark(
+                std::vector<size_t> postorder_indexes,
+                rna_pair_label::label_status_type status);
+    /*
+     * sets node-labels from other-rna,
+     * when nodes are not deleted/inserted
+     */
+    void modify(
+                const rna_tree& other);
 
 public:
     std::string name;
 };
 
-template <typename iter>
-    iter rna_tree::remove(iter it)
-{
-    DEBUG("erasing node %s", label_str(*it));
-
-    it = _tree.flatten(it);
-    assert(is_leaf(it));
-    iter del = it++;
-    _tree.erase(del);
-    --_size;
-    return --it;
-}
 
 
+// GLOBAL FUNCTIONS:
 size_t get_label_index(
                 rna_tree::pre_post_order_iterator iter);
-
-size_t get_label_index(
-                rna_tree::base_iterator iter);
 
 bool is(
                 rna_tree::iterator it,

@@ -35,6 +35,65 @@ using namespace std;
 #define UPDATE_PS psout.seek(psout.save(doc.rna)); wait_for_input()
 
 
+compact::compact(
+                const document& _doc)
+        : doc(_doc)
+{
+    APP_DEBUG_FNAME;
+}
+
+void compact::shift_branch(iterator it, Point vector)
+{
+    APP_DEBUG_FNAME;
+
+    function<size_t(iterator, Point)> recursion = [&recursion](iterator iter, Point vec)
+    {
+        size_t out = 1;
+        auto& label = iter->get_label();
+        for (size_t i = 0; i < label.size(); ++i)
+            label.lbl(i).point = label.lbl(i).point + vec;
+        for (sibling_iterator sib = iter.begin(); sib != iter.end(); ++sib)
+            out += recursion(sib, vec);
+        return out;
+    };
+
+    size_t n = recursion(it, vector);
+    DEBUG("shift by %s, #nodes=%lu", vector.to_string().c_str(), n);
+}
+
+void compact::set_distance(iterator parent, iterator child, double dist)
+{
+    APP_DEBUG_FNAME;
+
+    Point p1, p2, vec, shift;
+    double actual;
+
+    p1 = parent->get_label().get_centre();
+    p2 = child->get_label().get_centre();
+    vec = normalize(p2 - p1);
+    actual = distance(p1, p2);
+    shift = vec * (dist - actual);
+
+    shift_branch(child, shift);
+}
+
+void compact::reinsert(vector<sibling_iterator> nodes, const circle& c)
+{
+    auto points = c.split(nodes.size());
+
+    for (size_t i = 0; i < points.size(); ++i)
+    {
+        auto it = nodes.at(i);
+        auto& label = it->get_label();
+
+        assert(!label.is_paired());
+        if (label.status == rna_pair_label::touched)
+            label.status = rna_pair_label::reinserted;
+        label.set_points_exact(points.at(i), 0);
+    }
+};
+
+
 void compact::make_compact()
 {
     APP_DEBUG_FNAME;
@@ -43,12 +102,13 @@ void compact::make_compact()
 
     init();
 
-    psout.seek(psout.save(doc.rna));
-    //wait_for_input();
+    UPDATE_PS;
 
     make_inserted();
     make_deleted();
 }
+
+
 
 void compact::normalize_pair_distance(iterator it)
 {
@@ -98,7 +158,7 @@ void compact::init_points(iterator it)
     }
     else
         label.lbl(0).point = plabel.lbl(0).point + vec;
-};
+}
 
 void compact::init()
 {
@@ -120,46 +180,12 @@ void compact::init()
 }
 
 
-void compact::reinsert(vector<sibling_iterator> nodes, const circle& c)
-{
-    auto points = c.split(nodes.size());
-
-    for (size_t i = 0; i < points.size(); ++i)
-    {
-        auto it = nodes.at(i);
-        auto& label = it->get_label();
-
-        assert(!label.is_paired());
-        if (label.status == rna_pair_label::touched)
-            label.status = rna_pair_label::reinserted;
-        label.set_points_exact(points.at(i), 0);
-    }
-};
-
-void compact::shift_nodes(iterator it, Point vector)
-{
-    APP_DEBUG_FNAME;
-
-    function<size_t(iterator, Point)> recursion = [&recursion](iterator iter, Point vec)
-    {
-        size_t out = 1;
-        auto& label = iter->get_label();
-        for (size_t i = 0; i < label.size(); ++i)
-            label.lbl(i).point = label.lbl(i).point + vec;
-        for (sibling_iterator sib = iter.begin(); sib != iter.end(); ++sib)
-            out += recursion(sib, vec);
-        return out;
-    };
-
-    size_t n = recursion(it, vector);
-    DEBUG("posunutie o %s, #vrcholov=%lu", vector.to_string().c_str(), n);
-}
-
 
 
 compact::circle compact::create(const interval& in)
 {
     circle c;
+    // TODO: lepsia inicializacia direction
 
     c.p1 = in.begin->get_label().lbl(in.b_index).point;
     c.p2 = in.end->get_label().lbl(in.e_index).point;
@@ -187,25 +213,9 @@ void compact::remake(const interval& in, bool is_hairpin)
     }
     else
     {
-        WARN("skipping, #nodes = %lu > max = %lu",
+        WARN("remake(): skipping, #nodes = %lu > max = %lu",
                 in.vec.size(), MAX_NODES_MOVE);
     }
-}
-
-void compact::set_distance(iterator parent, iterator child, double dist)
-{
-    APP_DEBUG_FNAME;
-
-    Point p1, p2, vec, shift;
-    double actual;
-
-    p1 = parent->get_label().get_centre();
-    p2 = child->get_label().get_centre();
-    vec = normalize(p2 - p1);
-    actual = distance(p1, p2);
-    shift = vec * (dist - actual);
-
-    shift_nodes(child, shift);
 }
 
 
@@ -273,6 +283,19 @@ void compact::remake_interial_loops(const std::vector<interval> vec)
     remake(vec[1]);
 }
 
+void compact::remake_multibranch_loops(const std::vector<interval> vec)
+{
+    APP_DEBUG_FNAME;
+
+    for (auto in : vec)
+    {
+        if (!in.has_del)
+            continue;
+
+        remake(in);
+    }
+}
+
 
 void compact::make_deleted()
 {
@@ -299,7 +322,7 @@ void compact::make_deleted()
                 case 2: // interial loop/bulge
                     remake_interial_loops(intervals);
                 default:
-                    remake_multibranch_loops(intervals);
+                    //remake_multibranch_loops(intervals);
                     break;
             }
 
@@ -308,19 +331,6 @@ void compact::make_deleted()
         ++it;
     }
     UPDATE_PS;
-}
-
-void compact::remake_multibranch_loops(const std::vector<interval> vec)
-{
-    APP_DEBUG_FNAME;
-
-    for (auto in : vec)
-    {
-        if (!in.has_del)
-            continue;
-
-        remake(in);
-    }
 }
 
 

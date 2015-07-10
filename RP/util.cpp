@@ -23,7 +23,6 @@
 
 #include "util.hpp"
 #include "app.hpp"
-#include "macros.hpp"
 
 
 using namespace std;
@@ -148,7 +147,7 @@ document read_ps(
         DEBUG("epilog '%s'", line.c_str());
     }
 
-    doc.prolog = document::default_prologue();
+    //doc.prolog = document::default_prologue();
 
     return doc;
 }
