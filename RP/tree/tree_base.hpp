@@ -31,7 +31,9 @@
 
 // global functions:
 template <typename iterator>
-inline const char* label(iterator it);
+inline std::string label(iterator it);
+
+#define clabel(iter) label(iter).c_str()
 
 template <typename iterator>
 inline size_t id(iterator it);
@@ -67,6 +69,8 @@ public:
     typedef typename tree_type::iterator iterator;
     typedef std::vector<sibling_iterator> path_type;
     typedef tree_node_<node_type> tree_node;
+
+    struct iterator_hash;
 
 protected:
     tree_base() = default;
@@ -142,7 +146,7 @@ private:
 protected:
     tree_type _tree;
     size_t _size = 1;   // vzdy je tam aspon ROOT_id
-    size_t id = ID++;
+    size_t _id = ID++;
     // do korena posadi vrchol ROOT_id
 };
 
@@ -163,7 +167,7 @@ tree_base<node_type>::tree_base(const std::string& brackets, const labels_array&
 {
     assert(brackets.size() == _labels.size());
     
-    _tree.set_head(node_type("ROOT_" + std::to_string(id), true));
+    _tree.set_head(node_type("ROOT_" + std::to_string(_id), true));
     //tree_ptr = std::make_shared<tree_type>(node_type("ROOT_" + std::to_string(id), true));
     auto iter = begin();
     size_t i = 0;
@@ -208,7 +212,7 @@ tree_base<node_type>::tree_base(const std::string& brackets, const labels_array&
 template <typename node_type>
 size_t tree_base<node_type>::get_id() const
 {
-    return id;
+    return _id;
 }
 
 template <typename node_type>

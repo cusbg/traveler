@@ -44,6 +44,8 @@ private:
     void merge(
                 rna_tree& templated,
                 const rna_tree& other);
+    void unique_indexes(
+                iterator it);
 public:
     size_t child_index(
                 sibling_iterator sib);

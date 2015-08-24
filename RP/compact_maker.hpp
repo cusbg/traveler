@@ -22,7 +22,7 @@
 #ifndef COMPACT_MAKER_HPP
 #define COMPACT_MAKER_HPP
 
-#include "util.hpp"
+#include "rna_tree.hpp"
 #include "point.hpp"
 
 
@@ -31,24 +31,31 @@ class compact
 public: //TODO: remove
     using iterator          = rna_tree::iterator;
     using sibling_iterator  = rna_tree::sibling_iterator;
-    struct interval;
+    struct intervals;
     struct circle;
+    struct init;
 public:
-    compact(
-                const document& _doc);
+    compact(const rna_tree& _rna);
     void make_compact();
 
 private:
-    /*
-     * shift all nodes in it-subtree
-     */
-    void shift_branch(
-                iterator it,
-                Point vector);
-    void set_distance(
-                iterator parent,
-                iterator child,
-                double dist);
+
+    template <typename interval>
+        void redraw(interval in);
+    void redraw(
+                iterator beg,
+                iterator end);
+    void reinsert(
+                std::vector<iterator> nodes,
+                const circle& c);
+    void remake(
+                iterator it);
+
+
+
+
+
+#ifdef NODEF
     /*
      * set points to lie on circle
      */
@@ -60,12 +67,7 @@ private:
     void init();
     void init_points(
                 iterator it);
-    /*
-     * normalize distance between base pairs
-     * from     G --- C
-     * to       G - C
-     */
-    void normalize_pair_distance(
+    bool init_points_recursive(
                 iterator it);
 
     void make_inserted();
@@ -83,11 +85,14 @@ private:
     void remake_multibranch_loops(
                 const std::vector<interval> vec);
 
+#endif
 
+public:
+    rna_tree& get() {return rna;}
 
 
 private:
-    document doc;
+    rna_tree rna;
 };
 
 #define branches_count(_iter) \

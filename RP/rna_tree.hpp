@@ -43,22 +43,10 @@ public:
     bool operator==(
                 const rna_tree& other) const;
 
-    /*
-     * merge 2 rna-s, inserts inserted-nodes from other.
-     *
-     * ATTENTION:
-     *      could delete some nodes from templated-rna,
-     *      because of similar situation:
-     *          templ: (..del(..))
-     *          other: (.ins(..).)
-     *          -> output should be (.(..).), so we need to remove del-node
-     */
-    static void merge(
-                rna_tree& templated,
-                rna_tree other,
-                const mapping& m);
+    void test_branches() const;
 
-private:
+
+public:
     /*
      * inserts node(label) before it and steal steal_children next it siblings
      */
@@ -72,22 +60,28 @@ private:
     template <typename iter>
         iter erase(
                 iter it);
-    /*
-     * marks nodes in vector with status
-     */
-    void mark(
-                std::vector<size_t> postorder_indexes,
-                rna_pair_label::label_status_type status);
-    /*
-     * sets node-labels from other-rna,
-     * when nodes are not deleted/inserted
-     */
-    void modify(
-                const rna_tree& other);
-
 public:
     std::string name;
 };
+
+
+
+template <typename iter>
+    iter rna_tree::erase(iter it)
+{
+    DEBUG("erasing node %s", clabel(it));
+
+    iter del;
+
+    it = _tree.flatten(it);
+    assert(is_leaf(it));
+
+    --_size;
+
+    del = it++;
+    _tree.erase(del);
+    return it;
+}
 
 
 

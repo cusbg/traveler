@@ -93,12 +93,7 @@ public:
         pair_changed
 
     } status = untouched;
-    enum todo_type
-    {
-        redraw,
-        undefined,
-        ignore,
-    } todo = undefined;
+    std::vector<size_t> remake;
 
 private:
     std::vector<rna_label> labels;

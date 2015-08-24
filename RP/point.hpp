@@ -1,5 +1,5 @@
 /*
- * File: point.hpp
+ * File: Point.hpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
@@ -38,6 +38,8 @@ struct Point
     Point operator-() const;
     Point operator/(double value) const;
     Point operator*(double value) const;
+    Point& operator+=(Point other);
+    Point& operator-=(Point other);
     bool operator==(Point other) const;
 
     Point swap_xy() const;
@@ -45,6 +47,8 @@ struct Point
     bool bad() const;
     static Point bad_point();
 };
+
+Point operator*(double value, Point p);
 
 Point centre(Point p1, Point p2);
 
@@ -62,8 +66,26 @@ Point orthogonal(Point p);
 
 Point orthogonal(Point p, Point direction);
 
+Point move_point(Point p, Point move_to, double length);
+
 Point base_pair_edge_point(Point from, Point to);
 
+bool lies_on_line(Point p1, Point p2, Point p3);
+
+template <typename T>
+inline T squared(const T& t)
+{
+    return t * t;
+}
+
+
+namespace std
+{
+inline std::string to_string(Point p)
+{
+    return p.to_string();
+}
+}
 
 #endif /* !POINT_HPP */
 

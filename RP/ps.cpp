@@ -97,8 +97,8 @@ void ps::set_io_flags()
     switch (status)
     {
         case rna_pair_label::deleted:
-            if (it->get_label().todo == rna_pair_label::ignore)
-                return "";
+            //if (it->get_label().todo == rna_pair_label::ignore)
+                //return "";
             out = print_colored(it, DELETE_COLOR);
             //wait_for_input();
             break;
@@ -131,7 +131,24 @@ void ps::set_io_flags()
     bool edge = false;
     edge = true;
     if (edge)
+    {
+        if (it->get_label().is_paired() &&
+                it->get_label().inited_points() &&
+                distance(it->get_label().lbl(0).point,
+                    it->get_label().lbl(1).point) == 0)
+        {
+            ERR("ERR");
+            cout << *it << it->get_label().lbl(0).point << ";" << it->get_label().lbl(1).point << endl;
+            rna_tree::print_subtree(it);
+            psout.print_to_ps(
+                    ps::print(other) +
+                    ps::print(it->get_label().lbl(0)) +
+                    ps::print(it->get_label().lbl(1)));
+            abort();
+        }
+
         out += print_edge(it);
+    }
 
     return out;
 };
@@ -341,6 +358,25 @@ streampos ps::print_to_ps(
     return pos;
 }
 
+streampos ps::print_subtree(
+                rna_tree::iterator it)
+{
+    APP_DEBUG_FNAME;
+    rna_tree::pre_post_order_iterator begin, end;
+    streampos pos = get_pos();
+
+    begin = rna_tree::pre_post_order_iterator(it, true);
+    end = rna_tree::pre_post_order_iterator(it, false);
+    ++end;
+
+    while (begin != end)
+    {
+        print_to_ps(ps::print(begin->get_label().lbl(get_label_index(begin))));
+        ++begin;
+    }
+    return pos;
+}
+
 void ps::seek(
                 streampos pos)
 {
@@ -432,7 +468,7 @@ size_t ps::fill(char ch)
 void print_color_help()
 {
     APP_DEBUG_FNAME;
-    Point p = {350, -800};
+    Point p = {350, -600};
     Point vec = {0, -20};
 
     std::vector<std::pair<RGB, std::string>> colors = 

@@ -1,5 +1,5 @@
 /*
- * File: tree_base_iterators.hpp
+ * File: tree_base_utils.hpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
@@ -68,6 +68,11 @@ private:
     bool preorder;
 };
 
+template <typename node_type>
+struct tree_base<node_type>::iterator_hash
+{
+    size_t operator()(iterator it) const;
+};
 
 
 
@@ -75,7 +80,7 @@ private:
 
 /* global function */
 template <typename iterator>
-const char* label(iterator it)
+std::string label(iterator it)
 {
     if (it.node == NULL)
         return "<null>";
@@ -187,7 +192,7 @@ typename tree_base<node_type>::_pre_post_order_iterator& tree_base<node_type>::_
     // if postorder and have next sibling, became him, and become preorder
 
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
-    DEBUG("%s", label(*this));
+    DEBUG("%s", clabel(*this));
     if (preorder)
     {
         if (is_leaf(*this))
@@ -225,7 +230,7 @@ typename tree_base<node_type>::_pre_post_order_iterator& tree_base<node_type>::_
             preorder = false;
         }
     }
-    DEBUG("%s", label(*this));
+    DEBUG("%s", clabel(*this));
 
     return *this;
 }
@@ -479,6 +484,16 @@ bool tree_base<node_type>::is_only_child(const base_iterator& it)
     return (it.node->parent == nullptr ||
             it.node->parent->first_child == it.node->parent->last_child);
 }
+
+
+
+template <typename node_type>
+size_t tree_base<node_type>::iterator_hash::operator()(iterator it) const
+{
+    assert(it.node != nullptr);
+    return ::id(it);
+}
+
 
 #endif /* !TREE_BASE_UTILS_HPP */
 

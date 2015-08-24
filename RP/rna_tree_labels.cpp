@@ -24,6 +24,26 @@
 using namespace std;
 
 
+std::string to_string(rna_pair_label::label_status_type status)
+{
+    string out;
+
+#define ST(status) case rna_pair_label::status: out = #status; break;
+
+    switch (status)
+    {
+        ST(inserted)
+        ST(deleted)
+        ST(touched)
+        ST(untouched)
+        ST(edited)
+        ST(reinserted)
+        ST(pair_changed)
+    }
+    return out;
+}
+
+
 // RNA_PAIR_LABEL:
 rna_pair_label::rna_pair_label(
                 const std::string& s)
@@ -79,7 +99,7 @@ bool rna_pair_label::is_paired() const
 void rna_pair_label::set_points_exact(
                 const rna_pair_label& from)
 {
-    //APP_DEBUG_FNAME;
+    APP_DEBUG_FNAME;
 
     for (size_t i = 0; i < 2; ++i)
         if (i < labels.size() && i < from.labels.size())
@@ -89,7 +109,10 @@ void rna_pair_label::set_points_exact(
 void rna_pair_label::set_points_nearby(
                 const rna_pair_label& from)
 {
-    //APP_DEBUG_FNAME;
+    APP_DEBUG_FNAME;
+
+    if (labels.size() != from.labels.size())
+        WARN("wrong lbl sizes");
 
     for (size_t i = 0; i < 2; ++i)
         if (i < labels.size() && i < from.labels.size())
@@ -101,8 +124,8 @@ void rna_pair_label::set_points_nearby(
                 size_t which)
 {
     double posunutie;
-    //posunutie = 5 + rand() % 10;
-    posunutie = 5;
+    posunutie = 5 + rand() % 10;
+    //posunutie = 5;
     p.x += posunutie;
     //p.y += posunutie;
 
@@ -130,6 +153,7 @@ std::string rna_pair_label::get_points_string() const
 std::string rna_pair_label::to_string() const
 {
     string out;
+
     if (status == inserted)
         out += "__ins`";
     if (status == deleted)
@@ -160,12 +184,26 @@ void rna_pair_label::set_label_strings(
 
     //APP_DEBUG_FNAME;
 
-    DEBUG("changing labels from %s to %s", to_string().c_str(), from.to_string().c_str());
+    assert(&from != nullptr);
 
+    //DEBUG("%s <-> %s", to_string().c_str(), from.to_string().c_str());
+
+    if (status != untouched)
+    {
+        logger.warnStream() << *this << " " << from << " STATUS: " << ::to_string(status);
+    }
     assert(status == untouched);
 
+    if (is_paired() != from.is_paired())
+    {
+        ERR("not compatible nodes: paired-nonpaired");
+        abort();
+    }
     if (to_string() != from.to_string())
+    {
         status = edited;
+        DEBUG("changing labels from %s to %s", to_string().c_str(), from.to_string().c_str());
+    }
     else if (labels.size() != from.labels.size())
     {
         DEBUG("pair_changed");
@@ -197,6 +235,9 @@ Point rna_pair_label::get_centre() const
         if (!inited_points())
         {
             WARN("::get_centre() -> not inited");
+            DEBUG("%s", this->to_string().c_str());
+            //double i = rand() % 10;
+            //return Point({100 + i, i});
             return Point::bad_point();
         }
         else

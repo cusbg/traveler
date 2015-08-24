@@ -23,60 +23,42 @@
 #define COMPACT_MAKER_UTILS_HPP
 
 #include "compact_maker.hpp"
+#include "compact_init.hpp"
+#include "compact_maker_utils.hpp"
+#include "compact_circle.hpp"
 
-struct compact::circle
+struct compact::intervals
 {
-    void compute_sgn();
+    struct interval;
+    enum rna_structure_type
+    {
+        hairpin,
+        interior_loop,
+        multibranch_loop
+    };
 
-    void init(size_t n);
-    Point rotate(double angle) const;
-    std::vector<Point> split(size_t n) const;
-    bool lies_in_segment(Point p) const;
+    void create(iterator it);
 
-    double radius() const;
-    double segment_angle() const;
-    double segment_length() const;
-
-    static double min_circle_length(size_t nodes_count);
-    static double max_circle_length(size_t nodes_count);
-    static double min_circle_radius(size_t nodes_count);
-    static double max_circle_radius(size_t nodes_count);
-
-    void draw();   //TODO remove
-
-public:
-    Point centre;
-    Point p1, p2;
-    Point direction;
-
-private:
-    /*
-     * sgn =  1 ~> v protismere hod. ruciciek
-     * sgn = -1 ~> v smere hodinovych ruciciek
-     */
-    char sgn = 0;
+    std::vector<interval> vec;
+    rna_structure_type type;
 };
 
-struct compact::interval
+struct compact::intervals::interval
 {
-    typedef rna_tree::iterator iterator;
-    typedef rna_tree::sibling_iterator sibling_iterator;
-
-    static std::vector<interval> create(sibling_iterator it);
-
     void print();
-
-private:
-    static void add_recursive(sibling_iterator it, interval& in, std::vector<interval>& intervals);
+    Point get_circle_direction();
 
 public:
     char b_index, e_index;
     sibling_iterator begin, end;
-    std::vector<sibling_iterator> vec;
-    bool has_del;
+    std::vector<iterator> vec;
+    bool remake = false;
 };
 
-std::ostream& operator<<(std::ostream& out, const compact::circle& c);
+template <>
+        void compact::redraw<compact::intervals::interval>(intervals::interval in);
+
+Point get_direction(rna_tree::iterator it);
 
 #endif /* !COMPACT_MAKER_UTILS_HPP */
 

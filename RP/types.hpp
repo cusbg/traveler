@@ -57,15 +57,19 @@ inline void wait_for_input()
     std::cin.read(&ch, 1);
 }
 
-template <typename T>
-inline T squared(T t)
+namespace std
 {
-    return t * t;
-}
-
 inline std::string to_string(bool b)
 {
     return b ? "true" : "false";
+}
+#define to_cstr(val) to_string(val).c_str()
+}
+
+template <typename container_type, typename value_type>
+inline bool contains(const container_type& c, const value_type& v)
+{
+    return std::find(c.begin(), c.end(), v) != c.end();
 }
 
 

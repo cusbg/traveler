@@ -98,7 +98,7 @@ void matcher::mark(
         --index;    // indexy cislovane od 1
         size_t to_move = index - i;
         it = move_it_plus(it, to_move);
-        remake(it);
+        //remake(it);
         it->get_label().status = status;
         DEBUG("mark: %s", it->get_label().to_string().c_str());
         i = index;
@@ -111,6 +111,8 @@ void matcher::run(
                 const mapping& m)
 {
     APP_DEBUG_FNAME;
+
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     mark(templated, m.get_to_remove(), rna_pair_label::deleted);
     mark(other, m.get_to_insert(), rna_pair_label::inserted);
@@ -152,6 +154,7 @@ void matcher::merge(
         {
             if (is(sib1, rna_pair_label::deleted))
             {
+                remake(sib1);
                 sib1 = templated.erase(sib1);
                 continue;
             }
@@ -182,10 +185,10 @@ void matcher::merge(
                     }
                 }
 
-                print_parent_subtree(sib1);
-                print_parent_subtree(sib2);
+                //print_parent_subtree(sib1);
+                //print_parent_subtree(sib2);
                 sib1 = templated.insert(ins, sib2->get_label(), steal);
-                print_parent_subtree(sib1);
+                remake(sib1);
             }
             else
             {
@@ -198,10 +201,12 @@ void matcher::merge(
         while (sib1 != it1.end())
         {
             assert(is(sib1, rna_pair_label::deleted));
+            remake(sib1);
             sib1 = templated.erase(sib1);
         }
 
         assert(sib1 == it1.end() && sib2 == it2.end());
+        unique_indexes(it1);
 
         ++it1;
         ++it2;
@@ -209,9 +214,18 @@ void matcher::merge(
 
     assert(it1 == templated.end() && it2 == other.end());
     assert(templated == other);
+    templated.test_branches();
 }
 
 
+void matcher::unique_indexes(
+                iterator it)
+{
+    auto& vec = it->get_label().remake;
+    sort(vec.begin(), vec.end());
+    auto end = unique(vec.begin(), vec.end());
+    vec.erase(end, vec.end());
+}
 
 
 

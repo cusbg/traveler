@@ -66,6 +66,8 @@ public:
                 rna_tree::iterator it);
     streampos save(
                 const rna_tree& rna);
+    streampos print_subtree(
+                rna_tree::iterator it);
 
     // vv budu vracat len stringy na vypisanie..
     static std::string print(

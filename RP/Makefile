@@ -109,7 +109,7 @@ clean:
 	rm -rf $(BUILDDIR)
 
 cleanMK:
-	rm -f $(BUILDDIR)/*.mk Makefile
+	rm -f $(BUILDDIR)/*.mk $(BUILDDIR)/Makefile
 
 cleanLog:
 	rm -f $(LOGDIR)

@@ -1,5 +1,5 @@
 /*
- * File: app.hpp
+ * File: checks.hpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
@@ -19,40 +19,28 @@
  * USA.
  */
 
-#ifndef APP_HPP
-#define APP_HPP
+#ifndef CHECKS_HPP
+#define CHECKS_HPP
 
 #include "types.hpp"
-#include "rna_tree.hpp"
 
 class rna_tree;
-class mapping;
-struct document;
 
-
-
-class app
+class crossing_check
 {
+private:
+    struct edge;
+    typedef std::vector<crossing_check::edge> edges;
 public:
-    void run_app();
-    void run_between(
-                const std::string& first,
-                const std::string& second);
-
-    static rna_tree get_rna(const std::string& filename);
-    static mapping get_map(const std::string& filename1, const std::string& filename2);
+//private:
+    std::vector<edge> split_to_edges(rna_tree rna);
+    bool intersect(rna_tree rna);
 
 private:
-
-    void print_default(
-                const rna_tree& tree);
-
+    bool intersect(edge e1, edge e2);
 };
 
 
 
-
-
-
-#endif /* !APP_HPP */
+#endif /* !CHECKS_HPP */
 
