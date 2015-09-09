@@ -23,6 +23,7 @@
 #include "util.hpp"
 #include "ps.hpp"
 #include "compact_maker_utils.hpp"
+#include "checks.hpp"
 
 
 
@@ -395,9 +396,6 @@ void compact::reinsert(vector<iterator> nodes, const circle& c)
 {
     APP_DEBUG_FNAME;
 
-    if (nodes.size() > 25)
-        return;
-
     auto points = c.split(nodes.size());
 
     for (size_t i = 0; i < points.size(); ++i)
@@ -426,6 +424,7 @@ void compact::make_compact()
     {
         //normalize_pair_distance(it);
 
+        check_angle(it);
         if (to_remake(it) ||
                 (is(it, rna_pair_label::inserted) && it->get_label().is_paired()))
         {
@@ -435,6 +434,10 @@ void compact::make_compact()
 
         ++it;
     }
+
+    bool b = crossing_check().intersect(rna);
+
+    INFO("intersect: %s", to_string(b).c_str());
 
     //UPDATE_PS;
 }
@@ -456,28 +459,38 @@ void compact::remake(iterator it)
     switch (in.type)
     {
         case intervals::hairpin:
-            redraw(in.vec[0]);
-            UPDATE_PS;
+            redraw(in.vec[0], in.vec[0].get_circle_direction());
+            //UPDATE_PS;
             break;
         case intervals::interior_loop:
+            assert(in.vec.size() == 2);
             //psout.print_pair(in.vec[0].begin);
-            redraw(in.vec[0]);
-            redraw(in.vec[1]);
-            UPDATE_PS;
+            redraw(in.vec[0], in.vec[0].get_circle_direction());
+            redraw(in.vec[1], in.vec[1].get_circle_direction());
+            //UPDATE_PS;
             break;
         case intervals::multibranch_loop:
             DEBUG("MULTI");
             for (auto i : in.vec)
                 if (i.remake)
-                    redraw(i);
+                    redraw(i, in.get_circle_direction());
             break;
     }
+    UPDATE_PS;
 }
 
 template <>
-        void compact::redraw<compact::intervals::interval>(intervals::interval in)
+        void compact::redraw<compact::intervals::interval>(
+                intervals::interval in,
+                Point dir)
 {
     APP_DEBUG_FNAME;
+
+    DEBUG("redraw, size %lu", in.vec.size());
+
+#define MAX_NODES_REDRAW 25
+    if (in.vec.size() > MAX_NODES_REDRAW)
+        return;
 
     circle c;
 
@@ -485,7 +498,7 @@ template <>
     c.p2 = in.end->get_label().lbl(in.e_index).point;
     c.centre = centre(c.p1, c.p2);
 
-    c.direction = in.get_circle_direction();
+    c.direction = dir;
     c.compute_sgn();
 
     c.init(in.vec.size());
@@ -496,7 +509,43 @@ template <>
     reinsert(in.vec, c);
 }
 
+void compact::check_angle(
+                iterator it)
+{
+    iterator par1, par2;
+#define parent(iter) rna_tree::parent(iter)
+#define gcentre(iter) iter->get_label().get_centre()
+    if (it->is_root() || branches_count(it) != 1)
+        return;
+    par1 = parent(it);
+    if (par1->is_root() || branches_count(par1) != 1)
+        return;
+    par2 = parent(par1);
+    if (par2->is_root() || branches_count(par2) != 1)
+        return;
 
+    // branch: it - par1 - par2
+    
+    circle c;
+    Point p1, p2, p;
+    double alpha;
+
+    p1 = gcentre(it);
+    p = gcentre(par1);
+    p2 = gcentre(par2);
+
+    alpha = angle(p1, p, p2);
+    if (double_equals_precision(alpha, 180, 3) ||
+            rna_tree::is_only_child(it))
+        return;
+
+    WARN("shift_branch");
+    DEBUG("angle: %f", alpha);
+    compact::init::shift_branch_angle(it, 180 - alpha);
+    UPDATE_PS;
+    //psout.print_subtree(par2);
+    //abort();
+}
 
 
 

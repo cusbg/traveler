@@ -29,13 +29,14 @@
 #define label_str(node) \
     (node).get_label().to_string().c_str()
 
+
 struct rna_label
 {
     bool operator==(const rna_label& other) const;
 
     std::string to_string() const;
 
-    Point point = Point::bad_point();
+    Point point;
     std::string label;
 };
 

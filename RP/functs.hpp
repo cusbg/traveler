@@ -147,9 +147,30 @@ inline void a()
     rna1.print_tree();
 }
 
+inline void intersection()
+{
+    crossing_check::edge e1, e2;
+
+    e1.p1 = {5, 8};
+    e1.p2 = {2, 3};
+
+    e2.p1 = {4, 5};
+    e2.p2 = {8, 9};
+
+
+    cout<< lies_on_line({0, 0}, {1, 1}, {-2, -2}) << endl;
+    cout << lies_on_line(e1.p1, e1.p2, e2.p1) << endl;
+    abort();
+
+    cout << crossing_check().intersect(e1, e1) << endl;
+    cout << crossing_check().intersect(e1, e2) << endl;
+    abort();
+}
 
 inline void functs()
 {
+    //intersection();
+
     return;
     def_ps_init();
     circle c;

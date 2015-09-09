@@ -29,14 +29,17 @@ class rna_tree;
 class crossing_check
 {
 private:
+public:
     struct edge;
+    struct line_equation;
     typedef std::vector<crossing_check::edge> edges;
 public:
 //private:
     std::vector<edge> split_to_edges(rna_tree rna);
     bool intersect(rna_tree rna);
+    line_equation create_equation(edge e);
 
-private:
+//private:
     bool intersect(edge e1, edge e2);
 };
 

@@ -34,6 +34,7 @@ void compact::intervals::interval::print()
         << (int)b_index << " " << (int)e_index
         << " it: beg: " << *begin << "; end: " << *end
         << " count: " << vec.size()
+        << " remake: " << to_string(remake)
         << " VEC: ";
     for (auto val : vec)
         str << *val << ";";
@@ -112,6 +113,28 @@ void compact::intervals::create(iterator it)
             set_type(multibranch_loop);
 #undef set_type
     }
+}
+
+Point compact::intervals::get_circle_direction() const
+{
+    APP_DEBUG_FNAME;
+
+    Point p, p_sum;
+    size_t n;
+
+    n = 0;
+    p_sum = {0, 0};
+
+    for (auto i : vec)
+    {
+        p = i.begin->get_label().get_centre();
+        assert(!p.bad());
+
+        p_sum += p;
+        ++n;
+    }
+
+    return p_sum / n;
 }
 
 Point get_direction(rna_tree::iterator it)

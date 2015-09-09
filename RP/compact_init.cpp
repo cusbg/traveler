@@ -31,7 +31,7 @@ void compact::init::init_points(
     if (in.type == intervals::hairpin)
         return;
 
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
     if (in.type == intervals::interior_loop)
     {
@@ -102,20 +102,20 @@ void compact::init::init_points(
                     i.end.number_of_children() == 1)
             {
                 DEBUG("A");
-                auto ch = rna_tree::first_child(i.end);
+                auto par = i.end;
+                auto ch = rna_tree::first_child(par);
                 if (ch->get_label().is_paired() &&
                         inited(ch))
                 {
                     DEBUG("child init");
                     Point p, p1, p2;
-                    i.end->get_label().set_points_exact(ch->get_label());
+                    par->get_label().set_points_exact(ch->get_label());
 
-                    p1 = i.end->get_label().lbl(0).point;
-                    p2 = i.end->get_label().lbl(1).point;
+                    p1 = par->get_label().lbl(0).point;
+                    p2 = par->get_label().lbl(1).point;
 
-                    p = orthogonal(p1 - p2, get_direction(i.end) - p2);
-                    ch->get_label().lbl(0).point += p;
-                    ch->get_label().lbl(1).point += p;
+                    p = normalize(orthogonal(p1 - p2, get_direction(par) - p2));
+                    shift_branch(ch, p);
                     return true;
                 }
             }
@@ -161,17 +161,9 @@ void compact::init::init_points(
     }
 }
 
-bool compact::init::init_point_recursive(
-                iterator it)
-{
-    APP_DEBUG_FNAME;
-
-    return false;
-}
-
 void compact::init::shift_branch(iterator it, Point vector)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
     function<size_t(iterator, Point)> recursion = [&recursion](iterator iter, Point vec)
     {
@@ -188,8 +180,61 @@ void compact::init::shift_branch(iterator it, Point vector)
         return out;
     };
 
-    size_t n = recursion(it, vector);
-    DEBUG("shift by %s, #nodes=%lu", vector.to_string().c_str(), n);
+    size_t n;
+    n = recursion(it, vector);
+    //DEBUG("shift by %s, #nodes=%lu", vector.to_string().c_str(), n);
+}
+
+void compact::init::shift_branch_angle(
+                iterator it,
+                double alpha)
+{
+    return;
+    APP_DEBUG_FNAME;
+
+    circle c;
+    size_t n;
+    iterator par;
+
+    function<size_t(iterator)> recursion = [&recursion, &alpha, &c](iterator iter)
+    {
+        size_t n = 1;
+        auto& label = iter->get_label();
+        if (iter->get_label().inited_points())
+        {
+            for (size_t i = 0; i < label.size(); ++i)
+            {
+                c.p1 = label.lbl(i).point;
+                c.centre = centre(c.p1, c.p2);
+    /*auto s = psout.get_pos();
+    c.draw();
+    wait_for_input();
+    psout.seek(s);*/
+                label.lbl(i).point = c.rotate(alpha);
+            }
+        }
+        for (sibling_iterator sib = iter.begin(); sib != iter.end(); ++sib)
+            n += recursion(sib);
+        return n;
+    };
+
+    par = rna_tree::parent(it);
+    c.p1 = par->get_label().lbl(0).point;
+    c.p2 = par->get_label().lbl(1).point;
+    c.direction = rna_tree::parent(par)->get_label().get_centre();
+    c.centre = centre(c.p1, c.p2);
+    c.compute_sgn();
+    c.p2 = c.centre;
+
+    n = 0;
+
+    n = recursion(it);
+
+    rna_tree::print_subtree(it);
+    DEBUG("shift by angle %f, #nodes=%lu", alpha, n);
+    psout.seek(psout.print_subtree(it));
+    wait_for_input();
+    //abort();
 }
 
 void compact::init::set_distance(iterator parent, iterator child, double dist)
@@ -210,6 +255,7 @@ void compact::init::set_distance(iterator parent, iterator child, double dist)
 
 void compact::init::normalize_pair_distance(iterator it)
 {
+    abort();
     if (!it->get_label().is_paired())
         return;
 
@@ -242,7 +288,6 @@ void compact::init::normalize_pair_distance(iterator it)
 {
     if (in.type == intervals::hairpin)
         return;
-
     if (in.type == intervals::interior_loop)
         check_interior_loop(in);
     if (in.type == intervals::multibranch_loop)
@@ -252,9 +297,10 @@ void compact::init::normalize_pair_distance(iterator it)
 void compact::init::check_interior_loop(
                 intervals in)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
     assert(in.vec.size() == 2);
+    assert(in.type == intervals::interior_loop);
     assert(in.vec[0].begin == in.vec[1].end &&
             in.vec[1].begin == in.vec[0].end);
 
@@ -282,31 +328,56 @@ void compact::init::check_interior_loop(
 
     DEBUG("actual %f, avg %f", actual, normal);
 
-    auto pos = psout.get_pos();
-
-    psout.print_subtree(par);
-    psout.print_to_ps(ps::print_line(par->get_label().get_centre(), ch->get_label().get_centre()));
-    psout.print_to_ps(ps::print(red) + ps::print(ch->get_label().get_centre(), "*") + ps::print(black));
-
-    wait_for_input();
+    //auto pos = psout.get_pos();
+    //psout.print_subtree(par);
+    //psout.print_to_ps(ps::print_line(par->get_label().get_centre(), ch->get_label().get_centre()));
+    //psout.print_to_ps(ps::print(red) + ps::print(ch->get_label().get_centre(), "*") + ps::print(black));
+    //wait_for_input();
     if (!double_equals_precision(actual, normal, 1))
     {
         rna_tree::print_subtree(par);
         set_distance(par, ch, normal);
     }
-    psout.seek(pos);
-    pos = psout.print_subtree(par);
-    psout.print_to_ps(ps::print_line(par->get_label().get_centre(), ch->get_label().get_centre()));
-    psout.print_to_ps(ps::print(red) + ps::print(ch->get_label().get_centre(), "*") + ps::print(black));
-    psout.seek(pos);
-    wait_for_input();
+    //psout.seek(pos);
+    //pos = psout.print_subtree(par);
+    //psout.print_to_ps(ps::print_line(par->get_label().get_centre(), ch->get_label().get_centre()));
+    //psout.print_to_ps(ps::print(red) + ps::print(ch->get_label().get_centre(), "*") + ps::print(black));
+    //psout.seek(pos);
+    //wait_for_input();
 }
 
 void compact::init::check_multibranch_loop(
                 intervals in)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
-    ERR("not implemented");
+    return;
+    assert(in.type == intervals::multibranch_loop);
+
+    iterator it1, it2;
+    double actual, normal;
+
+    for (size_t i = 0; i < in.vec.size(); ++i)
+    {
+        it1 = in.vec[i].begin;
+        it2 = in.vec[i].end;
+
+        actual = distance(it1->get_label().get_centre(), it2->get_label().get_centre());
+        normal = circle::min_circle_length(in.vec[i].vec.size());
+
+        DEBUG("actual %f, normal %f", actual, normal);
+        if (!double_equals_precision(actual, normal, 5))
+        {
+            psout.print_subtree(rna_tree::parent(it1));
+            WARN("! %s",
+                    rna_tree::print_subtree(rna_tree::parent(it1), false).c_str());
+            abort();
+        }
+    }
+
 }
+
+
+
+
 

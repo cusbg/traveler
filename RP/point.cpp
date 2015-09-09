@@ -236,66 +236,45 @@ Point base_pair_edge_point(Point from, Point to)
     return from + vec;
 }
 
-bool lies_on_line(Point _p1, Point _p2, Point _p3)
+bool lies_on_line(Point p1, Point p2, Point p3)
 {
     APP_DEBUG_FNAME;
-    DEBUG("p1=%s, p2=%s, p3=%s", _p1.to_string().c_str(), _p2.to_string().c_str(), _p3.to_string().c_str());
 
-    /*Point b1, b2;
-    double k, l;
-*/
-
-    std::function<bool(Point, Point, Point)> f = [](Point p1, Point p2, Point p3)
-    {
-        Point b1, b2;
-        double k, l;
-
-        b1 = p2 - p1;
-        b2 = p3 - p1;
-
-        k = b1.x / b2.x;
-        l = b1.y / b2.y;
-
-        //DEBUG("%f, %f", k, l);
-        //DEBUG("p1=%s, p2=%s, p3=%s", p1.to_string().c_str(), p2.to_string().c_str(), p3.to_string().c_str());
-        //DEBUG("b1=%s, b2=%s", b1.to_string().c_str(), b2.to_string().c_str());
-
-        return k * b2 == b1 || 
-            l * b2 == b1;
-    };
-
-    if (_p1 == _p2 ||
-            _p1 == _p3 ||
-            _p2 == _p3)
-    {
-        ERR("equal points");
-        abort();
-    }
-    return f(_p1, _p2, _p3) ||
-        f(_p2, _p3, _p1) ||
-        f(_p3, _p1, _p2);
-/*
-    b1 = p2 - p1;
-    b2 = p3 - p1;
-
-    k = b1.x / b2.x;
-    l = b1.y / b2.y;
-
-    DEBUG("%f, %f", k, l);
-    DEBUG("p1=%s, p2=%s, p3=%s", p1.to_string().c_str(), p2.to_string().c_str(), p3.to_string().c_str());
-    DEBUG("b1=%s, b2=%s", b1.to_string().c_str(), b2.to_string().c_str());
-
-    return k * b2 == b1 || 
-        l * b2 == b1 ||
-        lies_on_line(p2, p3, p1) ||
-        lies_on_line(p3, p1, p2);
-    return double_equals(k, l);
-
-    return k * p2 + p1 == p3 ||
-        l * p2 + p1 == p3;
-    return false;*/
+    return lies_between(p1, p2, p3) ||
+        lies_between(p2, p3, p1) ||
+        lies_between(p3, p1, p2);
 }
 
+bool lies_between(Point p, Point from, Point to)
+{
+	p = p - from;
+	to = to - from;
+
+    cout << p << endl << to << endl;
+
+    if (p.x == 0 &&
+            p.y == 0 &&
+            to.x == 0 &&
+            to.y == 0)
+        return true;
+
+    if (p.x == 0 && to.x == 0)
+    {
+        assert(to.y != 0);
+        return p.y / to.y <= 1;
+    }
+    if (p.y == 0 && to.y == 0)
+    {
+        assert(to.y != 0);
+        return p.x / to.x <= 1;
+    }
+    if (to.x == 0 || to.y == 0)
+        return false;
+    assert(to.x != 0 && to.y != 0);
+    return p.x / to.x <= 1 &&
+        p.x / to.x >= 0 &&
+        p.x / to.x == p.y / to.y;
+}
 
 
 

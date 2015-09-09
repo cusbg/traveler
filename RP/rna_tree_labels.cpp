@@ -92,6 +92,8 @@ std::ostream& operator<<(
 
 bool rna_pair_label::is_paired() const
 {
+    if (labels.size() != 1 && labels.size() != 2)
+        DEBUG("%lu: %s : %s", labels.size(), to_string().c_str(), get_points_string().c_str());
     assert(labels.size() == 1 || labels.size() == 2);
     return labels.size() == 2;
 }

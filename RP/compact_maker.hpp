@@ -41,7 +41,7 @@ public:
 private:
 
     template <typename interval>
-        void redraw(interval in);
+        void redraw(interval in, Point dir);
     void redraw(
                 iterator beg,
                 iterator end);
@@ -51,6 +51,8 @@ private:
     void remake(
                 iterator it);
 
+    void check_angle(
+                iterator it);
 
 
 

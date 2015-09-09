@@ -38,6 +38,7 @@ struct compact::intervals
     };
 
     void create(iterator it);
+    Point get_circle_direction() const;
 
     std::vector<interval> vec;
     rna_structure_type type;
@@ -56,7 +57,7 @@ public:
 };
 
 template <>
-        void compact::redraw<compact::intervals::interval>(intervals::interval in);
+        void compact::redraw<compact::intervals::interval>(intervals::interval in, Point dir);
 
 Point get_direction(rna_tree::iterator it);
 

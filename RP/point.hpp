@@ -23,7 +23,7 @@
 #define POINT_HPP
 
 
-#include <iostream>
+#include <ostream>
 
 struct Point
 {
@@ -71,6 +71,9 @@ Point move_point(Point p, Point move_to, double length);
 Point base_pair_edge_point(Point from, Point to);
 
 bool lies_on_line(Point p1, Point p2, Point p3);
+
+bool lies_between(Point p, Point from, Point to);
+
 
 template <typename T>
 inline T squared(const T& t)

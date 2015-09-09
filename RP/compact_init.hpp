@@ -28,8 +28,6 @@ struct compact::init
 {
     static void init_points(
                 intervals in);
-    static bool init_point_recursive(
-                iterator it);
 
     static void check_distance(
                 const intervals& in);
@@ -48,6 +46,9 @@ struct compact::init
     static void shift_branch(
                 iterator it,
                 Point vector);
+    static void shift_branch_angle(
+                iterator from,
+                double alpha);
     static void set_distance(
                 iterator parent,
                 iterator child,
