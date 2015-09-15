@@ -77,6 +77,13 @@ tree_base<label_type>::tree_base(
     /*set_ids_postorder();*/
 }
 
+template <typename label_type>
+bool tree_base<label_type>::operator==(
+                const tree_base<label_type>& other) const
+{
+    return _tree.equal_subtree(_tree.begin(), other._tree.begin());
+}
+
 /* inline */
 template <typename label_type>
 size_t tree_base<label_type>::id() const
@@ -161,7 +168,7 @@ std::string label(
     if (it.node == nullptr)
         return "<null>";
     else
-        return it->to_string();
+        return to_string(*it);
 }
 
 #endif /* !TREE_BASE_UTILS_HPP */

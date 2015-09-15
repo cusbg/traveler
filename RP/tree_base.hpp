@@ -55,6 +55,8 @@ public:
         tree_base(
                 const std::string& brackets,
                 const labels_array& labels);
+    inline bool operator==(
+                const tree_base<label_type>& other) const;
 
 public:
     inline size_t id() const;
@@ -122,7 +124,7 @@ template <typename iter>
 inline std::string label(
                 const iter& it);
 
-#define clabel(iter) (label(iter).c_str())
+#define clabel(iter) ((label(iter)).c_str())
 
 
 #include "tree_base_iter.hpp"

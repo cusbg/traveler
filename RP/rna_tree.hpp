@@ -1,7 +1,7 @@
 /*
  * File: rna_tree.hpp
  *
- * Copyright (C) 2014 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,79 +22,33 @@
 #ifndef RNA_TREE_HPP
 #define RNA_TREE_HPP
 
-#include "tree/tree_base.hpp"
-#include "tree/node_base.hpp"
-#include "rna_tree_labels.hpp"
+#include "tree_base.hpp"
+#include "rna_tree_label.hpp"
 
-typedef node_base<rna_pair_label> rna_node_type;
 
-class mapping;
-
-class rna_tree : public tree_base<rna_node_type>
+class rna_tree
+    : public tree_base<rna_pair_label>
 {
 public:
     virtual ~rna_tree() = default;
     rna_tree() = default;
     rna_tree(
-                const std::string& brackets,
-                const std::string& labels,
+                const std::string& _brackets,
+                const std::string& _labels,
                 const std::string& _name = "");
-
-    bool operator==(
-                const rna_tree& other) const;
-
-    void test_branches() const;
-
-
-public:
-    /*
-     * inserts node(label) before it and steal steal_children next it siblings
-     */
-    iterator insert(
-                sibling_iterator it,
+    
+    sibling_iterator insert(
+                sibling_iterator sib,
                 rna_pair_label label,
                 size_t steal_children = 0);
-    /*
-     * remove it from tree, returns next node-iter
-     */
-    template <typename iter>
-        iter erase(
-                iter it);
+    sibling_iterator erase(
+                sibling_iterator sib);
+
 public:
-    std::string name;
+    std::string _name;
 };
 
 
-
-template <typename iter>
-    iter rna_tree::erase(iter it)
-{
-    DEBUG("erasing node %s", clabel(it));
-
-    iter del;
-
-    it = _tree.flatten(it);
-    assert(is_leaf(it));
-
-    --_size;
-
-    del = it++;
-    _tree.erase(del);
-    return it;
-}
-
-
-
-// GLOBAL FUNCTIONS:
-size_t get_label_index(
-                rna_tree::pre_post_order_iterator iter);
-
-bool is(
-                rna_tree::iterator it,
-                rna_pair_label::label_status_type status);
-bool has_child(
-                rna_tree::iterator it,
-                rna_pair_label::label_status_type status);
 
 #endif /* !RNA_TREE_HPP */
 
