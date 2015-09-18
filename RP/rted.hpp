@@ -45,13 +45,16 @@ public:
     void run_rted();
 
 private:
-    /*
-     * initializes tables to their needed size
-     * compute full decomposition, subtree size and relevant subforest tables
+    /**
+     * initializes tables to their needed size;
+     * compute:
+     *  subtree size
+     *  full decomposition,
+     *  relevant subforest tables
      */
     void init();
 
-    /*
+    /**
      * upgrade full_decomposition tables
      *
      * ALeft == left_decomposition
@@ -70,17 +73,13 @@ private:
                 table_type& ALeft,
                 table_type& ARight);
 
-    /*
+    /**
      * upgrade relevant_subforests tables of it with respect to left/right path
      *
      * FLeft[parent] = 1 + F[mostleft_child] +
      *                  sum(Size[other_children] + F[other_children])
      * FRight[parent] = 1 + F[mostright_child] +
      *                  sum(Size[other_children] + F[other_children])
-     *
-     *  where   mostleft_child_index == 0,
-     *          other_children_index == 1,..,n-1,
-     *          rightmost_child_index == n-1
      */
     void compute_relevant_subforrests(
                 iterator it,
@@ -88,7 +87,7 @@ private:
                 table_type& FRight,
                 table_type& Size);
 
-    /*
+    /**
      * update Size table from children:
      *
      * Size[parent] = sum(Size[ch]) + 1
@@ -97,24 +96,81 @@ private:
     void compute_subtree_size(
                 iterator it,
                 table_type& Size);
+
+    /**
+     * initialize L/R/H_v tables for leaf it1
+     *
+     * T1_{L,R,H}v[it1_id][it2_id] = 0;
+     */
     void init_T1_LRH_v_tables(
                 iterator it1,
                 iterator it2);
+
+    /**
+     * initialize L/R/H_w tables for leaf it
+     *
+     * T2_{L,R,H}w[it_id] = 0;
+     */
     void init_T2_LRH_w_tables(
                 iterator it);
+
+    /*
+     * checks initialization for *LRH* tables
+     * and for parents of it-s too,
+     * if parents are not initalized, init parent
+     *      -- visiting first_child(parent)
+     */
+    void first_visit(
+                iterator it1,
+                iterator it2);
+
+    /*
+     * compute C from rted_opt_strategy(F,G) (== lines 7-12)
+     * find minimum and stores minimal_path
+     * returns c_min
+     */
     size_t update_STR_table(
                 iterator it1,
                 iterator it2);
-    void update_T2_LRH_w_tables(
-                iterator it,
-                size_t c_min);
+
+    /*
+     * == ekvivalent to lines 16, 17, 18 in rted_opt_strategy(F,G)
+     *
+     * T1_Lv[parent_it1][it2] += (it1 == leftmost_child) ?
+     *                              T1_Lv[it1][it2] : c_min;
+     * T1_Rv[parent_it1][it2] += (it1 == leftmost_child) ?
+     *                              T1_Rv[it1][it2] : c_min;
+     * T1_Hv[parent_it1][it2] += (it1 is on heavy_parents_path) ?
+     *                              T2_Hw[it1][it2] : c_min;
+     *
+     * How to predict we are on heavy_parent_path???
+     *  as in update_T2_H_w_table, we use table T1_Hv_partials,
+     *  where we store tuple (subtree_size, c_min, H_value) of heaviest child
+     *  if i find heavier ch2 (Size[ch2] > subtree_size) i compute
+     *  T1_Hv[parent1_id][it2_id] = c_min - H_value + T1_Hv[it1_id][it2_id]
+     *  and store values from ch2:
+     *       subtree_size = Size[ch2];
+     *       c_min = function_c_min;
+     *       H_value = T1_Hv[it1_id][it2_id];
+     */
     void update_T1_LRH_v_tables(
                 iterator it1,
                 iterator it2,
                 size_t c_min);
-    void first_visit(
-                iterator it1,
-                iterator it2);
+
+    /*
+     * == ekvivalent to lines 20, 21, 22 in rted_opt_strategy(F,G)
+     *
+     * T2_Lw[parent_it] += (it == leftmost_child) ? T2_Lw[it] : c_min;
+     * T2_Rw[parent_it] += (it == rightmost_child) ? T2_Rw[it] : c_min;
+     * T2_Hw[parent_it] += (it is on heavy_parents_path) ? T2_Hw[it] : c_min;
+     *
+     * How to predict we are on heavy_parent_path???
+     *      ... See update_T1_LRH_v_tables()
+     */
+    void update_T2_LRH_w_tables(
+                iterator it,
+                size_t c_min);
 
 public:
     strategy_table_type& get_strategies()
@@ -137,6 +193,7 @@ private:
                 // A* = decomposition tables.
                 // ALeft/ARight == left/right decomposition
                 // A == full decomposition
+                //  ALeft/ARight are needed only for A decomposition..
                 T1_ALeft,
                 T1_ARight,
                 T1_A,
@@ -156,12 +213,12 @@ private:
                 T1_Size,
                 T2_Size,
 
-                //main loop, {L,R,H}w
+                //main loop, {LRH}w
                 T2_Lw,
                 T2_Rw,
                 T2_Hw;
 
-    // 2D maps: _map[v_id][w_id] == value
+    // 2D tables: {LRH}v[v_id][w_id] == value
     std::vector<table_type>
                 T1_Lv,
                 T1_Rv,
