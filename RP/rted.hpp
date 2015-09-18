@@ -23,21 +23,20 @@
 #define RTED_HPP
 
 #include "types.hpp"
-#include "rna_tree.hpp"
 #include "strategy.hpp"
 
 
+template <typename tree_type>
 class rted
 {
 public:
-    typedef rna_tree                            tree_type;
     typedef strategy_type                       strategy;
     typedef std::vector<std::vector<strategy>>  strategy_table_type;
     typedef std::vector<size_t>                 table_type;
 
-    typedef tree_type::iterator                 iterator;
-    typedef tree_type::post_order_iterator      post_order_iterator;
-    typedef tree_type::sibling_iterator         sibling_iterator;
+    typedef typename tree_type::iterator                 iterator;
+    typedef typename tree_type::post_order_iterator      post_order_iterator;
+    typedef typename tree_type::sibling_iterator         sibling_iterator;
 
 public:
     rted(
@@ -46,19 +45,55 @@ public:
     void run_rted();
 
 private:
+    /*
+     * initializes tables to their needed size
+     * compute full decomposition, subtree size and relevant subforest tables
+     */
     void init();
-    void tree_ids_postorder();
 
+    /*
+     * upgrade full_decomposition tables
+     *
+     * ALeft == left_decomposition
+     * ARight == right_decomposition
+     * A[parent] = sum(ALeft[ch1] * ARight[ch2]) + sum(A[ch]) + 1
+     *  where ch, ch1, ch2 are children, and ch1<ch2
+     *
+     * ALeft[parent] = sum(ALeft[ch]) + 1
+     * ARight[parent] = sum(ARight[ch]) + 1
+     *
+     * after computing, ALeft[ch1] and ARight[ch1] is not needed
+     */
     void compute_full_decomposition(
                 iterator it,
                 table_type& A,
                 table_type& ALeft,
                 table_type& ARight);
+
+    /*
+     * upgrade relevant_subforests tables of it with respect to left/right path
+     *
+     * FLeft[parent] = 1 + F[mostleft_child] +
+     *                  sum(Size[other_children] + F[other_children])
+     * FRight[parent] = 1 + F[mostright_child] +
+     *                  sum(Size[other_children] + F[other_children])
+     *
+     *  where   mostleft_child_index == 0,
+     *          other_children_index == 1,..,n-1,
+     *          rightmost_child_index == n-1
+     */
     void compute_relevant_subforrests(
                 iterator it,
                 table_type& FLeft,
                 table_type& FRight,
                 table_type& Size);
+
+    /*
+     * update Size table from children:
+     *
+     * Size[parent] = sum(Size[ch]) + 1
+     *  where ch are children
+     */
     void compute_subtree_size(
                 iterator it,
                 table_type& Size);
@@ -77,6 +112,9 @@ private:
                 iterator it1,
                 iterator it2,
                 size_t c_min);
+    void first_visit(
+                iterator it1,
+                iterator it2);
 
 public:
     strategy_table_type& get_strategies()
@@ -151,6 +189,7 @@ public:
 #endif
 };
 
+#include "rted_implementation.hpp"
 
 #endif /* !RTED_HPP */
 

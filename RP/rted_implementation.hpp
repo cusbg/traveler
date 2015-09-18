@@ -1,5 +1,5 @@
 /*
- * File: rted.cpp
+ * File: rted_implementation.hpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
@@ -19,18 +19,21 @@
  * USA.
  */
 
+#ifndef RTED_IMPLEMENTATION_HPP
+#define RTED_IMPLEMENTATION_HPP
+
 #include "rted.hpp"
 
-using namespace std;
+#define RTED_BAD        0xBADF00D
+#define isbad(value)    ((value) == RTED_BAD)
 
-#define BAD 0xBADF00D
-
-rted::rted(tree_type& _t1, tree_type& _t2)
+template <typename tree_type>
+rted<tree_type>::rted(tree_type& _t1, tree_type& _t2)
     : t1(_t1), t2(_t2)
 { }
 
-
-void rted::run_rted()
+template <typename tree_type>
+void rted<tree_type>::run_rted()
 {
     APP_DEBUG_FNAME;
 
@@ -43,12 +46,11 @@ void rted::run_rted()
     {
         for (it2 = t2.begin_post(); !tree_type::is_root(it2); ++it2)
         {
-            DEBUG("%s:%lu <-> %s:%lu", clabel(it1), id(it1), clabel(it2), id(it2));
+            DEBUG("%s:%lu <-> %s:%lu",
+                    clabel(it1), id(it1),
+                    clabel(it2), id(it2));
 
-            if (tree_type::is_leaf(it1))
-                init_T1_LRH_v_tables(it1, it2);
-            if (tree_type::is_leaf(it2))
-                init_T2_LRH_w_tables(it2);
+            first_visit(it1, it2);
 
             size_t c_min = update_STR_table(it1, it2);
 
@@ -56,26 +58,15 @@ void rted::run_rted()
             update_T2_LRH_w_tables(it2, c_min);
         }
     }
+    update_STR_table(it1, it2);
+
     INFO("END: RTED");
 
     DEBUG("STR: %s", to_cstr(STR[id(t1.begin())][id(t2.begin())]));
 }
 
-void rted::tree_ids_postorder()
-{
-    post_order_iterator it;
-    
-    for (auto t : {&t1, &t2})
-    {
-        node_base::reset_ID();
-        for (it = t->begin_post(); it != t->end_post(); ++it)
-            it->reset_id();
-
-        assert(t->size() - 1 == id(t->begin()));
-    }
-}
-
-void rted::init()
+template <typename tree_type>
+void rted<tree_type>::init()
 {
     APP_DEBUG_FNAME;
 
@@ -89,7 +80,8 @@ void rted::init()
     size1 = t1.size();
     size2 = t2.size();
 
-    tree_ids_postorder();
+    t1.set_postorder_ids();
+    t2.set_postorder_ids();
 
     t1.print_tree();
     t2.print_tree();
@@ -99,13 +91,13 @@ void rted::init()
     STR.resize(size1, inner_str);
 
     // {L,R,H}v tables:
-    inner_v.resize(size2);
+    inner_v.resize(size2, RTED_BAD);
     for (auto table : {&T1_Lv, &T1_Rv, &T1_Hv})
         table->resize(size1, inner_v);
 
     // {L, R, H}w tables:
     for (auto table : {&T2_Lw, &T2_Rw, &T2_Hw})
-        table->resize(size2);
+        table->resize(size2, RTED_BAD);
 
     // partial tables:
     T2_Hw_partials.resize(size2);
@@ -114,10 +106,10 @@ void rted::init()
     // initialize all tables to size of tree..
     for (auto table : {&T1_ALeft, &T1_ARight, &T1_A,
                     &T1_FLeft, &T1_FRight, &T1_Size})
-        table->resize(size1);
+        table->resize(size1, RTED_BAD);
     for (auto table : {&T2_ALeft, &T2_ARight, &T2_A,
                     &T2_FLeft, &T2_FRight, &T2_Size})
-        table->resize(size2);
+        table->resize(size2, RTED_BAD);
 
     INFO("END prepare tables");
     INFO("BEG precomputation");
@@ -147,7 +139,8 @@ void rted::init()
     INFO("END precomputation");
 }
 
-void rted::compute_full_decomposition(
+template <typename tree_type>
+void rted<tree_type>::compute_full_decomposition(
                 iterator it,
                 table_type& A,
                 table_type& ALeft,
@@ -192,7 +185,8 @@ void rted::compute_full_decomposition(
             ARight[it_id]);
 }
 
-void rted::compute_relevant_subforrests(
+template <typename tree_type>
+void rted<tree_type>::compute_relevant_subforrests(
                 iterator it,
                 table_type& FLeft,
                 table_type& FRight,
@@ -230,7 +224,8 @@ void rted::compute_relevant_subforrests(
             clabel(it), FRight[it_id]);
 }
 
-void rted::compute_subtree_size(
+template <typename tree_type>
+void rted<tree_type>::compute_subtree_size(
                 iterator it,
                 table_type& Size)
 {
@@ -247,7 +242,8 @@ void rted::compute_subtree_size(
             Size[it_id]);
 }
 
-void rted::init_T1_LRH_v_tables(
+template <typename tree_type>
+void rted<tree_type>::init_T1_LRH_v_tables(
                 iterator it1,
                 iterator it2)
 {
@@ -267,7 +263,8 @@ void rted::init_T1_LRH_v_tables(
             clabel(it2));
 }
 
-void rted::init_T2_LRH_w_tables(
+template <typename tree_type>
+void rted<tree_type>::init_T2_LRH_w_tables(
                 iterator it)
 {
     //APP_DEBUG_FNAME;
@@ -282,11 +279,12 @@ void rted::init_T2_LRH_w_tables(
             clabel(it));
 }
 
-size_t rted::update_STR_table(
+template <typename tree_type>
+size_t rted<tree_type>::update_STR_table(
                 iterator it1,
                 iterator it2)
 {
-    vector<size_t> vec(6);
+    std::vector<size_t> vec(6);
     size_t it1_id = id(it1);
     size_t it2_id = id(it2);
 
@@ -324,12 +322,31 @@ size_t rted::update_STR_table(
     return c_min;
 }
 
-void rted::update_T2_LRH_w_tables(
+template <typename tree_type>
+void rted<tree_type>::update_T2_LRH_w_tables(
                 iterator it,
                 size_t c_min)
 {
     size_t it_id = id(it);
     size_t parent_id = id(tree_type::parent(it));
+
+    {   // checks:
+        std::vector<bool> vec = {
+            isbad(T2_Lw[parent_id]),
+            isbad(T2_Rw[parent_id]),
+            isbad(T2_Hw[parent_id]),
+            isbad(T2_Lw[it_id]),
+            isbad(T2_Rw[it_id]),
+            isbad(T2_Hw[it_id])
+        };
+        if (std::find(vec.begin(), vec.end(), true) != vec.end())
+        {
+            ERR("isbad() w[%s], w[%s]",
+                    clabel(tree_type::parent(it)), clabel(it));
+            LOGGER_PRINT_CONTAINER(vec, "isbad");
+            abort();
+        }
+    }
 
     // Lw:
     T2_Lw[parent_id] +=
@@ -370,7 +387,8 @@ void rted::update_T2_LRH_w_tables(
             T2_Hw[parent_id]);
 }
 
-void rted::update_T1_LRH_v_tables(
+template <typename tree_type>
+void rted<tree_type>::update_T1_LRH_v_tables(
                 iterator it1,
                 iterator it2,
                 size_t c_min)
@@ -378,6 +396,23 @@ void rted::update_T1_LRH_v_tables(
     size_t it1_id = id(it1);
     size_t it2_id = id(it2);
     size_t parent1_id = id(tree_type::parent(it1));
+
+    {   // checks:
+        std::vector<bool> vec = {
+            isbad(T1_Lv[parent1_id][it2_id]),
+            isbad(T1_Rv[parent1_id][it2_id]),
+            isbad(T1_Hv[parent1_id][it2_id]),
+            isbad(T1_Lv[it1_id][it2_id]),
+            isbad(T1_Rv[it1_id][it2_id]),
+            isbad(T1_Hv[it1_id][it2_id])
+        };
+        if (std::find(vec.begin(), vec.end(), true) != vec.end())
+        {
+            ERR("isbad()");
+            LOGGER_PRINT_CONTAINER(vec, "isbad");
+            abort();
+        }
+    }
 
     // Lv:
     T1_Lv[parent1_id][it2_id] +=
@@ -391,11 +426,11 @@ void rted::update_T1_LRH_v_tables(
 
     // Hv:
     auto res = T1_Hv_partials[parent1_id][it2_id];
+    size_t val;
 
     if (T1_Size[it1_id] > res.subtree_size)
     {
-        T1_Hv[parent1_id][it2_id] +=
-            T1_Hv[it1_id][it2_id] - res.H_value + res.c_min;
+        val = T1_Hv[it1_id][it2_id] - res.H_value + res.c_min;
 
         res.subtree_size = T1_Size[it1_id];
         res.c_min = c_min;
@@ -404,7 +439,9 @@ void rted::update_T1_LRH_v_tables(
         T1_Hv_partials[parent1_id][it2_id] = res;
     }
     else
-        T1_Hv[parent1_id][it2_id] += c_min;
+        val = c_min;
+
+    T1_Hv[parent1_id][it2_id] += val;
 
 
     DEBUG("T1_Lv\t[%s][%s]\t = %lu \t (update)",
@@ -421,4 +458,96 @@ void rted::update_T1_LRH_v_tables(
             T1_Hv[parent1_id][it2_id]);
 }
 
+template <typename tree_type>
+void rted<tree_type>::first_visit(
+                iterator it1,
+                iterator it2)
+{
+    size_t parent1_id = id(tree_type::parent(it1));
+    size_t parent2_id = id(tree_type::parent(it2));
+    size_t it1_id = id(it1);
+    size_t it2_id = id(it2);
+    std::vector<bool> vec;
+
+    DEBUG("check %s <-> %s", clabel(it1), clabel(it2));
+
+    if (tree_type::is_leaf(it1))
+        init_T1_LRH_v_tables(it1, it2);
+    if (tree_type::is_leaf(it2))
+        init_T2_LRH_w_tables(it2);
+
+#define all_same(v) (v[0] == v[1] && v[1] == v[2])
+
+    { // initialize parents if they are not..
+        vec = {
+            isbad(T1_Lv[parent1_id][it2_id]),
+            isbad(T1_Rv[parent1_id][it2_id]),
+            isbad(T1_Hv[parent1_id][it2_id]),
+        };
+        if (!all_same(vec))
+        {   // should be all inited/not-inited
+            ERR("all_same");
+            LOGGER_PRINT_CONTAINER(vec, "isbad v");
+            abort();
+        }
+        if (vec[0] == true)
+        {   // init parent
+            T1_Lv[parent1_id][it2_id] =
+                T1_Rv[parent1_id][it2_id] =
+                T1_Hv[parent1_id][it2_id] = 0;
+
+            DEBUG("T1_{LRH}v[%s][%s] parent init",
+                    clabel(tree_type::parent(it1)), clabel(it2));
+        }
+
+        vec = {
+            isbad(T2_Lw[parent2_id]),
+            isbad(T2_Rw[parent2_id]),
+            isbad(T2_Hw[parent2_id]),
+        };
+        if (!all_same(vec))
+        {   // should be all inited/not-inited
+            ERR("all_same");
+            LOGGER_PRINT_CONTAINER(vec, "isbad w");
+            abort();
+        }
+        if (vec[0] == true)
+        {
+            T2_Lw[parent2_id] =
+                T2_Rw[parent2_id] =
+                T2_Hw[parent2_id] = 0;
+
+            DEBUG("T2_{LRH}w[%s] parent init", clabel(tree_type::parent(it1)));
+        }
+    }
+
+    { // it1 should be inited yet
+        vec = {
+            isbad(T1_Lv[it1_id][it2_id]),
+            isbad(T1_Rv[it1_id][it2_id]),
+            isbad(T1_Hv[it1_id][it2_id]),
+        };
+        if (all_same(vec) && vec[0] == true)
+        {
+            ERR("all_same");
+            LOGGER_PRINT_CONTAINER(vec, "isbad");
+            abort();
+        }
+        vec = {
+            isbad(T2_Lw[it2_id]),
+            isbad(T2_Rw[it2_id]),
+            isbad(T2_Hw[it2_id]),
+        };
+        if (all_same(vec) && vec[0] == true)
+        {
+            ERR("all_same");
+            LOGGER_PRINT_CONTAINER(vec, "isbad");
+            abort();
+        }
+    }
+}
+
+
+#undef isbad
+#endif /* !RTED_IMPLEMENTATION_HPP */
 

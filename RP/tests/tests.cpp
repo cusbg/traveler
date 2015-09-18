@@ -21,14 +21,21 @@
 
 #define TESTS
 
-#include "tests.hpp"
-#include "../rted.hpp"
+#include "rted_test.cpp"
 
 using namespace std;
 
 void tests()
 {
-    rted::test();
+    rted<rna_tree>::test();
+    INFO("TESTS OK");
+    exit(0);
 }
 
+int main()
+{
+    tests();
+
+    return 0;
+}
 

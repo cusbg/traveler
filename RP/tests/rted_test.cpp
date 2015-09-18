@@ -20,6 +20,7 @@
  */
 
 #define TESTS
+#include "../rna_tree.hpp"
 #include "../rted.hpp"
 
 
@@ -36,18 +37,19 @@
 using namespace std;
 
 /* static */
-void rted::test()
+template <>
+void rted<rna_tree>::test()
 {
     APP_DEBUG_FNAME;
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     auto test_funct = [](string b1, string l1, string b2, string l2)
     {
-        rna_tree rna1 = rna_tree(b1, l1);
-        rna_tree rna2 = rna_tree(b2, l2);
-        rted::tree_type::iterator it1, it2;
-        it1 = rted::tree_type::first_child(rna1.begin());
-        it2 = rted::tree_type::first_child(rna2.begin());
+        rna_tree rna1(b1, l1);
+        rna_tree rna2(b2, l2);
+        rna_tree::iterator it1, it2;
+        it1 = rna_tree::first_child(rna1.begin());
+        it2 = rna_tree::first_child(rna2.begin());
 
         DEBUG("%s <-> %s", clabel(it1), clabel(it2));
 
@@ -68,6 +70,7 @@ void rted::test()
     assert(out2.is_left());
 
     INFO("tests OK");
+    exit(0);
 }
 
 
