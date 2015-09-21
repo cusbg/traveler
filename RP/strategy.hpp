@@ -31,13 +31,16 @@
 #define RTED_T1_HEAVY   4
 #define RTED_T2_HEAVY   5
 
-struct strategy_type
+
+struct strategy
 {
-    strategy_type() = default;
+    strategy() = default;
+    strategy(
+                int index);
+    strategy(
+                const std::string& text);
 
 public:
-    static strategy_type from_index(
-                int index);
     int to_index() const;
     bool is_left() const;
     bool is_right() const;
@@ -58,7 +61,7 @@ public:
 
     friend std::ostream& operator<<(
                 std::ostream& out,
-                strategy_type str);
+                strategy str);
 
     enum _strategy
     {
@@ -72,10 +75,17 @@ public:
         T2
     };
 
-    _strategy   strategy;
+    _strategy   str;
     _tree       tree;
     bool inited = false;
 };
+
+
+// rted/gted type:
+typedef std::vector<std::vector<strategy>>  strategy_table_type;
+
+std::ostream& operator<<(
+                std::ostream& out, strategy_table_type strategies);
 
 #endif /* !STRATEGY_HPP */
 

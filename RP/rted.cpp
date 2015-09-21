@@ -1,5 +1,5 @@
 /*
- * File: rted_implementation.hpp
+ * File: rted.cpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
@@ -27,24 +27,28 @@
 #define RTED_BAD        0xBADF00D
 #define isbad(value)    ((value) == RTED_BAD)
 
-template <typename tree_type>
-rted<tree_type>::rted(tree_type& _t1, tree_type& _t2)
+#ifdef NDEBUG
+#undef DEBUG
+#define DEBUG(...)
+#endif
+
+rted::rted(tree_type& _t1, tree_type& _t2)
     : t1(_t1), t2(_t2)
 { }
 
-template <typename tree_type>
-void rted<tree_type>::run_rted()
+void rted::run_rted()
 {
     APP_DEBUG_FNAME;
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     post_order_iterator it1, it2;
 
     init();
 
     INFO("BEG: RTED");
-    for (it1 = t1.begin_post(); !tree_type::is_root(it1); ++it1)
+    for (it1 = t1.begin_post(); it1 != t1.end_post(); ++it1)
     {
-        for (it2 = t2.begin_post(); !tree_type::is_root(it2); ++it2)
+        for (it2 = t2.begin_post(); it2 != t2.end_post(); ++it2)
         {
             DEBUG("%s:%lu <-> %s:%lu",
                     clabel(it1), id(it1),
@@ -54,19 +58,19 @@ void rted<tree_type>::run_rted()
 
             size_t c_min = update_STR_table(it1, it2);
 
-            update_T1_LRH_v_tables(it1, it2, c_min);
-            update_T2_LRH_w_tables(it2, c_min);
+            if (!tree_type::is_root(it1))
+                update_T1_LRH_v_tables(it1, it2, c_min);
+            if (!tree_type::is_root(it2))
+                update_T2_LRH_w_tables(it2, c_min);
         }
     }
-    update_STR_table(it1, it2);
 
     INFO("END: RTED");
 
-    DEBUG("STR: %s", to_cstr(STR[id(t1.begin())][id(t2.begin())]));
+    INFO("STR: %s", to_cstr(STR[id(t1.begin())][id(t2.begin())]));
 }
 
-template <typename tree_type>
-void rted<tree_type>::init()
+void rted::init()
 {
     APP_DEBUG_FNAME;
 
@@ -139,8 +143,7 @@ void rted<tree_type>::init()
     INFO("END precomputation");
 }
 
-template <typename tree_type>
-void rted<tree_type>::compute_full_decomposition(
+void rted::compute_full_decomposition(
                 iterator it,
                 table_type& A,
                 table_type& ALeft,
@@ -185,8 +188,7 @@ void rted<tree_type>::compute_full_decomposition(
             ARight[it_id]);
 }
 
-template <typename tree_type>
-void rted<tree_type>::compute_relevant_subforrests(
+void rted::compute_relevant_subforrests(
                 iterator it,
                 table_type& FLeft,
                 table_type& FRight,
@@ -224,8 +226,7 @@ void rted<tree_type>::compute_relevant_subforrests(
             clabel(it), FRight[it_id]);
 }
 
-template <typename tree_type>
-void rted<tree_type>::compute_subtree_size(
+void rted::compute_subtree_size(
                 iterator it,
                 table_type& Size)
 {
@@ -242,8 +243,7 @@ void rted<tree_type>::compute_subtree_size(
             Size[it_id]);
 }
 
-template <typename tree_type>
-void rted<tree_type>::init_T1_LRH_v_tables(
+void rted::init_T1_LRH_v_tables(
                 iterator it1,
                 iterator it2)
 {
@@ -263,29 +263,25 @@ void rted<tree_type>::init_T1_LRH_v_tables(
             clabel(it2));
 }
 
-template <typename tree_type>
-void rted<tree_type>::init_T2_LRH_w_tables(
-                iterator it)
+void rted::init_T2_LRH_w_tables(
+                iterator it2)
 {
     //APP_DEBUG_FNAME;
 
-    size_t it_id = id(it);
+    size_t it2_id = id(it2);
 
-    T2_Lw[it_id] =
-        T2_Rw[it_id] =
-        T2_Hw[it_id] = 0;
+    T2_Lw[it2_id] =
+        T2_Rw[it2_id] =
+        T2_Hw[it2_id] = 0;
 
     DEBUG("T2_{LRH}w\t[%s]\t == 0 (init)",
-            clabel(it));
+            clabel(it2));
 }
 
-template <typename tree_type>
-void rted<tree_type>::first_visit(
+void rted::first_visit(
                 iterator it1,
                 iterator it2)
 {
-    size_t parent1_id = id(tree_type::parent(it1));
-    size_t parent2_id = id(tree_type::parent(it2));
     size_t it1_id = id(it1);
     size_t it2_id = id(it2);
     std::vector<bool> vec;
@@ -298,32 +294,13 @@ void rted<tree_type>::first_visit(
         init_T2_LRH_w_tables(it2);
 
 #define all_same(v) (v[0] == v[1] && v[1] == v[2])
+    auto init_parent_w_tables = [this](iterator iter2) {
+        if (tree_type::is_root(iter2))
+            return;
 
-    { // initialize parents if they are not..
-        vec = {
-            isbad(T1_Lv[parent1_id][it2_id]),
-            isbad(T1_Rv[parent1_id][it2_id]),
-            isbad(T1_Hv[parent1_id][it2_id]),
-        };
-        if (!all_same(vec))
-        {   // should be all inited/not-inited
-            ERR("all_same");
-            LOGGER_PRINT_CONTAINER(vec, "isbad v");
-            abort();
-        }
-        if (vec[0] == true)
-        {   // init parent
-            assert(tree_type::is_first_child(it1));
+        size_t parent2_id = id(tree_type::parent(iter2));
 
-            T1_Lv[parent1_id][it2_id] =
-                T1_Rv[parent1_id][it2_id] =
-                T1_Hv[parent1_id][it2_id] = 0;
-
-            DEBUG("T1_{LRH}v[%s][%s] parent init",
-                    clabel(tree_type::parent(it1)), clabel(it2));
-        }
-
-        vec = {
+        std::vector<bool> vec = {
             isbad(T2_Lw[parent2_id]),
             isbad(T2_Rw[parent2_id]),
             isbad(T2_Hw[parent2_id]),
@@ -336,15 +313,48 @@ void rted<tree_type>::first_visit(
         }
         if (vec[0] == true)
         {
-            assert(tree_type::is_first_child(it2));
+            assert(tree_type::is_first_child(iter2));
 
             T2_Lw[parent2_id] =
                 T2_Rw[parent2_id] =
                 T2_Hw[parent2_id] = 0;
 
-            DEBUG("T2_{LRH}w[%s] parent init", clabel(tree_type::parent(it1)));
+            DEBUG("T2_{LRH}w[%s] parent init", clabel(tree_type::parent(iter2)));
         }
-    }
+    };
+    auto init_parent_v_tables = [this](iterator iter1, iterator iter2) {
+        if (tree_type::is_root(iter1))
+            return;
+
+        size_t parent1_id = id(tree_type::parent(iter1));
+        size_t it2_id = id(iter2);
+
+        std::vector<bool> vec = {
+            isbad(T1_Lv[parent1_id][it2_id]),
+            isbad(T1_Rv[parent1_id][it2_id]),
+            isbad(T1_Hv[parent1_id][it2_id]),
+        };
+        if (!all_same(vec))
+        {   // should be all inited/not-inited
+            ERR("all_same");
+            LOGGER_PRINT_CONTAINER(vec, "isbad v");
+            abort();
+        }
+        if (vec[0] == true)
+        {   // init parent
+            assert(tree_type::is_first_child(iter1));
+
+            T1_Lv[parent1_id][it2_id] =
+                T1_Rv[parent1_id][it2_id] =
+                T1_Hv[parent1_id][it2_id] = 0;
+
+            DEBUG("T1_{LRH}v[%s][%s] parent init",
+                    clabel(tree_type::parent(iter1)), clabel(iter2));
+        }
+    };
+
+    init_parent_w_tables(it2);
+    init_parent_v_tables(it1, it2);
 
     { // it1 should be inited yet
         vec = {
@@ -374,8 +384,7 @@ void rted<tree_type>::first_visit(
 
 }
 
-template <typename tree_type>
-size_t rted<tree_type>::update_STR_table(
+size_t rted::update_STR_table(
                 iterator it1,
                 iterator it2)
 {
@@ -407,7 +416,7 @@ size_t rted<tree_type>::update_STR_table(
     size_t index = distance(vec.begin(), c_min_it);
 
     DEBUG("c_min %lu, index %lu", c_min, index);
-    STR[it1_id][it2_id] = strategy::from_index(index);
+    STR[it1_id][it2_id] = strategy(index);
 
     DEBUG("STR\t[%s][%s]\t == %s",
             clabel(it1),
@@ -417,8 +426,7 @@ size_t rted<tree_type>::update_STR_table(
     return c_min;
 }
 
-template <typename tree_type>
-void rted<tree_type>::update_T1_LRH_v_tables(
+void rted::update_T1_LRH_v_tables(
                 iterator it1,
                 iterator it2,
                 size_t c_min)
@@ -488,69 +496,68 @@ void rted<tree_type>::update_T1_LRH_v_tables(
             T1_Hv[parent1_id][it2_id]);
 }
 
-template <typename tree_type>
-void rted<tree_type>::update_T2_LRH_w_tables(
-                iterator it,
+void rted::update_T2_LRH_w_tables(
+                iterator it2,
                 size_t c_min)
 {
-    size_t it_id = id(it);
-    size_t parent_id = id(tree_type::parent(it));
+    size_t it2_id = id(it2);
+    size_t parent2_id = id(tree_type::parent(it2));
 
     {   // checks:
         std::vector<bool> vec = {
-            isbad(T2_Lw[parent_id]),
-            isbad(T2_Rw[parent_id]),
-            isbad(T2_Hw[parent_id]),
-            isbad(T2_Lw[it_id]),
-            isbad(T2_Rw[it_id]),
-            isbad(T2_Hw[it_id])
+            isbad(T2_Lw[parent2_id]),
+            isbad(T2_Rw[parent2_id]),
+            isbad(T2_Hw[parent2_id]),
+            isbad(T2_Lw[it2_id]),
+            isbad(T2_Rw[it2_id]),
+            isbad(T2_Hw[it2_id])
         };
         if (std::find(vec.begin(), vec.end(), true) != vec.end())
         {
             ERR("isbad() w[%s], w[%s]",
-                    clabel(tree_type::parent(it)), clabel(it));
+                    clabel(tree_type::parent(it2)), clabel(it2));
             LOGGER_PRINT_CONTAINER(vec, "isbad");
             abort();
         }
     }
 
     // Lw:
-    T2_Lw[parent_id] +=
-        tree_type::is_first_child(it) ?
-        T2_Lw[it_id] : c_min;
+    T2_Lw[parent2_id] +=
+        tree_type::is_first_child(it2) ?
+        T2_Lw[it2_id] : c_min;
 
     // Rw:
-    T2_Rw[parent_id] +=
-        tree_type::is_last_child(it) ?
-        T2_Rw[it_id] : c_min;
+    T2_Rw[parent2_id] +=
+        tree_type::is_last_child(it2) ?
+        T2_Rw[it2_id] : c_min;
 
     // Hw:
-    auto res = T2_Hw_partials[parent_id];
+    auto res = T2_Hw_partials[parent2_id];
 
-    if (T2_Size[it_id] > res.subtree_size)
+    if (T2_Size[it2_id] > res.subtree_size)
     {
-        T2_Hw[parent_id] +=
-            T2_Hw[it_id] - res.H_value + res.c_min;
+        T2_Hw[parent2_id] +=
+            T2_Hw[it2_id] - res.H_value + res.c_min;
 
-        res.subtree_size = T2_Size[it_id];
+        res.subtree_size = T2_Size[it2_id];
         res.c_min = c_min;
-        res.H_value = T2_Hw[it_id];
+        res.H_value = T2_Hw[it2_id];
 
-        T2_Hw_partials[parent_id] = res;
+        T2_Hw_partials[parent2_id] = res;
     }
     else
-        T2_Hw[parent_id] += c_min;
+        T2_Hw[parent2_id] += c_min;
 
 
     DEBUG("T2_Lw\t[%s]\t = %lu \t (update)",
-            clabel(tree_type::parent(it)),
-            T2_Lw[parent_id]);
+            clabel(tree_type::parent(it2)),
+            T2_Lw[parent2_id]);
     DEBUG("T2_Rw\t[%s]\t = %lu \t (update)",
-            clabel(tree_type::parent(it)),
-            T2_Rw[parent_id]);
+            clabel(tree_type::parent(it2)),
+            T2_Rw[parent2_id]);
     DEBUG("T2_Hw\t[%s]\t = %lu \t (update)",
-            clabel(tree_type::parent(it)),
-            T2_Hw[parent_id]);
+            clabel(tree_type::parent(it2)),
+            T2_Hw[parent2_id]);
 }
 
 

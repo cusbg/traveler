@@ -23,7 +23,7 @@
 
 using namespace std;
 
-int strategy_type::to_index() const
+int strategy::to_index() const
 {
     int out;
     bool t1 = is_T1();
@@ -38,90 +38,106 @@ int strategy_type::to_index() const
     return out;
 }
 
-/* static */
-strategy_type strategy_type::from_index(int index)
+strategy::strategy(int index)
 {
     assert(index >= 0 && index < 6);
 
-    strategy_type s;
-
     if (is_left(index))
-        s.strategy = left;
+        str = left;
     else if (is_right(index))
-        s.strategy = right;
+        str = right;
     else
-        s.strategy = heavy;
+        str = heavy;
 
     if (is_T1(index))
-        s.tree = T1;
+        tree = T1;
     else
-        s.tree = T2;
+        tree = T2;
 
-    s.inited = true;
-
-    return s;
+    inited = true;
 }
 
-bool strategy_type::is_left() const
+strategy::strategy(
+                const std::string& text)
 {
-    assert(inited);
-    return strategy == left;
+    assert(text.size() == 2);
+    assert(contains("LRH", text[0]) && contains("12", text[2]));
+
+    if (text[0] == 'L')
+        str = left;
+    if (text[0] == 'R')
+        str = right;
+    if (text[0] == 'H')
+        str = heavy;
+
+    if (text[1] == '1')
+        tree = T1;
+    if (text[1] == '2')
+        tree = T2;
+
+    inited = true;
 }
 
-bool strategy_type::is_right() const
+bool strategy::is_left() const
 {
     assert(inited);
-    return strategy == right;
+    return str == left;
 }
 
-bool strategy_type::is_heavy() const
+bool strategy::is_right() const
 {
     assert(inited);
-    return strategy == heavy;
+    return str == right;
+}
+
+bool strategy::is_heavy() const
+{
+    assert(inited);
+    return str == heavy;
 }
 
 /* static */
-bool strategy_type::is_left(int index)
+bool strategy::is_left(int index)
 {
     assert(index >= 0 && index < 6);
     return index >= 0 && index < 2;
 }
 
 /* static */
-bool strategy_type::is_right(int index)
+bool strategy::is_right(int index)
 {
     assert(index >= 0 && index < 6);
     return index >= 2 && index < 4;
 }
 
 /* static */
-bool strategy_type::is_heavy(int index)
+bool strategy::is_heavy(int index)
 {
     assert(index >= 0 && index < 6);
     return index >= 4 && index < 6;
 }
 
-bool strategy_type::is_T1() const
+bool strategy::is_T1() const
 {
     assert(inited);
     return tree == T1;
 }
 
-bool strategy_type::is_T2() const
+bool strategy::is_T2() const
 {
     assert(inited);
     return tree == T2;
 }
 
 /* static */
-bool strategy_type::is_T1(int index)
+bool strategy::is_T1(int index)
 {
     assert(index >= 0 && index < 6);
     return index % 2 == 0;
 }
 
 /* static */
-bool strategy_type::is_T2(int index)
+bool strategy::is_T2(int index)
 {
     assert(index >= 0 && index < 6);
     return index % 2 == 1;
@@ -129,25 +145,35 @@ bool strategy_type::is_T2(int index)
 
 std::ostream& operator<<(
                 std::ostream& out,
-                strategy_type str)
+                strategy str)
 {
-    if (!str.inited)
-        return out;
+    assert(str.inited);
 
     if (str.is_left())
-        out << "left";
+        out << "L";
     else if (str.is_right())
-        out << "right";
+        out << "R";
     else
-        out << "heavy";
-
-    out << ":";
+        out << "H";
 
     if (str.is_T1())
-        out << "T1";
+        out << "1";
     else
-        out << "T2";
+        out << "2";
 
+    return out;
+}
+
+std::ostream& operator<<(
+                std::ostream& out, strategy_table_type strategies)
+{
+    // do not output root line
+    for (size_t i = 0; i < strategies.size() - 1; ++i)
+    {
+        for (auto val : strategies[i])
+            out << val << " ";
+        out << endl;
+    }
     return out;
 }
 

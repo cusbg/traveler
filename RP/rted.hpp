@@ -24,19 +24,18 @@
 
 #include "types.hpp"
 #include "strategy.hpp"
+#include "rna_tree.hpp"
 
 
-template <typename tree_type>
 class rted
 {
 public:
-    typedef strategy_type                       strategy;
-    typedef std::vector<std::vector<strategy>>  strategy_table_type;
-    typedef std::vector<size_t>                 table_type;
+    typedef rna_tree                                    tree_type;
+    typedef typename tree_type::iterator                iterator;
+    typedef typename tree_type::post_order_iterator     post_order_iterator;
+    typedef typename tree_type::sibling_iterator        sibling_iterator;
 
-    typedef typename tree_type::iterator                 iterator;
-    typedef typename tree_type::post_order_iterator      post_order_iterator;
-    typedef typename tree_type::sibling_iterator         sibling_iterator;
+    typedef std::vector<size_t>                         table_type;
 
 public:
     rted(
@@ -112,9 +111,9 @@ private:
      * T2_{L,R,H}w[it_id] = 0;
      */
     void init_T2_LRH_w_tables(
-                iterator it);
+                iterator it2);
 
-    /*
+    /**
      * checks initialization for *LRH* tables
      * and for parents of it-s too,
      * if parents are not initalized, init parent
@@ -124,7 +123,7 @@ private:
                 iterator it1,
                 iterator it2);
 
-    /*
+    /**
      * compute C from rted_opt_strategy(F,G) (== lines 7-12)
      * find minimum and stores minimal_path
      * returns c_min
@@ -133,7 +132,7 @@ private:
                 iterator it1,
                 iterator it2);
 
-    /*
+    /**
      * == ekvivalent to lines 16, 17, 18 in rted_opt_strategy(F,G)
      *
      * T1_Lv[parent_it1][it2] += (it1 == leftmost_child) ?
@@ -158,7 +157,7 @@ private:
                 iterator it2,
                 size_t c_min);
 
-    /*
+    /**
      * == ekvivalent to lines 20, 21, 22 in rted_opt_strategy(F,G)
      *
      * T2_Lw[parent_it] += (it == leftmost_child) ? T2_Lw[it] : c_min;
@@ -169,7 +168,7 @@ private:
      *      ... See update_T1_LRH_v_tables()
      */
     void update_T2_LRH_w_tables(
-                iterator it,
+                iterator it2,
                 size_t c_min);
 
 public:
@@ -245,8 +244,6 @@ public:
     static void test();
 #endif
 };
-
-#include "rted_implementation.hpp"
 
 #endif /* !RTED_HPP */
 
