@@ -31,3 +31,16 @@ size_t node_base::id() const
     return _id;
 }
 
+void node_base::reset_id()
+{
+    _id = ID++;
+}
+
+/* static */
+void node_base::reset_ID()
+{
+    APP_DEBUG_FNAME;
+
+    ID = 0;
+}
+

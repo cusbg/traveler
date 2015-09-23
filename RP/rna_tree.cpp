@@ -37,6 +37,8 @@ rna_tree::rna_tree(
 
     std::stringstream stream;
 
+    set_postorder_ids();
+
     stream
         << "TREE '"
         << id()
@@ -49,6 +51,24 @@ rna_tree::rna_tree(
 
     logger.debugStream() << stream.str();
 }
+
+void rna_tree::update_points(
+                const vector<point>& points)
+{
+    APP_DEBUG_FNAME;
+
+    pre_post_order_iterator it;
+    size_t i = 0;
+
+    for (it = ++begin_pre_post();
+            it != end_pre_post() && i < points.size();
+            ++it, ++i)
+        it->set_points_exact(points[i], it.label_index());
+
+    assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
+}
+
+
 
 std::vector<rna_pair_label> convert(
                 const std::string& labels)
@@ -103,6 +123,10 @@ rna_tree::sibling_iterator rna_tree::insert(
     return pos;
 }
 
+std::string rna_tree::name() const
+{
+    return _name;
+}
 
 
 

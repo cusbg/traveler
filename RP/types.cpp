@@ -1,7 +1,7 @@
 /*
  * File: types.cpp
  *
- * Copyright (C) 2014 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,17 +19,6 @@
  * USA.
  */
 
-#include "types.hpp"
-
-using namespace std;
-
-
-
-
-
-
-
-
 #include <log4cpp/Category.hh>
 #include <log4cpp/Appender.hh>
 #include <log4cpp/FileAppender.hh>
@@ -39,9 +28,10 @@ using namespace std;
 #include <log4cpp/Priority.hh>
 #include <log4cpp/PatternLayout.hh>
 
-// getpid():
-#include <sys/types.h>
-#include <unistd.h>
+#include "types.hpp"
+
+using namespace std;
+
 
 log4cpp::Category& init_logger()
 {
@@ -49,7 +39,7 @@ log4cpp::Category& init_logger()
     log4cpp::Appender* file_appender;
     log4cpp::PatternLayout* console_layout;
     log4cpp::PatternLayout* file_layout;
-    string logfile = "build/logs/program-" + to_string(getpid()) + ".log";
+    string logfile = "build/logs/program.log";
     string pattern = "%d{%H:%M:%S:%l} %u:\t[%p] %m%n";
 
     console_appender = new log4cpp::OstreamAppender("console", &std::cout);
@@ -73,7 +63,5 @@ log4cpp::Category& init_logger()
 }
 
 log4cpp::Category& logger = init_logger();
-
-
 
 

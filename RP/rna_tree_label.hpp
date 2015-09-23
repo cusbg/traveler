@@ -23,6 +23,7 @@
 #define RNA_TREE_LABEL_HPP
 
 #include "tree_base_node.hpp"
+#include "point.hpp"
 
 struct rna_label
 {
@@ -30,6 +31,7 @@ struct rna_label
                 const rna_label& other) const;
 
     std::string label;
+    point p;
 };
 
 
@@ -37,9 +39,25 @@ class rna_pair_label
     : public node_base
 {
 public:
+    enum status_type
+    {
+        untouched,
+        touched,
+        edited,
+        deleted,
+        inserted,
+        reinserted,
+        pair_changed,
+    };
+
+public:
     rna_pair_label() = default;
     rna_pair_label(
                 const std::string& s);
+    bool operator==(
+                const rna_pair_label& other) const;
+    rna_pair_label operator+(
+                const rna_pair_label& other) const;
 
     const rna_label& operator[](
                 size_t index) const;
@@ -49,12 +67,25 @@ public:
     friend std::ostream& operator<<(
                 std::ostream& out,
                 rna_pair_label lbl);
+    friend std::ostream& operator<<(
+                std::ostream& out,
+                status_type status);
 
     bool paired() const;
-    bool operator==(
-                const rna_pair_label& other) const;
-    rna_pair_label operator+(
-                const rna_pair_label& other) const;
+    bool inited_points() const;
+    point centre() const;
+
+    void set_label_strings(
+                const rna_pair_label& other);
+    void set_points_nearby(
+                point p,
+                size_t index);
+    void set_points_exact(
+                point p,
+                size_t index);
+
+public:
+    status_type status = untouched;
 
 private:
     std::vector<rna_label> labels;

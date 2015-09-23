@@ -1,7 +1,7 @@
 /*
- * File: Point.cpp
+ * File: point.cpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,104 +21,65 @@
 
 
 #include <iomanip>
-#include <cmath>
-#include <functional>
 
 #include "point.hpp"
-#include "types.hpp"
 
 using namespace std;
 
-#define BAD_POINT     Point({0xBADF00D, 0xBADF00D})
+#define radians_to_degrees(x)   (x * 180 / M_PI)
+#define degrees_to_radians(x)   (x * M_PI / 180)
 
-//#define OUTPUT_FUNCTIONS
-#ifdef OUTPUT_FUNCTIONS
+#define double_equals_precision(val1, val2, precision) \
+    (abs(val1 - val2) < abs(precision))
+#define double_equals(val1, val2) \
+    double_equals_precision(val1, val2, 0.0001)
 
+#define BAD_POINT       (point({0xBADF00D, 0xBADF00D}))
+#define squared(val)    ((val) * (val))
+
+
+#define PRINT_FUNCTIONS
+
+#ifdef PRINT_FUNCTIONS
 #define BINARY_OUTPUT(P1, P2) \
             { \
                 APP_DEBUG_FNAME; \
-                DEBUG("%s; %s", ::to_string(P1).c_str(), ::to_string(P2).c_str()); \
+                DEBUG("%s; %s", to_cstr(P1), to_cstr(P2)); \
             }
 #define UNARY_OUTPUT(P) \
             { \
                 APP_DEBUG_FNAME; \
-                DEBUG("%s", ::to_string(P).c_str()); \
+                DEBUG("%s", to_cstr(P)); \
             }
-
-#else
+#else // PRINT_FUNCTIONS
 #define BINARY_OUTPUT(P1, P2)
 #define UNARY_OUTPUT(P)
-#endif
+#endif // PRINT_FUNCTIONS
 
-Point::Point()
-    : Point(BAD_POINT)
+#define BINARY(P1, P2) \
+    BINARY_OUTPUT(P1, P2); \
+    assert(!(P1).bad() && !(P2).bad());
+
+#define UNARY(P) \
+    UNARY_OUTPUT(P); \
+    assert(!(P).bad());
+
+point::point()
+    : point(BAD_POINT)
 { }
 
-Point::Point(std::initializer_list<double> l)
+point::point(double _x, double _y)
+    : x(_x), y(_y)
+{ }
+
+bool point::operator==(point other) const
 {
-    x = *l.begin();
-    y = *(l.begin() + 1);
+    BINARY(*this, other);
+
+    return x == other.x && y == other.y;
 }
 
-
-Point Point::operator+(Point other) const
-{
-    BINARY_OUTPUT(*this, other);
-
-    return Point({x + other.x, y + other.y});
-}
-
-Point Point::operator-(Point other) const
-{
-    BINARY_OUTPUT(*this, other);
-
-    return Point({x - other.x, y - other.y});
-}
-
-Point Point::operator-() const
-{
-    UNARY_OUTPUT(*this);
-
-    return Point({-x, -y});
-}
-
-Point Point::operator*(double val) const
-{
-    BINARY_OUTPUT(*this, val);
-
-    return Point({ x * val, y * val});
-}
-
-Point Point::operator/(double val) const
-{
-    BINARY_OUTPUT(*this, val);
-
-    assert (val != 0);
-    return Point({x / val, y / val});
-}
-
-bool Point::operator==(Point other) const
-{
-    BINARY_OUTPUT(*this, other);
-
-    return double_equals(x, other.x) &&
-        double_equals(y, other.y);
-    //return x == other.x && y == other.y;
-}
-
-Point& Point::operator+=(Point other)
-{
-    *this = *this + other;
-    return *this;
-}
-
-Point& Point::operator-=(Point other)
-{
-    *this = *this - other;
-    return *this;
-}
-
-std::ostream& operator<< (std::ostream& out, Point p)
+std::ostream& operator<<(std::ostream& out, point p)
 {
     if (p.bad())
         out << "0xBADF00D 0xBADF00D";
@@ -134,59 +95,111 @@ std::ostream& operator<< (std::ostream& out, Point p)
     return out;
 }
 
-std::string Point::to_string() const
+
+point point::operator+(point other) const
 {
-    stringstream str;
-    str << *this;
-    return str.str();
+    BINARY(*this, other);
+
+    return {x + other.x, y + other.y};
 }
 
-Point Point::swap_xy() const
+point point::operator-(point other) const
 {
-    return Point({y, x});
+    BINARY(*this, other);
+
+    return {x - other.x, y - other.y};
 }
 
-bool Point::bad() const
+point point::operator-() const
 {
+    UNARY(*this);
+
+    return {-x, -y};
+}
+
+point point::operator/(double value) const
+{
+    UNARY(*this);
+
+    return {x / value, y / value};
+}
+
+point point::operator*(double value) const
+{
+    UNARY(*this);
+
+    return {x * value, y * value};
+}
+
+point& point::operator+=(point other)
+{
+    BINARY(*this, other);
+
+    *this = *this + other;
+    return *this;
+}
+
+point& point::operator-=(point other)
+{
+    BINARY(*this, other);
+
+    *this = *this - other;
+    return *this;
+}
+
+bool point::bad() const
+{
+    UNARY(*this);
+
     return *this == bad_point();
 }
 
-/* static */ Point Point::bad_point()
+/* static */ point point::bad_point()
 {
     return BAD_POINT;
 }
 
-
-// GLOBAL FUNCTIONS:
-
-Point operator*(double value, Point p)
+point operator*(double value, point p)
 {
     return p * value;
 }
 
-Point centre(Point p1, Point p2)
+
+// TODO: pridat do funkcii kontrolu na badpoint
+
+point centre(point p1, point p2)
 {
+    BINARY(p1, p2);
+
     return (p1 + p2) / 2;
 }
 
-double distance(Point p1, Point p2)
+double distance(point p1, point p2)
 {
+    BINARY(p1, p2);
+
     return size(p2 - p1);
 }
 
-double size(Point vector)
+double size(point vector)
 {
+    UNARY(vector);
+
     return sqrt(squared(vector.x) + squared(vector.y));
 }
 
-Point normalize(Point p)
+point normalize(point p)
 {
+    UNARY(p);
+
     assert(size(p) != 0);
     return p / size(p);
 }
 
-double angle(Point p)
+double angle(point p)
 {
+    UNARY(p);
+
     double out = fmod(radians_to_degrees(atan2(p.y, p.x)) + 360, 360);
 
     assert(isnormal(out) || out == 0);
@@ -194,8 +207,11 @@ double angle(Point p)
     return out;
 }
 
-double angle(Point p1, Point centre, Point p2)
+double angle(point p1, point centre, point p2)
 {
+    BINARY(p1, p2);
+    UNARY(centre);
+
     double out = fmod(angle(p2 - centre) - angle(p1 - centre) + 360, 360);
 
     assert(isnormal(out) || out == 0);
@@ -203,14 +219,18 @@ double angle(Point p1, Point centre, Point p2)
     return out;
 }
 
-Point orthogonal(Point p)
+point orthogonal(point p)
 {
-    return normalize(Point({p.y, -p.x}));
+    UNARY(p);
+
+    return normalize({p.y, -p.x});
 }
 
-Point orthogonal(Point p, Point direction)
+point orthogonal(point p, point direction)
 {
-    Point o = orthogonal(p);
+    BINARY(p, direction);
+
+    point o = orthogonal(p);
 
     assert(!double_equals(distance(o, direction), distance(-o, direction)));
 
@@ -220,37 +240,41 @@ Point orthogonal(Point p, Point direction)
         return -o;
 }
 
-Point move_point(Point p, Point move_to, double length)
+point move_point(point p, point move_to, double length)
 {
-    APP_DEBUG_FNAME;
+    BINARY(p, move_to);
 
-    Point vec = normalize(move_to - p);
+    point vec = normalize(move_to - p);
 
     return p + length * vec;
 }
 
-Point base_pair_edge_point(Point from, Point to)
+point base_pair_edge_point(point from, point to)
 {
-    Point vec = {3, 3};
+    BINARY(from, to);
+
+    point vec = {3, 3};
     vec = vec + normalize(to - from) * 4;
     return from + vec;
 }
 
-bool lies_on_line(Point p1, Point p2, Point p3)
+bool lies_on_line(point p1, point p2, point p3)
 {
-    APP_DEBUG_FNAME;
+    BINARY(p1, p2);
+    UNARY(p3);
 
     return lies_between(p1, p2, p3) ||
         lies_between(p2, p3, p1) ||
         lies_between(p3, p1, p2);
 }
 
-bool lies_between(Point p, Point from, Point to)
+bool lies_between(point p, point from, point to)
 {
+    BINARY(from, to);
+    UNARY(p);
+
 	p = p - from;
 	to = to - from;
-
-    cout << p << endl << to << endl;
 
     if (p.x == 0 &&
             p.y == 0 &&
@@ -263,19 +287,21 @@ bool lies_between(Point p, Point from, Point to)
         assert(to.y != 0);
         return p.y / to.y <= 1;
     }
+
     if (p.y == 0 && to.y == 0)
     {
         assert(to.y != 0);
         return p.x / to.x <= 1;
     }
+
     if (to.x == 0 || to.y == 0)
         return false;
+
     assert(to.x != 0 && to.y != 0);
+
     return p.x / to.x <= 1 &&
         p.x / to.x >= 0 &&
         p.x / to.x == p.y / to.y;
 }
-
-
 
 

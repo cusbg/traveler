@@ -36,7 +36,10 @@ public:
                 const std::string& _brackets,
                 const std::string& _labels,
                 const std::string& _name = "");
-    
+
+    void update_points(
+                const std::vector<point>& points);
+
     sibling_iterator insert(
                 sibling_iterator sib,
                 rna_pair_label label,
@@ -44,7 +47,9 @@ public:
     sibling_iterator erase(
                 sibling_iterator sib);
 
-public:
+    std::string name() const;
+
+private:
     std::string _name;
 };
 

@@ -1,7 +1,7 @@
 /*
- * File: Point.hpp
+ * File: point.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,73 +22,57 @@
 #ifndef POINT_HPP
 #define POINT_HPP
 
+#include "types.hpp"
 
-#include <ostream>
 
-struct Point
+struct point
 {
-    double x, y;
+    double x;
+    double y;
 
-    Point();
-    Point(std::initializer_list<double>);
+    point();
+    point(double _x, double _y);
+    bool operator==(point other) const;
 
-    friend std::ostream& operator<< (std::ostream& out, Point p);
-    Point operator+(Point other) const;
-    Point operator-(Point other) const;
-    Point operator-() const;
-    Point operator/(double value) const;
-    Point operator*(double value) const;
-    Point& operator+=(Point other);
-    Point& operator-=(Point other);
-    bool operator==(Point other) const;
+    point operator+(point other) const;
+    point operator-(point other) const;
+    point operator-() const;
+    point operator/(double value) const;
+    point operator*(double value) const;
+    point& operator+=(point other);
+    point& operator-=(point other);
 
-    Point swap_xy() const;
-    std::string to_string() const;
     bool bad() const;
-    static Point bad_point();
+    static point bad_point();
+
+    friend std::ostream& operator<<(std::ostream& out, point p);
 };
 
-Point operator*(double value, Point p);
 
-Point centre(Point p1, Point p2);
+point centre(point p1, point p2);
 
-double distance(Point p1, Point p2);
+double distance(point p1, point p2);
 
-double size(Point vector);
+double size(point vector);
 
-Point normalize(Point p);
+point normalize(point p);
 
-double angle(Point p);
+double angle(point p);
 
-double angle(Point p1, Point centre, Point p2);
+double angle(point p1, point centre, point p2);
 
-Point orthogonal(Point p);
+point orthogonal(point p);
 
-Point orthogonal(Point p, Point direction);
+point orthogonal(point p, point direction);
 
-Point move_point(Point p, Point move_to, double length);
+point move_point(point p, point move_to, double length);
 
-Point base_pair_edge_point(Point from, Point to);
+point base_pair_edge_point(point from, point to);
 
-bool lies_on_line(Point p1, Point p2, Point p3);
+bool lies_on_line(point p1, point p2, point p3);
 
-bool lies_between(Point p, Point from, Point to);
+bool lies_between(point p, point from, point to);
 
-
-template <typename T>
-inline T squared(const T& t)
-{
-    return t * t;
-}
-
-
-namespace std
-{
-inline std::string to_string(Point p)
-{
-    return p.to_string();
-}
-}
 
 #endif /* !POINT_HPP */
 

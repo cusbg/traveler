@@ -26,6 +26,10 @@
 #include "tree_base_iter.hpp"
 
 
+//
+// tree<> functions:
+//
+
 /* static */
 template <typename label_type>
 size_t tree_base<label_type>::ID = 0;
@@ -37,28 +41,33 @@ tree_base<label_type>::tree_base(
                 const std::string& _brackets,
                 const labels_array& _labels)
 {
-    auto iter = begin();
+    APP_DEBUG_FNAME;
+
+    iterator it;
     size_t i = 0;
     
     assert(_brackets.size() == _labels.size());
 
     _tree.set_head(label_type("ROOT_" + std::to_string(_id)));
+    _size = 1;  // ROOT
+    it = begin();
+
     while(i < _brackets.size())
     {
         switch (_brackets[i])
         {
-            assert(_tree.is_valid(iter));
+            assert(_tree.is_valid(it));
             case '(':
-                iter = _tree.append_child(iter, _labels[i]);
+                it = _tree.append_child(it, _labels[i]);
                 ++_size;
                 break;
             case ')':
-                assert(!is_root(iter));
-                *iter = *iter + _labels[i];
-                iter = parent(iter);
+                assert(!is_root(it));
+                *it = *it + _labels[i];
+                it = parent(it);
                 break;
             case '.':
-                _tree.append_child(iter, _labels[i]);
+                _tree.append_child(it, _labels[i]);
                 ++_size;
                 break;
             default:
@@ -73,8 +82,6 @@ tree_base<label_type>::tree_base(
         ++i;
     }
     assert(_tree.size() == size());
-
-    /*set_ids_postorder();*/
 }
 
 template <typename label_type>
@@ -132,10 +139,13 @@ std::string tree_base<label_type>::print_subtree(
                 out << "(";
 
                 assert(it.begin() != it.end());
+
                 for (sibling_iterator sib = it.begin(); sib != it.end(); ++sib)
                 {
                     print_recursive(sib, out);
-                    out << ", ";
+
+                    if (!is_last_child(sib))
+                        out << ", ";
                 }
                 out << ")";
             }
@@ -147,6 +157,26 @@ std::string tree_base<label_type>::print_subtree(
     return stream.str();
 }
 
+
+template <typename label_type>
+void tree_base<label_type>::set_postorder_ids()
+{
+    APP_DEBUG_FNAME;
+
+    post_order_iterator it;
+
+    label_type::reset_ID();
+
+    for (it = begin_post(); it != end_post(); ++it)
+        it->reset_id();
+
+    assert(size() - 1 == ::id(begin()));
+}
+
+
+//
+// global functions:
+//
 
 /* global */
 /* inline */

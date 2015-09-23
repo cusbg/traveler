@@ -168,7 +168,7 @@ std::ostream& operator<<(
                 std::ostream& out, strategy_table_type strategies)
 {
     // do not output root line
-    for (size_t i = 0; i < strategies.size() - 1; ++i)
+    for (size_t i = 0; i < strategies.size(); ++i)
     {
         for (auto val : strategies[i])
             out << val << " ";

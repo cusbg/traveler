@@ -33,10 +33,11 @@ template <typename label_type>
 class tree_base
 {
 private:
+    class                                           _pre_post_order_iterator;
+
+protected:
     typedef tree<label_type>                        tree_type;
     typedef tree_node_<label_type>                  tree_node_type;
-    class                                           _pre_post_order_iterator;
-    struct                                          _iterator_hash;
 
 public:
     typedef typename tree_type::iterator_base       base_iterator;
@@ -44,7 +45,6 @@ public:
     typedef typename tree_type::sibling_iterator    sibling_iterator;
     typedef typename tree_type::post_order_iterator post_order_iterator;
     typedef _pre_post_order_iterator                pre_post_order_iterator;
-    typedef _iterator_hash                          iterator_hash;
 
 protected:
     tree_base() = default;
@@ -68,6 +68,9 @@ public:
                 bool debug_output = true);
     inline std::string print_tree(
                 bool debug_output = true) const;
+
+public:
+    void set_postorder_ids();
 
 public:
     /* .begin(), .end() functions from tree<> */
@@ -108,7 +111,7 @@ private:
     static size_t ID;
 
 protected:
-    const size_t _id = ID++;
+    size_t _id = ID++;
     tree_type _tree;
     size_t _size;
 };

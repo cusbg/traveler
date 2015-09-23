@@ -43,6 +43,8 @@ public:
     _pre_post_order_iterator(
                 tree_node_type* nodeptr = nullptr,
                 bool _preorder = true);
+    _pre_post_order_iterator(
+                const _pre_post_order_iterator& other) = default;
     
     bool operator==(
                 const _pre_post_order_iterator&) const;
@@ -53,6 +55,7 @@ public:
     _pre_post_order_iterator&   operator++();
 
     inline bool preorder() const;
+    inline size_t label_index() const;
 
 private:
     bool _preorder;
@@ -80,7 +83,7 @@ bool tree_base<label_type>::_pre_post_order_iterator::operator==(
                 const _pre_post_order_iterator& it) const
 {
     return it.node == this->node &&
-        it.preorder == this->preorder;
+        it.preorder() == this->preorder();
 }
 
 template <typename label_type>
@@ -154,6 +157,14 @@ bool tree_base<label_type>::_pre_post_order_iterator::preorder() const
     return _preorder;
 }
 
+/* inline */
+template <typename label_type>
+size_t tree_base<label_type>::_pre_post_order_iterator::label_index() const
+{
+    if (this->preorder() || !(*this)->paired())
+        return 0;
+    return 1;
+}
 
 
 //
@@ -262,7 +273,7 @@ bool tree_base<label_type>::is_leaf(
                 const base_iterator& it)
 {
     assert(it.node != nullptr);
-    return it.node->first_child != nullptr;
+    return it.begin() == it.end();
 }
 
 /* static */

@@ -1,5 +1,5 @@
 /*
- * File: tree_base_node.hpp
+ * File: mapping.hpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
@@ -19,29 +19,46 @@
  * USA.
  */
 
-#ifndef TREE_BASE_NODE_HPP
-#define TREE_BASE_NODE_HPP
+#ifndef MAPPING_HPP
+#define MAPPING_HPP
 
-#include "types.hpp"
+#include "utils.hpp"
 
-class node_base
+class mapping
 {
 public:
-    virtual ~node_base() = default;
-protected:
-    node_base() = default;
+    typedef std::vector<size_t> indexes;
 
-public:
-    size_t id() const;
-    void reset_id();
-    static void reset_ID();
+    struct mapping_pair
+    {
+        size_t from, to;
+    };
 
 private:
-    static size_t ID;
-protected:
-    size_t _id = ID++;
+    static void run_rted(
+                const rna_tree& rna1,
+                const rna_tree& rna2,
+                const std::string& filename);
+
+    static mapping read_mapping(
+                std::istream& in);
+
+public:
+    mapping() = default;
+    mapping(
+                const rna_tree& rna1,
+                const rna_tree& rna2);
+    mapping(
+                const std::string& filename);
+
+    indexes get_to_insert() const;
+    indexes get_to_remove() const;
+
+public:
+    size_t distance;
+    std::vector<mapping_pair> map;
 };
 
 
-#endif /* !TREE_BASE_NODE_HPP */
+#endif /* !MAPPING_HPP */
 

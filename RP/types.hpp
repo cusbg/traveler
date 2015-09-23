@@ -29,19 +29,6 @@
 #include <sstream>
 #include <algorithm>
 #include <stdexcept>
-#include <utility>
-
-using namespace std::rel_ops;
-
-#define radians_to_degrees(x)   (x * 180 / M_PI)
-#define degrees_to_radians(x)   (x * M_PI / 180)
-
-#define ARRAY_LENGTH(x)     ((sizeof(x)/sizeof(0[x])) / ((size_t)(!(sizeof(x) % sizeof(0[x])))))
-
-#define double_equals_precision(val1, val2, precision) \
-    (abs(val1 - val2) < abs(precision))
-#define double_equals(val1, val2) \
-    double_equals_precision(val1, val2, 0.0001)
 
 
 
@@ -69,15 +56,32 @@ inline std::string to_string(bool b)
 template <typename container_type, typename value_type>
 inline bool contains(const container_type& c, const value_type& v)
 {
-    return std::find(c.begin(), c.end(), v) != c.end();
+    return std::find(std::begin(c), std::end(c), v) != std::end(c);
 }
+
+template <typename T>
+inline std::string to_string(const T& t)
+{
+    std::stringstream str;
+    str << t;
+    return str.str();
+}
+
+template <typename T>
+inline bool operator!=(const T& t1, const T& t2)
+{
+    return !(t1 == t2);
+}
+
+
 
 
 
 class set_logger_priority_to_return_function
 {
 public:
-    set_logger_priority_to_return_function(log4cpp::Priority::Value new_priority)
+    set_logger_priority_to_return_function(
+                log4cpp::Priority::Value new_priority)
     {
         old_priority = logger.getPriority();
         logger.setPriority(new_priority);
@@ -112,7 +116,7 @@ private:
             std::stringstream stream; \
             for (auto __value : container) \
                 stream << __value << " "; \
-            DEBUG(name": %s", stream.str().c_str()); \
+            DEBUG("%s: %s", name, stream.str().c_str()); \
         }
 
 
