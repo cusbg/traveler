@@ -10,14 +10,14 @@ DEBUG			= -g -Wall
 #RELEASE		= DNDEBUG -O3
 CFLAGS			= -std=c++11 -c $(DEBUG) $(RELEASE)
 LFLAGS			= $(DEBUG) $(RELEASE) $(shell pkg-config --libs log4cpp)
-SHELL			= /bin/bash
+SHELL			= /bin/bash -o pipefail
 
 BUILDDIR		= build
 LOGDIR			= $(BUILDDIR)/logs
 FILESDIR		= $(BUILDDIR)/files
 
 TARGET			= program
-SOURCES			= $(shell find ./ -name "*.cpp" | sed 's@\./@@g')
+SOURCES			= $(shell find ./ -maxdepth 1 -name "*.cpp" | sed 's@\./@@g')
 HEADERS			= $(shell find ./ -name "*.hpp" | sed 's@\./@@g')
 OBJECTS			= $(shell echo $(SOURCES) | sed 's@\.cpp@.o@ g; s@[^ ]*/@@g')
 MAKEFILES		= $(shell echo $(SOURCES) | sed 's@\.cpp@.mk@g; s@[^ ]*/@@g')
@@ -26,7 +26,7 @@ MAKEDEPENDENCY	= $(CC) -MM -E
 
 
 ARGS			=
-run: build $(FILESDIR)/generated
+run: build
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
 	@echo "**********************************************************************"
@@ -42,10 +42,8 @@ debug: build
 analyse:
 	gprof $(BUILDDIR)/$(TARGET) | less
 
-generate: build $(FILESDIR)/generated
 
-
-$(BUILDDIR)/$(TARGET): OtherMks $(BUILDDIR)/Makefile
+$(BUILDDIR)/$(TARGET): $(BUILDDIR)/Makefile
 
 $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES))
 	@rm -f $@
@@ -72,20 +70,12 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 			\\n \
 			\\ninclude $(MAKEFILES) \
 					>> $@
-	@#@make --directory=$(BUILDDIR) -f Makefile
 	@make -j4 --directory=$(BUILDDIR) -f Makefile
 
-MK_DIRECTORIES		= $(LOGDIR) $(FILESDIR) $(FILESDIR)/mappings $(FILESDIR)/rted
+MK_DIRECTORIES		= $(LOGDIR) $(FILESDIR)
 mk_dirs:
 	@mkdir -p $(MK_DIRECTORIES)
 
-$(FILESDIR)/generated:
-	@echo "**********************************************************************"
-	@echo "********************* RUNNING  PROGRAM *******************************"
-	@echo "**********************************************************************"
-	@echo
-	$(BUILDDIR)/$(TARGET) "generate" || rm -r $(FILESDIR)
-	@touch $@
 
 $(BUILDDIR)/%.mk: %.cpp
 	@mkdir -p $(BUILDDIR)
@@ -95,15 +85,12 @@ $(BUILDDIR)/%.mk: %.cpp
 	@echo '	$(CC) $(CFLAGS) $$< -o $$@ ' \
 					>> $@
 
-OtherMks:
-	@make -j4 --directory=./tree -f Makefile build
-	@make -j4 --directory=./ted	 -f Makefile build
+java_rted:
+	java -cp java_RTED util.RTEDCommandLine --costs 1 1 0 --mapping --verbose --trees #'T1' 'T2'
 
 rnafold:
-	make -f ./Makefile.RNAfold
+	../RNAPlot/bin/RNAfold --noPS << END \n SEQ \n END
 
-rted:
-	make -f ./Makefile.RTED
 
 clean:
 	rm -rf $(BUILDDIR)
