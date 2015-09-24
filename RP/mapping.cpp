@@ -59,6 +59,12 @@ mapping::indexes mapping::get_to_remove() const
 }
 
 mapping::mapping(
+                const rna_tree& rna1,
+                const rna_tree& rna2)
+    : mapping(MAP(rna1.name(), rna2.name()))
+{ }
+
+mapping::mapping(
                 const std::string& filename)
 {
     APP_DEBUG_FNAME;
@@ -72,74 +78,49 @@ mapping::mapping(
 /* static */ mapping mapping::read_mapping(
                 std::istream& in)
 {
+    APP_DEBUG_FNAME;
+
     mapping map;
     mapping_pair m;
 
-    string distance;
+    string s;
     in
-        >> distance
-        >> distance;
-    map.distance = stoi(distance);
+        >> s
+        >> s;
+    //DEBUG("distance: %s", s.c_str());
+    map.distance = stoi(s);
 
     while(true)
     {
-        in >> m.from >> m.to;
+        in >> s;
         if (in.fail())
             break;
+        m = split(s);
         map.map.push_back(m);
     }
     return map;
 }
 
-mapping::mapping(
-                const rna_tree& rna1,
-                const rna_tree& rna2)
-    : mapping(MAP(rna1.name(), rna2.name()))
-{ }
-
-/* static */ void mapping::run_rted(
-                const rna_tree& rna1,
-                const rna_tree& rna2,
-                const std::string& filename)
+/* static */ mapping::mapping_pair mapping::split(
+                const std::string& text)
 {
-    APP_DEBUG_FNAME;
+    mapping_pair m;
+    stringstream str;
+    char ch;
 
-    string command;
-    string f1, f2;
+    str << text;
 
-    if(reader::exist_file(filename))
-    {
-        DEBUG("RTED: file %s exist, return", filename.c_str());
-        return;
-    }
+    str
+        >> m.from
+        >> ch
+        >> ch
+        >> m.to;
 
-    //f1 = RTED_RUN_FILE(1, rna1.name());
-    //f2 = RTED_RUN_FILE(2, rna2.name());
+    assert(!str.fail());
 
-    ofstream out;
-    out.open(f1);
-    out << convert_to_java_format(rna1);
-    out.close();
-    out.open(f2);
-    out << convert_to_java_format(rna2);
-    out.close();
+    //DEBUG("%lu -> %lu",
+            //m.from, m.to);
 
-    command =
-                "java -cp java_RTED util.RTEDCommandLine "
-                    "--costs 1 1 0 "
-                    "-m "
-                    "--files "
-                    " '" + f1 + "' "
-                    " '" + f2 + "' "
-                    " > " + filename;
-
-    DEBUG("RUN COMMAND: %s", command.c_str());
-    
-    if (system(command.c_str()) != 0)
-    {
-        ERR("rted command failed");
-        abort();
-    }
+    return m;
 }
-
 

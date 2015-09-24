@@ -54,6 +54,14 @@ private:
 };
 
 
+/* global */
+inline bool is(
+                rna_tree::iterator it,
+                rna_pair_label::status_type status)
+{
+    return it->status == status;
+}
+
 
 #endif /* !RNA_TREE_HPP */
 

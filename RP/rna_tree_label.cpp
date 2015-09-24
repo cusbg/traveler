@@ -83,8 +83,20 @@ std::ostream& operator<<(
                 std::ostream& out,
                 rna_pair_label lbl)
 {
+    if (lbl.status == rna_pair_label::inserted)
+        out << "__ins`";
+    if (lbl.status == rna_pair_label::deleted)
+        out << "__del`";
+    if (lbl.status == rna_pair_label::reinserted)
+        out << "__reins`";
+
     for (const auto& val : lbl.labels)
         out << val.label;
+
+    if (lbl.status == rna_pair_label::inserted ||
+            lbl.status == rna_pair_label::deleted ||
+            lbl.status == rna_pair_label::reinserted)
+        out << "`";
 
     return out;
 }
@@ -144,7 +156,7 @@ void rna_pair_label::set_points_exact(
                 point p,
                 size_t index)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
     (*this)[index].p = p;
 }
@@ -153,7 +165,7 @@ void rna_pair_label::set_points_nearby(
                 point p,
                 size_t index)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
     double i;
     i = 5 + rand() % 10;

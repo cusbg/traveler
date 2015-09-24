@@ -1,7 +1,7 @@
 /*
  * File: generator.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,19 +22,28 @@
 #ifndef GENERATOR_HPP
 #define GENERATOR_HPP
 
+#include "types.hpp"
+
+class rna_tree;
 
 class generator
 {
 public:
     static void generate_files();
+    static void force_generate();
 
+    static std::string run_folder(
+                const std::string& labels);
+    static std::string run_mapping(
+                rna_tree rna1,
+                rna_tree rna2);
+    static bool generate();
 private:
     static void generate_seq_files();
     static void generate_fold_files();
-    static void generate_ps_files();
-    static void generate_svg_files();
     static void generate_mapping();
 };
+
 
 #endif /* !GENERATOR_HPP */
 

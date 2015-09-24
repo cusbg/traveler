@@ -1,7 +1,7 @@
 /*
  * File: generator.cpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,14 +19,44 @@
  * USA.
  */
 
-#include <fstream>
-
 #include "generator.hpp"
 #include "types.hpp"
-#include "util.hpp"
-
+#include "utils.hpp"
+#include "mapping.hpp"
+#include "rna_tree.hpp"
 
 using namespace std;
+
+
+#define exist_file reader::exist_file
+#define read_file reader::read_file
+
+/* static */ void generator::generate_files()
+{
+    APP_DEBUG_FNAME;
+
+    if (!generate())
+        return;
+
+    force_generate();
+    generate_seq_files();
+    generate_fold_files();
+    generate_mapping();
+
+    INFO("generate OK");
+}
+
+/* static */ void generator::force_generate()
+{
+    APP_DEBUG_FNAME;
+
+    //generate_seq_files();
+    //generate_fold_files();
+    generate_mapping();
+
+    INFO("generate OK");
+}
+
 
 
 /* static */ void generator::generate_seq_files()
@@ -39,11 +69,12 @@ using namespace std;
     {
         string fileIn = PS_IN(val);
         string fileOut = SEQ(val);
-        string labels = read_ps(fileIn).labels;
+        string labels = ps_document(fileIn).labels;
         ofstream out(fileOut);
         out << labels;
         assert(!out.fail());
     }
+    DEBUG("generate OK");
 }
 
 /* static */ void generator::generate_fold_files()
@@ -51,128 +82,145 @@ using namespace std;
     APP_DEBUG_FNAME;
 
     vector<string> vec = FILES;
+    string b;
 
     for (auto val : vec)
     {
-        string fileIn = FOLD_IN(val);
-        string fileOut = FOLD(val);
-        
-        if (!exist_file(fileIn))
-        {
-            ERR("FILE %s does not exist", fileIn.c_str());
-            abort();
-        }
-        string brackets = read_file(fileIn);
-
-        ofstream out(fileOut);
-        out << brackets;
-        assert(!out.fail());
+        string lbl = reader::read_file(SEQ(val));
+        b = run_folder(lbl);
+        writer::save(FOLD(val), b);
     }
-}
 
-/* static */ void generator::generate_ps_files()
-{
-    APP_DEBUG_FNAME;
-
-    vector<string> vec = FILES;
-
-    for (auto val : vec)
-    {
-        string fileIn = "../InFiles/" + val + ".ps";
-        string fileOut = PS_IN(val);
-        string command = "cp " + fileIn + " " + fileOut;
-
-        if (!exist_file(fileIn))
-        {
-            ERR("FILE %s does not exist", fileIn.c_str());
-            abort();
-        }
-        system(command.c_str());
-        assert(exist_file(fileOut));
-    }
+    DEBUG("generate OK");
 }
 
 /* static */ void generator::generate_mapping()
 {
     APP_DEBUG_FNAME;
 
-    typedef mapping::mapping_pair mapping_pair;
-
-    vector<string> vec;
-    vec = FILES;
+    vector<string> vec = FILES;
+    string l1, l2, b1, b2, s;
+    rna_tree rna1, rna2;
 
     for (auto val1 : vec)
     {
-        string labels1, brackets1;
-        labels1     = read_file(SEQ(val1));
-        brackets1   = read_file(FOLD(val1));
+        l1 = read_file(SEQ(val1));
+        b1 = read_file(FOLD(val1));
 
-        rna_tree rna1(brackets1, labels1, val1);
+        rna1 = rna_tree(b1, l1, val1);
 
         for (auto val2 : vec)
         {
             if (val1 == val2)
                 continue;
 
-            string labels2, brackets2;
-            labels2     = read_file(SEQ(val2));
-            brackets2   = read_file(FOLD(val2));
+            l2 = read_file(SEQ(val2));
+            b2 = read_file(FOLD(val2));
 
-            rna_tree rna2(brackets2, labels2, val2);
+            rna2 = rna_tree(b2, l2, val2);
 
-            auto map = mapping::compute_mapping(rna1, rna2);
-
-            sort(map.map.begin(), map.map.end(),
-                    [](mapping_pair m1, mapping_pair m2) { return m1.from < m2.from; });
-
-            string fileOut = MAP(val1, val2);
-            ofstream out(fileOut);
-
-            out << map.distance << endl;
-            for (auto val : map.map)
-                out << val.from << "\t" << val.to << endl;
-
-            assert(!out.fail());
+            s = run_mapping(rna1, rna2);
+            writer::save(MAP(val1, val2), s);
         }
     }
+    DEBUG("generate OK");
 }
 
-/* static */ void generator::generate_files()
+/* static */ bool generator::generate()
 {
     APP_DEBUG_FNAME;
 
-    generate_ps_files();
-    generate_seq_files();
-    generate_fold_files();
-    generate_mapping();
-
-    generate_svg_files();
-}
-
-
-/* static */ void generator::generate_svg_files()
-#ifdef NODEF
-{
-    APP_DEBUG_FNAME;
-
-    vector<string> vec = FILES;
-    document doc;
-    
-    for (auto val : vec)
+    for (auto val1 : FILES)
     {
-        doc = read_ps(PS_IN(val));
-        string labels   = doc.labels;
-        string brackets = read_file(FOLD(val));
-        doc.rna = rna_tree(brackets, labels, val);
-        doc.update_rna_points();
+        assert(reader::exist_file(PS_IN(val1)));
 
-        svg s;
+        if (!reader::exist_file(SEQ(val1)) ||
+                !reader::exist_file(FOLD(val1)))
+            return true;
+        
+        for (auto val2 : FILES)
+        {
+            if (val1 == val2)
+                continue;
 
-        s = svg::init(SVG_OUT(val));
-        s.print_default(doc.rna);
+            if (!reader::exist_file(MAP(val1, val2)))
+                return true;
+        }
     }
+    return false;
 }
-#else
-{}
-#endif
+
+
+
+/* static */ string generator::run_folder(
+                const std::string& labels)
+{
+    APP_DEBUG_FNAME;
+
+    stringstream str;
+    string command;
+    string s;
+
+    str
+        << "RNAfold --noPS << END"
+        << endl
+        << labels
+        << endl
+        << "END";
+
+    command = str.str();
+
+    s = get_command_output(command).at(1);
+    s = s.substr(0, s.find(' '));
+
+    logger.debugStream()
+        << "fold('"
+        << labels
+        << "')\n= '"
+        << s
+        << "'";
+
+    return s;
+}
+
+/* static */ string generator::run_mapping(
+                rna_tree rna1,
+                rna_tree rna2)
+{
+    APP_DEBUG_FNAME;
+
+    stringstream str;
+    string command;
+    string s;
+
+    writer::save("/tmp/1.txt", convert_to_java_format(rna1));
+    writer::save("/tmp/2.txt", convert_to_java_format(rna2));
+
+    str
+        << "java -cp java_RTED util.RTEDCommandLine "
+        << "--costs 1 1 0 " // del ins edit
+        << "--mapping "
+        << "--verbose "
+        << "--files /tmp/1.txt /tmp/2.txt";
+        //<< "--trees '"
+        //<< convert_to_java_format(rna1)
+        //<< "' \t '"
+        //<< convert_to_java_format(rna2)
+        //<< "'";
+
+    command = str.str();
+
+    for (auto val : get_command_output(command))
+    {
+        DEBUG("%s", val.c_str());
+        wait_for_input();
+
+        if (val.find("distance") == val.npos &&
+                val.find("->") == val.npos)
+            continue;
+        s += val;
+    }
+
+    return s;
+}
 

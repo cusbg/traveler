@@ -1,7 +1,7 @@
 /*
- * File: rna_tree_matcher.hpp
+ * File: tree_matcher.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,10 +19,13 @@
  * USA.
  */
 
-#ifndef RNA_TREE_MATCHER_HPP
-#define RNA_TREE_MATCHER_HPP
+#ifndef TREE_MATCHER_HPP
+#define TREE_MATCHER_HPP
+
 
 #include "rna_tree.hpp"
+
+class mapping;
 
 class matcher
 {
@@ -31,26 +34,31 @@ private:
     typedef rna_tree::post_order_iterator post_order_iterator;
     typedef rna_tree::sibling_iterator sibling_iterator;
     typedef std::vector<size_t> indexes_type;
+
 public:
+    matcher(
+                const rna_tree& templated,
+                const rna_tree& other);
     void run(
-                rna_tree& templated,
-                rna_tree other,
                 const mapping& m);
+    inline size_t child_index(
+                sibling_iterator sib);
+
 private:
     void mark(
                 rna_tree& rna,
                 const indexes_type& postorder_indexes,
-                rna_pair_label::label_status_type status);
-    void merge(
-                rna_tree& templated,
-                const rna_tree& other);
-    void unique_indexes(
+                rna_pair_label::status_type status);
+    void merge();
+    void erase();
+    void compute_sizes();
+    inline void make_unique(
                 iterator it);
-public:
-    size_t child_index(
-                sibling_iterator sib);
+private:
+    rna_tree t1, t2;
+    std::vector<size_t> s1, s2;
 };
 
 
-#endif /* !RNA_TREE_MATCHER_HPP */
+#endif /* !TREE_MATCHER_HPP */
 

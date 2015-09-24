@@ -86,6 +86,7 @@ public:
 
 public:
     status_type status = untouched;
+    std::vector<size_t> remake_ids;
 
 private:
     std::vector<rna_label> labels;

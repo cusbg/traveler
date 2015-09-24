@@ -35,13 +35,10 @@ public:
     };
 
 private:
-    static void run_rted(
-                const rna_tree& rna1,
-                const rna_tree& rna2,
-                const std::string& filename);
-
     static mapping read_mapping(
                 std::istream& in);
+    static mapping_pair split(
+                const std::string& text);
 
 public:
     mapping() = default;

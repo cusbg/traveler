@@ -21,7 +21,6 @@
 
 #include "utils.hpp"
 #include "rna_tree.hpp"
-#include "gted.hpp"
 
 using namespace std;
 
@@ -224,7 +223,7 @@ std::string convert_to_java_format(
         [&](rna_tree::sibling_iterator sib, stringstream& out)
     {
         out << "{";
-        out << label(sib) << " ";
+        out << label(sib);
 
         if (!rna_tree::is_leaf(sib))
             print_recursive(rna_tree::first_child(sib), out);
