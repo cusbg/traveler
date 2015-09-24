@@ -24,20 +24,12 @@
 #include <fstream>
 
 #include "types.hpp"
-#include "util.hpp"
+#include "utils.hpp"
 #include "app.hpp"
 #include "generator.hpp"
+#include "rna_tree.hpp"
 
 #include "point.hpp"
-#include "compact_maker.hpp"
-#include "compact_maker_utils.hpp"
-#include "ps.hpp"
-
-#include "checks.hpp"
-#include "rna_tree_matcher.hpp"
-
-
-#include "functs.hpp"
 
 using namespace std;
 
@@ -46,47 +38,17 @@ int main(int argc, char** argv)
     cout << boolalpha;
     srand(1);
 
-    functs();
-
-    if (argc == 2)
-    {
-        generator::generate_files();
-        exit(0);
-    }
-
     string from, to;
-
-    from = "human";
-    to = "frog";
-
-    //from = "mouse";
-    //to = "human";
-    //to = "rabbit";
-
-    //from = "rabbit";
-    //to = "human";
-    from = "frog";
-    to = "rabbit";
-
-    swap(from, to);
+    app a;
 
     from = "rabbit";
     to = "frog";
 
-    app a;
-    a.run_between(from, to);
     //a.run_app();
+    a.run_between(from, to);
+
 
     return 0;
-}
-
-void def_ps_init()
-{
-    APP_DEBUG_FNAME;
-
-    string s = document::default_prologue();
-    psout = ps::init("build/files/ps.ps");
-    psout.print_to_ps(s);
 }
 
 
