@@ -222,7 +222,7 @@ std::string convert_to_java_format(
             stringstream&)> print_recursive =
         [&](rna_tree::sibling_iterator sib, stringstream& out)
     {
-        out << "{";
+        out << "{" << " ";
         out << label(sib);
 
         if (!rna_tree::is_leaf(sib))
@@ -263,7 +263,8 @@ rna_tree get_rna(const std::string& name)
     l = reader::read_file(SEQ(name));
     b = reader::read_file(FOLD(name));
 
-    rna_tree rna(b, l, name);
+    rna_tree rna(b, l, ps_document(PS_IN(name)).points, name);
+
     return rna;
 }
 

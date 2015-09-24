@@ -39,19 +39,13 @@ using namespace std;
         return;
 
     force_generate();
-    generate_seq_files();
-    generate_fold_files();
-    generate_mapping();
-
-    INFO("generate OK");
 }
 
 /* static */ void generator::force_generate()
 {
     APP_DEBUG_FNAME;
 
-    //generate_seq_files();
-    //generate_fold_files();
+    generate_seq_files();
     generate_mapping();
 
     INFO("generate OK");
@@ -74,23 +68,6 @@ using namespace std;
         out << labels;
         assert(!out.fail());
     }
-    DEBUG("generate OK");
-}
-
-/* static */ void generator::generate_fold_files()
-{
-    APP_DEBUG_FNAME;
-
-    vector<string> vec = FILES;
-    string b;
-
-    for (auto val : vec)
-    {
-        string lbl = reader::read_file(SEQ(val));
-        b = run_folder(lbl);
-        writer::save(FOLD(val), b);
-    }
-
     DEBUG("generate OK");
 }
 
@@ -152,6 +129,41 @@ using namespace std;
 
 
 
+/* static */ string generator::run_mapping(
+                rna_tree rna1,
+                rna_tree rna2)
+{
+    APP_DEBUG_FNAME;
+
+    stringstream str;
+    string command;
+    string s;
+
+    str
+        << "java -cp java_RTED util.RTEDCommandLine "
+        << "--costs 1 1 0 " // del ins edit
+        << "--mapping "
+        << "--verbose "
+        << "--trees '"
+        << convert_to_java_format(rna1)
+        << "' \t '"
+        << convert_to_java_format(rna2)
+        << "'";
+
+    command = str.str();
+
+    for (auto val : get_command_output(command))
+    {
+        if (val.find("distance") == val.npos &&
+                val.find("->") == val.npos)
+            continue;
+        s += val;
+    }
+
+    return s;
+}
+
+#ifdef NODEF
 /* static */ string generator::run_folder(
                 const std::string& labels)
 {
@@ -183,44 +195,21 @@ using namespace std;
     return s;
 }
 
-/* static */ string generator::run_mapping(
-                rna_tree rna1,
-                rna_tree rna2)
+/* static */ void generator::generate_fold_files()
 {
     APP_DEBUG_FNAME;
 
-    stringstream str;
-    string command;
-    string s;
+    vector<string> vec = FILES;
+    string b;
 
-    writer::save("/tmp/1.txt", convert_to_java_format(rna1));
-    writer::save("/tmp/2.txt", convert_to_java_format(rna2));
-
-    str
-        << "java -cp java_RTED util.RTEDCommandLine "
-        << "--costs 1 1 0 " // del ins edit
-        << "--mapping "
-        << "--verbose "
-        << "--files /tmp/1.txt /tmp/2.txt";
-        //<< "--trees '"
-        //<< convert_to_java_format(rna1)
-        //<< "' \t '"
-        //<< convert_to_java_format(rna2)
-        //<< "'";
-
-    command = str.str();
-
-    for (auto val : get_command_output(command))
+    for (auto val : vec)
     {
-        DEBUG("%s", val.c_str());
-        wait_for_input();
-
-        if (val.find("distance") == val.npos &&
-                val.find("->") == val.npos)
-            continue;
-        s += val;
+        string lbl = reader::read_file(SEQ(val));
+        b = run_folder(lbl);
+        writer::save(FOLD(val), b);
     }
 
-    return s;
+    DEBUG("generate OK");
 }
+#endif
 

@@ -34,14 +34,6 @@
 #define SEQ(val)                    (std::string() + "precomputed/" + val + ".seq")
 #define FOLD(val)                   (std::string() + "precomputed/" + val + ".fold")
 #define MAP(val1, val2)             (std::string() + "precomputed/" + val1 + "-" + val2 + ".map")
-//#define PS_IN(val)                  "precomputed/" + val + ".ps"
-//#define PS_OUT(val1, val2)          "build/files/" + val1 + "-" + val2 + ".out.ps"
-//#define SEQ(val)                    "precomputed/" + val + ".seq"
-//#define FOLD(val)                   "build/files/" + val + ".fold"
-//#define FOLD_IN(val)                "precomputed/" + val + ".fold"
-//#define MAP(val1, val2)             "build/files/mappings/" + val1 + "-" + val2 + ".map"
-//#define RTED_MAP_FILE(rna1, rna2)   "build/files/mappings/map_" + rna1.name() + "-" + rna2.name() + ".map"
-//#define RTED_RUN_FILE(i, name)      "build/files/rted/run_rted."#i"." + name
 
 
 class rna_tree;

@@ -32,15 +32,21 @@ public:
     static void generate_files();
     static void force_generate();
 
+#ifdef NODEF
+private:
+    static void generate_fold_files();
+public:
+    /*DO NOT USE! brackets -> from database..*/
     static std::string run_folder(
                 const std::string& labels);
+#endif
+
     static std::string run_mapping(
                 rna_tree rna1,
                 rna_tree rna2);
     static bool generate();
 private:
     static void generate_seq_files();
-    static void generate_fold_files();
     static void generate_mapping();
 };
 
