@@ -24,6 +24,11 @@
 
 #include "types.hpp"
 
+#define double_equals_precision(val1, val2, precision) \
+    (abs(val1 - val2) < abs(precision))
+#define double_equals(val1, val2) \
+    double_equals_precision(val1, val2, 0.0001)
+
 
 struct point
 {

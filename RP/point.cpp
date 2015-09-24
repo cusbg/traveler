@@ -29,16 +29,11 @@ using namespace std;
 #define radians_to_degrees(x)   (x * 180 / M_PI)
 #define degrees_to_radians(x)   (x * M_PI / 180)
 
-#define double_equals_precision(val1, val2, precision) \
-    (abs(val1 - val2) < abs(precision))
-#define double_equals(val1, val2) \
-    double_equals_precision(val1, val2, 0.0001)
-
 #define BAD_POINT       (point({0xBADF00D, 0xBADF00D}))
 #define squared(val)    ((val) * (val))
 
 
-#define PRINT_FUNCTIONS
+//#define PRINT_FUNCTIONS
 
 #ifdef PRINT_FUNCTIONS
 #define BINARY_OUTPUT(P1, P2) \
@@ -74,7 +69,7 @@ point::point(double _x, double _y)
 
 bool point::operator==(point other) const
 {
-    BINARY(*this, other);
+    //BINARY(*this, other); // !!!
 
     return x == other.x && y == other.y;
 }
@@ -149,7 +144,7 @@ point& point::operator-=(point other)
 
 bool point::bad() const
 {
-    UNARY(*this);
+    //UNARY(*this); // !!!
 
     return *this == bad_point();
 }
