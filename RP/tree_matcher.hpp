@@ -39,7 +39,7 @@ public:
     matcher(
                 const rna_tree& templated,
                 const rna_tree& other);
-    void run(
+    rna_tree& run(
                 const mapping& m);
     inline size_t child_index(
                 sibling_iterator sib);

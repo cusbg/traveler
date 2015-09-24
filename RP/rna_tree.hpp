@@ -25,6 +25,7 @@
 #include "tree_base.hpp"
 #include "rna_tree_label.hpp"
 
+struct point;
 
 class rna_tree
     : public tree_base<rna_pair_label>
@@ -35,6 +36,11 @@ public:
     rna_tree(
                 const std::string& _brackets,
                 const std::string& _labels,
+                const std::string& _name = "");
+    rna_tree(
+                const std::string& _brackets,
+                const std::string& _labels,
+                const std::vector<point>& _points,
                 const std::string& _name = "");
 
     void update_points(
@@ -53,13 +59,9 @@ private:
     std::string _name;
 };
 
-
-/* global */
-inline bool is(
-                rna_tree::iterator it,
-                rna_pair_label::status_type status)
+inline bool is(const rna_tree::base_iterator& iter, rna_pair_label::status_type s)
 {
-    return it->status == status;
+    return iter->status == s;
 }
 
 

@@ -52,20 +52,14 @@ rna_tree::rna_tree(
     logger.debugStream() << stream.str();
 }
 
-void rna_tree::update_points(
-                const vector<point>& points)
+rna_tree::rna_tree(
+                const std::string& _brackets,
+                const std::string& _labels,
+                const std::vector<point>& _points,
+                const std::string& _name)
+    : rna_tree(_brackets, _labels, _name)
 {
-    APP_DEBUG_FNAME;
-
-    pre_post_order_iterator it;
-    size_t i = 0;
-
-    for (it = ++begin_pre_post();
-            it != end_pre_post() && i < points.size();
-            ++it, ++i)
-        it->set_points_exact(points[i], it.label_index());
-
-    assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
+    update_points(_points);
 }
 
 
@@ -83,10 +77,29 @@ std::vector<rna_pair_label> convert(
     return vec;
 }
 
+
+
+void rna_tree::update_points(
+                const vector<point>& points)
+{
+    APP_DEBUG_FNAME;
+
+    pre_post_order_iterator it;
+    size_t i = 0;
+
+    for (it = ++begin_pre_post();
+            it != end_pre_post() && i < points.size();
+            ++it, ++i)
+        it->set_points_exact(points[i], it.label_index());
+
+    assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
+}
+
+
 rna_tree::sibling_iterator rna_tree::erase(
                 sibling_iterator sib)
 {
-    APP_DEBUG_FNAME;
+    DEBUG("erase(%s:%lu)", clabel(sib), ::id(sib));
 
     sibling_iterator del;
 
@@ -118,7 +131,7 @@ rna_tree::sibling_iterator rna_tree::insert(
     while (steal_children-- != 0)
         ++end;
 
-    pos = _tree.reparent(pos, beg, end);
+    _tree.reparent(pos, beg, end);
 
     return pos;
 }
@@ -127,5 +140,6 @@ std::string rna_tree::name() const
 {
     return _name;
 }
+
 
 

@@ -201,5 +201,17 @@ std::string label(
         return to_string(*it);
 }
 
+/* global */
+/* inline */
+template <typename iter>
+inline iter plusplus(
+                iter it,
+                size_t n)
+{
+    while (n--)
+        ++it;
+    return it;
+}
+
 #endif /* !TREE_BASE_UTILS_HPP */
 

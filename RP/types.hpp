@@ -116,7 +116,7 @@ private:
             std::stringstream stream; \
             for (auto __value : container) \
                 stream << __value << " "; \
-            DEBUG("%s: %s", name, stream.str().c_str()); \
+            logger.debugStream() << name << ": " << stream.str(); \
         }
 
 
