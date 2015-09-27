@@ -1,5 +1,5 @@
 /*
- * File: compact_init.hpp
+ * File: compact.cpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
@@ -19,46 +19,28 @@
  * USA.
  */
 
-#ifndef COMPACT_INIT_HPP
-#define COMPACT_INIT_HPP
-
-#include "types.hpp"
 #include "compact.hpp"
+#include "write_ps_document.hpp"
+#include "compact_circle.hpp"
+#include "compact_init.hpp"
 
-struct compact::init
+
+using namespace std;
+
+compact::compact(
+                const rna_tree& _rna)
+    : rna(_rna)
+{ }
+
+void compact::run()
 {
-public:
-    init(
-                rna_tree& _rna);
+    APP_DEBUG_FNAME;
 
-public:
-    static void shift_branch(
-                iterator parent,
-                point vec);
-    static void rotate_branch(
-                iterator parent,
-                double angle);
+    init i(rna);
 
-private:
-    sibling_iterator get_prev(
-                sibling_iterator it);
-    sibling_iterator get_next(
-                sibling_iterator it);
-    point direction_vector_from(
-                iterator it);
-
-    point init_branch_recursive(
-                sibling_iterator it,
-                point from);
-
-private:
-    void run();
-
-public:
-    rna_tree &rna;
-};
+    psout.print(ps_writer::sprint(rna));
 
 
-
-#endif /* !COMPACT_INIT_HPP */
+    DEBUG("END compact::run()");
+}
 

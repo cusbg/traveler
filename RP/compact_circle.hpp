@@ -1,7 +1,7 @@
 /*
  * File: compact_circle.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,53 +22,43 @@
 #ifndef COMPACT_CIRCLE_HPP
 #define COMPACT_CIRCLE_HPP
 
-#include "compact_maker.hpp"
 
-
-#define PAIRS_DISTANCE              20
-#define PAIRS_DISTANCE_PRECISION    1
-#define BASES_DISTANCE              8
-#define BASES_RATIO                 1.4
-
+#include "compact.hpp"
 
 struct compact::circle
 {
-    void compute_sgn();
-
-    void init(size_t n);
-    Point rotate(double angle) const;
-    std::vector<Point> split(size_t n) const;
-    bool lies_in_segment(Point p) const;
-
+private:
+public:
     double radius() const;
     double segment_angle() const;
     double segment_length() const;
 
-    static double min_circle_length(size_t nodes_count);
-    static double max_circle_length(size_t nodes_count);
-    static double min_circle_radius(size_t nodes_count);
-    static double max_circle_radius(size_t nodes_count);
-
-    void draw();   //TODO remove
+    bool lies_in_segment(const point& p) const;
+    point rotate(double angle) const;
+    std::vector<point> split(size_t n) const;
 
 public:
-    Point centre;
-    Point p1, p2;
-    Point direction;    // ukazuje smer neobsahujuci vysek kruznice
-                        // =>  !lies_in_segment(direction) 
+    circle() = default;
+    void compute_sgn();
+    void init(size_t n);
 
-//#ifdef TESTS
 public:
-    void tests() const;
-//#endif
+    friend std::ostream& operator<<(
+                std::ostream& out,
+                const circle& c);
+public:
+    point p1, p2;
+    point centre;
+    point direction;
 
 private:
     /*
      * sgn =  1 ~> v protismere hod. ruciciek
      * sgn = -1 ~> v smere hodinovych ruciciek
      */
-    char sgn = 0;
+    signed char sgn = 0;
 };
+
 
 
 #endif /* !COMPACT_CIRCLE_HPP */
