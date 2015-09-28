@@ -19,6 +19,13 @@
  * USA.
  */
 
+//#define TESTS
+
+#ifdef TESTS
+
+#include "tests/tests.cpp"
+
+#else
 
 #include <iostream>
 #include <fstream>
@@ -51,4 +58,4 @@ int main(int argc, char** argv)
     return 0;
 }
 
-
+#endif

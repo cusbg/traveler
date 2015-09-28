@@ -25,6 +25,7 @@
 #include "mapping.hpp"
 #include "tree_matcher.hpp"
 #include "write_ps_document.hpp"
+#include "compact.hpp"
 
 
 using namespace std;
@@ -63,6 +64,9 @@ void app::run_between(
     map = mapping(rna1, rna2);
     
     rna1 = matcher(rna1, rna2).run(map);
+
+    compact(rna1).run();
+    abort();
 
     psout.print(psout.sprint(rna1));
 }

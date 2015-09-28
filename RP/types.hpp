@@ -37,12 +37,6 @@ extern log4cpp::Category& logger; // globalna premenna...
 
 
 
-inline void wait_for_input()
-{
-    logger.notice("%s", __PRETTY_FUNCTION__);
-    char ch;
-    std::cin.read(&ch, 1);
-}
 
 namespace std
 {
@@ -62,6 +56,9 @@ inline bool contains(const container_type& c, const value_type& v)
 template <typename T>
 inline std::string to_string(const T& t)
 {
+    // pri funkcii operator<<() to nefunguje!!
+    // funkcia sa pouziva aj pri operator<<(bool/char[]/..)
+    // takze treba napisat vsade operator<< a to_string() bude fungovat ok
     std::stringstream str;
     str << t;
     return str.str();
@@ -77,23 +74,33 @@ inline bool operator!=(const T& t1, const T& t2)
 
 
 
-class set_logger_priority_to_return_function
+struct logger_end_of_function_priority
 {
 public:
-    set_logger_priority_to_return_function(
-                log4cpp::Priority::Value new_priority)
-    {
-        old_priority = logger.getPriority();
-        logger.setPriority(new_priority);
-    }
-    ~set_logger_priority_to_return_function()
-    {
-        logger.setPriority(old_priority);
-    }
+    logger_end_of_function_priority(
+                log4cpp::Priority::Value new_priority);
+    ~logger_end_of_function_priority();
 
 private:
     log4cpp::Priority::Value old_priority;
 };
+
+struct print_class_BEG_END_name
+{
+    print_class_BEG_END_name(
+                const std::string& _name);
+    ~print_class_BEG_END_name();
+
+private:
+    std::string fname;
+};
+
+inline void wait_for_input()
+{
+    logger.notice("%s", __PRETTY_FUNCTION__);
+    char ch;
+    std::cin.read(&ch, 1);
+}
 
 #define DEBUG(...) \
     logger.debug(__VA_ARGS__)
@@ -105,17 +112,19 @@ private:
     logger.warn(__VA_ARGS__)
 
 
+#define WAIT wait_for_input();
+
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
-    set_logger_priority_to_return_function __logger_priority(log4cpp::Priority::PRIORITY)
+    logger_end_of_function_priority __logger_priority(log4cpp::Priority::PRIORITY)
 
 #define APP_DEBUG_FNAME \
-    logger.debug("Entering function: %s", __PRETTY_FUNCTION__)
+    print_class_BEG_END_name __function_name(__PRETTY_FUNCTION__)
 
 #define LOGGER_PRINT_CONTAINER(container, name) \
         { \
             std::stringstream stream; \
             for (auto __value : container) \
-                stream << __value << " "; \
+                stream << to_string(__value) << " "; \
             logger.debugStream() << name << ": " << stream.str(); \
         }
 

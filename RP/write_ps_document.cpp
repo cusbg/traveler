@@ -147,7 +147,7 @@ ps_writer psout;
     if (p1.bad() || p2.bad())
     {
         ERR("bad_point, cannot draw line");
-        abort();
+        //abort();
         return "";
     }
 

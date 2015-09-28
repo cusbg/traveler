@@ -65,3 +65,27 @@ log4cpp::Category& init_logger()
 log4cpp::Category& logger = init_logger();
 
 
+logger_end_of_function_priority::logger_end_of_function_priority(
+                log4cpp::Priority::Value new_priority)
+{
+    old_priority = logger.getPriority();
+    logger.setPriority(new_priority);
+}
+
+logger_end_of_function_priority::~logger_end_of_function_priority()
+{
+    logger.setPriority(old_priority);
+}
+
+print_class_BEG_END_name::print_class_BEG_END_name(
+                const std::string& _fname)
+    : fname(_fname)
+{
+    DEBUG("BEG function: %s", fname.c_str());
+}
+
+print_class_BEG_END_name::~print_class_BEG_END_name()
+{
+    DEBUG("END function: %s", fname.c_str());
+}
+

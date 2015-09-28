@@ -107,6 +107,9 @@ public:
     static bool is_root(
                 const base_iterator& it);
 
+    static bool is_valid(
+                const base_iterator& it);
+
 private:
     static size_t ID;
 

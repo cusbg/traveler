@@ -26,9 +26,6 @@
 
 using namespace std;
 
-#define radians_to_degrees(x)   (x * 180 / M_PI)
-#define degrees_to_radians(x)   (x * M_PI / 180)
-
 #define BAD_POINT       (point({0xBADF00D, 0xBADF00D}))
 #define squared(val)    ((val) * (val))
 

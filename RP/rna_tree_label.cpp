@@ -54,6 +54,18 @@ rna_label& rna_pair_label::operator[](
     return labels.at(index);
 }
 
+const rna_label& rna_pair_label::at(
+                size_t index) const
+{
+    return (*this)[index];
+}
+
+rna_label& rna_pair_label::at(
+                size_t index)
+{
+    return (*this)[index];
+}
+
 bool rna_pair_label::operator==(
                 const rna_pair_label& other) const
 {
@@ -124,6 +136,11 @@ std::ostream& operator<<(
 }
 
 
+size_t rna_pair_label::size() const
+{
+    return (size_t)paired() + 1;
+}
+
 bool rna_pair_label::paired() const
 {
     assert(labels.size() == 1 || labels.size() == 2);
@@ -150,6 +167,12 @@ point rna_pair_label::centre() const
         return ::centre((*this)[0].p, (*this)[1].p);
     else
         return (*this)[0].p;
+}
+
+void rna_pair_label::clear_points()
+{
+    for (auto& val : labels)
+        val.p = point::bad_point();
 }
 
 void rna_pair_label::set_points_exact(

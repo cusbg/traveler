@@ -168,8 +168,8 @@ void matcher::merge()
                     }
                     assert(actual == needed);
                 }
-
                 ch1 = t1.insert(ins, *ch2, steal);
+                ch1->clear_points();
                 set_remake(ch1);
             }
             else

@@ -29,6 +29,9 @@
 #define double_equals(val1, val2) \
     double_equals_precision(val1, val2, 0.0001)
 
+#define radians_to_degrees(x)   (x * 180 / M_PI)
+#define degrees_to_radians(x)   (x * M_PI / 180)
+
 
 struct point
 {

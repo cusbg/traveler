@@ -39,7 +39,6 @@ public:
 
 //private:
     struct circle;
-    struct init;
 
 public:
     compact(
@@ -47,8 +46,33 @@ public:
     void run();
 
 private:
+    // INIT functions:
+    void init();
+    static void shift_branch(
+                iterator parent,
+                point vec);
+    static void rotate_branch(
+                iterator parent,
+                double angle);
+
+    sibling_iterator get_onlyone_branch(
+                sibling_iterator it);
+
     point direction_vector_from(
                 iterator it);
+    sibling_iterator get_prev(
+                sibling_iterator it);
+    sibling_iterator get_next(
+                sibling_iterator it);
+
+    point init_branch_recursive(
+                sibling_iterator it,
+                point from);
+    void adjust_branch(
+                sibling_iterator it);
+
+
+private:
     void init_branches();
 private:
     rna_tree rna;

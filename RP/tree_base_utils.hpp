@@ -173,7 +173,6 @@ void tree_base<label_type>::set_postorder_ids()
     assert(size() - 1 == ::id(begin()));
 }
 
-
 //
 // global functions:
 //

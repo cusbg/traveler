@@ -63,6 +63,10 @@ public:
                 size_t index) const;
     rna_label& operator[](
                 size_t index);
+    const rna_label& at(
+                size_t index) const;
+    rna_label& at(
+                size_t index);
 
     friend std::ostream& operator<<(
                 std::ostream& out,
@@ -71,10 +75,12 @@ public:
                 std::ostream& out,
                 status_type status);
 
+    size_t size() const;
     bool paired() const;
     bool inited_points() const;
     point centre() const;
 
+    void clear_points();
     void set_label_strings(
                 const rna_pair_label& other);
     void set_points_nearby(

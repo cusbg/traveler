@@ -294,6 +294,13 @@ bool tree_base<label_type>::is_root(
     return it.node->parent == nullptr;
 }
 
+/* static */
+template <typename label_type>
+bool tree_base<label_type>::is_valid(
+                const base_iterator& it)
+{
+    return it.node != nullptr;
+}
 
 
 #endif /* !TREE_BASE_ITER_HPP */
