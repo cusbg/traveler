@@ -5,27 +5,27 @@
 #
 
 
-CC				= g++
-DEBUG			= -g -Wall
-#RELEASE		= DNDEBUG -O3
-CFLAGS			= -std=c++11 -c $(DEBUG) $(RELEASE)
-LFLAGS			= $(DEBUG) $(RELEASE) $(shell pkg-config --libs log4cpp)
-SHELL			= /bin/bash -o pipefail
+CC                      = g++
+DEBUG                   = -g -Wall
+#RELEASE                 = DNDEBUG -O3
+CFLAGS                  = -std=c++11 -c $(DEBUG) $(RELEASE)
+LFLAGS                  = $(DEBUG) $(RELEASE) $(shell pkg-config --libs log4cpp)
+SHELL                   = /bin/bash -o pipefail
 
-BUILDDIR		= build
-LOGDIR			= $(BUILDDIR)/logs
-FILESDIR		= $(BUILDDIR)/files
+BUILDDIR                = build
+LOGDIR                  = $(BUILDDIR)/logs
+FILESDIR                = $(BUILDDIR)/files
 
-TARGET			= program
-SOURCES			= $(shell find ./ -maxdepth 1 -name "*.cpp" | sed 's@\./@@g')
-HEADERS			= $(shell find ./ -name "*.hpp" | sed 's@\./@@g')
-OBJECTS			= $(shell echo $(SOURCES) | sed 's@\.cpp@.o@ g; s@[^ ]*/@@g')
-MAKEFILES		= $(shell echo $(SOURCES) | sed 's@\.cpp@.mk@g; s@[^ ]*/@@g')
+TARGET                  = program
+SOURCES                 = $(shell find ./ -maxdepth 1 -name "*.cpp" | sed 's@\./@@g')
+HEADERS                 = $(shell find ./ -name "*.hpp" | sed 's@\./@@g')
+OBJECTS                 = $(shell echo $(SOURCES) | sed 's@\.cpp@.o@ g; s@[^ ]*/@@g')
+MAKEFILES               = $(shell echo $(SOURCES) | sed 's@\.cpp@.mk@g; s@[^ ]*/@@g')
 
-MAKEDEPENDENCY	= $(CC) -MM -E 
+MAKEDEPENDENCY          = $(CC) -MM -E 
 
 
-ARGS			=
+ARGS                    =
 run: build
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
@@ -70,11 +70,12 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 			\\n \
 			\\ninclude $(MAKEFILES) \
 					>> $@
-	@make -j4 --directory=$(BUILDDIR) -f Makefile
+	@make -j6 --directory=$(BUILDDIR) -f Makefile
 
 MK_DIRECTORIES		= $(LOGDIR) $(FILESDIR)
 mk_dirs:
 	@mkdir -p $(MK_DIRECTORIES)
+	@cp -n precomputed/*.ps build/files/
 
 
 $(BUILDDIR)/%.mk: %.cpp

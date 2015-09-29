@@ -34,19 +34,13 @@ using namespace std;
 
 #ifdef PRINT_FUNCTIONS
 #define BINARY_OUTPUT(P1, P2) \
-            { \
-                APP_DEBUG_FNAME; \
-                DEBUG("%s; %s", to_cstr(P1), to_cstr(P2)); \
-            }
+            DEBUG("%s: %s; %s", __PRETTY_FUNCTION__, to_cstr(P1), to_cstr(P2));
 #define UNARY_OUTPUT(P) \
-            { \
-                APP_DEBUG_FNAME; \
-                DEBUG("%s", to_cstr(P)); \
-            }
-#else // PRINT_FUNCTIONS
+            DEBUG("%s: %s", __PRETTY_FUNCTION__, to_cstr(P));
+#else
 #define BINARY_OUTPUT(P1, P2)
 #define UNARY_OUTPUT(P)
-#endif // PRINT_FUNCTIONS
+#endif // PRINT_FUNCTIONS ^^
 
 #define BINARY(P1, P2) \
     BINARY_OUTPUT(P1, P2); \
@@ -112,6 +106,7 @@ point point::operator-() const
 point point::operator/(double value) const
 {
     UNARY(*this);
+    assert(value != 0 && !::isnan(x / value) && !::isnan(y / value));
 
     return {x / value, y / value};
 }
@@ -119,6 +114,7 @@ point point::operator/(double value) const
 point point::operator*(double value) const
 {
     UNARY(*this);
+    assert(value != 0 && !::isnan(x * value) && !::isnan(y * value));
 
     return {x * value, y * value};
 }
@@ -143,7 +139,8 @@ bool point::bad() const
 {
     //UNARY(*this); // !!!
 
-    return *this == bad_point();
+    return *this == bad_point() ||
+        ::isnan(x) || ::isnan(y);
 }
 
 /* static */ point point::bad_point()

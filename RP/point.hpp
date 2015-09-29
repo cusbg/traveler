@@ -24,8 +24,14 @@
 
 #include "types.hpp"
 
-#define double_equals_precision(val1, val2, precision) \
-    (abs(val1 - val2) < abs(precision))
+inline bool double_equals_precision(
+                double val1,
+                double val2,
+                double precision)
+{
+    return fabs(val1 - val2) < fabs(precision);
+}
+
 #define double_equals(val1, val2) \
     double_equals_precision(val1, val2, 0.0001)
 

@@ -22,9 +22,12 @@
 #include "compact.hpp"
 #include "write_ps_document.hpp"
 #include "compact_circle.hpp"
+#include "compact_utils.hpp"
 
 
 using namespace std;
+
+#define UPDATE_PS psout.seek(psout.print(psout.sprint(rna))); WAIT;
 
 inline string to_string(const rna_tree::sibling_iterator& it)
 {
@@ -41,6 +44,7 @@ void compact::run()
     APP_DEBUG_FNAME;
 
     init();
+    make();
 
     psout.print(ps_writer::sprint(rna));
 
@@ -53,6 +57,7 @@ void compact::run()
                 iterator parent,
                 point vector)
 {
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
     APP_DEBUG_FNAME;
 
     function<size_t(iterator)> recursion =
@@ -95,55 +100,12 @@ void compact::run()
     abort();
 }
 
-compact::sibling_iterator compact::get_prev(
-                sibling_iterator it)
-{
-    APP_DEBUG_FNAME;
 
-    while (!rna_tree::is_first_child(it))
-    {
-        --it;
-
-        if (it->inited_points())
-            break;
-    }
-    if (it->inited_points())
-        return it;
-    else
-        it = rna_tree::parent(it);
-
-    DEBUG("prev parent");
-    rna.print_subtree(it);
-    return it;
-}
-
-compact::sibling_iterator compact::get_next(
-                sibling_iterator it)
-{
-    APP_DEBUG_FNAME;
-
-    while (!rna_tree::is_last_child(it))
-    {
-        ++it;
-
-        if (it->inited_points())
-            break;
-    }
-    if (it->inited_points())
-        return it;
-    else
-        it = rna_tree::parent(it);
-
-    DEBUG("next parent");
-    rna.print_subtree(it);
-    return it;
-}
 
 compact::sibling_iterator compact::get_onlyone_branch(
                 sibling_iterator it)
 {
     sibling_iterator ch, out;
-    sibling_iterator ch1, ch2;
     sibling_iterator bad;
 
     if (rna_tree::is_leaf(it))
@@ -160,8 +122,10 @@ compact::sibling_iterator compact::get_onlyone_branch(
 }
 
 
+
 void compact::init()
 {
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
     APP_DEBUG_FNAME;
 
     iterator it;
@@ -182,33 +146,8 @@ void compact::init()
             DEBUG("INIT OK");
             continue;
         }
-
-        iterator prev, next;
-        point p1, p2;
-        prev = get_prev(it);
-        next = get_next(it);
-
-        if (prev == next)
-        {
-            p1 = prev->at(0).p;
-            p2 = prev->at(1).p;
-            p = normalize(centre(p1, p2) - rna_tree::parent(prev)->centre());
-
-            p1 += p * BASES_DISTANCE;
-            p2 += p * BASES_DISTANCE;
-        }
         else
-        {
-            p1 = prev->centre();
-            p2 = next->centre();
-        }
-
-        p = centre(p1, p2);
-        p1 = move_point(p, p1, PAIRS_DISTANCE / 2);
-        p2 = move_point(p, p2, PAIRS_DISTANCE / 2);
-
-        it->at(0).p = p1;
-        it->at(1).p = p2;
+            abort();
     }
 
     for (it = rna.begin(); it != rna.end(); ++it)
@@ -219,7 +158,7 @@ void compact::init()
         {
             for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch)
                 if (!rna_tree::is_leaf(ch))
-                    adjust_branch(ch);
+                    even_branch(ch);
         }
     }
 }
@@ -267,10 +206,10 @@ point compact::init_branch_recursive(
     return point::bad_point();
 }
 
-void compact::adjust_branch(
+void compact::even_branch(
                 sibling_iterator it)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
     assert(!rna_tree::is_leaf(it));
 
     vector<sibling_iterator> vec;
@@ -284,7 +223,6 @@ void compact::adjust_branch(
             break;
         vec.push_back(it);
     }
-    LOGGER_PRINT_CONTAINER(vec, "vec_it");
 
     point p1, p2, p, shift, newpos;
 
@@ -333,6 +271,79 @@ void compact::adjust_branch(
 }
 
 
+void compact::reinsert(
+                const circle& c,
+                const nodes_vec& nodes)
+{
+    APP_DEBUG_FNAME;
+
+    if (nodes.empty())
+        return;
+
+    assert(!nodes.empty());
+    LOGGER_PRINT_CONTAINER(nodes, "nodes");
+
+    points_vec points = c.split(nodes.size());
+
+    assert(points.size() == nodes.size());
+    for (size_t i = 0; i < points.size(); ++i)
+    {
+        assert(rna_tree::is_leaf(nodes[i]));
+
+        nodes[i]->set_points_exact(points[i], 0);
+        if (is(nodes[i], rna_pair_label::touched))
+            nodes[i]->status = rna_pair_label::reinserted;
+    }
+    UPDATE_PS;
+}
+
+
+void compact::make()
+{
+    APP_DEBUG_FNAME;
+    
+    iterator it;
+    circles_vec cvec;
+    intervals in;
+
+    for (it = rna.begin(); it != rna.end(); ++it)
+    {
+        if (it->remake_ids.empty())
+            continue;
+
+        in.init(it);
+        cvec = init_circles(in);
+
+        assert(in.vec.size() == cvec.size());
+        for (size_t i = 0; i < in.vec.size(); ++i)
+            reinsert(cvec[i], in.vec[i].vec);
+    }
+}
+
+compact::circles_vec compact::init_circles(
+                const intervals& in)
+{
+    APP_DEBUG_FNAME;
+
+    circles_vec cvec;
+    circle c;
+    point dir = in.get_circle_direction();
+
+    assert(!in.vec.empty());
+
+    for (const auto& i : in.vec)
+    {
+        c.p1 = i.beg.it->at(i.beg.index).p;
+        c.p2 = i.end.it->at(i.end.index).p;
+        c.direction = dir;
+        c.centre = centre(c.p1, c.p2);
+        c.compute_sgn();
+        c.init(i.vec.size());
+        cvec.push_back(c);
+    }
+
+    return cvec;
+}
 
 
 

@@ -27,18 +27,22 @@
 
 
 #define PAIRS_DISTANCE              20
-#define PAIRS_DISTANCE_PRECISION    1
 #define BASES_DISTANCE              8
-#define BASES_RATIO                 1.4
 
 class compact
 {
 public:
+    struct circle;
+    struct intervals;
+
+public:
     typedef rna_tree::iterator                  iterator;
     typedef rna_tree::sibling_iterator          sibling_iterator;
+    typedef std::vector<point>                  points_vec;
+    typedef std::vector<circle>                 circles_vec;
+    typedef std::vector<sibling_iterator>       nodes_vec;
 
 //private:
-    struct circle;
 
 public:
     compact(
@@ -46,8 +50,6 @@ public:
     void run();
 
 private:
-    // INIT functions:
-    void init();
     static void shift_branch(
                 iterator parent,
                 point vec);
@@ -55,25 +57,31 @@ private:
                 iterator parent,
                 double angle);
 
-    sibling_iterator get_onlyone_branch(
-                sibling_iterator it);
+private:
+    // INIT functions:
+    void init();
 
-    point direction_vector_from(
-                iterator it);
-    sibling_iterator get_prev(
-                sibling_iterator it);
-    sibling_iterator get_next(
+    sibling_iterator get_onlyone_branch(
                 sibling_iterator it);
 
     point init_branch_recursive(
                 sibling_iterator it,
                 point from);
-    void adjust_branch(
+    void even_branch(
                 sibling_iterator it);
+    // INIT ^^
 
+private:
+    void make();
+    circles_vec init_circles(
+                const intervals& in);
+    void reinsert(
+                const circle& c,
+                const nodes_vec& nodes);
 
 private:
     void init_branches();
+
 private:
     rna_tree rna;
 };

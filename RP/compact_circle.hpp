@@ -33,19 +33,28 @@ public:
     double segment_angle() const;
     double segment_length() const;
 
-    bool lies_in_segment(const point& p) const;
-    point rotate(double angle) const;
-    std::vector<point> split(size_t n) const;
+    bool lies_in_segment(
+                const point& p) const;
+    point rotate(
+                double angle) const;
+    std::vector<point> split(
+                size_t n) const;
 
 public:
     circle() = default;
     void compute_sgn();
-    void init(size_t n);
+    void init(
+                size_t n);
+
+public:
+    static double min_circle_length(
+                size_t n);
 
 public:
     friend std::ostream& operator<<(
                 std::ostream& out,
                 const circle& c);
+    std::string print_points();
 public:
     point p1, p2;
     point centre;
