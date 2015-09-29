@@ -49,6 +49,8 @@ public:
 public:
     static double min_circle_length(
                 size_t n);
+    static double max_circle_length(
+                size_t n);
 
 public:
     friend std::ostream& operator<<(

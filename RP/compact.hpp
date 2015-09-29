@@ -50,6 +50,10 @@ public:
     void run();
 
 private:
+    static void set_distance(
+                iterator parent,
+                iterator child,
+                double distance);
     static void shift_branch(
                 iterator parent,
                 point vec);
@@ -73,11 +77,17 @@ private:
 
 private:
     void make();
-    circles_vec init_circles(
+    circles_vec get_circles(
                 const intervals& in);
     void reinsert(
                 const circle& c,
                 const nodes_vec& nodes);
+    void set_distances(
+                intervals& in);
+    void set_distance_interior_loop(
+                intervals& in);
+    void set_distance_multibranch_loop(
+                intervals& in);
 
 private:
     void init_branches();

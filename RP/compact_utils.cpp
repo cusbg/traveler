@@ -20,6 +20,11 @@
  */
 
 #include "compact_utils.hpp"
+#include "write_ps_document.hpp"
+
+#define remake_child(parent, id) \
+    (contains(parent->remake_ids, id) || \
+     is(parent, rna_pair_label::inserted))
 
 using namespace std;
 
@@ -36,7 +41,9 @@ void compact::intervals::init(
 
     for (ch = parent.begin(); ch != parent.end(); ++ch, ++i)
     {
-        if (contains(parent->remake_ids, i))
+        bool rmk = remake_child(parent, i);
+
+        if (rmk)
             vec.back().remake = true;
 
         if (ch->paired())
@@ -50,8 +57,15 @@ void compact::intervals::init(
         }
         else
             vec.back().vec.push_back(ch);
+
+        if (rmk)
+            vec.back().remake = true;
     }
     vec.back().end = {parent, 1};
+    if (*std::max_element(parent->remake_ids.begin(),
+                parent->remake_ids.end()) >= i)
+        vec.back().remake = true;
+
     DEBUG("created %s", to_cstr(vec.back()));
 
     switch (vec.size())
@@ -99,5 +113,9 @@ point compact::intervals::get_circle_direction() const
         << label(i.end.it)
         << ":"
         << (int)i.end.index;
+    str << endl;
+    for (auto val : i.vec)
+        str << clabel(val) << " ";
+
     return str.str();
 }

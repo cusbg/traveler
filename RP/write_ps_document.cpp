@@ -268,7 +268,7 @@ ps_writer psout;
     {
         if (it->paired() &&
                 it->inited_points() &&
-                double_equals(distance((*it)[0].p, (*it)[1].p), 0))
+                double_equals(distance(it->at(0).p, it->at(1).p), 0))
         {
             ERR("ERR");
             cout << label(it) << (*it)[0].p << ";" << (*it)[1].p << endl;
@@ -288,5 +288,22 @@ ps_writer psout;
 
 
 
+/* static */ std::string ps_writer::sprint_subtree(
+                pre_post_it it)
+{
+    pre_post_it beg, end;
+    string out;
+    beg = pre_post_it(it, true);
+    end = pre_post_it(it, false);
+
+    assert(!rna_tree::is_leaf(it));
+
+    while (beg != end)
+    {
+        out += psout.sprint(beg);
+        ++beg;
+    }
+    return out;
+}
 
 

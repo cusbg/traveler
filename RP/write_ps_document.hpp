@@ -53,6 +53,8 @@ public:
                 const rna_label& label);
     static std::string sprint(
                 rna_tree rna);
+    static std::string sprint_subtree(
+                pre_post_it it);
     static std::string sprint(
                 RGB rgb);
     static std::string sprint_line(

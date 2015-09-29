@@ -208,7 +208,7 @@ void matcher::make_unique(
 /* inline */
 size_t matcher::child_index(rna_tree::sibling_iterator sib)
 {
-    size_t n = 1;
+    size_t n = 0;
     while (!rna_tree::is_first_child(sib))
     {
         ++n;

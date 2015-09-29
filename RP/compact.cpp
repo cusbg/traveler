@@ -45,11 +45,6 @@ void compact::run()
 
     init();
     make();
-
-    psout.print(ps_writer::sprint(rna));
-
-
-    DEBUG("END compact::run()");
 }
 
 
@@ -98,6 +93,27 @@ void compact::run()
         };
     // TODO
     abort();
+}
+
+/* static */ void compact::set_distance(
+                iterator parent,
+                iterator child,
+                double dist)
+{
+    APP_DEBUG_FNAME;
+
+    assert(rna_tree::parent(child) == parent);
+
+    point p1, p2, vec, shift;
+    double actual;
+
+    p1 = parent->centre();
+    p2 = child->centre();
+    vec = normalize(p2 - p1);
+    actual = distance(p1, p2);
+    shift = vec * (dist - actual);
+
+    shift_branch(child, shift);
 }
 
 
@@ -294,33 +310,9 @@ void compact::reinsert(
         if (is(nodes[i], rna_pair_label::touched))
             nodes[i]->status = rna_pair_label::reinserted;
     }
-    UPDATE_PS;
 }
 
-
-void compact::make()
-{
-    APP_DEBUG_FNAME;
-    
-    iterator it;
-    circles_vec cvec;
-    intervals in;
-
-    for (it = rna.begin(); it != rna.end(); ++it)
-    {
-        if (it->remake_ids.empty())
-            continue;
-
-        in.init(it);
-        cvec = init_circles(in);
-
-        assert(in.vec.size() == cvec.size());
-        for (size_t i = 0; i < in.vec.size(); ++i)
-            reinsert(cvec[i], in.vec[i].vec);
-    }
-}
-
-compact::circles_vec compact::init_circles(
+compact::circles_vec compact::get_circles(
                 const intervals& in)
 {
     APP_DEBUG_FNAME;
@@ -346,5 +338,83 @@ compact::circles_vec compact::init_circles(
 }
 
 
+void compact::make()
+{
+    APP_DEBUG_FNAME;
+    
+    iterator it;
+    circles_vec cvec;
+    intervals in;
 
+    for (it = rna.begin(); it != rna.end(); ++it)
+    {
+        if (it->remake_ids.empty())
+            continue;
+
+        in.init(it);
+        set_distances(in);
+        cvec = get_circles(in);
+
+        assert(in.vec.size() == cvec.size());
+        for (size_t i = 0; i < in.vec.size(); ++i)
+            if (in.vec[i].remake)
+                reinsert(cvec[i], in.vec[i].vec);
+    }
+}
+
+void compact::set_distances(
+                intervals& in)
+{
+    APP_DEBUG_FNAME;
+
+    switch (in.type)
+    {
+        case intervals::hairpin:
+            break;
+        case intervals::interior_loop:
+            set_distance_interior_loop(in);
+            break;
+        case intervals::multibranch_loop:
+            set_distance_multibranch_loop(in);
+            break;
+    }
+}
+
+void compact::set_distance_interior_loop(
+                intervals& in)
+{
+    APP_DEBUG_FNAME;
+    assert(in.vec.size() == 2);
+
+    iterator parent, child;
+    double actual, avg;
+    vector<double> l(2);
+
+    parent = in.vec[0].beg.it;
+    child = in.vec[0].end.it;
+
+    actual = distance(parent->centre(), child->centre());
+    l[0] = circle::min_circle_length(in.vec[0].vec.size());
+    l[1] = circle::min_circle_length(in.vec[1].vec.size());
+    sort(l.begin(), l.end());
+    avg = l[0] + (l[1] - l[0])/4;
+
+    if (avg < BASES_DISTANCE)
+        avg = BASES_DISTANCE;
+
+    if (!double_equals_precision(actual, avg, 1))
+    {
+        set_distance(parent, child, avg);
+        in.vec[0].remake = true;
+        in.vec[1].remake = true;
+    }
+    UPDATE_PS;
+}
+
+void compact::set_distance_multibranch_loop(
+                intervals& in)
+{
+    APP_DEBUG_FNAME;
+
+}
 

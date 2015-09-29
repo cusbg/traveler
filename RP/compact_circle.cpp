@@ -121,6 +121,24 @@ std::vector<point> compact::circle::split(size_t n) const
     else if (nodes_count < 3)
         out += 3;
 
+    DEBUG("min_circle_length(%lu) = %f", nodes_count, out);
+
+    return out;
+}
+
+/* static */ double compact::circle::max_circle_length(size_t nodes_count)
+{
+    double out;
+    out = nodes_count * BASES_DISTANCE * BASES_RATIO;
+
+    if (nodes_count == 0)
+        out = BASES_DISTANCE;
+    else if (nodes_count < 3)
+        out += 3;
+
+    out *= 2;
+    DEBUG("max_circle_length(%lu) = %f", nodes_count, out);
+
     return out;
 }
 
