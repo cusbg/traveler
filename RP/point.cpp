@@ -50,6 +50,8 @@ using namespace std;
     UNARY_OUTPUT(P); \
     assert(!(P).bad());
 
+
+
 point::point()
     : point(BAD_POINT)
 { }

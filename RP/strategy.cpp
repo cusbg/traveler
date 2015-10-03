@@ -143,6 +143,8 @@ bool strategy::is_T2(int index)
     return index % 2 == 1;
 }
 
+
+
 std::ostream& operator<<(
                 std::ostream& out,
                 strategy str)

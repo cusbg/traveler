@@ -69,7 +69,7 @@ mapping::mapping(
 {
     APP_DEBUG_FNAME;
 
-    assert(reader::exist_file(filename));
+    assert(exist_file(filename));
 
     ifstream in(filename);
     *this = read_mapping(in);

@@ -20,16 +20,11 @@
  */
 
 #include "generator.hpp"
-#include "types.hpp"
 #include "utils.hpp"
-#include "mapping.hpp"
 #include "rna_tree.hpp"
 
 using namespace std;
 
-
-#define exist_file reader::exist_file
-#define read_file reader::read_file
 
 /* static */ void generator::generate_files()
 {
@@ -97,7 +92,7 @@ using namespace std;
             rna2 = rna_tree(b2, l2, val2);
 
             s = run_mapping(rna1, rna2);
-            writer::save(MAP(val1, val2), s);
+            write_file(MAP(val1, val2), s);
         }
     }
     DEBUG("generate OK");
@@ -109,10 +104,10 @@ using namespace std;
 
     for (auto val1 : FILES)
     {
-        assert(reader::exist_file(PS_IN(val1)));
+        assert(exist_file(PS_IN(val1)));
 
-        if (!reader::exist_file(SEQ(val1)) ||
-                !reader::exist_file(FOLD(val1)))
+        if (!exist_file(SEQ(val1)) ||
+                !exist_file(FOLD(val1)))
             return true;
         
         for (auto val2 : FILES)
@@ -120,7 +115,7 @@ using namespace std;
             if (val1 == val2)
                 continue;
 
-            if (!reader::exist_file(MAP(val1, val2)))
+            if (!exist_file(MAP(val1, val2)))
                 return true;
         }
     }
@@ -152,7 +147,7 @@ using namespace std;
 
     command = str.str();
 
-    for (auto val : get_command_output(command))
+    for (const auto& val : get_command_output(command))
     {
         if (val.find("distance") == val.npos &&
                 val.find("->") == val.npos)
@@ -204,9 +199,9 @@ using namespace std;
 
     for (auto val : vec)
     {
-        string lbl = reader::read_file(SEQ(val));
+        string lbl = read_file(SEQ(val));
         b = run_folder(lbl);
-        writer::save(FOLD(val), b);
+        write_file(FOLD(val), b);
     }
 
     DEBUG("generate OK");

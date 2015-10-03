@@ -35,14 +35,27 @@ public:
 
     bool lies_in_segment(
                 const point& p) const;
+    /**
+     * rotate point p1 with `angle`
+     */
     point rotate(
                 double angle) const;
+    /**
+     * returns `n` points on circle
+     */
     std::vector<point> split(
                 size_t n) const;
 
 public:
     circle() = default;
+    /**
+     * compute direction of circle
+     * (clockwise/counterclockwise)
+     */
     void compute_sgn();
+    /**
+     * initialize circle for `n` children
+     */
     void init(
                 size_t n);
 

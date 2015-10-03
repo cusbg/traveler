@@ -58,35 +58,7 @@ rna_tree& matcher::run(
     return t1;
 }
 
-void matcher::compute_sizes()
-{
-    APP_DEBUG_FNAME;
 
-    auto comp_f =
-        [](rna_tree& rna, vector<size_t>& sizes) {
-            post_order_iterator it;
-            sibling_iterator ch;
-
-            sizes.resize(rna.size());
-
-            for (auto it = rna.begin(); it != rna.end(); ++it)
-                assert(id(it) < sizes.size());
-
-            for (it = rna.begin_post(); it != rna.end_post(); ++it)
-            {
-                sizes[id(it)] =
-                    (is(it, rna_pair_label::inserted) ||
-                     is(it, rna_pair_label::deleted)) ? 0 : 1;
-
-                if (!rna_tree::is_leaf(it))
-                    for (ch = it.begin(); ch != it.end(); ++ch)
-                        sizes[id(it)] += sizes[id(ch)];
-            }
-        };
-
-    comp_f(t1, s1);
-    comp_f(t2, s2);
-}
 
 void matcher::mark(
                 rna_tree& rna,
@@ -194,6 +166,35 @@ void matcher::merge()
 
 
 
+void matcher::compute_sizes()
+{
+    APP_DEBUG_FNAME;
+
+    auto comp_f =
+        [](rna_tree& rna, vector<size_t>& sizes) {
+            post_order_iterator it;
+            sibling_iterator ch;
+
+            sizes.resize(rna.size());
+
+            for (auto it = rna.begin(); it != rna.end(); ++it)
+                assert(id(it) < sizes.size());
+
+            for (it = rna.begin_post(); it != rna.end_post(); ++it)
+            {
+                sizes[id(it)] =
+                    (is(it, rna_pair_label::inserted) ||
+                     is(it, rna_pair_label::deleted)) ? 0 : 1;
+
+                if (!rna_tree::is_leaf(it))
+                    for (ch = it.begin(); ch != it.end(); ++ch)
+                        sizes[id(it)] += sizes[id(ch)];
+            }
+        };
+
+    comp_f(t1, s1);
+    comp_f(t2, s2);
+}
 
 /* inline */
 void matcher::make_unique(
@@ -216,7 +217,5 @@ size_t matcher::child_index(rna_tree::sibling_iterator sib)
     }
     return n;
 }
-
-
 
 

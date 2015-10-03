@@ -130,14 +130,14 @@ template <typename iter>
 inline std::string label(
                 const iter& it);
 
+#define clabel(iter) ((label(iter)).c_str())
+
 /* global, declaration */
 template <typename iter>
 inline iter plusplus(
                 iter it,
                 size_t n);
 
-
-#define clabel(iter) ((label(iter)).c_str())
 
 
 #include "tree_base_iter.hpp"

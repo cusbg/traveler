@@ -29,7 +29,13 @@ class rna_tree;
 class generator
 {
 public:
+    /**
+     * run generator if needed (generate() returns true)
+     */
     static void generate_files();
+    /**
+     * run generator
+     */
     static void force_generate();
 
 #ifdef NODEF
@@ -41,9 +47,15 @@ public:
                 const std::string& labels);
 #endif
 
+    /**
+     * runs java mapping between `rna1` and `rna2`
+     */
     static std::string run_mapping(
                 rna_tree rna1,
                 rna_tree rna2);
+    /**
+     * returns if files dont exist (=> need to run generator)
+     */
     static bool generate();
 private:
     static void generate_seq_files();

@@ -43,13 +43,24 @@ public:
                 const std::vector<point>& _points,
                 const std::string& _name = "");
 
+    /**
+     * update postorder points
+     */
     void update_points(
                 const std::vector<point>& points);
 
+    /**
+     * insert `label` to tree before `it` and set
+     * `steal` next siblings to be children of inserted node
+     */
     sibling_iterator insert(
-                sibling_iterator sib,
+                sibling_iterator it,
                 rna_pair_label label,
-                size_t steal_children = 0);
+                size_t steal = 0);
+    /**
+     * reparent `sib`-s children to be its next siblings,
+     * remove `sib` from tree and return its next sibling
+     */
     sibling_iterator erase(
                 sibling_iterator sib);
 
@@ -59,7 +70,9 @@ private:
     std::string _name;
 };
 
-inline bool is(const rna_tree::base_iterator& iter, rna_pair_label::status_type s)
+inline bool is(
+                const rna_tree::base_iterator& iter,
+                rna_pair_label::status_type s)
 {
     return iter->status == s;
 }

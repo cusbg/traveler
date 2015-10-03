@@ -38,26 +38,43 @@
 
 class rna_tree;
 
-class reader
-{
-public:
-    static std::string read_file(const std::string& filename);
-    static bool exist_file(const std::string& filename);
-};
 
-class writer
-{
-public:
-    static void save(
+bool exist_file(
+                const std::string& filename);
+
+std::string read_file(
+                const std::string& filename);
+
+void write_file(
                 const std::string& filename,
                 const std::string& text);
-};
 
-class ps_document : public reader
+
+/**
+ * convert rna_tree to java-implementation rted fromat
+ */
+std::string convert_to_java_format(
+                rna_tree rna);
+
+rna_tree get_rna(
+                const std::string& name);
+
+/**
+ * runs command and return vector<lines> from output
+ */
+std::vector<std::string> get_command_output(
+                const std::string& command);
+
+
+/**
+ * ps document reader
+ */
+class ps_document
 {
 public:
     ps_document() = default;
-    ps_document(const std::string& filename);
+    ps_document(
+                const std::string& filename);
 
     static bool is_base_line(
                 const std::string& line);
@@ -72,13 +89,6 @@ public:
     std::string prolog;
     std::string epilog;
 };
-
-
-std::string convert_to_java_format(rna_tree rna);
-
-rna_tree get_rna(const std::string& name);
-
-std::vector<std::string> get_command_output(const std::string& command);
 
 #endif /* !READER_HPP */
 

@@ -26,8 +26,9 @@
 #include "tree_base.hpp"
 #endif
 
-/* inner class prepostorder iterator */
-/* visit every non-leaf node 2x, once when going in the subtree, once when going up */
+/**
+ * visit every non-leaf node 2x, once when going in the subtree, once going up
+ */
 template <typename label_type>
 class tree_base<label_type>::_pre_post_order_iterator
     : public tree_base<label_type>::tree_type::iterator_base
@@ -61,7 +62,10 @@ private:
     bool _preorder;
 };
 
-/* _pre_post_order_iterator class functions: */
+//
+// _pre_post_order_iterator class functions:
+//
+
 template <typename label_type>
 tree_base<label_type>::_pre_post_order_iterator::_pre_post_order_iterator(
                 tree_node_type* nodeptr,

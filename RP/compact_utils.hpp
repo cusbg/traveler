@@ -34,6 +34,9 @@ struct compact::intervals
         multibranch_loop
     };
 
+    /**
+     * create intervals for `parent`-s children
+     */
     void init(iterator parent);
     point get_circle_direction() const;
 

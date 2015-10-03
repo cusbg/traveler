@@ -40,15 +40,10 @@ void document_writer::init(
     out.close();
 
     out.open(filename, ios::out | ios::in);
-    set_io_flags();
-    assert(out.good());
-}
-
-void document_writer::set_io_flags()
-{
     out
         << std::unitbuf
         << std::scientific;
+    assert(out.good());
 }
 
 void document_writer::seek(
@@ -79,7 +74,7 @@ size_t document_writer::fill(char ch)
     streampos pos, end;
 
     pos = get_pos();
-    out.seekp(0, out.end);
+    seek_end();
     end = get_pos();
 
     size_t n = end - pos;

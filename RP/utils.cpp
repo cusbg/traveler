@@ -25,7 +25,8 @@
 using namespace std;
 
 
-/* static */ std::string reader::read_file(const std::string& filename)
+/* global */ std::string read_file(
+                const std::string& filename)
 {
     assert(exist_file(filename));
 
@@ -35,13 +36,13 @@ using namespace std;
     return s.str();
 }
 
-/* static */ bool reader::exist_file(const std::string& filename)
+/* global */ bool exist_file(
+                const std::string& filename)
 {
     return ifstream(filename).good();
 }
 
-
-/* static */ void writer::save(
+/* global */ void write_file(
                 const std::string& filename,
                 const std::string& what)
 {
@@ -58,7 +59,7 @@ ps_document::ps_document(const std::string& name)
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     string line, str;
-    assert(reader::exist_file(name));
+    assert(exist_file(name));
 
     ifstream in(name);
     point p;
@@ -260,8 +261,8 @@ rna_tree get_rna(const std::string& name)
 {
     string l, b;
 
-    l = reader::read_file(SEQ(name));
-    b = reader::read_file(FOLD(name));
+    l = read_file(SEQ(name));
+    b = read_file(FOLD(name));
 
     rna_tree rna(b, l, ps_document(PS_IN(name)).points, name);
 

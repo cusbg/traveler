@@ -39,19 +39,40 @@ public:
     matcher(
                 const rna_tree& templated,
                 const rna_tree& other);
+    /**
+     * mapps t1 to t2 with mapping `m`
+     * t1=templated, t2=other
+     *  -> removes nodes i->0, inserts nodes 0->i, changes label i->j
+     */
     rna_tree& run(
                 const mapping& m);
-    inline size_t child_index(
-                sibling_iterator sib);
 
 private:
+    /**
+     * marks nodes with `status`
+     */
     void mark(
                 rna_tree& rna,
                 const indexes_type& postorder_indexes,
                 rna_pair_label::status_type status);
-    void merge();
+    /**
+     * erase nodes marked as 'deleted'
+     */
     void erase();
-    void compute_sizes();
+    /**
+     * merge t1 with t2,
+     * inserts nodes marked as 'inserted' from t2->t1, rename other
+     */
+    void merge();
+    /**
+     * compute subtree sizes for each node in trees
+     */
+    inline void compute_sizes();
+    inline size_t child_index(
+                sibling_iterator sib);
+    /**
+     * unique sort of remake_ids
+     */
     inline void make_unique(
                 iterator it);
 private:

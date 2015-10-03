@@ -34,20 +34,36 @@ protected:
     document_writer() = default;
 
 public:
+    /**
+     * initialize new document_writer on document `filename`
+     */
     void init(
                 const std::string& filename);
+    /**
+     * fill document from actual position to end of file with `ch`-chars
+     * and seek to actual position
+     */
     size_t fill(char ch = ' ');
 
 public:
+    /**
+     * print `text` to document
+     */
     virtual streampos print(
                 const std::string& text) = 0;
+    /**
+     * seek to `pos`
+     */
     void seek(
                 streampos pos);
+    /**
+     * seeks to the end of file
+     */
     void seek_end();
+    /**
+     * return actual position in stream
+     */
     streampos get_pos();
-
-private:
-    void set_io_flags();
 
 protected:
     std::string filename;
