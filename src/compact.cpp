@@ -353,12 +353,8 @@ void compact::make()
 
         in.init(it);
         set_distances(in);
-        cvec = get_circles(in);
-
-        assert(in.vec.size() == cvec.size());
-        for (size_t i = 0; i < in.vec.size(); ++i)
-            if (in.vec[i].remake)
-                reinsert(cvec[i], in.vec[i].vec);
+        for (auto& i : in.vec)
+            remake(i, in.get_circle_direction());
     }
 }
 
@@ -411,16 +407,6 @@ void compact::set_distance_interior_loop(
     UPDATE_PS;
 }
 
-void compact::set_distance_multibranch_loop(
-                intervals& in)
-{
-    APP_DEBUG_FNAME;
-
-    for (auto i : in.vec)
-        split(i);
-    abort();
-}
-
 
 double compact::get_length(
                 const interval& in)
@@ -444,11 +430,13 @@ double compact::get_length(
     }
     p2 = in.end.it->at(in.end.index).p;
     len += distance(p1, p2);
-    return len / in.vec.size();
+    len = len / (in.vec.size() + 1);
+    DEBUG("len = %f", len);
+    return len;
 }
 
 void compact::split(
-                const interval& in)
+                interval& in)
 {
     APP_DEBUG_FNAME;
 
@@ -470,26 +458,57 @@ void compact::split(
     i = 1;
     j = 0;
 
-    while (true)
+    for (; j < p2.size(); ++j)
     {
         double l = length;
-        while (distance(p, p1[i]) < l)
+        while (distance(p, p1.at(i)) < l)
         {
-            l -= distance(p, p1[i]);
+            l -= distance(p, p1.at(i));
             p = p1[i];
             ++i;
         }
-        p = move_point(p, p1[i], l);
+        p = move_point(p, p1.at(i), l);
         p2[j] = p;
-        ++j;
     }
-    assert(i == p1.size() && j == p2.size());
+    DEBUG("i %lu, j %lu, p1 %lu, p2 %lu",
+            i, j, p1.size(), p2.size());
+    assert(j == p2.size());
 
+    j = 0;
+    for (auto val : in.vec)
+        val->at(0).p = p2[j++];
+    in.remake = false;
+}
 
-    DEBUG("len: %f", length);
+void compact::remake(
+                const interval& i,
+                point direction)
+{
+    APP_DEBUG_FNAME;
+    if (!i.remake)
+        return;
+    circle c;
+    c.p1 = i.beg.it->at(i.beg.index).p;
+    c.p2 = i.end.it->at(i.end.index).p;
+    c.direction = direction;
+    c.centre = centre(c.p1, c.p2);
+    c.compute_sgn();
+    c.init(i.vec.size());
+
+    reinsert(c, i.vec);
 }
 
 
+void compact::set_distance_multibranch_loop(
+                intervals& in)
+{
+    APP_DEBUG_FNAME;
+
+    for (auto& i : in.vec)
+        if (i.vec.size() > 10)
+            split(i);
+    UPDATE_PS;
+}
 
 
 

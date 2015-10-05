@@ -83,6 +83,9 @@ private:
     void reinsert(
                 const circle& c,
                 const nodes_vec& nodes);
+    void remake(
+                const interval& in,
+                point direction);
     void set_distances(
                 intervals& in);
     void set_distance_interior_loop(
@@ -90,10 +93,11 @@ private:
     void set_distance_multibranch_loop(
                 intervals& in);
 
+
     double get_length(
                 const interval& in);
     void split(
-                const interval& in);
+                interval& in);
 private:
     void init_branches();
 
