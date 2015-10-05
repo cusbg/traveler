@@ -101,7 +101,8 @@ point compact::intervals::get_circle_direction() const
     return psum;
 }
 
-/* static */ std::string to_string(const compact::intervals::interval& i)
+/* static */ std::string to_string(
+                const compact::interval& i)
 {
     stringstream str;
     str

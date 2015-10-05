@@ -29,7 +29,7 @@ using namespace std;
 
 #define UPDATE_PS psout.seek(psout.print(psout.sprint(rna))); WAIT;
 
-inline string to_string(const rna_tree::sibling_iterator& it)
+static inline string to_string(const rna_tree::sibling_iterator& it)
 {
     return label(it);
 }
@@ -416,5 +416,81 @@ void compact::set_distance_multibranch_loop(
 {
     APP_DEBUG_FNAME;
 
+    for (auto i : in.vec)
+        split(i);
+    abort();
 }
+
+
+double compact::get_length(
+                const interval& in)
+{
+    if (in.vec.empty())
+        return 0;
+
+    double len = 0;
+    point p1 = in.beg.it->at(in.beg.index).p;
+    point p2;
+
+    for (const auto& val : in.vec)
+    {
+        assert(!val->paired());
+        if (val->inited_points())
+        {
+            p2 = val->at(0).p;
+            len += distance(p1, p2);
+            p1 = p2;
+        }
+    }
+    p2 = in.end.it->at(in.end.index).p;
+    len += distance(p1, p2);
+    return len / in.vec.size();
+}
+
+void compact::split(
+                const interval& in)
+{
+    APP_DEBUG_FNAME;
+
+    vector<point> p1, p2;
+    point p;
+    double length;
+    size_t i, j;
+
+    length = get_length(in);
+
+    p1.push_back(in.beg.it->at(in.beg.index).p);
+    p2.resize(in.vec.size());
+    for (const auto& i : in.vec)
+        if (i->inited_points())
+            p1.push_back(i->at(0).p);
+    p1.push_back(in.end.it->at(in.end.index).p);
+    p = p1[0];
+
+    i = 1;
+    j = 0;
+
+    while (true)
+    {
+        double l = length;
+        while (distance(p, p1[i]) < l)
+        {
+            l -= distance(p, p1[i]);
+            p = p1[i];
+            ++i;
+        }
+        p = move_point(p, p1[i], l);
+        p2[j] = p;
+        ++j;
+    }
+    assert(i == p1.size() && j == p2.size());
+
+
+    DEBUG("len: %f", length);
+}
+
+
+
+
+
 

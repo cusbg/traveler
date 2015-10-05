@@ -1,7 +1,7 @@
 /*
- * File: checks.hpp
+ * File: compact_utils.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,31 +19,42 @@
  * USA.
  */
 
-#ifndef CHECKS_HPP
-#define CHECKS_HPP
+#ifndef COMPACT_UTILS_HPP
+#define COMPACT_UTILS_HPP
 
-#include "types.hpp"
+#include "compact.hpp"
 
-class rna_tree;
-
-class crossing_check
+struct compact::intervals
 {
-private:
-public:
-    struct edge;
-    struct line_equation;
-    typedef std::vector<crossing_check::edge> edges;
-public:
-//private:
-    std::vector<edge> split_to_edges(rna_tree rna);
-    bool intersect(rna_tree rna);
-    line_equation create_equation(edge e);
+    enum rna_structure_type
+    {
+        hairpin,
+        interior_loop,
+        multibranch_loop
+    };
 
-//private:
-    bool intersect(edge e1, edge e2);
+    /**
+     * create intervals for `parent`-s children
+     */
+    void init(iterator parent);
+    point get_circle_direction() const;
+
+    std::vector<interval> vec;
+    rna_structure_type type;
 };
 
+struct compact::interval
+{
+    struct
+    {
+        iterator it;
+        bool index;
+    } beg, end;
+    nodes_vec vec;
+    bool remake = false;
+};
 
+std::string to_string(const compact::interval& i);
 
-#endif /* !CHECKS_HPP */
+#endif /* !COMPACT_UTILS_HPP */
 

@@ -66,9 +66,6 @@ void app::run_between(
     rna1 = matcher(rna1, rna2).run(map);
 
     compact(rna1).run();
-    abort();
-
-    psout.print(psout.sprint(rna1));
 }
 
 

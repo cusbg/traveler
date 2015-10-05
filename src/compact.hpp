@@ -34,6 +34,7 @@ class compact
 public:
     struct circle;
     struct intervals;
+    struct interval;
 
 public:
     typedef rna_tree::iterator                  iterator;
@@ -89,6 +90,10 @@ private:
     void set_distance_multibranch_loop(
                 intervals& in);
 
+    double get_length(
+                const interval& in);
+    void split(
+                const interval& in);
 private:
     void init_branches();
 
