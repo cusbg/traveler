@@ -58,9 +58,6 @@ private:
     static void shift_branch(
                 iterator parent,
                 point vec);
-    static void rotate_branch(
-                iterator parent,
-                double angle);
 
 private:
     // INIT functions:
@@ -72,7 +69,7 @@ private:
     point init_branch_recursive(
                 sibling_iterator it,
                 point from);
-    void even_branch(
+    void make_branch_even(
                 sibling_iterator it);
     // INIT ^^
 
@@ -97,7 +94,7 @@ private:
     double get_length(
                 const interval& in);
     void split(
-                interval& in);
+                const interval& in);
 private:
     void init_branches();
 

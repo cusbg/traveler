@@ -64,7 +64,9 @@ bool point::operator==(point other) const
 {
     //BINARY(*this, other); // !!!
 
-    return x == other.x && y == other.y;
+    return
+        double_equals(x, other.x) &&
+        double_equals(y, other.y);
 }
 
 std::ostream& operator<<(std::ostream& out, point p)

@@ -62,6 +62,7 @@ struct point
     friend std::ostream& operator<<(std::ostream& out, point p);
 };
 
+point operator*(double value, point p);
 
 point centre(point p1, point p2);
 

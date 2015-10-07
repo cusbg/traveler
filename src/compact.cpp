@@ -28,6 +28,11 @@
 using namespace std;
 
 #define UPDATE_PS psout.seek(psout.print(psout.sprint(rna))); WAIT;
+#define toremake(iter) \
+    (iter->paired() && \
+        (!iter->remake_ids.empty() || \
+        is(iter, rna_pair_label::inserted)))
+
 
 static inline string to_string(const rna_tree::sibling_iterator& it)
 {
@@ -44,7 +49,9 @@ void compact::run()
     APP_DEBUG_FNAME;
 
     init();
+    UPDATE_PS;
     make();
+    UPDATE_PS;
 }
 
 
@@ -74,25 +81,6 @@ void compact::run()
     size_t n;
     n = recursion(parent);
     DEBUG("shift #%lu '%s'", n, to_cstr(vector));
-}
-
-/* static */ void compact::rotate_branch(
-                iterator parent,
-                double alpha)
-{
-    APP_DEBUG_FNAME;
-
-    function<size_t(iterator)> recursion =
-        [&recursion, &alpha](iterator it) {
-
-            sibling_iterator ch;
-            size_t out = 1;
-
-
-            return out;
-        };
-    // TODO
-    abort();
 }
 
 /* static */ void compact::set_distance(
@@ -141,8 +129,9 @@ compact::sibling_iterator compact::get_onlyone_branch(
 
 void compact::init()
 {
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
     APP_DEBUG_FNAME;
+
+    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     iterator it;
     point p;
@@ -159,11 +148,28 @@ void compact::init()
 
         if (!init_branch_recursive(it, p).bad())
         {
-            DEBUG("INIT OK");
+            DEBUG("INIT_rec OK");
             continue;
         }
         else
-            abort();
+        {
+            rna.print_subtree(it);
+            //psout.print(psout.sprint_subtree(it));
+            //abort();
+            assert(rna_tree::is_valid(get_onlyone_branch(rna_tree::parent(it))));   // => 1 branch
+
+            point p1, p2, vec;
+            iterator par = rna_tree::parent(it);
+            vec = normalize(par->centre() - rna_tree::parent(par)->centre());
+            p1 = par->at(0).p + vec;
+            p2 = par->at(1).p + vec;
+
+            it->set_points_exact(p1, 0);
+            it->set_points_exact(p2, 1);
+
+            DEBUG("INIT OK");
+            UPDATE_PS;
+        }
     }
 
     for (it = rna.begin(); it != rna.end(); ++it)
@@ -174,9 +180,10 @@ void compact::init()
         {
             for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch)
                 if (!rna_tree::is_leaf(ch))
-                    even_branch(ch);
+                    make_branch_even(ch);
         }
     }
+    INFO("compact::init() OK");
 }
 
 point compact::init_branch_recursive(
@@ -188,17 +195,23 @@ point compact::init_branch_recursive(
     point p;
     sibling_iterator ch;
 
+    rna.print_subtree(it);
+
     if (it->inited_points())
     {
         p = normalize(it->centre() - from) * BASES_DISTANCE;
         shift_branch(it, p);
 
+        DEBUG("ret %s", to_cstr(p));
         return p;
     }
 
     ch = get_onlyone_branch(it);
-    if (sibling_iterator() == ch)
+    if (!rna_tree::is_valid(ch))
+    {
+        DEBUG("!valid");
         return point::bad_point();
+    }
 
     assert(sibling_iterator() != ch);
 
@@ -222,7 +235,7 @@ point compact::init_branch_recursive(
     return point::bad_point();
 }
 
-void compact::even_branch(
+void compact::make_branch_even(
                 sibling_iterator it)
 {
     //APP_DEBUG_FNAME;
@@ -338,6 +351,7 @@ compact::circles_vec compact::get_circles(
 }
 
 
+
 void compact::make()
 {
     APP_DEBUG_FNAME;
@@ -348,7 +362,7 @@ void compact::make()
 
     for (it = rna.begin(); it != rna.end(); ++it)
     {
-        if (it->remake_ids.empty())
+        if (!toremake(it))
             continue;
 
         in.init(it);
@@ -382,6 +396,8 @@ void compact::set_distance_interior_loop(
     APP_DEBUG_FNAME;
     assert(in.vec.size() == 2);
 
+    rna.print_subtree(in.vec[0].beg.it);
+
     iterator parent, child;
     double actual, avg;
     vector<double> l(2);
@@ -404,7 +420,6 @@ void compact::set_distance_interior_loop(
         in.vec[0].remake = true;
         in.vec[1].remake = true;
     }
-    UPDATE_PS;
 }
 
 
@@ -436,7 +451,7 @@ double compact::get_length(
 }
 
 void compact::split(
-                interval& in)
+                const interval& in)
 {
     APP_DEBUG_FNAME;
 
@@ -477,7 +492,6 @@ void compact::split(
     j = 0;
     for (auto val : in.vec)
         val->at(0).p = p2[j++];
-    in.remake = false;
 }
 
 void compact::remake(
@@ -502,14 +516,18 @@ void compact::remake(
 void compact::set_distance_multibranch_loop(
                 intervals& in)
 {
+#define MULTIBRANCH_MINIMUM_SPLIT   10
+
     APP_DEBUG_FNAME;
 
-    for (auto& i : in.vec)
-        if (i.vec.size() > 10)
-            split(i);
-    UPDATE_PS;
+    for (size_t i = 0; i < in.vec.size(); ++i)
+    {
+        if (in.vec[i].vec.size() > MULTIBRANCH_MINIMUM_SPLIT)
+        {
+            split(in.vec[i]);
+            in.vec[i].remake = false;
+        }
+    }
 }
-
-
 
 

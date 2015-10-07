@@ -23,8 +23,8 @@
 #include "write_ps_document.hpp"
 
 #define remake_child(parent, id) \
-    (contains(parent->remake_ids, id) || \
-     is(parent, rna_pair_label::inserted))
+    (is(parent, rna_pair_label::inserted) || \
+    contains(parent->remake_ids, id))
 
 using namespace std;
 
@@ -32,6 +32,8 @@ void compact::intervals::init(
                 iterator parent)
 {
     APP_DEBUG_FNAME;
+
+    assert(!rna_tree::is_leaf(parent));
 
     sibling_iterator ch;
     size_t i = 0;
@@ -49,10 +51,7 @@ void compact::intervals::init(
         if (ch->paired())
         {
             vec.back().end = {ch, 0};
-
-            DEBUG("created %s", to_cstr(vec.back()));
             vec.push_back(interval());
-
             vec.back().beg = {ch, 1};
         }
         else
@@ -62,23 +61,31 @@ void compact::intervals::init(
             vec.back().remake = true;
     }
     vec.back().end = {parent, 1};
-    if (*std::max_element(parent->remake_ids.begin(),
-                parent->remake_ids.end()) >= i)
-        vec.back().remake = true;
+    //if (is(parent, rna_pair_label::inserted))
+        //vec.back().remake = true;
+    if (!parent->remake_ids.empty())
+        if (*std::max_element(parent->remake_ids.begin(),
+                    parent->remake_ids.end()) >= i)
+            vec.back().remake = true;
 
-    DEBUG("created %s", to_cstr(vec.back()));
+    if (is(parent, rna_pair_label::inserted))
+        for (auto & i : vec)
+            i.remake = true;
 
     switch (vec.size())
     {
-#define set_type(t) type = t; DEBUG("type = %s", #t); break;
+#define typeswitch(t) type = compact::intervals::t; break;
         case 1:
-            set_type(hairpin);
+            typeswitch(hairpin);
         case 2:
-            set_type(interior_loop);
+            typeswitch(interior_loop);
         default:
-            set_type(multibranch_loop);
+            typeswitch(multibranch_loop);
 #undef set_type
     }
+
+    rna_tree::print_subtree(parent);
+    DEBUG("created %s: %s", to_cstr(type), to_cstr(vec.back()));
 }
 
 point compact::intervals::get_circle_direction() const
@@ -101,9 +108,9 @@ point compact::intervals::get_circle_direction() const
     return psum;
 }
 
-/* static */ std::string to_string(
+std::string to_string(
                 const compact::interval& i)
-{
+{ 
     stringstream str;
     str
         << "INTERVAL: "
@@ -120,3 +127,17 @@ point compact::intervals::get_circle_direction() const
 
     return str.str();
 }
+
+static std::string to_string(compact::intervals::rna_structure_type t)
+{
+#undef typeswitch
+#define typeswitch(t) case compact::intervals::t : return #t;
+    switch (t)
+    {
+        typeswitch(hairpin);
+        typeswitch(multibranch_loop);
+        typeswitch(interior_loop);
+    }
+    abort();
+}
+

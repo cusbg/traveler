@@ -31,8 +31,8 @@ using namespace std;
 
 #define PI      M_PI
 
-#define BASES_RATIO                 1.4
-#define BASES_DISTANCE_PRECISION    2
+#define BASES_RATIO                 1.
+#define BASES_DISTANCE_PRECISION    2.
 
 double compact::circle::radius() const
 {

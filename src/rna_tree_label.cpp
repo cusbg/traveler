@@ -43,7 +43,15 @@ const rna_label& rna_pair_label::operator[](
 {
     assert(index == 0 || index == 1);
 
-    return labels.at(index);
+    try
+    {
+        return labels.at(index);
+    }
+    catch (...)
+    {
+        DEBUG("label(%s)[%lu]", to_cstr(*this), index);
+        abort();
+    }
 }
 
 rna_label& rna_pair_label::operator[](
@@ -51,7 +59,15 @@ rna_label& rna_pair_label::operator[](
 {
     assert(index == 0 || index == 1);
 
-    return labels.at(index);
+    try
+    {
+        return labels.at(index);
+    }
+    catch (...)
+    {
+        DEBUG("label(%s)[%lu]", to_cstr(*this), index);
+        abort();
+    }
 }
 
 const rna_label& rna_pair_label::at(

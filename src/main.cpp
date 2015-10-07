@@ -51,6 +51,14 @@ int main(int argc, char** argv)
     from = "rabbit";
     to = "frog";
 
+    from = "frog";
+    to = "human";
+
+    from = "frog";
+    to = "rabbit";
+
+    //to = "mouse";
+
     //a.run_app();
     a.run_between(from, to);
 
