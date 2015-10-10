@@ -34,6 +34,16 @@ using namespace std;
         is(iter, rna_pair_label::inserted)))
 
 
+void print_line(point from, point to)
+{
+    psout.print(psout.sprint(green));
+    psout.print(psout.sprint_line(from, to));
+    psout.print(psout.sprint(from, "1"));
+    psout.print(psout.sprint(to, "2"));
+    psout.print(psout.sprint(black));
+}
+
+
 static inline string to_string(const rna_tree::sibling_iterator& it)
 {
     return label(it);
@@ -125,13 +135,11 @@ compact::sibling_iterator compact::get_onlyone_branch(
     return out;
 }
 
-
-
 void compact::init()
 {
     APP_DEBUG_FNAME;
 
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     iterator it;
     point p;
@@ -146,16 +154,15 @@ void compact::init()
         assert(!it->inited_points() && it->paired());
         assert(!p.bad());
 
+        rna.print_subtree(it);
+
         if (!init_branch_recursive(it, p).bad())
         {
             DEBUG("INIT_rec OK");
-            continue;
         }
         else
         {
             rna.print_subtree(it);
-            //psout.print(psout.sprint_subtree(it));
-            //abort();
             assert(rna_tree::is_valid(get_onlyone_branch(rna_tree::parent(it))));   // => 1 branch
 
             point p1, p2, vec;
@@ -168,7 +175,6 @@ void compact::init()
             it->set_points_exact(p2, 1);
 
             DEBUG("INIT OK");
-            UPDATE_PS;
         }
     }
 
@@ -195,29 +201,21 @@ point compact::init_branch_recursive(
     point p;
     sibling_iterator ch;
 
-    rna.print_subtree(it);
-
     if (it->inited_points())
     {
         p = normalize(it->centre() - from) * BASES_DISTANCE;
-        shift_branch(it, p);
-
-        DEBUG("ret %s", to_cstr(p));
         return p;
     }
 
     ch = get_onlyone_branch(it);
     if (!rna_tree::is_valid(ch))
-    {
-        DEBUG("!valid");
         return point::bad_point();
-    }
 
-    assert(sibling_iterator() != ch);
-
+    assert(rna_tree::is_valid(ch));
     p = init_branch_recursive(ch, from);
     if (!p.bad())
     {
+        shift_branch(it, p);
         if (ch->paired())
         {
             it->at(0).p = ch->at(0).p - p;
@@ -225,6 +223,7 @@ point compact::init_branch_recursive(
         }
         else
         {
+            abort();
             it->at(0).p = ch->at(0).p - p;
             it->at(1).p = orthogonal(ch->at(0).p) * PAIRS_DISTANCE - p;
         }
