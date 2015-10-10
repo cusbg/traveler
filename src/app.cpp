@@ -26,6 +26,7 @@
 #include "tree_matcher.hpp"
 #include "write_ps_document.hpp"
 #include "compact.hpp"
+#include "overlap_checks.hpp"
 
 
 using namespace std;
@@ -66,6 +67,8 @@ void app::run_between(
     rna1 = matcher(rna1, rna2).run(map);
 
     compact(rna1).run();
+
+    overlap_checks(rna1).run();
 }
 
 

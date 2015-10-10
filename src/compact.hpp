@@ -47,7 +47,7 @@ public:
 
 public:
     compact(
-                const rna_tree& _rna);
+                rna_tree& _rna);
     void run();
 
 private:
@@ -58,14 +58,12 @@ private:
     static void shift_branch(
                 iterator parent,
                 point vec);
+    static sibling_iterator get_onlyone_branch(
+                sibling_iterator it);
 
 private:
     // INIT functions:
     void init();
-
-    sibling_iterator get_onlyone_branch(
-                sibling_iterator it);
-
     point init_branch_recursive(
                 sibling_iterator it,
                 point from);
@@ -95,11 +93,9 @@ private:
                 const interval& in);
     void split(
                 const interval& in);
-private:
-    void init_branches();
 
 private:
-    rna_tree rna;
+    rna_tree &rna;
 };
 
 

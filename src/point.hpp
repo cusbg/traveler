@@ -32,8 +32,12 @@ inline bool double_equals_precision(
     return fabs(val1 - val2) < fabs(precision);
 }
 
-#define double_equals(val1, val2) \
-    double_equals_precision(val1, val2, 0.0001)
+inline bool double_equals(
+                double val1,
+                double val2)
+{
+    return double_equals_precision(val1, val2, 0.0001);
+}
 
 #define radians_to_degrees(x)   (x * 180 / M_PI)
 #define degrees_to_radians(x)   (x * M_PI / 180)

@@ -27,7 +27,8 @@
 
 using namespace std;
 
-#define UPDATE_PS psout.seek(psout.print(psout.sprint(rna))); WAIT;
+#define UPDATE_PS
+//#define UPDATE_PS psout.seek(psout.print(psout.sprint(rna))); WAIT;
 #define toremake(iter) \
     (iter->paired() && \
         (!iter->remake_ids.empty() || \
@@ -50,7 +51,7 @@ static inline string to_string(const rna_tree::sibling_iterator& it)
 }
 
 compact::compact(
-                const rna_tree& _rna)
+                rna_tree& _rna)
     : rna(_rna)
 { }
 

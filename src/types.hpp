@@ -29,13 +29,10 @@
 #include <sstream>
 #include <algorithm>
 #include <stdexcept>
-
-
-
 #include <log4cpp/Category.hh>
+
+
 extern log4cpp::Category& logger; // globalna premenna...
-
-
 
 
 namespace std
@@ -128,6 +125,7 @@ inline void wait_for_input()
             logger.debugStream() << name << ": " << stream.str(); \
         }
 
+#define abort() ERR("abort()"), ::abort()
 
 
 #endif /* !TYPES_HPP */
