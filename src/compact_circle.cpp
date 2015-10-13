@@ -193,10 +193,8 @@ void compact::circle::init(
     {
         if (double_equals_precision(actual_length, needed_length,
                     BASES_DISTANCE_PRECISION))
-        {
-            INFO("circle::init OK");
             break;
-        }
+
         shift = normalize(shift) * shift_size;
         
         if (actual_length < needed_length)

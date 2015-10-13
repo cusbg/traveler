@@ -38,7 +38,7 @@ using namespace std;
 void print_line(point from, point to)
 {
     psout.print(psout.sprint(green));
-    psout.print(psout.sprint_line(from, to));
+    psout.print(psout.sprint_edge(from, to, false));
     psout.print(psout.sprint(from, "1"));
     psout.print(psout.sprint(to, "2"));
     psout.print(psout.sprint(black));

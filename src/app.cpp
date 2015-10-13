@@ -51,6 +51,7 @@ void app::run_between(
                 const std::string& val1,
                 const std::string& val2)
 {
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
     APP_DEBUG_FNAME;
 
     psout.init(PS_OUT(val1, val2));
@@ -69,6 +70,8 @@ void app::run_between(
     compact(rna1).run();
 
     overlap_checks(rna1).run();
+
+    psout.print(psout.sprint(rna1));
 }
 
 

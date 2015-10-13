@@ -138,9 +138,10 @@ ps_writer psout;
     return out.str();
 }
 
-/* static */ std::string ps_writer::sprint_line(
+/* static */ std::string ps_writer::sprint_edge(
                 point p1,
-                point p2)
+                point p2,
+                bool base_pair)
 {
     stringstream out;
 
@@ -151,10 +152,13 @@ ps_writer psout;
         return "";
     }
 
-    point pa;
-    pa = base_pair_edge_point(p1, p2);
-    p2 = base_pair_edge_point(p2, p1);
-    p1 = pa;
+    if (base_pair)
+    {
+        point pa;
+        pa = base_pair_edge_point(p1, p2);
+        p2 = base_pair_edge_point(p2, p1);
+        p1 = pa;
+    }
 
     out
         << std::left
@@ -185,7 +189,7 @@ ps_writer psout;
     p1 = (*iter)[0].p;
     p2 = (*iter)[1].p;
 
-    return sprint_line(p1, p2);
+    return sprint_edge(p1, p2);
 }
 
 /* static */ std::string ps_writer::sprint(
@@ -306,4 +310,19 @@ ps_writer psout;
     return out;
 }
 
+
+/* static */ std::string ps_writer::sprint_circle(
+                point p,
+                double size)
+{
+    std::stringstream str;
+    str
+        << "360 0 "
+        << size
+        << " 1.0 1.0 "
+        << p
+        << " lwarc"
+        << endl;
+    return str.str();
+}
 

@@ -21,6 +21,7 @@
 
 #include "overlap_checks.hpp"
 #include "rna_tree.hpp"
+#include "write_ps_document.hpp"
 
 using namespace std;
 
@@ -58,38 +59,23 @@ overlap_checks::edges overlap_checks::get_edges()
     e.p1 = it->at(it.label_index()).p;
     ++it;
 
-    while (++rna_tree::pre_post_order_iterator(it) != rna.end_pre_post())
+    while (true)
     {
         e.p1 = it->at(it.label_index()).p;
         ++it;
+        if (++rna_tree::pre_post_order_iterator(it) == rna.end_pre_post())
+            break;
+        assert(it->inited_points());
         e.p2 = it->at(it.label_index()).p;
 
         vec.push_back(e);
     }
+    //for (auto val : vec)
+        //psout.print(psout.sprint_edge(val.p1, val.p2, false));
+
+    //abort();
 
     return vec;
-}
-
-overlap_checks::line_equation overlap_checks::get_equation(
-                const edge& e)
-{
-    point p;
-    line_equation q;
-
-    p = e.p2 - e.p1;
-    assert(size(p) != 0);
-
-    q.a = -p.y;
-    q.b = p.x;
-    q.c = -(q.a * e.p1.x + q.b * e.p1.y);
-
-    assert(!q.hasnan());
-    // (a != 0 != b) || c == 0
-    assert((!iszero(q.a) ||
-                !iszero(q.b)) ||
-            iszero(q.c));
-
-    return q;
 }
 
 void overlap_checks::run(
@@ -104,19 +90,14 @@ void overlap_checks::run(
     {
         e1 = e[i];
 
-        for (size_t j = i + 1; j < e.size(); ++j)
+        for (size_t j = i + 2; j < e.size(); ++j)
         {
             e2 = e[j];
 
             p = intersection(e1, e2);
 
             if (!p.bad())
-            {
-                cout << p << endl;
-                abort();
-            }
-
-
+                has_intersection(e1, e2);
         }
     }
 }
@@ -125,108 +106,61 @@ point overlap_checks::intersection(
                 const edge& e1,
                 const edge& e2)
 {
-    line_equation k, l;
+    // sin(a)/alpha == sin(b)/beta == sin(c)/gamma
+    //
+    double alpha, beta, gamma;
+    double a, c;
     point p;
 
-    k = get_equation(e1);
-    l = get_equation(e2);
+    assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p1));
+    assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p2));
 
-    p = compute(k, l);
+    DEBUG("e1: <%s | %s>, e2: <%s | %s>",
+            to_cstr(e1.p1), to_cstr(e1.p2),
+            to_cstr(e2.p1), to_cstr(e2.p2));
 
-    return p;
-}
+    c = distance(e1.p1, e2.p1);
+    alpha = angle(e2.p1, e1.p1, e1.p2);
+    beta = angle(e1.p1, e2.p1, e2.p2);
+    gamma = 180. - alpha - beta;
 
-point overlap_checks::compute(
-                line_equation k,
-                line_equation l)
-{
-    line_equation m;
-    point p;
-    double n1, n2;
+    if (gamma < 0 || iszero(gamma))
+        return point::bad_point();
 
-    DEBUG("BEG EQ:\n"
-            "k = %s\n"
-            "l = %s\n"
-            "m = %s",
-            to_cstr(k), to_cstr(l), to_cstr(m));
-    if (!iszero(k.a) || !iszero(l.a))
-    {
-        n1 = k.a;
-        n2 = l.a;
-    }
+    a = radians_to_degrees(c / sin(degrees_to_radians(gamma)) *
+            sin(degrees_to_radians(alpha)));
+
+    DEBUG("alpha %f, beta %f, gamma %f, c %f, a %f",
+            alpha, beta, gamma, c, a);
+
+    if (!iszero(a))
+        p = move_point(e2.p1, e2.p2, a);
+    else p = e2.p1;
+
+    if (lies_between(p, e1.p1, e1.p2) &&
+            lies_between(p, e2.p1, e2.p2))
+        return p;
     else
-    {
-        assert(!iszero(k.a) || !iszero(l.a));
-        n1 = k.b;
-        n2 = l.b;
-    }
-    //m = {0, 0, 0};
-
-    k *= n2;
-    l *= n1;
-
-    // m = k - l
-    m.a = k.a - l.a;
-    m.b = k.b - l.b;
-    m.c = k.c - l.c;
-
-    DEBUG("END EQ:\n"
-            "k = %s\n"
-            "l = %s\n"
-            "m = %s",
-            to_cstr(k), to_cstr(l), to_cstr(m));
-
-    assert(iszero(m.a) || iszero(m.b));
-
-    if (!iszero(m.a))
-    {
-        p.x = m.c / m.a;
-
-        assert(!iszero(k.b) || !iszero(l.b));
-        p.y = (k.a * p.x + k.c) / (iszero(k.b) ? l.b : k.b);
-    }
-    else if (!iszero(m.b))
-    {
-        p.y = -(m.c / m.b);
-
-        assert(!iszero(k.a) || !iszero(l.a));
-        p.x = (-(k.b * p.y + k.c)) / (iszero(k.a) ? l.a : k.a);
-    }
-    else
-        p = point::bad_point();
-
-    return p;
+        return point::bad_point();
 }
 
-
-
-
-
-/* inline */ bool overlap_checks::line_equation::hasnan() const
+void overlap_checks::has_intersection(
+                const edge& e1,
+                const edge& e2)
 {
-    return ::isnan(a) || ::isnan(b) || ::isnan(c);
-}
+    APP_DEBUG_FNAME;
+    WARN("intersection occurs");
 
-/* inline */ overlap_checks::line_equation&
-overlap_checks::line_equation::operator*=(
-                double val)
-{
-    a *= val;
-    b *= val;
-    c *= val;
-    return *this;
-}
+    auto vec = {
+        distance(e1.p1, e1.p2),
+        distance(e1.p1, e2.p1),
+        distance(e1.p1, e2.p2),
+        distance(e2.p1, e2.p2)
+    };
 
-std::ostream& operator<<(
-                std::ostream& out,
-                const overlap_checks::line_equation& k)
-{
-    out
-        << k.a << "x "
-        << k.b << "y "
-        << k.c
-        << " = 0";
-    return out;
+    double max = *std::max_element(vec.begin(), vec.end());
+
+    psout.print(psout.sprint_circle(e1.p1, max));
 }
 
 

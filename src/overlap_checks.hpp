@@ -34,19 +34,8 @@ public:
     {
         point p1, p2;
     };
-    struct line_equation
-    {
-        /* equation: a*x + b*y + c = 0 */
-        double a, b, c;
-
-        inline bool hasnan() const;
-        inline line_equation& operator*=(
-                double val);
-        friend std::ostream& operator<<(
-                std::ostream& out,
-                const line_equation& k);
-    };
     typedef std::vector<edge> edges;
+    typedef std::vector<double> equation;
 
 public:
     overlap_checks(
@@ -57,14 +46,14 @@ private:
     void run(
                     const edges& e);
     edges get_edges();
-    inline line_equation get_equation(
-                    const edge& e);
     point intersection(
                     const edge& e1,
                     const edge& e2);
+    void has_intersection(
+                    const edge& e1,
+                    const edge& e2);
     point compute(
-                    line_equation k,
-                    line_equation l);
+                    std::vector<equation> vec);
 
 private:
     rna_tree& rna;

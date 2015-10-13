@@ -57,9 +57,10 @@ public:
                 pre_post_it it);
     static std::string sprint(
                 RGB rgb);
-    static std::string sprint_line(
+    static std::string sprint_edge(
                 point p1,
-                point p2);
+                point p2,
+                bool base_pair = true);
     static std::string sprint_edge(
                 const pre_post_it& iter);
     static std::string sprint(
@@ -69,6 +70,9 @@ public:
                 pre_post_it it);
     static std::string sprint_formatted(
                 pre_post_it it);
+    static std::string sprint_circle(
+                point p,
+                double size);
 
 public:
     virtual streampos print(

@@ -283,7 +283,7 @@ bool lies_between(point p, point from, point to)
 
     if (p.y == 0 && to.y == 0)
     {
-        assert(to.y != 0);
+        assert(to.x != 0);
         return p.x / to.x <= 1;
     }
 
