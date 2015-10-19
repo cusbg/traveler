@@ -49,8 +49,6 @@ public:
     
     bool operator==(
                 const _pre_post_order_iterator&) const;
-    bool operator!=(
-                const _pre_post_order_iterator&) const;
     
     _pre_post_order_iterator    operator++(int);
     _pre_post_order_iterator&   operator++();
@@ -60,6 +58,28 @@ public:
 
 private:
     bool _preorder;
+};
+
+/**
+ * go post order from end of tree
+ */
+template <typename label_type>
+class tree_base<label_type>::_reverse_post_order_iterator
+    : public tree_base<label_type>::tree_type::iterator_base
+{
+public:
+    typedef typename tree_base<
+                        label_type>::tree_type::iterator_base iterator_base;
+
+public:
+    _reverse_post_order_iterator(const iterator_base&);
+    _reverse_post_order_iterator(tree_node_type* nodeptr = nullptr);
+    bool operator==(
+                const iterator_base&) const;
+
+public:
+    _reverse_post_order_iterator& operator++();
+    _reverse_post_order_iterator& operator--();
 };
 
 //
@@ -88,13 +108,6 @@ bool tree_base<label_type>::_pre_post_order_iterator::operator==(
 {
     return it.node == this->node &&
         it.preorder() == this->preorder();
-}
-
-template <typename label_type>
-bool tree_base<label_type>::_pre_post_order_iterator::operator!=(
-                const _pre_post_order_iterator& it) const
-{
-    return !(it == *this);
 }
 
 template <typename label_type>
@@ -170,6 +183,44 @@ size_t tree_base<label_type>::_pre_post_order_iterator::label_index() const
     return 1;
 }
 
+//
+// _reverse_post_order_iterator class functions:
+//
+template <typename label_type>
+tree_base<label_type>::_reverse_post_order_iterator::_reverse_post_order_iterator(
+                tree_node_type* nodeptr)
+    : iterator_base(nodeptr)
+{ }
+
+template <typename label_type>
+tree_base<label_type>::_reverse_post_order_iterator::_reverse_post_order_iterator(
+                const iterator_base& it)
+    : iterator_base(it.node)
+{ }
+
+template <typename label_type>
+bool tree_base<label_type>::_reverse_post_order_iterator::operator==(
+                const iterator_base& it) const
+{
+    return it.node == this->node;
+}
+
+template <typename label_type>
+typename tree_base<label_type>::_reverse_post_order_iterator&
+tree_base<label_type>::_reverse_post_order_iterator::operator++()
+{
+    *this = --iterator(*this);
+    return *this;
+}
+
+template <typename label_type>
+typename tree_base<label_type>::_reverse_post_order_iterator&
+tree_base<label_type>::_reverse_post_order_iterator::operator--()
+{
+    *this = ++iterator(*this);
+    return *this;
+}
+
 
 //
 // TREE->ITERATOR functions:
@@ -215,6 +266,20 @@ typename tree_base<label_type>::pre_post_order_iterator
 tree_base<label_type>::end_pre_post()
 {
     return ++pre_post_order_iterator(begin(), false);
+}
+
+template <typename label_type>
+typename tree_base<label_type>::reverse_post_order_iterator
+tree_base<label_type>::begin_rev_post()
+{
+    return --end();
+}
+
+template <typename label_type>
+typename tree_base<label_type>::reverse_post_order_iterator
+tree_base<label_type>::end_rev_post()
+{
+    return --begin();
 }
 
 

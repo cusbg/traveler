@@ -24,13 +24,15 @@
 
 #include "types.hpp"
 
-#define RTED_T1_LEFT    0
-#define RTED_T2_LEFT    1
-#define RTED_T1_RIGHT   2
-#define RTED_T2_RIGHT   3
-#define RTED_T1_HEAVY   4
-#define RTED_T2_HEAVY   5
-
+enum rted_strategy
+{
+    RTED_T1_LEFT  = 0,
+    RTED_T2_LEFT  = 1,
+    RTED_T1_RIGHT = 2,
+    RTED_T2_RIGHT = 3,
+    RTED_T1_HEAVY = 4,
+    RTED_T2_HEAVY = 5,
+};
 
 struct strategy
 {
@@ -86,6 +88,9 @@ typedef std::vector<std::vector<strategy>>  strategy_table_type;
 
 std::ostream& operator<<(
                 std::ostream& out, strategy_table_type strategies);
+
+std::ostream& operator<<(
+                std::ostream& out, rted_strategy str);
 
 #endif /* !STRATEGY_HPP */
 

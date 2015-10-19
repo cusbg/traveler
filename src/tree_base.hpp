@@ -34,6 +34,7 @@ class tree_base
 {
 private:
     class                                           _pre_post_order_iterator;
+    class                                           _reverse_post_order_iterator;
 
 protected:
     typedef tree<label_type>                        tree_type;
@@ -45,6 +46,7 @@ public:
     typedef typename tree_type::sibling_iterator    sibling_iterator;
     typedef typename tree_type::post_order_iterator post_order_iterator;
     typedef _pre_post_order_iterator                pre_post_order_iterator;
+    typedef _reverse_post_order_iterator            reverse_post_order_iterator;
 
 protected:
     tree_base() = default;
@@ -78,9 +80,11 @@ public:
     inline iterator end();
     inline post_order_iterator begin_post();
     inline post_order_iterator end_post();
-    /* + pre_post_order iterators */
+    /* + pre_post_order iterators && reverse_post_order_iterators */
     inline pre_post_order_iterator begin_pre_post();
     inline pre_post_order_iterator end_pre_post();
+    inline reverse_post_order_iterator begin_rev_post();
+    inline reverse_post_order_iterator end_rev_post();
 
 public:
     /* STATIC functions: */

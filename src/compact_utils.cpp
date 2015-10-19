@@ -128,7 +128,7 @@ std::string to_string(
     return str.str();
 }
 
-static std::string to_string(compact::intervals::rna_structure_type t)
+std::string to_string(compact::intervals::rna_structure_type t)
 {
 #undef typeswitch
 #define typeswitch(t) case compact::intervals::t : return #t;

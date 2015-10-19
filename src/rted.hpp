@@ -41,7 +41,7 @@ public:
     rted(
                 tree_type& _t1,
                 tree_type& _t2);
-    void run_rted();
+    void run();
 
 private:
     /**

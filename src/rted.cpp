@@ -19,20 +19,23 @@
  * USA.
  */
 
-#ifndef RTED_IMPLEMENTATION_HPP
-#define RTED_IMPLEMENTATION_HPP
-
 #include "rted.hpp"
 
 #define RTED_BAD        0xBADF00D
 #define isbad(value)    ((value) == RTED_BAD)
 
+#ifdef NDEBUG
+#undef DEBUG
+#define DEBUG(...)
+#endif
+
+using namespace std;
 
 rted::rted(tree_type& _t1, tree_type& _t2)
     : t1(_t1), t2(_t2)
 { }
 
-void rted::run_rted()
+void rted::run()
 {
     APP_DEBUG_FNAME;
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
@@ -556,6 +559,4 @@ void rted::update_T2_LRH_w_tables(
             T2_Hw[parent2_id]);
 }
 
-
-#endif /* !RTED_IMPLEMENTATION_HPP */
 

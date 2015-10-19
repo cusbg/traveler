@@ -179,3 +179,11 @@ std::ostream& operator<<(
     return out;
 }
 
+std::ostream& operator<<(
+                std::ostream& out, rted_strategy str)
+{
+    out << strategy(str);
+    return out;
+}
+
+
