@@ -46,13 +46,13 @@ void f()
 {
     rna_tree rna1, rna2;
 
-    //rna1 = get_rna("rabbit");
-    //rna2 = get_rna("frog");
+    rna1 = get_rna("rabbit");
+    rna2 = get_rna("frog");
 
-    rna1 = rna_tree(".((...(.))).",
-                    "123456787329");
-    rna2 = rna_tree("..(((..(.(.)).).))",
-                    "efghijklmnonlpiqhg");
+    //rna1 = rna_tree(".((...(.))).",
+                    //"123456787329");
+    //rna2 = rna_tree("..(((..(.(.)).).))",
+                    //"efghijklmnonlpiqhg");
 
     rted r(rna1, rna2);
     r.run();

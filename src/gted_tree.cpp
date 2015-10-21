@@ -100,10 +100,11 @@ void gted_tree::init()
         {
             auto &subforest = subforests[id(it)];
             auto &keyroot   = keyroots[id(it)];
+            size_t chid = id(ch);
 
-            insert(subforests[id(ch)].left,  subforest.left);
-            insert(subforests[id(ch)].right, subforest.right);
-            insert(subforests[id(ch)].heavy, subforest.heavy);
+            insert(subforests[chid].left,  subforest.left);
+            insert(subforests[chid].right, subforest.right);
+            insert(subforests[chid].heavy, subforest.heavy);
 
             if (!is_left(ch))
             {
@@ -111,32 +112,35 @@ void gted_tree::init()
                 subforest.left.push_back(ch);
             }
             else
-                insert(keyroots[id(ch)].left, keyroot.left);
+                insert(keyroots[chid].left, keyroot.left);
+
             if (!is_right(ch))
             {
                 keyroot.right.push_back(ch);
                 subforest.right.push_back(ch);
             }
             else
-                insert(keyroots[id(ch)].right, keyroot.right);
+                insert(keyroots[chid].right, keyroot.right);
+
             if (!is_heavy(ch))
             {
                 keyroot.heavy.push_back(ch);
                 subforest.heavy.push_back(ch);
             }
             else
-                insert(keyroots[id(ch)].heavy, keyroot.heavy);
+                insert(keyroots[chid].heavy, keyroot.heavy);
         }
-
-            //DEBUG("it: %s", clabel(it));
-            //DEBUG("sub");
-            //LOGGER_PRINT_CONTAINER(subforests[id(it)].left, "left");
-            //LOGGER_PRINT_CONTAINER(subforests[id(it)].right, "right");
-            //LOGGER_PRINT_CONTAINER(subforests[id(it)].heavy, "heavy");
-            //DEBUG("key");
-            //LOGGER_PRINT_CONTAINER(keyroots[id(it)].left, "left");
-            //LOGGER_PRINT_CONTAINER(keyroots[id(it)].right, "right");
-            //LOGGER_PRINT_CONTAINER(keyroots[id(it)].heavy, "heavy");
+/*
+            DEBUG("it: %s", clabel(it));
+            DEBUG("sub");
+            LOGGER_PRINT_CONTAINER(subforests[id(it)].left, "left");
+            LOGGER_PRINT_CONTAINER(subforests[id(it)].right, "right");
+            LOGGER_PRINT_CONTAINER(subforests[id(it)].heavy, "heavy");
+            DEBUG("key");
+            LOGGER_PRINT_CONTAINER(keyroots[id(it)].left, "left");
+            LOGGER_PRINT_CONTAINER(keyroots[id(it)].right, "right");
+            LOGGER_PRINT_CONTAINER(keyroots[id(it)].heavy, "heavy");
+*/
     }
 
     assert(size() == get_size(begin()));

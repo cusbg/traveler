@@ -22,7 +22,8 @@
 #ifndef MAPPING_HPP
 #define MAPPING_HPP
 
-#include "utils.hpp"
+#include "types.hpp"
+#include "rna_tree.hpp"
 
 class mapping
 {

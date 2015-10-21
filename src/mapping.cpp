@@ -20,8 +20,8 @@
  */
 
 #include "mapping.hpp"
-#include "rna_tree.hpp"
 #include "generator.hpp"
+#include "utils.hpp"
 
 using namespace std;
 

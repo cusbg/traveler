@@ -44,46 +44,46 @@ public:
 
 private:
     inline size_t id(
-                iterator it)
+                iterator it) const
     {
         return ::id(it);
     }
 
 public:
     inline void check_same_tree(
-                iterator it)
+                iterator it) const
     {
         while (!is_root(it))
             it = parent(it);
-        assert(it == begin());
+        assert(_tree.begin() == it);
     }
 public:
     inline iterator get_heavy_child(
-                const iterator& it)
+                const iterator& it) const
     {
         check_same_tree(it);
         return heavy_children[id(it)];
     }
     inline size_t get_size(
-                const iterator& it)
+                const iterator& it) const
     {
         check_same_tree(it);
         return sizes[id(it)];
     }
     inline LRH get_leafs(
-                const iterator& it)
+                const iterator& it) const
     {
         check_same_tree(it);
         return leafs[id(it)];
     }
     inline LRH_table get_keyroots(
-                const iterator& it)
+                const iterator& it) const
     {
         check_same_tree(it);
         return keyroots[id(it)];
     }
     inline LRH_table get_subforests(
-                const iterator& it)
+                const iterator& it) const
     {
         check_same_tree(it);
         return subforests[id(it)];
@@ -91,17 +91,17 @@ public:
 
 public:
     inline bool is_left(
-                iterator it)
+                iterator it) const
     {
         return is_first_child(it);
     }
     inline bool is_right(
-                iterator it)
+                iterator it) const
     {
         return is_last_child(it);
     }
     inline bool is_heavy(
-                iterator it)
+                iterator it) const
     {
         return is_root(it) ||
             get_heavy_child(parent(it)) == it;
