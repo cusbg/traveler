@@ -25,14 +25,45 @@
 #include "types.hpp"
 
 class rna_tree;
+class mapping;
 
 class app
 {
+private:
+    struct arguments;
+
 public:
-    void run_app();
-    void run_between(
-                const std::string& first,
-                const std::string& second);
+    void run(
+                std::vector<std::string> args);
+    void run(
+                arguments args);
+    void run(
+                rna_tree& templated,
+                rna_tree& matched,
+                const mapping& map);
+
+    void save(
+                rna_tree& rna,
+                const std::string& filename,
+                const std::string& templated_rna_file);
+
+    void usage(
+                const std::string& appname = "");
+
+private:
+    rna_tree create_matched(
+                const std::string& seqfile,
+                const std::string& foldfile,
+                const std::string& name);
+    rna_tree create_templated(
+                const std::string& psfile,
+                const std::string& foldfile,
+                const std::string& name);
+
+    void print(
+                const arguments& args);
+
+private:
 };
 
 

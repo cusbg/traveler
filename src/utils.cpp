@@ -21,6 +21,7 @@
 
 #include "utils.hpp"
 #include "rna_tree.hpp"
+#include "mapping.hpp"
 
 using namespace std;
 
@@ -293,4 +294,183 @@ std::vector<std::string> get_command_output(const std::string& command)
 
     return vec;
 }
+
+
+
+
+
+template <typename table_type, typename table_value_type = size_t, typename file_value_type = size_t>
+table_type load_table(
+                const std::string& filename)
+{
+    APP_DEBUG_FNAME;
+
+    assert(exist_file(filename));
+
+    std::ifstream in(filename);
+    size_t m, n;
+    file_value_type val;
+
+    table_type table;
+
+    in
+        >> m
+        >> n;
+
+    assert(!in.fail());
+
+    table.resize(m, typename table_type::value_type(n));
+
+    for (size_t i = 0; i < m; ++i)
+    {
+        for (size_t j = 0; j < n; ++j)
+        {
+            in >> val;
+
+            table[i][j] = table_value_type(val);
+        }
+    }
+    assert(!in.fail());
+    assert(in.eof());
+
+    return table;
+}
+
+template <typename table_type, typename table_value_type = size_t, typename file_value_type = size_t>
+void save_table(
+                const std::string& filename,
+                const table_type& table)
+{
+    APP_DEBUG_FNAME;
+
+    using std::endl;
+
+    std::ofstream out(filename);
+    size_t m, n;
+
+    m = table.size();
+    n = table.at(0).size();
+
+    out
+        << m
+        << " "
+        << n
+        << endl;
+
+    for (size_t i = 0; i < m; ++i)
+    {
+        for (size_t j = 0; j < n; ++j)
+        {
+            const table_value_type& val = table[i][j];
+
+            out << file_value_type(val) << " ";
+        }
+        out << endl;
+    }
+    assert(!out.fail());
+}
+
+
+
+
+void save_strategy_table(
+                const std::string& filename,
+                const strategy_table_type& table)
+{
+    APP_DEBUG_FNAME;
+
+    save_table<strategy_table_type,
+                strategy, size_t>(filename, table);
+}
+
+strategy_table_type load_strategy_table(
+                const std::string& filename)
+{
+    APP_DEBUG_FNAME;
+
+    return load_table<strategy_table_type,
+                strategy>(filename);
+}
+
+void save_tree_distance_table(
+                const std::string& filename,
+                const std::vector<std::vector<size_t>>& table)
+{
+    APP_DEBUG_FNAME;
+    typedef std::vector<std::vector<size_t>> tree_distance_table_type;
+
+    save_table<tree_distance_table_type,
+                size_t, size_t>(filename, table);
+}
+
+std::vector<std::vector<size_t>> load_tree_distance_table(
+                const std::string& filename)
+{
+    APP_DEBUG_FNAME;
+    typedef std::vector<std::vector<size_t>> tree_distance_table_type;
+
+    return load_table<tree_distance_table_type,
+                size_t, size_t>(filename);
+}
+
+
+
+void save_tree_mapping_table(
+                const std::string& filename,
+                const mapping& map)
+{
+    APP_DEBUG_FNAME;
+
+    ofstream out(filename);
+
+    out
+        << "DISTANCE: "
+        << map.distance
+        << endl;
+
+    for (const auto& m : map.map)
+    {
+        out
+            << m.from 
+            << " "
+            << m.to
+            << endl;
+    }
+    assert(!out.fail());
+}
+
+mapping load_mapping_table(
+                const std::string& filename)
+{
+    APP_DEBUG_FNAME;
+
+    assert(exist_file(filename));
+
+    string s;
+    mapping map;
+    mapping::mapping_pair m;
+    ifstream in(filename);
+
+    in
+        >> s
+        >> map.distance;
+
+    assert(!in.fail());
+    assert(s == "DISTANCE:");
+
+    while (true)
+    {
+        in
+            >> m.from
+            >> m.to;
+        if (in.fail())
+            break;
+
+        map.map.push_back(m);
+    }
+
+    return map;
+}
+
+
 

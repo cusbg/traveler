@@ -35,6 +35,48 @@
 #define FOLD(val)                   (std::string() + "precomputed/" + val + ".fold")
 #define MAP(val1, val2)             (std::string() + "precomputed/" + val1 + "-" + val2 + ".map")
 
+#define RTED(val1, val2)            (std::string() + "precomputed/" + val1 + "-" + val2 + ".rted")
+#define GTED(val1, val2)            (std::string() + "precomputed/" + val1 + "-" + val2 + ".gted")
+
+class mapping;
+
+/**
+ * save strategy `table` to `filename`
+ *  format:
+ *      0-th line:      'm n'
+ *      (i+1)-th line:  STR[i][*]
+ *  where m = #rows, n = #cols
+ */
+void save_strategy_table(
+                const std::string& filename,
+                const strategy_table_type& table);
+
+/**
+ * loads previously saved STR from `filename`
+ *  format:
+ *      0-th line:      'm n'
+ *      (i+1)-th line:  STR[i][*]
+ *  where m = #rows, n = #cols
+ */
+strategy_table_type load_strategy_table(
+                const std::string& filename);
+
+void save_tree_distance_table(
+                const std::string& filename,
+                const std::vector<std::vector<size_t>>& table);
+
+std::vector<std::vector<size_t>> load_tree_distance_table(
+                const std::string& filename);
+
+void save_tree_mapping_table(
+                const std::string& filename,
+                const mapping& map);
+
+mapping load_mapping_table(
+                const std::string& filename);
+
+
+
 
 class rna_tree;
 
@@ -83,7 +125,6 @@ public:
     rna_tree make_rna() const;
 
     std::string labels;
-    std::string brackets;
     std::vector<point> points;
 
     std::string prolog;

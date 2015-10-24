@@ -61,10 +61,16 @@ public:
     static bool is_T2(
                 int index);
 
+    inline operator size_t() const  // cast: '(size_t)strategy'
+    {
+        return to_index();
+    }
+
     friend std::ostream& operator<<(
                 std::ostream& out,
                 strategy str);
 
+private:
     enum _strategy
     {
         left,

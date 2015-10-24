@@ -7,7 +7,7 @@
 
 CC                      = g++
 DEBUG                   = -g -Wall
-RELEASE                 = -DNDEBUG -O3
+#RELEASE                 = -DNDEBUG -O3
 CFLAGS                  = -std=c++11 -c $(DEBUG) $(RELEASE)
 LFLAGS                  = $(DEBUG) $(RELEASE) $(shell pkg-config --libs log4cpp)
 SHELL                   = /bin/bash -o pipefail
@@ -25,7 +25,9 @@ MAKEFILES               = $(shell echo $(SOURCES) | sed 's@\.cpp@.mk@g; s@[^ ]*/
 MAKEDEPENDENCY          = $(CC) -MM -E 
 
 
-ARGS                    =
+TT                      = --template-tree precomputed/frog.ps precomputed/frog.fold
+MT                      = --match-tree precomputed/frog.seq precomputed/frog.fold
+ARGS                    = --rted --strategies FILEr --gted --strategies FILEg --ted FILEgt --mapping FILEgm --ps --mapping FILEpm  FILEp $(TT) $(MT)
 run: build
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
@@ -56,25 +58,13 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 			$(CC) $(LFLAGS) $(OBJECTS) -o $(TARGET) \\n\\t \
 			@echo \\n\\t \
 			@echo "**************END-LINKING:**************" \\n\\t \
-			@echo \\n\\t \
-			\\n \
-			\\nCOMPBEGIN: \\n\\t \
-			@echo \\n\\t \
-			@echo "****************COMPILING:****************" \\n\\t \
-			@echo \
-			\\n \
-			\\nCOMPEND: \\n\\t \
-			@echo \\n\\t \
-			@echo "**************END-COMPILING:**************" \\n\\t \
-			@echo \
 			\\n \
 			\\ninclude $(MAKEFILES) \
 					>> $@
-	@make -j6 --directory=$(BUILDDIR) -f Makefile
+	@make -j10 --directory=$(BUILDDIR) -f Makefile
 
-MK_DIRECTORIES		= $(LOGDIR) $(FILESDIR)
 mk_dirs:
-	@mkdir -p $(MK_DIRECTORIES)
+	@mkdir -p $(LOGDIR) $(FILESDIR)
 	@cp -n precomputed/*.ps build/files/
 
 

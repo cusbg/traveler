@@ -34,6 +34,17 @@
 
 extern log4cpp::Category& logger; // globalna premenna...
 
+#define DEBUG(...) \
+    if (logger.isDebugEnabled()) \
+        logger.debug(__VA_ARGS__)
+#define INFO(...) \
+    if (logger.isInfoEnabled()) \
+        logger.info(__VA_ARGS__)
+#define WARN(...) \
+    logger.warn(__VA_ARGS__)
+#define ERR(...) \
+    logger.error(__VA_ARGS__)
+
 
 namespace std
 {
@@ -41,8 +52,8 @@ inline std::string to_string(bool b)
 {
     return b ? "true" : "false";
 }
-#define to_cstr(val) to_string(val).c_str()
 }
+#define to_cstr(val) to_string(val).c_str()
 
 template <typename container_type, typename value_type>
 inline bool contains(const container_type& c, const value_type& v)
@@ -94,19 +105,11 @@ private:
 
 inline void wait_for_input()
 {
-    logger.notice("%s", __PRETTY_FUNCTION__);
+    logger.emerg("%s", __PRETTY_FUNCTION__);
     char ch;
     std::cin.read(&ch, 1);
 }
 
-#define DEBUG(...) \
-    logger.debug(__VA_ARGS__)
-#define INFO(...) \
-    logger.info(__VA_ARGS__)
-#define ERR(...) \
-    logger.error(__VA_ARGS__)
-#define WARN(...) \
-    logger.warn(__VA_ARGS__)
 
 
 #define WAIT wait_for_input();

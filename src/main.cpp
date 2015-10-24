@@ -44,6 +44,9 @@ using namespace std;
 
 void f()
 {
+    generator::generate_gted();
+    exit(0);
+
     rna_tree rna1, rna2;
 
     rna1 = get_rna("rabbit");
@@ -61,31 +64,14 @@ void f()
     exit(0);
 }
 
+
 int main(int argc, char** argv)
 {
     cout << boolalpha;
     srand(1);
 
-    f();
-
-    string from, to;
-    app a;
-
-    from = "rabbit";
-    to = "frog";
-
-    from = "frog";
-    to = "human";
-
-    from = "frog";
-    to = "rabbit";
-
-
-    //to = "mouse";
-
-    a.run_app();
-    //a.run_between(from, to);
-
+    app app;
+    app.run(vector<string>(argv, argv + argc));
 
     return 0;
 }
