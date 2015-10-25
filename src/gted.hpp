@@ -22,10 +22,8 @@
 #ifndef GTED_HPP
 #define GTED_HPP
 
-#include <unordered_map>
 
 #include "types.hpp"
-#include "rna_tree.hpp"
 #include "strategy.hpp"
 #include "gted_tree.hpp"
 
@@ -50,11 +48,19 @@ public:
 public:
     gted(
                 const rna_tree& _t1,
-                const rna_tree& _t2,
-                const strategy_table_type& _str);
-    void run();
+                const rna_tree& _t2);
 
-    mapping compute_mapping();
+    void run(
+                const strategy_table_type& _str);
+
+    inline void set_tdist_table(
+                const tree_distance_table_type& _tdist)
+    { tdist = _tdist; }
+    mapping get_mapping();
+
+public:
+    inline tree_distance_table_type& get_tree_distances()
+    { return tdist; }
 
 private:
     void checks();
@@ -66,7 +72,7 @@ private:
     void single_path_function(
                 iterator root1,
                 iterator root2);
-    void compute_distance(
+    std::vector<std::vector<size_t>> compute_distance(
                 iterator root1,
                 iterator root2);
     template <typename iterator_type, typename funct_get_begin>

@@ -23,6 +23,7 @@
 #define APP_HPP
 
 #include "types.hpp"
+#include "overlap_checks.hpp"
 
 class rna_tree;
 class mapping;
@@ -43,9 +44,10 @@ public:
                 const mapping& map);
 
     void save(
-                rna_tree& rna,
                 const std::string& filename,
-                const std::string& templated_rna_file);
+                rna_tree& rna,
+                const overlap_checks::overlaps& overlaps,
+                const std::string& templated_ps);
 
     void usage(
                 const std::string& appname = "");

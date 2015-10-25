@@ -36,24 +36,31 @@ public:
     };
     typedef std::vector<edge> edges;
     typedef std::vector<double> equation;
+    struct overlapping
+    {
+        point centre;
+        double radius;
+    };
+    typedef std::vector<overlapping> overlaps;
 
 public:
     overlap_checks(
-                    rna_tree& _rna);
-    void run();
+                rna_tree& _rna);
+    overlaps run();
 
 private:
-    void run(
-                    const edges& e);
+    overlaps run(
+                const edges& e);
     edges get_edges();
     point intersection(
-                    const edge& e1,
-                    const edge& e2);
+                const edge& e1,
+                const edge& e2);
     void has_intersection(
-                    const edge& e1,
-                    const edge& e2);
+                const edge& e1,
+                const edge& e2);
+
     point compute(
-                    std::vector<equation> vec);
+                std::vector<equation> vec);
 
 private:
     rna_tree& rna;

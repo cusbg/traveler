@@ -39,8 +39,8 @@ public:
 
 public:
     rted(
-                tree_type& _t1,
-                tree_type& _t2);
+                const tree_type& _t1,
+                const tree_type& _t2);
     void run();
 
 private:
@@ -171,18 +171,17 @@ private:
                 iterator it2,
                 size_t c_min);
 
+private:
+    void check_postorder();
+
 public:
     strategy_table_type& get_strategies()
         { return STR; } 
-    table_type& get_t1_sizes()
-        { return T1_Size; }
-    table_type& get_t2_sizes()
-        { return T2_Size; }
 
 private:
     tree_type
-                &t1,
-                &t2;
+                t1,
+                t2;
 
     strategy_table_type
                 STR;
@@ -244,6 +243,8 @@ public:
     static void test();
 #endif
 };
+
+
 
 #endif /* !RTED_HPP */
 

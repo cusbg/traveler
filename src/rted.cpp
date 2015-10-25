@@ -19,6 +19,8 @@
  * USA.
  */
 
+#include <fstream>
+
 #include "rted.hpp"
 
 #define RTED_BAD        0xBADF00D
@@ -31,9 +33,15 @@
 
 using namespace std;
 
-rted::rted(tree_type& _t1, tree_type& _t2)
+rted::rted(
+                const tree_type& _t1,
+                const tree_type& _t2)
     : t1(_t1), t2(_t2)
-{ }
+{
+    APP_DEBUG_FNAME;
+
+    check_postorder();
+}
 
 void rted::run()
 {
@@ -82,9 +90,6 @@ void rted::init()
 
     size1 = t1.size();
     size2 = t2.size();
-
-    t1.set_postorder_ids();
-    t2.set_postorder_ids();
 
     t1.print_tree();
     t2.print_tree();
@@ -557,6 +562,26 @@ void rted::update_T2_LRH_w_tables(
     DEBUG("T2_Hw\t[%s]\t = %lu \t (update)",
             clabel(tree_type::parent(it2)),
             T2_Hw[parent2_id]);
+}
+
+void rted::check_postorder()
+{
+    size_t i;
+    bool b = true;
+    i = 0;
+    for (post_order_iterator it = t1.begin_post(); it != t1.end_post(); ++it, ++i)
+        if (id(it) != i)
+            b = false;
+    i = 0;
+    for (post_order_iterator it = t2.begin_post(); it != t2.end_post(); ++it, ++i)
+        if (id(it) != i)
+            b = false;
+
+    if (!b)
+    {
+        ERR("trees arent postorder");
+        abort();
+    }
 }
 
 

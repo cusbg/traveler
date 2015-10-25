@@ -38,13 +38,51 @@ overlap_checks::overlap_checks(
     APP_DEBUG_FNAME;
 }
 
-void overlap_checks::run()
+overlap_checks::overlaps overlap_checks::run()
 {
     APP_DEBUG_FNAME;
 
     edges vec = get_edges();
-    run(vec);
+    return run(vec);
 }
+
+overlap_checks::overlaps overlap_checks::run(
+                const edges& e)
+{
+    APP_DEBUG_FNAME;
+
+    edge e1, e2;
+    point p;
+    vector<overlapping> vec;
+
+    for (size_t i = 0; i < e.size(); ++i)
+    {
+        e1 = e[i];
+
+        for (size_t j = i + 2; j < e.size(); ++j)
+        {
+            e2 = e[j];
+
+            p = intersection(e1, e2);
+
+            if (!p.bad())
+            {
+                auto distances = {
+                    distance(e1.p1, e1.p2),
+                    distance(e1.p1, e2.p1),
+                    distance(e1.p1, e2.p2),
+                    distance(e2.p1, e2.p2)
+                };
+                double radius = *std::max_element(distances.begin(), distances.end());
+
+                vec.push_back({p, radius});
+            }
+        }
+    }
+
+    return vec;
+}
+
 
 overlap_checks::edges overlap_checks::get_edges()
 {
@@ -78,30 +116,6 @@ overlap_checks::edges overlap_checks::get_edges()
     return vec;
 }
 
-void overlap_checks::run(
-                const edges& e)
-{
-    APP_DEBUG_FNAME;
-
-    edge e1, e2;
-    point p;
-
-    for (size_t i = 0; i < e.size(); ++i)
-    {
-        e1 = e[i];
-
-        for (size_t j = i + 2; j < e.size(); ++j)
-        {
-            e2 = e[j];
-
-            p = intersection(e1, e2);
-
-            if (!p.bad())
-                has_intersection(e1, e2);
-        }
-    }
-}
-
 point overlap_checks::intersection(
                 const edge& e1,
                 const edge& e2)
@@ -111,6 +125,7 @@ point overlap_checks::intersection(
     double alpha, beta, gamma;
     double a, c;
     point p;
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p1));
     assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p2));

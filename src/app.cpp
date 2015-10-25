@@ -40,19 +40,20 @@ struct app::arguments
 
     struct
     {
-        bool run;
+        bool run = false;
         string strategies;
     } rted;
     struct
     {
-        bool run;
+        bool run = false;
         string strategies;
-        string ted;
+        string ted_out;
+        string ted_in;
         string mapping;
     } gted;
     struct
     {
-        bool run;
+        bool run = false;
         string mapping;
         string ps;
         string ps_templated;
@@ -141,20 +142,32 @@ void app::run(
         {
             DEBUG("arg gted");
             a.gted.run = true;
-            if (nextarg() == "--strategies")
+            bool arg = true;
+
+            while (arg)
             {
-                a.gted.strategies = args.at(i + 2);
-                i += 2;
-            }
-            if (nextarg() == "--ted")
-            {
-                a.gted.ted = args.at(i + 2);
-                i += 2;
-            }
-            if (nextarg() == "--mapping")
-            {
-                a.gted.mapping = args.at(i + 2);
-                i += 2;
+                if (nextarg() == "--strategies")
+                {
+                    a.gted.strategies = args.at(i + 2);
+                    i += 2;
+                }
+                else if (nextarg() == "--ted-out")
+                {
+                    a.gted.ted_out = args.at(i + 2);
+                    i += 2;
+                }
+                else if (nextarg() == "--ted-in")
+                {
+                    a.gted.ted_in = args.at(i + 2);
+                    i += 2;
+                }
+                else if (nextarg() == "--mapping")
+                {
+                    a.gted.mapping = args.at(i + 2);
+                    i += 2;
+                }
+                else
+                    arg = false;
             }
             continue;
         }
@@ -182,6 +195,7 @@ void app::run(
     if (!mt || !tt)
     {
         ERR("trees are missing");
+        usage(args.at(0));
         abort();
     }
     run(a);
@@ -191,6 +205,8 @@ void app::run(
 void app::run(
                 arguments args)
 {
+    APP_DEBUG_FNAME;
+
     if (args.rted.run)
     {
         rted r(args.templated, args.matched);
@@ -205,13 +221,15 @@ void app::run(
     }
     if (args.gted.run)
     {
-        assert(!args.gted.strategies.empty());
+        gted g(args.templated, args.matched);
 
-        gted g(args.templated, args.matched, load_strategy_table(args.gted.strategies));
-        g.run();
+        if (!args.gted.ted_in.empty())
+            g.set_tdist_table(load_tree_distance_table(args.gted.ted_in));
+        else
+            g.run(load_strategy_table(args.gted.strategies));
 
-        if (!args.gted.ted.empty())
-            save_tree_distance_table(args.gted.ted, g.get_tree_distances());
+        if (!args.gted.ted_out.empty())
+            save_tree_distance_table(args.gted.ted_out, g.get_tree_distances());
 
         if (!args.gted.mapping.empty())
         {
@@ -231,7 +249,8 @@ void app::run(
 
         if (!args.ps.ps.empty())
         {
-            save(args.templated, args.ps.ps, args.ps.ps_templated);
+            auto overlaps = overlap_checks(args.templated).run();
+            save(args.ps.ps, args.templated, overlaps, args.ps.ps_templated);
         }
     }
 }
@@ -246,8 +265,14 @@ void app::run(
     rna_tree rna;
 
     rna = matcher(templated, matched).run(map);
+
     compact(rna).run();
     overlap_checks(rna).run();
+
+    psout.init("build/files/ps.ps");
+    psout.print(ps_document::default_prologue());
+    psout.print(psout.sprint(rna));
+    abort();
 }
 
 
@@ -281,9 +306,10 @@ rna_tree app::create_templated(
 }
 
 void app::save(
-                rna_tree& rna,
                 const std::string& filename,
-                const string& templated_rna_file)
+                rna_tree& rna,
+                const overlap_checks::overlaps& overlaps,
+                const std::string& templated_ps)
 {
     APP_DEBUG_FNAME;
 
@@ -291,7 +317,7 @@ void app::save(
     string prolog;
     stringstream str;
 
-    prolog = ps_document(templated_rna_file).prolog;
+    prolog = ps_document(templated_ps).prolog;
 
     ps.init(filename);
     ps.print(prolog);
@@ -301,6 +327,9 @@ void app::save(
     {
         str << ps_writer::sprint_formatted(it);
     }
+    for (const auto& p : overlaps)
+        str << ps_writer::sprint_circle(p.centre, p.radius);
+
     ps.print(str.str());
 }
 
@@ -329,7 +358,10 @@ void app::usage(
         << endl
         << "OPTIONS:" << endl
         << "\t[-r|--rted [--strategies <FILE>]]" << endl
-        << "\t[-g|--gted [--strategies <FILE>] [--ted <FILE>] [--mapping <FILE>]]" << endl
+        << "\t[-g|--gted [--strategies <FILE>]"
+            << " [--ted-out <FILE>]"
+            << " [--ted-in <FILE>]"
+            << " [--mapping <FILE>]]" << endl
         << "\t[--ps [--mapping <FILE>] <FILE>]" << endl;
 
     INFO("%s", to_cstr(str.str()));
@@ -364,7 +396,9 @@ void app::print(
             << endl << '\t'
             << " strategy-in-file=" << args.gted.strategies
             << endl << '\t'
-            << " tree-edit-distance-out-file=" << args.gted.ted
+            << " tree-edit-distance-in-file=" << args.gted.ted_in
+            << endl << '\t'
+            << " tree-edit-distance-out-file=" << args.gted.ted_out
             << endl << '\t'
             << " mapping-table-out-file=" << args.gted.mapping
             << endl
@@ -380,11 +414,6 @@ void app::print(
 
     logger.debugStream() << str.str();
 }
-
-
-
-
-
 
 
 

@@ -35,34 +35,13 @@
 #include "app.hpp"
 #include "generator.hpp"
 #include "rna_tree.hpp"
+#include "mapping.hpp"
 
 #include "point.hpp"
 #include "rted.hpp"
 #include "gted.hpp"
 
 using namespace std;
-
-void f()
-{
-    generator::generate_gted();
-    exit(0);
-
-    rna_tree rna1, rna2;
-
-    rna1 = get_rna("rabbit");
-    rna2 = get_rna("frog");
-
-    //rna1 = rna_tree(".((...(.))).",
-                    //"123456787329");
-    //rna2 = rna_tree("..(((..(.(.)).).))",
-                    //"efghijklmnonlpiqhg");
-
-    rted r(rna1, rna2);
-    r.run();
-    gted g(rna1, rna2, r.get_strategies());
-    g.run();
-    exit(0);
-}
 
 
 int main(int argc, char** argv)

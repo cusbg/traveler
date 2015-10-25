@@ -305,6 +305,7 @@ table_type load_table(
 {
     APP_DEBUG_FNAME;
 
+    DEBUG("load: %s", to_cstr(filename));
     assert(exist_file(filename));
 
     std::ifstream in(filename);
@@ -331,6 +332,8 @@ table_type load_table(
         }
     }
     assert(!in.fail());
+    string s;
+    in >> s;    // no other words, only EOF
     assert(in.eof());
 
     return table;
@@ -342,6 +345,7 @@ void save_table(
                 const table_type& table)
 {
     APP_DEBUG_FNAME;
+    DEBUG("save: %s", to_cstr(filename));
 
     using std::endl;
 
@@ -421,6 +425,7 @@ void save_tree_mapping_table(
 {
     APP_DEBUG_FNAME;
 
+    DEBUG("save: %s", to_cstr(filename));
     ofstream out(filename);
 
     out
@@ -444,6 +449,7 @@ mapping load_mapping_table(
 {
     APP_DEBUG_FNAME;
 
+    DEBUG("load: %s", to_cstr(filename));
     assert(exist_file(filename));
 
     string s;

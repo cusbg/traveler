@@ -23,79 +23,89 @@
 #include "utils.hpp"
 #include "rna_tree.hpp"
 
+#include "rted.hpp"
+#include "gted.hpp"
+
 using namespace std;
 
+#ifdef NODEF
 
-/* static */ void generator::generate_files()
+/* static */ void generator::run()
 {
     APP_DEBUG_FNAME;
 
     if (!generate())
         return;
 
-    force_generate();
+    force_run();
 }
 
-/* static */ void generator::force_generate()
+/* static */ void generator::force_run()
 {
     APP_DEBUG_FNAME;
 
     generate_seq_files();
     generate_mapping();
 
-    INFO("generate OK");
+    generate_ted_files();
 }
 
+/* static */ void generator::foreach_run(
+                std::function<void(const std::string& val1,
+                    const std::string& val2)> funct)
+{
+    for (const auto& val1 : FILES)
+        for (const auto& val2 : FILES)
+            if (val1 != val2)
+                funct(val1, val2);
+}
+
+/* static */ void generator::foreach_run(
+                std::function<void(const std::string& val)> funct)
+{
+    for (const auto& val : FILES)
+        funct(val);
+}
 
 
 /* static */ void generator::generate_seq_files()
 {
     APP_DEBUG_FNAME;
 
-    vector<string> vec = FILES;
-
-    for (auto val : vec)
-    {
+    auto run = [](const string& val) {
         string fileIn = PS_IN(val);
         string fileOut = SEQ(val);
         string labels = ps_document(fileIn).labels;
         ofstream out(fileOut);
         out << labels;
         assert(!out.fail());
-    }
-    DEBUG("generate OK");
+    };
+
+    foreach_run(run);
 }
 
 /* static */ void generator::generate_mapping()
 {
     APP_DEBUG_FNAME;
 
-    vector<string> vec = FILES;
-    string l1, l2, b1, b2, s;
-    rna_tree rna1, rna2;
+    auto run = [](const string& val1, const string& val2) {
+        string l1, l2, b1, b2, s;
+        rna_tree rna1, rna2;
 
-    for (auto val1 : vec)
-    {
         l1 = read_file(SEQ(val1));
         b1 = read_file(FOLD(val1));
 
+        l2 = read_file(SEQ(val2));
+        b2 = read_file(FOLD(val2));
+
         rna1 = rna_tree(b1, l1, val1);
+        rna2 = rna_tree(b2, l2, val2);
 
-        for (auto val2 : vec)
-        {
-            if (val1 == val2)
-                continue;
+        s = run_java_mapping(rna1, rna2);
+        write_file(MAP(val1, val2), s);
+    };
 
-            l2 = read_file(SEQ(val2));
-            b2 = read_file(FOLD(val2));
-
-            rna2 = rna_tree(b2, l2, val2);
-
-            s = run_mapping(rna1, rna2);
-            write_file(MAP(val1, val2), s);
-        }
-    }
-    DEBUG("generate OK");
+    foreach_run(run);
 }
 
 /* static */ bool generator::generate()
@@ -123,8 +133,52 @@ using namespace std;
 }
 
 
+/* static */ void generator::generate_ted_files()
+{
+    APP_DEBUG_FNAME;
 
-/* static */ string generator::run_mapping(
+    generate_rted();
+    generate_gted();
+}
+
+/* static */ void generator::generate_rted()
+{
+    APP_DEBUG_FNAME;
+
+    auto run = [](const string& val1, const string& val2) {
+        rna_tree rna1 = get_rna(val1);
+        rna_tree rna2 = get_rna(val2);
+
+        rted r(rna1, rna2);
+        r.run();
+
+        save_strategy_table(RTED(val1, val2), r.get_strategies());
+    };
+
+    foreach_run(run);
+}
+
+/* static */ void generator::generate_gted()
+{
+    APP_DEBUG_FNAME;
+
+    auto run = [](const string& val1, const string& val2) {
+        rna_tree rna1 = get_rna(val1);
+        rna_tree rna2 = get_rna(val2);
+        strategy_table_type table = load_strategy_table(RTED(val1, val2));
+
+        gted g(rna1, rna2, table);
+        g.run();
+
+        save_tree_distance_table(GTED(val1, val2), g.get_tree_distances());
+    };
+
+    foreach_run(run);
+}
+
+
+
+/* static */ string generator::run_java_mapping(
                 rna_tree rna1,
                 rna_tree rna2)
 {
@@ -208,3 +262,5 @@ using namespace std;
 }
 #endif
 
+
+#endif

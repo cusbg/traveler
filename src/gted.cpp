@@ -19,13 +19,12 @@
  * USA.
  */
 
-//#undef NDEBUG
+
+#include <fstream>
 
 #include "gted.hpp"
 #include "mapping.hpp"
 
-//#undef DEBUG
-//#define DEBUG(...)
 
 using namespace std;
 
@@ -36,19 +35,16 @@ using namespace std;
      (str.is_right() ? (tblname).right : \
       (tblname).heavy))
 
-#define lies_on_path(iter, tree, path_name) \
-    (!(tree).is_ ##path_name(iter))
-
-#define lblid(iter) clabel(iter), id(iter)
 #define valid(iter) (rna_tree::is_valid(iter))
 
 
 gted::gted(
                 const rna_tree& _t1,
-                const rna_tree& _t2,
-                const strategy_table_type& _str)
-    : t1(_t1), t2(_t2), STR(_str)
-{ }
+                const rna_tree& _t2)
+    : t1(_t1), t2(_t2)
+{
+    INFO("gted(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
+}
 
 void gted::checks()
 {
@@ -61,11 +57,13 @@ void gted::checks()
         assert(id(it) == i);
 }
 
-void gted::run()
+void gted::run(
+                const strategy_table_type& _str)
 {
     APP_DEBUG_FNAME;
 
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    STR = _str;
+    LOGGER_PRIORITY_ON_FUNCTION(WARN);
 
     checks();
 
@@ -73,7 +71,9 @@ void gted::run()
 
     compute_distance_recursive(t1.begin(), t2.begin());
 
-    compute_mapping();
+    INFO("tdist[%s][%s] = %lu",
+            clabel(t1.begin()), clabel(t2.begin()),
+            tdist[id(t1.begin())][id(t2.begin())]);
 }
 
 void gted::compute_distance_recursive(
@@ -93,6 +93,7 @@ void gted::compute_distance_recursive(
     strategy str = STR[id(root1)][id(root2)];
     if (str.is_heavy())
         str = strategy(RTED_T2_RIGHT);
+    actual_str = str;
 
     INFO("str = %s", to_cstr(actual_str));
 
@@ -149,7 +150,7 @@ void gted::single_path_function(
     compute_distance(root1, root2);
 }
 
-void gted::compute_distance(
+gted::forest_distance_table_type gted::compute_distance(
                 iterator root1,
                 iterator root2)
 {
@@ -157,6 +158,7 @@ void gted::compute_distance(
 
     tree_type *t1ptr = &t1;
     tree_type *t2ptr = &t2;
+    forest_distance_table_type table;
 
     if (actual_str.is_T2())
     {
@@ -172,21 +174,23 @@ void gted::compute_distance(
         auto leaf_funct = [](tree_type& t, iterator root) {
             return t.get_leafs(root).left;
         };
-        compute_distance_LR<post_order_iterator>
-                (root1, root2, *t1ptr, *t2ptr, leaf_funct);
+        table = compute_distance_LR<post_order_iterator>(
+                    root1, root2, *t1ptr, *t2ptr, leaf_funct);
     }
     else if (actual_str.is_right())
     {
         auto leaf_funct = [](const tree_type& t, const iterator& root) {
             return t.get_leafs(root).right;
         };
-        compute_distance_LR<rev_post_order_iterator>
-                (root1, root2, *t1ptr, *t2ptr, leaf_funct);
+        table = compute_distance_LR<rev_post_order_iterator> (
+                    root1, root2, *t1ptr, *t2ptr, leaf_funct);
     }
+
+    return table;
 }
 
 template <typename iterator_type, typename funct_get_begin>
-std::vector<std::vector<size_t>> gted::compute_distance_LR(
+gted::forest_distance_table_type gted::compute_distance_LR(
                 iterator root1,
                 iterator root2,
                 tree_type& t1,
@@ -199,11 +203,12 @@ std::vector<std::vector<size_t>> gted::compute_distance_LR(
     APP_DEBUG_FNAME;
 
     DEBUG("root1 %s:%lu, root2 %s:%lu",
-            lblid(root1), lblid(root2));
+            clabel(root1), id(root1),
+            clabel(root2), id(root2));
     t1.print_subtree(root1);
     t2.print_subtree(root2);
 
-    vector<vector<size_t>> fdist(
+    forest_distance_table_type fdist(
                 t1.get_size(root1) + 1,
                     vector<size_t>(t2.get_size(root2) + 1, BAD));
     vector<size_t> vec(3);
@@ -286,6 +291,7 @@ std::vector<std::vector<size_t>> gted::compute_distance_LR(
 
 #undef set_fdist
 #undef get_fdist
+#undef prev
 }
 
 
@@ -397,60 +403,6 @@ void gted::set_fdist(
 
     fdist[i1][i2] = value;
 }
-
-
-
-mapping gted::compute_mapping()
-{
-    mapping m;
-    vector<pair<iterator, iterator>> to_be_matched;
-    iterator root1, root2;
-    iterator it1, it2;
-    iterator beg1, beg2;
-    vector<vector<size_t>> fdist;
-
-    auto compute_fdist_table =
-        [this](iterator iter1, iterator iter2) {
-            actual_str = strategy(RTED_T1_LEFT);
-
-            auto leaf_funct =
-                [](tree_type& t, iterator root) {
-                    return t.get_leafs(root).left;
-                };
-            return compute_distance_LR<post_order_iterator>
-                    (iter1, iter2, t1, t2, leaf_funct);
-        };
-
-    to_be_matched.push_back(make_pair(t1.begin(), t2.begin()));
-
-    while (!to_be_matched.empty())
-    {
-        root1 = to_be_matched.back().first;
-        root2 = to_be_matched.back().second;
-        to_be_matched.pop_back();
-
-        fdist = compute_fdist_table(root1, root2);
-
-        beg1 = t1.get_leafs(root1).left;
-        beg2 = t2.get_leafs(root2).left;
-        it1 = root1;
-        it2 = root2;
-
-        while (it1 != beg1 || it2 != beg2)
-        {
-            assert(id(beg1) <= id(it1) && id(beg2) <= id(it2));
-
-            if (it1 != beg1)
-            {
-            }
-        }
-
-    }
-
-    return m;
-}
-
-
 
 
 

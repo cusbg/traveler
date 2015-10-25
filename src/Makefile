@@ -24,22 +24,19 @@ MAKEFILES               = $(shell echo $(SOURCES) | sed 's@\.cpp@.mk@g; s@[^ ]*/
 
 MAKEDEPENDENCY          = $(CC) -MM -E 
 
-
-TT                      = --template-tree precomputed/frog.ps precomputed/frog.fold
-MT                      = --match-tree precomputed/frog.seq precomputed/frog.fold
-ARGS                    = --rted --strategies FILEr --gted --strategies FILEg --ted FILEgt --mapping FILEgm --ps --mapping FILEpm  FILEp $(TT) $(MT)
+ARGS                    =
 run: build
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
 	@echo "**********************************************************************"
 	@echo
-	$(BUILDDIR)/$(TARGET) $(ARGS)
+	sh -x run.sh
 
 
 build: mk_dirs $(BUILDDIR)/$(TARGET)
 
 debug: build
-	gdb $(BUILDDIR)/$(TARGET)
+	sh -x run.sh debug
 
 analyse:
 	gprof $(BUILDDIR)/$(TARGET) | less
@@ -65,13 +62,12 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 
 mk_dirs:
 	@mkdir -p $(LOGDIR) $(FILESDIR)
-	@cp -n precomputed/*.ps build/files/
 
 
-$(BUILDDIR)/%.mk: %.cpp
+$(BUILDDIR)/%.mk: %.cpp Makefile
 	@mkdir -p $(BUILDDIR)
 	@rm -f $@
-	@$(MAKEDEPENDENCY) $(CFLAGS) $^ | sed 's@\([^ :]*\.\([hc]pp\|hh\|h\)\)@../\1@g' \
+	@$(MAKEDEPENDENCY) $(CFLAGS) $< | sed 's@\([^ :]*\.\([hc]pp\|hh\|h\)\)@../\1@g' \
 					>> $@
 	@echo '	$(CC) $(CFLAGS) $$< -o $$@ ' \
 					>> $@
@@ -83,8 +79,11 @@ rnafold:
 	../RNAPlot/bin/RNAfold --noPS << END \n SEQ \n END
 
 
-clean:
-	rm -rf $(BUILDDIR)
+clean: cleanMK cleanCompiled
+	#rm -rf $(BUILDDIR)
+
+cleanCompiled:
+	rm -rf $(BUILDDIR)/*.o $(BUILDDIR)/$(TARGET)
 
 cleanMK:
 	rm -f $(BUILDDIR)/*.mk $(BUILDDIR)/Makefile

@@ -22,6 +22,8 @@
 #ifndef GENERATOR_HPP
 #define GENERATOR_HPP
 
+#include <functional>
+
 #include "types.hpp"
 
 class rna_tree;
@@ -29,14 +31,54 @@ class rna_tree;
 class generator
 {
 public:
+    generator() = delete;
+
+public:
     /**
      * run generator if needed (generate() returns true)
      */
-    static void generate_files();
+    static void run();
     /**
      * run generator
      */
-    static void force_generate();
+    static void force_run();
+
+    /**
+     * runs java mapping between `rna1` and `rna2`
+     */
+    static std::string run_java_mapping(
+                rna_tree rna1,
+                rna_tree rna2);
+    /**
+     * returns if files dont exist (=> need to run generator)
+     */
+    static bool generate();
+private:
+
+    /**
+     * run `funct` on every val from FILES
+     */
+    static void foreach_run(
+                std::function<void(const std::string& val)> funct);
+    /**
+     * run `funct` on every pair val1:val2 from FILES
+     */
+    static void foreach_run(
+                std::function<void(const std::string& val1,
+                    const std::string& val2)> funct);
+
+private:
+
+    static void generate_seq_files();
+    static void generate_mapping();
+
+
+    static void generate_ted_files();
+    static void generate_rted();
+public: // TODO << remove
+    static void generate_gted();
+
+
 
 #ifdef NODEF
 private:
@@ -46,20 +88,6 @@ public:
     static std::string run_folder(
                 const std::string& labels);
 #endif
-
-    /**
-     * runs java mapping between `rna1` and `rna2`
-     */
-    static std::string run_mapping(
-                rna_tree rna1,
-                rna_tree rna2);
-    /**
-     * returns if files dont exist (=> need to run generator)
-     */
-    static bool generate();
-private:
-    static void generate_seq_files();
-    static void generate_mapping();
 };
 
 

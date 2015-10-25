@@ -112,7 +112,7 @@ inline void wait_for_input()
 
 
 
-#define WAIT wait_for_input();
+#define WAIT DEBUG("%lu", __LINE__), wait_for_input()
 
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
     logger_end_of_function_priority __logger_priority(log4cpp::Priority::PRIORITY)
@@ -128,7 +128,7 @@ inline void wait_for_input()
             logger.debugStream() << name << ": " << stream.str(); \
         }
 
-#define abort() ERR("abort()"), ::abort()
+#define abort() ERR("abort(), line # %lu", __LINE__), ::abort()
 
 
 #endif /* !TYPES_HPP */
