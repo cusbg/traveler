@@ -406,4 +406,141 @@ void gted::set_fdist(
 
 
 
+mapping gted::get_mapping()
+{
+    APP_DEBUG_FNAME;
+
+    typedef post_order_iterator iterator_type;
+
+    checks();
+
+    mapping map;
+    vector<pair<iterator_type, iterator_type>> to_be_matched;
+    forest_distance_table_type fdist;
+    const iterator_type empty;
+    size_t id1, id2;
+    iterator_type root1, root2, it1, it2, beg1, beg2;
+
+    auto get_begin_leaf =
+        [](const tree_type& t, const iterator_type& root) {
+            return t.get_leafs(root).left;
+        };
+    auto compute_distance_local =
+        [this](const iterator_type& root1, const iterator_type& root2) {
+            LOGGER_PRIORITY_ON_FUNCTION(INFO);
+            tree_distance_table_type oldtdist = tdist;
+
+            auto fdist = compute_distance(root1, root2);
+
+            assert(tdist == oldtdist);
+            return fdist;
+        };
+    auto get_left_subtree =
+        [&empty](iterator_type iter, const iterator_type& root) {
+            while (tree_type::is_first_child(iter) && iter != root)
+                iter = tree_type::parent(iter);
+
+            if (iter == root)
+                iter = empty;
+            else if (!tree_type::is_first_child(iter))
+                iter = --sibling_iterator(iter);
+            else
+                iter = empty;
+
+            return iter;
+        };
+
+    to_be_matched.push_back({t1.begin(), t2.begin()});
+    actual_str = strategy(RTED_T1_LEFT);
+
+    while (!to_be_matched.empty())
+    {
+        root1 = to_be_matched.back().first;
+        root2 = to_be_matched.back().second;
+        to_be_matched.pop_back();
+
+        logger.infoStream()
+            << "matching roots:\n"
+            << tree_type::print_subtree(root1, false) << "\n"
+            << tree_type::print_subtree(root2, false);
+
+        fdist = compute_distance_local(root1, root2);
+
+        beg1 = get_begin_leaf(t1, root1);
+        beg2 = get_begin_leaf(t2, root2);
+
+        id1 = id(beg1);
+        id2 = id(beg2);
+
+        it1 = root1;
+        it2 = root2;
+
+#define prev(num) \
+    ((it ##num == beg ##num) ? empty : --iterator_type(it ##num))
+#define get_fdist(iter1, iter2) \
+    get_fdist(fdist, iter1, iter2, id1, id2)
+        while (tree_type::is_valid(it1) || tree_type::is_valid(it2))
+        {
+            DEBUG("its: %s - %s", clabel(it1), clabel(it2));
+
+            if (tree_type::is_valid(it1) &&
+                    get_fdist(prev(1), it2) + GTED_COST_DELETE ==
+                    get_fdist(it1, it2))
+            {
+                DEBUG("delete %s:%lu", clabel(it1), id(it1));
+
+                map.map.push_back({id(it1) + 1, 0});
+
+                it1 = prev(1);
+            }
+            else if (tree_type::is_valid(it2) &&
+                    get_fdist(it1, prev(2)) + GTED_COST_DELETE ==
+                    get_fdist(it1, it2))
+            {
+                DEBUG("insert %s:%lu", clabel(it2), id(it2));
+
+                map.map.push_back({0, id(it2) + 1});
+
+                it2 = prev(2);
+            }
+            else
+            {
+                if (get_begin_leaf(t1, it1) == beg1 &&
+                        get_begin_leaf(t2, it2) == beg2)
+                {
+                    DEBUG("match %s:%lu -> %s:%lu",
+                            clabel(it1), id(it1),
+                            clabel(it2), id(it2));
+
+                    map.map.push_back({id(it1) + 1, id(it2) + 1});
+
+                    it1 = prev(1);
+                    it2 = prev(2);
+                }
+                else
+                {
+                    logger.debugStream()
+                        << "to_be_matched:\n"
+                        << tree_type::print_subtree(it1, false) << "\n"
+                        << tree_type::print_subtree(it2, false);
+
+                    to_be_matched.push_back({it1, it2});
+
+                    it1 = get_left_subtree(it1, root1);
+                    it2 = get_left_subtree(it2, root2);
+                }
+            }
+        }
+        assert(!tree_type::is_valid(it1) && !tree_type::is_valid(it2));
+    }
+
+    assert(t1.size() + map.get_to_insert().size() ==
+            t2.size() + map.get_to_remove().size());
+
+    map.distance = map.get_to_insert().size() + map.get_to_remove().size();
+
+    sort(map.map.begin(), map.map.end());
+
+    return map;
+}
 

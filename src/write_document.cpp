@@ -31,18 +31,18 @@ void document_writer::init(
     APP_DEBUG_FNAME;
     assert(!filename.empty());
 
-    cout << out.good() << endl;
     out.close();
-    cout << out.good() << endl;
 
     // create file & truncate
     out.open(filename, ios::out);
     out.close();
 
+    // open in normal mode
     out.open(filename, ios::out | ios::in);
     out
         << std::unitbuf
         << std::scientific;
+
     assert(out.good());
 }
 
@@ -89,7 +89,4 @@ size_t document_writer::fill(char ch)
     seek(pos);
     return n;
 }
-
-
-
 

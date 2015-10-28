@@ -65,6 +65,8 @@ private:
     void print(
                 const arguments& args);
 
+public:
+
 private:
 };
 

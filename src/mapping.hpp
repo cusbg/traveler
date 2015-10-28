@@ -33,6 +33,8 @@ public:
     struct mapping_pair
     {
         size_t from, to;
+
+        bool operator< (const mapping_pair& other);
     };
 
 private:

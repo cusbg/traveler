@@ -39,7 +39,10 @@
 #define GTED(val1, val2)            (std::string() + "precomputed/" + val1 + "-" + val2 + ".gted")
 
 class mapping;
+class rna_tree;
 
+// TABLE-SAVING FUNCTIONS:
+    
 /**
  * save strategy `table` to `filename`
  *  format:
@@ -75,10 +78,8 @@ void save_tree_mapping_table(
 mapping load_mapping_table(
                 const std::string& filename);
 
+///
 
-
-
-class rna_tree;
 
 
 bool exist_file(
@@ -92,14 +93,6 @@ void write_file(
                 const std::string& text);
 
 
-/**
- * convert rna_tree to java-implementation rted fromat
- */
-std::string convert_to_java_format(
-                rna_tree rna);
-
-rna_tree get_rna(
-                const std::string& name);
 
 /**
  * runs command and return vector<lines> from output
@@ -121,8 +114,6 @@ public:
     static bool is_base_line(
                 const std::string& line);
     static std::string default_prologue();
-
-    rna_tree make_rna() const;
 
     std::string labels;
     std::vector<point> points;

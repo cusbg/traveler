@@ -25,6 +25,7 @@
 using namespace std;
 
 
+#ifdef NODEF
 mapping gted::get_mapping()
 {
     APP_DEBUG_FNAME;
@@ -165,67 +166,6 @@ mapping gted::get_mapping()
             }
         }
         assert(!tree_type::is_valid(it1) && !tree_type::is_valid(it2));
-/*
-        //while (it1 != beg1 || it2 != beg2)
-        //{
-            //assert(id(beg1) <= id(it1));
-            //assert(id(beg2) <= id(it2));
-
-            //DEBUG("its: %s - %s", clabel(it1), clabel(it2));
-
-            //if (it1 != beg1 &&
-                    //get_fdist(prev(1), it2) + GTED_COST_DELETE ==
-                    //get_fdist(it1, it2))
-
-            //{ // node `it1` was deleted
-                //DEBUG("delete %s", clabel(it1));
-                //map.map.push_back({id(it1) + 1, 0});
-
-                //--it1;
-            //}
-            //else if (it2 != beg2 &&
-                    //get_fdist(it1, prev(2)) + GTED_COST_DELETE ==
-                    //get_fdist(it1, it2))
-            //{   // node `it1` was inserted
-                //DEBUG("insert %s", clabel(it2));
-                //map.map.push_back({0, id(it2) + 1});
-
-                //--it2;
-            //}
-            //else
-            //{
-                //if (get_begin_leaf(t1, it1) == beg1 &&
-                        //get_begin_leaf(t2, it2) == beg2)
-                //{
-                    //DEBUG("match %s -> %s",
-                            //clabel(it1), clabel(it2));
-
-                    //map.map.push_back({id(it1) + 1, id(it2) + 1});
-
-                    //--it1;
-                    //--it2;
-                //}
-                //else
-                //{
-                    //logger.debugStream()
-                        //<< "to_be_matched:\n"
-                        //<< tree_type::print_subtree(it1, false) << "\n"
-                        //<< tree_type::print_subtree(it2, false);
-
-                    //to_be_matched.push_back({it1, it2});
-
-                    //if (!tree_type::is_first_child(it1))
-                        //it1 = --sibling_iterator(it1);
-                    //else
-                        //WAIT, it1 = beg1;
-                    //if (!tree_type::is_first_child(it2))
-                        //it2 = --sibling_iterator(it2);
-                    //else
-                        //WAIT, it2 = beg2;
-                //}
-            //}
-        //}
-        */
     }
 
     for (auto it = t1.begin(); it != t1.end(); ++it)
@@ -304,5 +244,6 @@ mapping gted::get_mapping()
 
     return map;
 }
+#endif
 
 

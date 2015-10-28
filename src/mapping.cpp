@@ -20,7 +20,6 @@
  */
 
 #include "mapping.hpp"
-#include "generator.hpp"
 #include "utils.hpp"
 
 using namespace std;
@@ -122,5 +121,13 @@ mapping::mapping(
             //m.from, m.to);
 
     return m;
+}
+
+
+bool mapping::mapping_pair::operator< (const mapping_pair& other)
+{
+    return from < other.from ||
+        (from == other.from &&
+            to < other.to);
 }
 

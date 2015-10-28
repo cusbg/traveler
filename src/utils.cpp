@@ -53,6 +53,33 @@ using namespace std;
     assert(out.good());
 }
 
+std::vector<std::string> get_command_output(const std::string& command)
+{
+    APP_DEBUG_FNAME;
+
+    vector<string> vec;
+    FILE* f;
+    char *l = nullptr;
+    size_t n = 0;
+
+    logger.debugStream()
+        << "RUN: "
+        << command;
+
+    f = popen(command.c_str(), "r");
+
+    while(getline(&l, &n, f) >= 0)
+        vec.push_back(l);
+
+    assert(!ferror(f));
+    pclose(f);
+    free(l);
+
+    return vec;
+}
+
+
+
 
 ps_document::ps_document(const std::string& name)
 {
@@ -211,89 +238,6 @@ bool ps_document::is_base_line(const std::string& line)
 }
 
 
-
-std::string convert_to_java_format(
-                rna_tree rna)
-{
-    APP_DEBUG_FNAME;
-
-    auto it = ++rna.begin();
-    stringstream stream;
-
-    std::function<void(rna_tree::sibling_iterator,
-            stringstream&)> print_recursive =
-        [&](rna_tree::sibling_iterator sib, stringstream& out)
-    {
-        out << "{" << " ";
-        out << label(sib);
-
-        if (!rna_tree::is_leaf(sib))
-            print_recursive(rna_tree::first_child(sib), out);
-
-        out << "}";
-
-        if (!rna_tree::is_last_child(sib))
-        {
-            ++sib;
-            print_recursive(sib, out);
-        }
-    };
-
-    stream << "{" << label(rna.begin());
-    print_recursive(it, stream);
-    stream << "}";
-
-    string s = stream.str();
-    int left, right;
-    left = right = 0;
-    for (auto val : s)
-    {
-        assert(left >= right);
-        if (val == '{')
-            ++left;
-        else if (val == '}')
-            ++right;
-    }
-    assert(left == right);
-    return stream.str();
-}
-
-rna_tree get_rna(const std::string& name)
-{
-    string l, b;
-
-    l = read_file(SEQ(name));
-    b = read_file(FOLD(name));
-
-    rna_tree rna(b, l, ps_document(PS_IN(name)).points, name);
-
-    return rna;
-}
-
-std::vector<std::string> get_command_output(const std::string& command)
-{
-    APP_DEBUG_FNAME;
-
-    vector<string> vec;
-    FILE* f;
-    char *l = nullptr;
-    size_t n = 0;
-
-    logger.debugStream()
-        << "RUN: "
-        << command;
-
-    f = popen(command.c_str(), "r");
-
-    while(getline(&l, &n, f) >= 0)
-        vec.push_back(l);
-
-    assert(!ferror(f));
-    pclose(f);
-    free(l);
-
-    return vec;
-}
 
 
 
@@ -479,4 +423,58 @@ mapping load_mapping_table(
 }
 
 
+
+
+#ifdef NODEF
+
+/**
+ * convert rna_tree to java-implementation rted fromat
+ */
+std::string convert_to_java_format(
+                rna_tree rna)
+{
+    APP_DEBUG_FNAME;
+
+    auto it = ++rna.begin();
+    stringstream stream;
+
+    std::function<void(rna_tree::sibling_iterator,
+            stringstream&)> print_recursive =
+        [&](rna_tree::sibling_iterator sib, stringstream& out)
+    {
+        out << "{" << " ";
+        out << label(sib);
+
+        if (!rna_tree::is_leaf(sib))
+            print_recursive(rna_tree::first_child(sib), out);
+
+        out << "}";
+
+        if (!rna_tree::is_last_child(sib))
+        {
+            ++sib;
+            print_recursive(sib, out);
+        }
+    };
+
+    stream << "{" << label(rna.begin());
+    print_recursive(it, stream);
+    stream << "}";
+
+    string s = stream.str();
+    int left, right;
+    left = right = 0;
+    for (auto val : s)
+    {
+        assert(left >= right);
+        if (val == '{')
+            ++left;
+        else if (val == '}')
+            ++right;
+    }
+    assert(left == right);
+    return stream.str();
+}
+
+#endif
 

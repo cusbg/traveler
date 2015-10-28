@@ -232,7 +232,6 @@ ps_writer psout;
 #define INSERT_COLOR    red
 #define REINSERT_COLOR  blue
 #define EDITED_COLOR    green
-#define OTHER_COLOR     other
 
     string out;
 

@@ -245,7 +245,8 @@ void app::run(
 
         mapping map = load_mapping_table(args.ps.mapping);
 
-        run(args.templated, args.matched, map);
+        args.templated = matcher(args.templated, args.matched).run(map);
+        compact(args.templated).run();
 
         if (!args.ps.ps.empty())
         {
@@ -253,26 +254,6 @@ void app::run(
             save(args.ps.ps, args.templated, overlaps, args.ps.ps_templated);
         }
     }
-}
-
-void app::run(
-                rna_tree& templated,
-                rna_tree& matched,
-                const mapping& map)
-{
-    APP_DEBUG_FNAME;
-
-    rna_tree rna;
-
-    rna = matcher(templated, matched).run(map);
-
-    compact(rna).run();
-    overlap_checks(rna).run();
-
-    psout.init("build/files/ps.ps");
-    psout.print(ps_document::default_prologue());
-    psout.print(psout.sprint(rna));
-    abort();
 }
 
 

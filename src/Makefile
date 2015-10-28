@@ -7,7 +7,8 @@
 
 CC                      = g++
 DEBUG                   = -g -Wall
-#RELEASE                 = -DNDEBUG -O3
+RELEASE                 = -DNDEBUG -O3
+RELEASE = -O3
 CFLAGS                  = -std=c++11 -c $(DEBUG) $(RELEASE)
 LFLAGS                  = $(DEBUG) $(RELEASE) $(shell pkg-config --libs log4cpp)
 SHELL                   = /bin/bash -o pipefail

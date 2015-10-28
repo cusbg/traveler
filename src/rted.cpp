@@ -26,10 +26,8 @@
 #define RTED_BAD        0xBADF00D
 #define isbad(value)    ((value) == RTED_BAD)
 
-#ifdef NDEBUG
-#undef DEBUG
-#define DEBUG(...)
-#endif
+// TODO: mozno prepisat podobne ako gted - vytvorit iny rted_tree,
+//  v ktorom budu ulozene vsetky potrebne tabulky
 
 using namespace std;
 
@@ -74,7 +72,7 @@ void rted::run()
 
     INFO("END: RTED");
 
-    INFO("STR: %s", to_cstr(STR[id(t1.begin())][id(t2.begin())]));
+    DEBUG("STR: %s", to_cstr(STR[id(t1.begin())][id(t2.begin())]));
 }
 
 void rted::init()

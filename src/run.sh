@@ -53,8 +53,25 @@ run_ps() {
 
 }
 
+run_all() {
+    file1=$1
+    file2=$2
+    DIROUT=build/files/run/
+    file="${DIROUT}/${file1}-${file2}"
+    tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fold --name ${file1}"
+    mt="--match-tree ${DIR}/${file2}.seq ${DIR}/${file2}.fold --name ${file2}"
+
+    mkdir -p ${DIROUT}
+
+    ${EXECUTABLE} \
+        ${tt} ${mt} \
+        --rted --strategies ${file}.rted \
+        --gted --ted-out ${file}.ted --mapping ${file}.map \
+        --ps ${file}.ps
+}
+
 f() {
-    run_ps "frog" "human"
+    run_all "frog" "human"
 
     exit 0
 }

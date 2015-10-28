@@ -24,7 +24,6 @@
 
 #include <fstream>
 
-
 class document_writer
 {
 public:
@@ -39,6 +38,7 @@ public:
      */
     void init(
                 const std::string& filename);
+
     /**
      * fill document from actual position to end of file with `ch`-chars
      * and seek to actual position
@@ -51,22 +51,24 @@ public:
      */
     virtual streampos print(
                 const std::string& text) = 0;
+
     /**
      * seek to `pos`
      */
     void seek(
                 streampos pos);
+
     /**
      * seeks to the end of file
      */
     void seek_end();
+
     /**
      * return actual position in stream
      */
     streampos get_pos();
 
 protected:
-    std::string filename;
     std::fstream out;
 };
 
