@@ -38,7 +38,6 @@ rna_tree& matcher::run(
                 const mapping& map)
 {
     APP_DEBUG_FNAME;
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     mark(t1, map.get_to_remove(), rna_pair_label::deleted);
     mark(t2, map.get_to_insert(), rna_pair_label::inserted);

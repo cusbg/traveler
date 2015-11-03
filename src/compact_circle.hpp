@@ -27,19 +27,24 @@
 
 struct compact::circle
 {
-private:
 public:
     double radius() const;
     double segment_angle() const;
     double segment_length() const;
 
+    /**
+     * return if `p` !NOT! lies in circle segment (p1, direction, p2)
+     * => direction == opposite direction of circle segment
+     */
     bool lies_in_segment(
                 const point& p) const;
+
     /**
      * rotate point p1 with `angle`
      */
     point rotate(
                 double angle) const;
+
     /**
      * returns `n` points on circle
      */
@@ -48,28 +53,32 @@ public:
 
 public:
     circle() = default;
+
     /**
      * compute direction of circle
      * (clockwise/counterclockwise)
      */
     void compute_sgn();
+
     /**
-     * initialize circle for `n` children
+     * initialize circle (length) for `n` nodes
      */
     void init(
                 size_t n);
 
 public:
+    /**
+     * minimal length for `n` nodes
+     */
     static double min_circle_length(
-                size_t n);
-    static double max_circle_length(
                 size_t n);
 
 public:
+    std::string print_points() const;
     friend std::ostream& operator<<(
                 std::ostream& out,
                 const circle& c);
-    std::string print_points();
+
 public:
     point p1, p2;
     point centre;
@@ -77,8 +86,10 @@ public:
 
 private:
     /*
-     * sgn =  1 ~> v protismere hod. ruciciek
-     * sgn = -1 ~> v smere hodinovych ruciciek
+     * sgn =  1 ~> clockwise
+     *              (v smere hodinovych ruciciek)
+     * sgn = -1 ~> counterclockwise
+     *              (v protismere)
      */
     signed char sgn = 0;
 };

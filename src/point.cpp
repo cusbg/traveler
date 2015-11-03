@@ -110,7 +110,7 @@ point point::operator-() const
 point point::operator/(double value) const
 {
     UNARY(*this);
-    assert(value != 0 && !::isnan(x / value) && !::isnan(y / value));
+    assert(!iszero(value) && !::isnan(x / value) && !::isnan(y / value));
 
     return {x / value, y / value};
 }
@@ -118,7 +118,7 @@ point point::operator/(double value) const
 point point::operator*(double value) const
 {
     UNARY(*this);
-    assert(value != 0 && !::isnan(x * value) && !::isnan(y * value));
+    assert(!iszero(value) && !::isnan(x * value) && !::isnan(y * value));
 
     return {x * value, y * value};
 }
@@ -158,7 +158,6 @@ point operator*(double value, point p)
 }
 
 
-// TODO: pridat do funkcii kontrolu na badpoint
 
 point centre(point p1, point p2)
 {
@@ -269,28 +268,28 @@ bool lies_between(point p, point from, point to)
 	p = p - from;
 	to = to - from;
 
-    if (p.x == 0 &&
-            p.y == 0 &&
-            to.x == 0 &&
-            to.y == 0)
+    if (iszero(p.x) &&
+            iszero(p.y) &&
+            iszero(to.x) &&
+            iszero(to.y))
         return true;
 
-    if (p.x == 0 && to.x == 0)
+    if (iszero(p.x) && iszero(to.x))
     {
-        assert(to.y != 0);
+        assert(!iszero(to.y));
         return p.y / to.y <= 1;
     }
 
-    if (p.y == 0 && to.y == 0)
+    if (iszero(p.y) && iszero(to.y))
     {
-        assert(to.x != 0);
+        assert(!iszero(to.x));
         return p.x / to.x <= 1;
     }
 
-    if (to.x == 0 || to.y == 0)
+    if (iszero(to.x) || iszero(to.y))
         return false;
 
-    assert(to.x != 0 && to.y != 0);
+    assert(!iszero(to.x) && !iszero(to.y));
 
     return p.x / to.x <= 1 &&
         p.x / to.x >= 0 &&

@@ -50,7 +50,7 @@ void rted::run()
 
     init();
 
-    INFO("BEG: RTED");
+    INFO("BEG: RTED(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
     for (it1 = t1.begin_post(); it1 != t1.end_post(); ++it1)
     {
         for (it2 = t2.begin_post(); it2 != t2.end_post(); ++it2)
@@ -70,7 +70,7 @@ void rted::run()
         }
     }
 
-    INFO("END: RTED");
+    INFO("END: RTED(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
 
     DEBUG("STR: %s", to_cstr(STR[id(t1.begin())][id(t2.begin())]));
 }
@@ -81,7 +81,7 @@ void rted::init()
 
     size_t size1, size2;
 
-    INFO("BEG prepare tables");
+    DEBUG("BEG prepare tables");
 
     strategy_table_type::value_type inner_str;
     table_type inner_v;
@@ -109,6 +109,11 @@ void rted::init()
     T2_Hw_partials.resize(size2);
     T1_Hv_partials.resize(size1, partial_result_arr(size2));
 
+    // A* = decomposition tables.
+    // ALeft/ARight == left/right decomposition
+    // T_ALeft/ARight -> only to compute T_A
+    table_type T1_ALeft, T1_ARight, T2_ALeft, T2_ARight;
+
     // initialize all tables to size of tree..
     for (auto table : {&T1_ALeft, &T1_ARight, &T1_A,
                     &T1_FLeft, &T1_FRight, &T1_Size})
@@ -117,8 +122,8 @@ void rted::init()
                     &T2_FLeft, &T2_FRight, &T2_Size})
         table->resize(size2, RTED_BAD);
 
-    INFO("END prepare tables");
-    INFO("BEG precomputation");
+    DEBUG("END prepare tables");
+    DEBUG("BEG precomputation");
 
     // precompute full-decomposition/relevant-subforest tables:
     for (post_order_iterator it = t1.begin_post(); it != t1.end_post(); ++it)
@@ -136,13 +141,7 @@ void rted::init()
     assert(T1_Size[id(t1.begin())] == t1.size());
     assert(T2_Size[id(t2.begin())] == t2.size());
 
-    // do not need anymore
-    T1_ALeft =
-        T2_ALeft =
-        T1_ARight =
-        T2_ARight = table_type();
-
-    INFO("END precomputation");
+    DEBUG("END precomputation");
 }
 
 void rted::compute_full_decomposition(

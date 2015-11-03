@@ -27,6 +27,7 @@
 
 class rna_tree;
 class mapping;
+class ps_writer;
 
 class app
 {
@@ -34,40 +35,65 @@ private:
     struct arguments;
 
 public:
+    /**
+     * run app with arguments from command line
+     *
+     * see usage() for detail arguments description
+     */
     void run(
                 std::vector<std::string> args);
+
+    /**
+     * run with handled command line arguments
+     */
     void run(
                 arguments args);
-    void run(
-                rna_tree& templated,
-                rna_tree& matched,
-                const mapping& map);
 
+    /**
+     * save rna to document
+     */
+    void save(
+                rna_tree& rna,
+                ps_writer& writer);
+
+    /**
+     * save rna to document,
+     * take prolog from `templated_ps` document
+     */
     void save(
                 const std::string& filename,
                 rna_tree& rna,
-                const overlap_checks::overlaps& overlaps,
                 const std::string& templated_ps);
 
+    /**
+     * print usage
+     */
     void usage(
                 const std::string& appname = "");
 
 private:
+    /**
+     * reads both seq & fold file and construct rna tree
+     */
     rna_tree create_matched(
                 const std::string& seqfile,
                 const std::string& foldfile,
                 const std::string& name);
+    /**
+     * reads ps & fold file and construct rna tree
+     * from ps extract rna sequence and node positions in image
+     */
     rna_tree create_templated(
                 const std::string& psfile,
                 const std::string& foldfile,
                 const std::string& name);
 
+    /**
+     * print arguments
+     */
     void print(
                 const arguments& args);
 
-public:
-
-private:
 };
 
 

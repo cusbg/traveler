@@ -26,12 +26,16 @@ using namespace std;
 inline std::vector<rna_pair_label> convert(
                 const std::string& labels);
 
+inline std::string trim(
+                std::string& s);
+
 
 rna_tree::rna_tree(
-                const std::string& _brackets,
-                const std::string& _labels,
-                const std::string& _name)
-    : tree_base<rna_pair_label>(_brackets, convert(_labels)), _name(_name)
+                std::string _brackets,
+                std::string _labels,
+                std::string _name)
+    : tree_base<rna_pair_label>(
+            trim(_brackets), convert(trim(_labels))), _name(_name)
 {
     //LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
@@ -139,6 +143,23 @@ rna_tree::sibling_iterator rna_tree::insert(
 std::string rna_tree::name() const
 {
     return _name;
+}
+
+
+/* inline */ std::string trim(
+                std::string& s)
+{
+#define WHITESPACES " \t\n\r\f\v"
+    size_t pos;
+
+    pos = s.find_first_not_of(WHITESPACES);
+    if (pos != s.npos)
+        s.erase(0, pos);
+    pos = s.find_last_not_of(WHITESPACES);
+    if (pos != s.npos)
+        s.erase(pos + 1);
+
+    return s;
 }
 
 

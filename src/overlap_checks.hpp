@@ -24,8 +24,8 @@
 
 #include "types.hpp"
 #include "point.hpp"
-#include "rna_tree.hpp"
 
+class rna_tree;
 
 class overlap_checks
 {
@@ -34,36 +34,42 @@ public:
     {
         point p1, p2;
     };
-    typedef std::vector<edge> edges;
-    typedef std::vector<double> equation;
     struct overlapping
     {
         point centre;
         double radius;
     };
+
+    typedef std::vector<edge> edges;
     typedef std::vector<overlapping> overlaps;
 
 public:
-    overlap_checks(
+    overlap_checks();
+    overlaps run(
                 rna_tree& _rna);
-    overlaps run();
 
 private:
+    /**
+     * create edges of rna
+     * for tree: (12(3, 4, 5))
+     *      where 12 is pair node (with labels 1 and 2) and 3,4,5 are leafs
+     *      created edges:
+     *          (1,3),(3,4),(4,5),(5,2)
+     *          => going pre_post_order in tree
+     */
+    edges get_edges(
+                rna_tree& rna);
+
     overlaps run(
                 const edges& e);
-    edges get_edges();
+
+    /**
+     * find point in which edges are intersecting each other
+     * if no point exist, return point::bad_point
+     */
     point intersection(
                 const edge& e1,
-                const edge& e2);
-    void has_intersection(
-                const edge& e1,
-                const edge& e2);
-
-    point compute(
-                std::vector<equation> vec);
-
-private:
-    rna_tree& rna;
+                const edge& e2) const;
 };
 
 

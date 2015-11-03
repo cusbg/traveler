@@ -21,7 +21,7 @@
 
 #include <log4cpp/Category.hh>
 #include <log4cpp/Appender.hh>
-#include <log4cpp/FileAppender.hh>
+#include <log4cpp/RollingFileAppender.hh>
 #include <log4cpp/OstreamAppender.hh>
 #include <log4cpp/Layout.hh>
 #include <log4cpp/BasicLayout.hh>
@@ -36,14 +36,15 @@ using namespace std;
 log4cpp::Category& init_logger()
 {
     log4cpp::Appender* console_appender;
-    log4cpp::Appender* file_appender;
+    log4cpp::RollingFileAppender* file_appender;
     log4cpp::PatternLayout* console_layout;
     log4cpp::PatternLayout* file_layout;
     string logfile = "build/logs/program.log";
     string pattern = "%d{%H:%M:%S:%l} %u:\t[%p] %m%n";
 
     console_appender = new log4cpp::OstreamAppender("console", &std::cout);
-    file_appender = new log4cpp::FileAppender("default", logfile, false);   // append=false=>truncate
+    file_appender = new log4cpp::RollingFileAppender(
+            "default", logfile, 1024 * 1024 * 1024, 2, true);
     
     file_layout = new log4cpp::PatternLayout();
     console_layout = new log4cpp::PatternLayout();
@@ -59,9 +60,14 @@ log4cpp::Category& init_logger()
     log.addAppender(console_appender);
     log.addAppender(file_appender);
 
+    log.info("************************************");
+    log.info("********* RUNNING  PROGRAM *********");
+    log.info("************************************");
+
     return log;
 }
 
+/* global */
 log4cpp::Category& logger = init_logger();
 
 

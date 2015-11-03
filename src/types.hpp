@@ -46,20 +46,15 @@ extern log4cpp::Category& logger; // globalna premenna...
     logger.error(__VA_ARGS__)
 
 
-namespace std
-{
-inline std::string to_string(bool b)
-{
-    return b ? "true" : "false";
-}
-}
-#define to_cstr(val) to_string(val).c_str()
+#define assert_err(boolean, ...) \
+    { \
+    if (!(boolean)) \
+        { \
+            ERR(__VA_ARGS__); \
+            exit(1); \
+        } \
+    }
 
-template <typename container_type, typename value_type>
-inline bool contains(const container_type& c, const value_type& v)
-{
-    return std::find(std::begin(c), std::end(c), v) != std::end(c);
-}
 
 template <typename T>
 inline std::string to_string(const T& t)
@@ -70,6 +65,14 @@ inline std::string to_string(const T& t)
     std::stringstream str;
     str << t;
     return str.str();
+}
+
+#define to_cstr(val) to_string(val).c_str()
+
+template <typename container_type, typename value_type>
+inline bool contains(const container_type& c, const value_type& v)
+{
+    return std::find(std::begin(c), std::end(c), v) != std::end(c);
 }
 
 template <typename T>
@@ -112,7 +115,11 @@ inline void wait_for_input()
 
 
 
-#define WAIT DEBUG("%lu", __LINE__), wait_for_input()
+#define WAIT \
+        { \
+            DEBUG("%s: %lu", __PRETTY_FUNCTION__, __LINE__); \
+            wait_for_input(); \
+        }
 
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
     logger_end_of_function_priority __logger_priority(log4cpp::Priority::PRIORITY)

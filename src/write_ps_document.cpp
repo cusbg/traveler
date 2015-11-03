@@ -27,33 +27,33 @@
 
 #define PS_COLUMNS_WIDTH 15
 
+// end of ps document..
+#define ps_end_str      "showpage\n"
+#define ps_end_length   (sizeof(ps_end_str) - 1)
+
 
 using namespace std;
 
-/* global */
-ps_writer psout;
-
 
 /* virtual */ streampos ps_writer::print(
-                const std::string& text)
+                const std::string& text,
+                bool seek)
 {
     streampos pos = get_pos();
 
     fill();
 
-#define ps_end_str      "showpage\n"
-#define ps_end_length   (sizeof(ps_end_str) - 1)
-
     out
         << text
         << ps_end_str;
 
-    out.seekp(-ps_end_length, out.cur);
+    if (seek)
+        out.seekp(-ps_end_length, out.cur);
 
     if (out.fail())
     {
         ERR("ps print fail");
-        abort();
+        exit(1);
     }
 
     return pos;
@@ -276,10 +276,6 @@ ps_writer psout;
             ERR("ERR");
             cout << label(it) << (*it)[0].p << ";" << (*it)[1].p << endl;
             rna_tree::print_subtree(it);
-            psout.print(
-                    ps_writer::sprint(other) +
-                    ps_writer::sprint((*it)[0]) +
-                    ps_writer::sprint((*it)[1]));
             abort();
         }
 
@@ -303,7 +299,7 @@ ps_writer psout;
 
     while (beg != end)
     {
-        out += psout.sprint(beg);
+        out += sprint(beg);
         ++beg;
     }
     return out;

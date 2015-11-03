@@ -54,7 +54,6 @@ struct compact::interval
     bool remake = false;
 };
 
-std::string to_string(const compact::interval& i);
 
 #endif /* !COMPACT_UTILS_HPP */
 

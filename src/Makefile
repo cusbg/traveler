@@ -7,7 +7,7 @@
 
 CC                      = g++
 DEBUG                   = -g -Wall
-RELEASE                 = -DNDEBUG -O3
+#RELEASE                 = -DNDEBUG -O3
 RELEASE = -O3
 CFLAGS                  = -std=c++11 -c $(DEBUG) $(RELEASE)
 LFLAGS                  = $(DEBUG) $(RELEASE) $(shell pkg-config --libs log4cpp)
@@ -26,7 +26,7 @@ MAKEFILES               = $(shell echo $(SOURCES) | sed 's@\.cpp@.mk@g; s@[^ ]*/
 MAKEDEPENDENCY          = $(CC) -MM -E 
 
 ARGS                    =
-run: build
+run: build cleanLog
 	@echo "**********************************************************************"
 	@echo "********************* RUNNING  PROGRAM *******************************"
 	@echo "**********************************************************************"
@@ -45,6 +45,7 @@ analyse:
 
 $(BUILDDIR)/$(TARGET): $(BUILDDIR)/Makefile
 
+CORES                   = $(shell expr $(shell nproc) + 2)
 $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES))
 	@rm -f $@
 	@echo -e\
@@ -59,7 +60,7 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 			\\n \
 			\\ninclude $(MAKEFILES) \
 					>> $@
-	@make -j10 --directory=$(BUILDDIR) -f Makefile
+	@make -j$(CORES) --directory=$(BUILDDIR) -f Makefile
 
 mk_dirs:
 	@mkdir -p $(LOGDIR) $(FILESDIR)
@@ -90,7 +91,7 @@ cleanMK:
 	rm -f $(BUILDDIR)/*.mk $(BUILDDIR)/Makefile
 
 cleanLog:
-	rm -f $(LOGDIR)
+	rm -f $(LOGDIR)/*.log
 
 .PHONY: $(BUILDDIR)/Makefile clean cleanMK
 

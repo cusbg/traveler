@@ -50,31 +50,47 @@ public:
                 const rna_tree& _t1,
                 const rna_tree& _t2);
 
+    /**
+     * runs gted
+     */
     void run(
                 const strategy_table_type& _str);
 
-    inline void set_tdist_table(
-                const tree_distance_table_type& _tdist)
-    { tdist = _tdist; }
     mapping get_mapping();
 
 public:
+    inline void set_tdist_table(
+                const tree_distance_table_type& _tdist)
+    { tdist = _tdist; }
     inline tree_distance_table_type& get_tree_distances()
     { return tdist; }
 
-private:
-    void checks();
 
 private:
+    /**
+     * recursive compute distances between subtrees root1/root2
+     *
+     * recursive call on decomponed tree's subtrees
+     */
     void compute_distance_recursive(
                 iterator root1,
                 iterator root2);
+    /**
+     * compute distances on each node root-leaf path
+     * with respect to actual strategy
+     */
     void single_path_function(
                 iterator root1,
                 iterator root2);
+    /**
+     * compute_distance between all nodes on root-leaf tree paths
+     */
     std::vector<std::vector<size_t>> compute_distance(
                 iterator root1,
                 iterator root2);
+    /**
+     * only left/right paths
+     */
     template <typename iterator_type, typename funct_get_begin>
         std::vector<std::vector<size_t>> compute_distance_LR(
                 iterator root1,
@@ -83,29 +99,37 @@ private:
                 tree_type& t2,
                 funct_get_begin get_begin);
 
-private:
-    size_t get_tdist(
+private: // functions allowing some checks..
+    inline size_t get_tdist(
                 iterator it1,
                 iterator it2);
-    void set_tdist(
+
+    inline void set_tdist(
                 iterator it1,
                 iterator it2,
                 size_t value);
 
-    size_t get_fdist(
+    inline size_t get_fdist(
                 const forest_distance_table_type& fdist,
                 const iterator& it1,
                 const iterator& it2,
                 size_t id1,
                 size_t id2);
 
-    void set_fdist(
+    inline void set_fdist(
                 forest_distance_table_type& fdist,
                 const iterator& it1,
                 const iterator& it2,
                 size_t value,
                 size_t id1,
                 size_t id2);
+
+    inline void checks();
+
+#ifdef TESTS
+public:
+    static void test();
+#endif
 
 private:
     tree_type t1, t2;

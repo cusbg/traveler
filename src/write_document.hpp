@@ -47,12 +47,6 @@ public:
 
 public:
     /**
-     * print `text` to document
-     */
-    virtual streampos print(
-                const std::string& text) = 0;
-
-    /**
      * seek to `pos`
      */
     void seek(

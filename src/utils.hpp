@@ -81,7 +81,6 @@ mapping load_mapping_table(
 ///
 
 
-
 bool exist_file(
                 const std::string& filename);
 
@@ -95,19 +94,11 @@ void write_file(
 
 
 /**
- * runs command and return vector<lines> from output
- */
-std::vector<std::string> get_command_output(
-                const std::string& command);
-
-
-/**
  * ps document reader
  */
 class ps_document
 {
 public:
-    ps_document() = default;
     ps_document(
                 const std::string& filename);
 

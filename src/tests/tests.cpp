@@ -22,14 +22,17 @@
 #define TESTS
 
 #include "rted_test.cpp"
+#include "gted_test.cpp"
+
 
 using namespace std;
 
 void tests()
 {
-    rted<rna_tree>::test();
+    rted::test();
+    gted::test();
+
     INFO("TESTS OK");
-    exit(0);
 }
 
 int main()

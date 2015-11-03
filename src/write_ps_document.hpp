@@ -75,12 +75,13 @@ public:
                 double size);
 
 public:
-    virtual streampos print(
-                const std::string& text);
+    /**
+     * print `text` to document
+     */
+    streampos print(
+                const std::string& text,
+                bool seek = true);
 };
-
-
-extern ps_writer psout;
 
 
 #endif /* !WRITE_PS_DOCUMENT_HPP */

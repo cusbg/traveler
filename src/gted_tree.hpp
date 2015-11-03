@@ -115,10 +115,5 @@ private:
     std::vector<LRH_table> subforests;
 };
 
-inline std::string to_string(gted_tree::iterator it)
-{
-    return label(it);
-}
-
 #endif /* !GTED_TREE_HPP */
 

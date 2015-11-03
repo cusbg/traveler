@@ -29,7 +29,8 @@ using namespace std;
 /* global */ std::string read_file(
                 const std::string& filename)
 {
-    assert(exist_file(filename));
+    assert_err(exist_file(filename),
+            "read_file(%s) failed, file does not exist", to_cstr(filename));
 
     ifstream in(filename);
     stringstream s;
@@ -50,32 +51,9 @@ using namespace std;
     ofstream out(filename);
     out << what;
     out.flush();
-    assert(out.good());
-}
 
-std::vector<std::string> get_command_output(const std::string& command)
-{
-    APP_DEBUG_FNAME;
-
-    vector<string> vec;
-    FILE* f;
-    char *l = nullptr;
-    size_t n = 0;
-
-    logger.debugStream()
-        << "RUN: "
-        << command;
-
-    f = popen(command.c_str(), "r");
-
-    while(getline(&l, &n, f) >= 0)
-        vec.push_back(l);
-
-    assert(!ferror(f));
-    pclose(f);
-    free(l);
-
-    return vec;
+    assert_err(out.good(),
+            "write_file(%s) failed", to_cstr(filename));
 }
 
 
@@ -87,7 +65,8 @@ ps_document::ps_document(const std::string& name)
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     string line, str;
-    assert(exist_file(name));
+    assert_err(exist_file(name),
+            "ps_document(%s): file does not exist", to_cstr(name));
 
     ifstream in(name);
     point p;
@@ -217,6 +196,8 @@ bool ps_document::is_base_line(const std::string& line)
         !(
             false
             || line.size() < 3
+            || !contains(bases, line.at(1))
+            || line.at(2) != ')'
             || find(bases.begin(), bases.end(), line.at(1)) == bases.end()
             || line.find("lwstring") == string::npos
             || str.fail()
@@ -249,8 +230,8 @@ table_type load_table(
 {
     APP_DEBUG_FNAME;
 
-    DEBUG("load: %s", to_cstr(filename));
-    assert(exist_file(filename));
+    assert_err(exist_file(filename),
+            "load_table(%s) failed, file does not exist", to_cstr(filename));
 
     std::ifstream in(filename);
     size_t m, n;
@@ -315,7 +296,9 @@ void save_table(
         }
         out << endl;
     }
-    assert(!out.fail());
+
+    assert_err(!out.fail(),
+            "save_table(%s) failed", to_cstr(filename));
 }
 
 
@@ -385,7 +368,9 @@ void save_tree_mapping_table(
             << m.to
             << endl;
     }
-    assert(!out.fail());
+
+    assert_err(!out.fail(),
+            "save_table(%s) failed", to_cstr(filename));
 }
 
 mapping load_mapping_table(
@@ -393,8 +378,8 @@ mapping load_mapping_table(
 {
     APP_DEBUG_FNAME;
 
-    DEBUG("load: %s", to_cstr(filename));
-    assert(exist_file(filename));
+    assert_err(exist_file(filename),
+            "load_file(%s) failed, file does not exist", to_cstr(filename));
 
     string s;
     mapping map;

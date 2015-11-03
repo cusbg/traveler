@@ -45,8 +45,10 @@ tree_base<label_type>::tree_base(
 
     iterator it;
     size_t i = 0;
-    
-    assert(_brackets.size() == _labels.size());
+
+    assert_err(_brackets.size() == _labels.size(),
+            "tree: brackets.size:%lu != labels.size:%lu",
+            _brackets.size(), _labels.size());
 
     _tree.set_head(label_type("ROOT_" + std::to_string(_id)));
     _size = 1;  // ROOT

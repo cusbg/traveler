@@ -41,6 +41,11 @@ struct app::arguments
     struct
     {
         bool run = false;
+        string psout;
+    } all;
+    struct
+    {
+        bool run = false;
         string strategies;
     } rted;
     struct
@@ -127,6 +132,14 @@ void app::run(
             tt = true;
             continue;
         }
+        if (arg == "-a" || arg == "--all")
+        {
+            DEBUG("arg all");
+            a.all.run = true;
+            a.all.psout = args.at(i + 1);
+            ++i;
+            continue;
+        }
         if (arg == "-r" || arg == "--rted")
         {
             DEBUG("arg rted");
@@ -190,14 +203,13 @@ void app::run(
         exit(1);
     }
 
-    print(a);
-
     if (!mt || !tt)
     {
         ERR("trees are missing");
         usage(args.at(0));
         abort();
     }
+
     run(a);
 }
 
@@ -207,54 +219,128 @@ void app::run(
 {
     APP_DEBUG_FNAME;
 
-    if (args.rted.run)
+    INFO("BEG: APP");
+
+    print(args);
+
+    if (args.all.run)
     {
         rted r(args.templated, args.matched);
-        r.run();
-        if (!args.rted.strategies.empty())
-        {
-            save_strategy_table(args.rted.strategies, r.get_strategies());
-
-            if (args.gted.strategies.empty())
-                args.gted.strategies = args.rted.strategies;
-        }
-    }
-    if (args.gted.run)
-    {
         gted g(args.templated, args.matched);
 
-        if (!args.gted.ted_in.empty())
-            g.set_tdist_table(load_tree_distance_table(args.gted.ted_in));
-        else
-            g.run(load_strategy_table(args.gted.strategies));
+        r.run();
+        g.run(r.get_strategies());
 
-        if (!args.gted.ted_out.empty())
-            save_tree_distance_table(args.gted.ted_out, g.get_tree_distances());
-
-        if (!args.gted.mapping.empty())
-        {
-            save_tree_mapping_table(args.gted.mapping, g.get_mapping());
-            if (args.ps.mapping.empty())
-                args.ps.mapping = args.gted.mapping;
-        }
-    }
-    if (args.ps.run)
-    {
-        assert(!args.ps.mapping.empty());
-        assert(!args.ps.ps.empty());
-
-        mapping map = load_mapping_table(args.ps.mapping);
-
-        args.templated = matcher(args.templated, args.matched).run(map);
+        args.templated = matcher(args.templated, args.matched).run(g.get_mapping());
         compact(args.templated).run();
 
-        if (!args.ps.ps.empty())
+        auto overlaps = overlap_checks().run(args.templated);
+
+        ps_writer ps;
+        ps.init(args.all.psout);
+
+        ps.print(ps_document::default_prologue(), true);
+        save(args.templated, ps);
+    }
+    else
+    {
+        if (args.rted.run)
         {
-            auto overlaps = overlap_checks(args.templated).run();
-            save(args.ps.ps, args.templated, overlaps, args.ps.ps_templated);
+            rted r(args.templated, args.matched);
+            r.run();
+            if (!args.rted.strategies.empty())
+            {
+                save_strategy_table(args.rted.strategies, r.get_strategies());
+
+                if (args.gted.strategies.empty())
+                    args.gted.strategies = args.rted.strategies;
+            }
+        }
+        if (args.gted.run)
+        {
+            gted g(args.templated, args.matched);
+
+            if (!args.gted.ted_in.empty())
+                g.set_tdist_table(load_tree_distance_table(args.gted.ted_in));
+            else
+                g.run(load_strategy_table(args.gted.strategies));
+
+            if (!args.gted.ted_out.empty())
+                save_tree_distance_table(args.gted.ted_out, g.get_tree_distances());
+
+            if (!args.gted.mapping.empty())
+            {
+                save_tree_mapping_table(args.gted.mapping, g.get_mapping());
+                if (args.ps.mapping.empty())
+                    args.ps.mapping = args.gted.mapping;
+            }
+        }
+        if (args.ps.run)
+        {
+            assert(!args.ps.mapping.empty());
+            assert(!args.ps.ps.empty());
+
+            mapping map = load_mapping_table(args.ps.mapping);
+
+            args.templated = matcher(args.templated, args.matched).run(map);
+            compact(args.templated).run();
+
+            if (!args.ps.ps.empty())
+            {
+                save(args.ps.ps, args.templated, args.ps.ps_templated);
+            }
         }
     }
+
+    INFO("END: APP");
 }
+
+
+
+
+void app::save(
+                const std::string& filename,
+                rna_tree& rna,
+                const std::string& templated_ps)
+{
+    APP_DEBUG_FNAME;
+
+    ps_writer ps;
+    string prolog;
+
+    prolog = ps_document(templated_ps).prolog;
+
+    ps.init(filename);
+    ps.print(prolog);
+
+    save(rna, ps);
+}
+
+void app::save(
+            rna_tree& rna,
+            ps_writer& writer)
+{
+    APP_DEBUG_FNAME;
+
+    stringstream str;
+
+    rna_tree::pre_post_order_iterator end(rna.begin(), false);
+    rna_tree::pre_post_order_iterator it = ++rna.begin();
+    overlap_checks::overlaps overlaps = overlap_checks().run(rna);
+
+    if (!overlaps.empty())
+        WARN("overlaps occurs in %s, count=%lu",
+                to_cstr(rna.name()), overlaps.size());
+
+    for (; it != end; ++it)
+        str << ps_writer::sprint_formatted(it);
+
+    for (const auto& p : overlaps)
+        str << ps_writer::sprint_circle(p.centre, p.radius);
+
+    writer.print(str.str());
+}
+
 
 
 
@@ -286,34 +372,6 @@ rna_tree app::create_templated(
     return rna_tree(brackets, ps.labels, ps.points, name);
 }
 
-void app::save(
-                const std::string& filename,
-                rna_tree& rna,
-                const overlap_checks::overlaps& overlaps,
-                const std::string& templated_ps)
-{
-    APP_DEBUG_FNAME;
-
-    ps_writer ps;
-    string prolog;
-    stringstream str;
-
-    prolog = ps_document(templated_ps).prolog;
-
-    ps.init(filename);
-    ps.print(prolog);
-
-    for (rna_tree::pre_post_order_iterator it = rna.begin_pre_post();
-            it != rna.end_pre_post(); ++it)
-    {
-        str << ps_writer::sprint_formatted(it);
-    }
-    for (const auto& p : overlaps)
-        str << ps_writer::sprint_circle(p.centre, p.radius);
-
-    ps.print(str.str());
-}
-
 
 
 
@@ -338,6 +396,7 @@ void app::usage(
             << endl
         << endl
         << "OPTIONS:" << endl
+        << "\t[-a|--all <FILE>]" << endl
         << "\t[-r|--rted [--strategies <FILE>]]" << endl
         << "\t[-g|--gted [--strategies <FILE>]"
             << " [--ted-out <FILE>]"
@@ -364,6 +423,12 @@ void app::print(
             << endl
         << "matched: "
             << args.matched.print_tree(false)
+            << endl
+        << "all:"
+            << endl << '\t'
+            << " run=" << args.all.run << ";"
+            << endl << '\t'
+            << " psout=" << args.all.psout
             << endl
         << "rted:"
             << endl << '\t'
@@ -393,7 +458,7 @@ void app::print(
             << endl
         << endl;
 
-    logger.debugStream() << str.str();
+    logger.infoStream() << str.str();
 }
 
 

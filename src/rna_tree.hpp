@@ -34,9 +34,9 @@ public:
     virtual ~rna_tree() = default;
     rna_tree() = default;
     rna_tree(
-                const std::string& _brackets,
-                const std::string& _labels,
-                const std::string& _name = "");
+                std::string _brackets,
+                std::string _labels,
+                std::string _name = "");
     rna_tree(
                 const std::string& _brackets,
                 const std::string& _labels,

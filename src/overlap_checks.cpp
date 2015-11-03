@@ -21,29 +21,59 @@
 
 #include "overlap_checks.hpp"
 #include "rna_tree.hpp"
-#include "write_ps_document.hpp"
+#include "point.hpp"
 
 using namespace std;
 
-inline bool iszero(
-                double val)
-{
-    return double_equals(val, 0);
-}
 
-overlap_checks::overlap_checks(
-                rna_tree& _rna)
-    : rna(_rna)
+overlap_checks::overlap_checks()
 {
     APP_DEBUG_FNAME;
 }
 
-overlap_checks::overlaps overlap_checks::run()
+overlap_checks::overlaps overlap_checks::run(
+                rna_tree& rna)
 {
     APP_DEBUG_FNAME;
 
-    edges vec = get_edges();
-    return run(vec);
+    INFO("BEG: OVERLAP_CHECKS(%s)", to_cstr(rna.name()));
+
+    edges vec = get_edges(rna);
+    overlaps overlaps = run(vec);
+
+    INFO("END: OVERLAP_CHECKS(%s)", to_cstr(rna.name()));
+
+    return overlaps;
+}
+
+overlap_checks::edges overlap_checks::get_edges(
+                rna_tree& rna)
+{
+    APP_DEBUG_FNAME;
+
+    edges vec;
+    edge e;
+    rna_tree::pre_post_order_iterator it, end;
+
+    it = ++rna.begin_pre_post();
+    end = rna_tree::pre_post_order_iterator(rna.begin(), false);
+
+    e.p1 = it->at(it.label_index()).p;
+    ++it;
+
+    while (true)
+    {
+        e.p1 = it->at(it.label_index()).p;
+        ++it;
+        if (it == end)
+            break;
+        assert(it->inited_points());
+        e.p2 = it->at(it.label_index()).p;
+
+        vec.push_back(e);
+    }
+
+    return vec;
 }
 
 overlap_checks::overlaps overlap_checks::run(
@@ -68,10 +98,10 @@ overlap_checks::overlaps overlap_checks::run(
             if (!p.bad())
             {
                 auto distances = {
-                    distance(e1.p1, e1.p2),
-                    distance(e1.p1, e2.p1),
-                    distance(e1.p1, e2.p2),
-                    distance(e2.p1, e2.p2)
+                    distance(p, e1.p1),
+                    distance(p, e1.p2),
+                    distance(p, e2.p1),
+                    distance(p, e2.p2),
                 };
                 double radius = *std::max_element(distances.begin(), distances.end());
 
@@ -83,56 +113,18 @@ overlap_checks::overlaps overlap_checks::run(
     return vec;
 }
 
-
-overlap_checks::edges overlap_checks::get_edges()
-{
-    APP_DEBUG_FNAME;
-
-    edges vec;
-    edge e;
-    rna_tree::pre_post_order_iterator it;
-
-    it = ++rna.begin_pre_post();
-
-    e.p1 = it->at(it.label_index()).p;
-    ++it;
-
-    while (true)
-    {
-        e.p1 = it->at(it.label_index()).p;
-        ++it;
-        if (++rna_tree::pre_post_order_iterator(it) == rna.end_pre_post())
-            break;
-        assert(it->inited_points());
-        e.p2 = it->at(it.label_index()).p;
-
-        vec.push_back(e);
-    }
-    //for (auto val : vec)
-        //psout.print(psout.sprint_edge(val.p1, val.p2, false));
-
-    //abort();
-
-    return vec;
-}
-
 point overlap_checks::intersection(
                 const edge& e1,
-                const edge& e2)
+                const edge& e2) const
 {
     // sin(a)/alpha == sin(b)/beta == sin(c)/gamma
     //
     double alpha, beta, gamma;
     double a, c;
     point p;
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p1));
     assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p2));
-
-    DEBUG("e1: <%s | %s>, e2: <%s | %s>",
-            to_cstr(e1.p1), to_cstr(e1.p2),
-            to_cstr(e2.p1), to_cstr(e2.p2));
 
     c = distance(e1.p1, e2.p1);
     alpha = angle(e2.p1, e1.p1, e1.p2);
@@ -145,9 +137,6 @@ point overlap_checks::intersection(
     a = radians_to_degrees(c / sin(degrees_to_radians(gamma)) *
             sin(degrees_to_radians(alpha)));
 
-    DEBUG("alpha %f, beta %f, gamma %f, c %f, a %f",
-            alpha, beta, gamma, c, a);
-
     if (!iszero(a))
         p = move_point(e2.p1, e2.p2, a);
     else p = e2.p1;
@@ -158,25 +147,4 @@ point overlap_checks::intersection(
     else
         return point::bad_point();
 }
-
-void overlap_checks::has_intersection(
-                const edge& e1,
-                const edge& e2)
-{
-    APP_DEBUG_FNAME;
-    WARN("intersection occurs");
-
-    auto vec = {
-        distance(e1.p1, e1.p2),
-        distance(e1.p1, e2.p1),
-        distance(e1.p1, e2.p2),
-        distance(e2.p1, e2.p2)
-    };
-
-    double max = *std::max_element(vec.begin(), vec.end());
-
-    psout.print(psout.sprint_circle(e1.p1, max));
-}
-
-
 

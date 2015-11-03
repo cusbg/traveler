@@ -22,9 +22,6 @@
 #include "compact_utils.hpp"
 #include "write_ps_document.hpp"
 
-#define remake_child(parent, id) \
-    (is(parent, rna_pair_label::inserted) || \
-    contains(parent->remake_ids, id))
 
 using namespace std;
 
@@ -61,8 +58,7 @@ void compact::intervals::init(
             vec.back().remake = true;
     }
     vec.back().end = {parent, 1};
-    //if (is(parent, rna_pair_label::inserted))
-        //vec.back().remake = true;
+
     if (!parent->remake_ids.empty())
         if (*std::max_element(parent->remake_ids.begin(),
                     parent->remake_ids.end()) >= i)
@@ -81,11 +77,10 @@ void compact::intervals::init(
             typeswitch(interior_loop);
         default:
             typeswitch(multibranch_loop);
-#undef set_type
+#undef typeswitch
     }
 
-    rna_tree::print_subtree(parent);
-    DEBUG("created %s: %s", to_cstr(type), to_cstr(vec.back()));
+    DEBUG("created:%s", to_cstr(*this));
 }
 
 point compact::intervals::get_circle_direction() const
@@ -108,11 +103,37 @@ point compact::intervals::get_circle_direction() const
     return psum;
 }
 
-std::string to_string(
+
+
+std::ostream& operator<<(
+                std::ostream& out,
+                const compact::intervals& i)
+{
+    out << "intervals:";
+    switch (i.type)
+    {
+#define typeswitch(t) case compact::intervals::t : out << #t; break;
+        typeswitch(hairpin);
+        typeswitch(multibranch_loop);
+        typeswitch(interior_loop);
+
+        default:
+            abort();
+#undef typeswitch
+    }
+    out << endl;
+
+    for (const auto& val : i.vec)
+        out << val << endl;
+
+    return out;
+}
+
+std::ostream& operator<<(
+                std::ostream& out,
                 const compact::interval& i)
-{ 
-    stringstream str;
-    str
+{
+    out
         << "INTERVAL: "
         << label(i.beg.it)
         << ":"
@@ -120,24 +141,12 @@ std::string to_string(
         << "| "
         << label(i.end.it)
         << ":"
-        << (int)i.end.index;
-    str << endl;
+        << (int)i.end.index
+        << endl;
+
     for (auto val : i.vec)
-        str << clabel(val) << " ";
+        out << clabel(val) << " ";
 
-    return str.str();
-}
-
-std::string to_string(compact::intervals::rna_structure_type t)
-{
-#undef typeswitch
-#define typeswitch(t) case compact::intervals::t : return #t;
-    switch (t)
-    {
-        typeswitch(hairpin);
-        typeswitch(multibranch_loop);
-        typeswitch(interior_loop);
-    }
-    abort();
+    return out;
 }
 

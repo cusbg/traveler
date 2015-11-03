@@ -40,13 +40,43 @@
 #include "rted.hpp"
 #include "gted.hpp"
 
+
+
+
+#include <csignal>
+#include <unistd.h>
+#include <strings.h>
+#include <string.h>
+
 using namespace std;
+
+
+void signal_handler(int signal)
+{
+    FILE* f = fopen("build/logs/signal.log", "w");
+    fprintf(f, "signal %i:%s caught, exiting", signal, strsignal(signal));
+    fflush(f);
+    exit(2);
+}
+
+void set_signal_handler()
+{
+    APP_DEBUG_FNAME;
+    struct sigaction act;
+    bzero(&act, sizeof(struct sigaction));
+    act.sa_handler = signal_handler;
+
+    for (int i = 0; i < 40; ++i)
+        sigaction(i, &act, NULL);
+}
 
 
 int main(int argc, char** argv)
 {
+    set_signal_handler();
     cout << boolalpha;
     srand(1);
+    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     app app;
     app.run(vector<string>(argv, argv + argc));

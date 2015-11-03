@@ -24,6 +24,8 @@
 
 #include "types.hpp"
 
+#define PI              M_PI
+
 inline bool double_equals_precision(
                 double val1,
                 double val2,
@@ -42,13 +44,19 @@ inline bool double_equals(
 inline double radians_to_degrees(
                 double val)
 {
-    return val * 180. / M_PI;
+    return val * 180. / PI;
 }
 
 inline double degrees_to_radians(
                 double val)
 {
-    return val * M_PI / 180.;
+    return val * PI / 180.;
+}
+
+inline bool iszero(
+                double val)
+{
+    return double_equals(val, 0);
 }
 
 

@@ -188,16 +188,8 @@ private:
 
     //tables for A(Gw), .., F(Gw), ..
     table_type
-                // A* = decomposition tables.
-                // ALeft/ARight == left/right decomposition
                 // A == full decomposition
-                //  ALeft/ARight are needed only for A decomposition..
-                T1_ALeft,
-                T1_ARight,
                 T1_A,
-
-                T2_ALeft,
-                T2_ARight,
                 T2_A,
 
                 // F* = relevant subforests tables

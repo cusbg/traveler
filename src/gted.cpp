@@ -43,18 +43,6 @@ gted::gted(
                 const rna_tree& _t2)
     : t1(_t1), t2(_t2)
 {
-    INFO("gted(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
-}
-
-void gted::checks()
-{
-    size_t i;
-    i = 0;
-    for (auto it = t1.begin_post(); it != t1.end_post(); ++it, ++i)
-        assert(id(it) == i);
-    i = 0;
-    for (auto it = t2.begin_post(); it != t2.end_post(); ++it, ++i)
-        assert(id(it) == i);
 }
 
 void gted::run(
@@ -62,8 +50,11 @@ void gted::run(
 {
     APP_DEBUG_FNAME;
 
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    INFO("BEG: GTED(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
+
     STR = _str;
-    LOGGER_PRIORITY_ON_FUNCTION(WARN);
 
     checks();
 
@@ -74,6 +65,8 @@ void gted::run(
     INFO("tdist[%s][%s] = %lu",
             clabel(t1.begin()), clabel(t2.begin()),
             tdist[id(t1.begin())][id(t2.begin())]);
+
+    INFO("END: GTED(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
 }
 
 void gted::compute_distance_recursive(
@@ -91,11 +84,12 @@ void gted::compute_distance_recursive(
             clabel(root1), clabel(root2));
 
     strategy str = STR[id(root1)][id(root2)];
+
     if (str.is_heavy())
-        str = strategy(RTED_T2_RIGHT);
+        str = strategy(RTED_T2_RIGHT);  // TODO nahodne
     actual_str = str;
 
-    INFO("str = %s", to_cstr(actual_str));
+    DEBUG("str = %s", to_cstr(actual_str));
 
     if (str.is_T1())
     {
@@ -103,16 +97,15 @@ void gted::compute_distance_recursive(
         for (const auto& val :
                 get_table(actual_str, t1.get_keyroots(root1)))
         {
-            actual_str = str;
             compute_distance_recursive(val, root2);
         }
     }
     else
     {
+        DEBUG("decomponing T2 - keyroots");
         for (const auto& val :
                 get_table(actual_str, t2.get_keyroots(root2)))
         {
-            actual_str = str;
             compute_distance_recursive(root1, val);
         }
     }
@@ -126,22 +119,22 @@ void gted::single_path_function(
                 iterator root2)
 {
     // using subforests
-    // if strategy == T1 -> divide t2...
 
     APP_DEBUG_FNAME;
 
-    DEBUG("single_path_function %s, %s", clabel(root1), clabel(root2));
+    DEBUG("single_path_function %s, %s",
+            clabel(root1), clabel(root2));
 
     if (actual_str.is_T1())
     {
         DEBUG("decomponing T2 - subforests");
-        // use t2.subforests
         for (const auto& val :
                 get_table(actual_str, t2.get_subforests(root2)))
             compute_distance(root1, val);
     }
     else
     {
+        DEBUG("decomponing T1 - subforests");
         for (const auto& val :
                 get_table(actual_str, t1.get_subforests(root1)))
             compute_distance(val, root2);
@@ -162,6 +155,7 @@ gted::forest_distance_table_type gted::compute_distance(
 
     if (actual_str.is_T2())
     {
+        // if T2 -> iterate with T2's iterators first..
         swap(t1ptr, t2ptr);
         swap(root1, root2);
     }
@@ -199,7 +193,6 @@ gted::forest_distance_table_type gted::compute_distance_LR(
 {
     // subtree has id-s (id(leafs.left) ... id(root1))
 
-    //LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
     APP_DEBUG_FNAME;
 
     DEBUG("root1 %s:%lu, root2 %s:%lu",
@@ -259,6 +252,8 @@ gted::forest_distance_table_type gted::compute_distance_LR(
                 vec[2] = get_fdist(prev(1), prev(2)) + GTED_COST_MODIFY; // modify `it1` ~> `it2`
             else
             {
+                // previous subtree visited root == --leaf
+                //
                 iterator_type prev_root1 = get_begin_leaf(t1, it1);
                 iterator_type prev_root2 = get_begin_leaf(t2, it2);
 
@@ -280,7 +275,7 @@ gted::forest_distance_table_type gted::compute_distance_LR(
             min = *min_element(vec.begin(), vec.end());
 
             set_fdist(it1, it2, min);
-            if (b) // i am at subtree roots
+            if (b) // i am in subtree roots
                 set_tdist(it1, it2, min);
         }
     }
@@ -294,121 +289,12 @@ gted::forest_distance_table_type gted::compute_distance_LR(
 #undef prev
 }
 
-
-
-
-size_t gted::get_tdist(
-                iterator it1,
-                iterator it2)
-{
-    assert(valid(it1) && valid(it2));
-
-    size_t i1, i2, out;
-
-    if (actual_str.is_T2())
-        swap(it1, it2);
-    t1.check_same_tree(it1);
-    t2.check_same_tree(it2);
-
-    i1 = id(it1);
-    i2 = id(it2);
-
-    assert(i1 < tdist.size() && i2 < tdist[i1].size());
-
-    DEBUG("\tget TDist[%s:%lu][%s:%lu] -> %lu",
-            clabel(it1), i1,
-            clabel(it2), i2,
-            tdist[i1][i2]);
-
-    out = tdist[i1][i2];
-
-    assert(out != BAD);
-    return out;
-}
-
-void gted::set_tdist(
-                iterator it1,
-                iterator it2,
-                size_t value)
-{
-    assert(valid(it1) && valid(it2));
-
-    size_t i1, i2;
-
-    if (actual_str.is_T2())
-        swap(it1, it2);
-    t1.check_same_tree(it1);
-    t2.check_same_tree(it2);
-
-    i1 = id(it1);
-    i2 = id(it2);
-
-    assert(i1 < tdist.size() && i2 < tdist[i1].size());
-    assert(value != BAD);
-
-    DEBUG("set TDist[%s:%lu][%s:%lu] = %lu",
-            clabel(it1), i1,
-            clabel(it2), i2,
-            value);
-
-    tdist[i1][i2] = value;
-}
-
-size_t gted::get_fdist(
-                const forest_distance_table_type& fdist,
-                const iterator& it1,
-                const iterator& it2,
-                size_t idleft1,
-                size_t idleft2)
-{
-    size_t i1, i2, out;
-
-    i1 = valid(it1) ? id(it1) - idleft1 + 1 : 0;
-    i2 = valid(it2) ? id(it2) - idleft2 + 1 : 0;
-
-    assert((int)i1 >= 0 && (int)i2 >= 0);
-    assert(i1 < fdist.size() && i2 < fdist[i1].size());
-
-    DEBUG("\tget FDist[%s:%lu:%lu][%s:%lu:%lu] -> %lu",
-            clabel(it1), valid(it1) ? id(it1) : 0, i1,
-            clabel(it2), valid(it2) ? id(it2) : 0, i2,
-            fdist[i1][i2]);
-
-    out = fdist[i1][i2];
-
-    assert(out != BAD);
-    return out;
-}
-
-void gted::set_fdist(
-                forest_distance_table_type& fdist,
-                const iterator& it1,
-                const iterator& it2,
-                size_t value,
-                size_t idleft1,
-                size_t idleft2)
-{
-    size_t i1, i2;
-
-    i1 = valid(it1) ? id(it1) - idleft1 + 1 : 0;
-    i2 = valid(it2) ? id(it2) - idleft2 + 1 : 0;
-
-    assert((int)i1 >= 0 && (int)i2 >= 0);
-    assert(i1 < fdist.size() && i2 < fdist[i1].size());
-
-    DEBUG("set FDist[%s:%lu:%lu][%s:%lu:%lu] = %lu",
-            clabel(it1), valid(it1) ? id(it1) : 0, i1,
-            clabel(it2), valid(it2) ? id(it2) : 0, i2,
-            value);
-
-    fdist[i1][i2] = value;
-}
-
-
-
 mapping gted::get_mapping()
 {
     APP_DEBUG_FNAME;
+
+    INFO("BEG: GTED_MAPPING(%s, %s)",
+            to_cstr(t1.name()), to_cstr(t2.name()));
 
     typedef post_order_iterator iterator_type;
 
@@ -459,7 +345,7 @@ mapping gted::get_mapping()
         root2 = to_be_matched.back().second;
         to_be_matched.pop_back();
 
-        logger.infoStream()
+        logger.debugStream()
             << "matching roots:\n"
             << tree_type::print_subtree(root1, false) << "\n"
             << tree_type::print_subtree(root2, false);
@@ -541,6 +427,138 @@ mapping gted::get_mapping()
 
     sort(map.map.begin(), map.map.end());
 
+    INFO("END: GTED_MAPPING(%s, %s)",
+            to_cstr(t1.name()), to_cstr(t2.name()));
+
+
     return map;
+
+#undef prev
+#undef get_fdist
 }
+
+
+
+
+
+/* inline */ size_t gted::get_tdist(
+                iterator it1,
+                iterator it2)
+{
+    assert(valid(it1) && valid(it2));
+
+    size_t i1, i2, out;
+
+    if (actual_str.is_T2())
+        swap(it1, it2);
+    t1.check_same_tree(it1);
+    t2.check_same_tree(it2);
+
+    i1 = id(it1);
+    i2 = id(it2);
+
+    assert(i1 < tdist.size() && i2 < tdist[i1].size());
+
+    DEBUG("\tget TDist[%s:%lu][%s:%lu] -> %lu",
+            clabel(it1), i1,
+            clabel(it2), i2,
+            tdist[i1][i2]);
+
+    out = tdist[i1][i2];
+
+    assert(out != BAD);
+
+    return out;
+}
+
+/* inline */ void gted::set_tdist(
+                iterator it1,
+                iterator it2,
+                size_t value)
+{
+    assert(valid(it1) && valid(it2));
+
+    size_t i1, i2;
+
+    if (actual_str.is_T2())
+        swap(it1, it2);
+    t1.check_same_tree(it1);
+    t2.check_same_tree(it2);
+
+    i1 = id(it1);
+    i2 = id(it2);
+
+    assert(i1 < tdist.size() && i2 < tdist[i1].size());
+    assert(value != BAD);
+
+    DEBUG("set TDist[%s:%lu][%s:%lu] = %lu",
+            clabel(it1), i1,
+            clabel(it2), i2,
+            value);
+
+    tdist[i1][i2] = value;
+}
+
+/* inline */ size_t gted::get_fdist(
+                const forest_distance_table_type& fdist,
+                const iterator& it1,
+                const iterator& it2,
+                size_t idleft1,
+                size_t idleft2)
+{
+    size_t i1, i2, out;
+
+    i1 = valid(it1) ? id(it1) - idleft1 + 1 : 0;
+    i2 = valid(it2) ? id(it2) - idleft2 + 1 : 0;
+
+    assert((int)i1 >= 0 && (int)i2 >= 0);
+    assert(i1 < fdist.size() && i2 < fdist[i1].size());
+
+    DEBUG("\tget FDist[%s:%lu:%lu][%s:%lu:%lu] -> %lu",
+            clabel(it1), valid(it1) ? id(it1) : 0, i1,
+            clabel(it2), valid(it2) ? id(it2) : 0, i2,
+            fdist[i1][i2]);
+
+    out = fdist[i1][i2];
+
+    assert(out != BAD);
+    return out;
+}
+
+/* inline */ void gted::set_fdist(
+                forest_distance_table_type& fdist,
+                const iterator& it1,
+                const iterator& it2,
+                size_t value,
+                size_t idleft1,
+                size_t idleft2)
+{
+    size_t i1, i2;
+
+    i1 = valid(it1) ? id(it1) - idleft1 + 1 : 0;
+    i2 = valid(it2) ? id(it2) - idleft2 + 1 : 0;
+
+    assert((int)i1 >= 0 && (int)i2 >= 0);
+    assert(i1 < fdist.size() && i2 < fdist[i1].size());
+
+    DEBUG("set FDist[%s:%lu:%lu][%s:%lu:%lu] = %lu",
+            clabel(it1), valid(it1) ? id(it1) : 0, i1,
+            clabel(it2), valid(it2) ? id(it2) : 0, i2,
+            value);
+
+    fdist[i1][i2] = value;
+}
+
+/* inline */ void gted::checks()
+{
+    size_t i;
+
+    i = 0;
+    for (auto it = t1.begin_post(); it != t1.end_post(); ++it, ++i)
+        assert(id(it) == i);
+    i = 0;
+    for (auto it = t2.begin_post(); it != t2.end_post(); ++it, ++i)
+        assert(id(it) == i);
+}
+
 
