@@ -19,68 +19,22 @@
  * USA.
  */
 
-#include <log4cpp/Category.hh>
-#include <log4cpp/Appender.hh>
-#include <log4cpp/RollingFileAppender.hh>
-#include <log4cpp/OstreamAppender.hh>
-#include <log4cpp/Layout.hh>
-#include <log4cpp/BasicLayout.hh>
-#include <log4cpp/Priority.hh>
-#include <log4cpp/PatternLayout.hh>
-
 #include "types.hpp"
 
 using namespace std;
 
 
-log4cpp::Category& init_logger()
-{
-    log4cpp::Appender* console_appender;
-    log4cpp::RollingFileAppender* file_appender;
-    log4cpp::PatternLayout* console_layout;
-    log4cpp::PatternLayout* file_layout;
-    string logfile = "build/logs/program.log";
-    string pattern = "%d{%H:%M:%S:%l} %u:\t[%p] %m%n";
-
-    console_appender = new log4cpp::OstreamAppender("console", &std::cout);
-    file_appender = new log4cpp::RollingFileAppender(
-            "default", logfile, 1024 * 1024 * 1024, 2, true);
-    
-    file_layout = new log4cpp::PatternLayout();
-    console_layout = new log4cpp::PatternLayout();
-    console_layout->setConversionPattern(pattern);
-    file_layout->setConversionPattern(pattern);
-
-    file_appender->setLayout(file_layout);
-    console_appender->setLayout(console_layout);
-
-    log4cpp::Category& log = log4cpp::Category::getRoot();
-    log.setPriority(log4cpp::Priority::DEBUG);
-
-    log.addAppender(console_appender);
-    log.addAppender(file_appender);
-
-    log.info("************************************");
-    log.info("********* RUNNING  PROGRAM *********");
-    log.info("************************************");
-
-    return log;
-}
-
-/* global */
-log4cpp::Category& logger = init_logger();
-
 
 logger_end_of_function_priority::logger_end_of_function_priority(
-                log4cpp::Priority::Value new_priority)
+                logger::priority new_priority)
 {
-    old_priority = logger.getPriority();
-    logger.setPriority(new_priority);
+    old_priority = logger.get_priority();
+    logger.set_priority(new_priority);
 }
 
 logger_end_of_function_priority::~logger_end_of_function_priority()
 {
-    logger.setPriority(old_priority);
+    logger.set_priority(old_priority);
 }
 
 print_class_BEG_END_name::print_class_BEG_END_name(

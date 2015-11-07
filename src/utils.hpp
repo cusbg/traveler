@@ -28,15 +28,6 @@
 #include "strategy.hpp"
 #include "point.hpp"
 
-#define FILES                       std::vector<std::string>({"human", "rabbit", "frog", "mouse"})
-#define PS_IN(val)                  (std::string() + "precomputed/" + val + ".ps")
-#define PS_OUT(val1, val2)          (std::string() + "build/files/" + val1 + "-" + val2 + ".out.ps")
-#define SEQ(val)                    (std::string() + "precomputed/" + val + ".seq")
-#define FOLD(val)                   (std::string() + "precomputed/" + val + ".fold")
-#define MAP(val1, val2)             (std::string() + "precomputed/" + val1 + "-" + val2 + ".map")
-
-#define RTED(val1, val2)            (std::string() + "precomputed/" + val1 + "-" + val2 + ".rted")
-#define GTED(val1, val2)            (std::string() + "precomputed/" + val1 + "-" + val2 + ".gted")
 
 class mapping;
 class rna_tree;

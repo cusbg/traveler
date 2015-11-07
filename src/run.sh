@@ -83,10 +83,10 @@ g() {
     file2=artemia-salina
     DIROUT=build/files/run
     file="${DIROUT}/${file1}-${file2}"
-    #tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fold --name ${file1}"
-    #mt="--match-tree build/files/${file2}.seq build/files/${file2}.fold --name ${file2}"
-    tt="--template-tree build/files/${file2}.ps build/files/${file2}.fold --name ${file2}"
-    mt="--match-tree ${DIR}/${file1}.seq ${DIR}/${file1}.fold --name ${file1}"
+    tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fold --name ${file1}"
+    mt="--match-tree build/files/${file2}.seq build/files/${file2}.fold --name ${file2}"
+    #tt="--template-tree build/files/${file2}.ps build/files/${file2}.fold --name ${file2}"
+    #mt="--match-tree ${DIR}/${file1}.seq ${DIR}/${file1}.fold --name ${file1}"
 
     ${EXECUTABLE} \
         ${tt} ${mt} \
@@ -100,6 +100,9 @@ then
 fi
 
 #f
+
+g rabbit
+fail_function
 
 
 for file1 in $FILES

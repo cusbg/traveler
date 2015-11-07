@@ -293,6 +293,8 @@ mapping gted::get_mapping()
 {
     APP_DEBUG_FNAME;
 
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
     INFO("BEG: GTED_MAPPING(%s, %s)",
             to_cstr(t1.name()), to_cstr(t2.name()));
 
@@ -345,10 +347,9 @@ mapping gted::get_mapping()
         root2 = to_be_matched.back().second;
         to_be_matched.pop_back();
 
-        logger.debugStream()
-            << "matching roots:\n"
-            << tree_type::print_subtree(root1, false) << "\n"
-            << tree_type::print_subtree(root2, false);
+        DEBUG("matching roots:\n%s\n%s",
+                to_cstr(tree_type::print_subtree(root1, false)),
+                to_cstr(tree_type::print_subtree(root2, false)));
 
         fdist = compute_distance_local(root1, root2);
 
@@ -405,10 +406,9 @@ mapping gted::get_mapping()
                 }
                 else
                 {
-                    logger.debugStream()
-                        << "to_be_matched:\n"
-                        << tree_type::print_subtree(it1, false) << "\n"
-                        << tree_type::print_subtree(it2, false);
+                    DEBUG("matching roots:\n%s\n%s",
+                            to_cstr(tree_type::print_subtree(it1, false)),
+                            to_cstr(tree_type::print_subtree(it2, false)));
 
                     to_be_matched.push_back({it1, it2});
 

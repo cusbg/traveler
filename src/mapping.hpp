@@ -45,11 +45,6 @@ private:
 
 public:
     mapping() = default;
-    mapping(
-                const rna_tree& rna1,
-                const rna_tree& rna2);
-    mapping(
-                const std::string& filename);
 
     indexes get_to_insert() const;
     indexes get_to_remove() const;

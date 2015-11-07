@@ -2,8 +2,8 @@
 
 
 ## Prerequisites:
-In order to successfully compile and run project, you will need:
-	log4cpp library
+	In order to successfully compile and run project, you will need:
+		log4cpp library -> delete until release..
 
 ## Compiling:
 To compile project, run `make build` in src/ directory.

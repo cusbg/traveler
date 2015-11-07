@@ -29,16 +29,13 @@
 #include <sstream>
 #include <algorithm>
 #include <stdexcept>
-#include <log4cpp/Category.hh>
-
-
-extern log4cpp::Category& logger; // globalna premenna...
+#include "logger.hpp"
 
 #define DEBUG(...) \
-    if (logger.isDebugEnabled()) \
+    if (logger.is_debug_enabled()) \
         logger.debug(__VA_ARGS__)
 #define INFO(...) \
-    if (logger.isInfoEnabled()) \
+    if (logger.is_info_enabled()) \
         logger.info(__VA_ARGS__)
 #define WARN(...) \
     logger.warn(__VA_ARGS__)
@@ -89,11 +86,11 @@ struct logger_end_of_function_priority
 {
 public:
     logger_end_of_function_priority(
-                log4cpp::Priority::Value new_priority);
+                logger::priority new_priority);
     ~logger_end_of_function_priority();
 
 private:
-    log4cpp::Priority::Value old_priority;
+    logger::priority old_priority;
 };
 
 struct print_class_BEG_END_name
@@ -122,7 +119,7 @@ inline void wait_for_input()
         }
 
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
-    logger_end_of_function_priority __logger_priority(log4cpp::Priority::PRIORITY)
+    logger_end_of_function_priority __logger_priority(logger::PRIORITY)
 
 #define APP_DEBUG_FNAME \
     print_class_BEG_END_name __function_name(__PRETTY_FUNCTION__)
@@ -132,7 +129,7 @@ inline void wait_for_input()
             std::stringstream stream; \
             for (auto __value : container) \
                 stream << to_string(__value) << " "; \
-            logger.debugStream() << name << ": " << stream.str(); \
+            logger.debug("%s", to_cstr(stream.str())); \
         }
 
 #define abort() ERR("abort(), line # %lu", __LINE__), ::abort()

@@ -50,12 +50,17 @@
 
 using namespace std;
 
-
 void signal_handler(int signal)
 {
-    FILE* f = fopen("build/logs/signal.log", "w");
-    fprintf(f, "signal %i:%s caught, exiting", signal, strsignal(signal));
-    fflush(f);
+    // TODO: lepsi handler
+    string out =
+        "signal "
+        + to_string(signal)
+        + ":"
+        + strsignal(signal)
+        + " caught, exiting\n";
+
+    write(2, out.c_str(), out.length());
     exit(2);
 }
 
@@ -68,6 +73,22 @@ void set_signal_handler()
 
     for (int i = 0; i < 40; ++i)
         sigaction(i, &act, NULL);
+}
+
+
+void generate_seq_from_ps(
+                const std::string& psfile,
+                const std::string& seqfile)
+{
+    ps_document doc(psfile);
+    write_file(seqfile, doc.labels);
+}
+void generate_seq()
+{
+    std::vector<std::string> vec({"human", "rabbit", "frog", "mouse"});
+    for (auto val : vec)
+        generate_seq_from_ps("precomputed/" + val + ".ps", "precomputed/" + val + ".seq");
+    abort();
 }
 
 

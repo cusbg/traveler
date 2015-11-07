@@ -57,49 +57,6 @@ mapping::indexes mapping::get_to_remove() const
     return vec;
 }
 
-mapping::mapping(
-                const rna_tree& rna1,
-                const rna_tree& rna2)
-    : mapping(MAP(rna1.name(), rna2.name()))
-{ }
-
-mapping::mapping(
-                const std::string& filename)
-{
-    APP_DEBUG_FNAME;
-
-    assert(exist_file(filename));
-
-    ifstream in(filename);
-    *this = read_mapping(in);
-}
-
-/* static */ mapping mapping::read_mapping(
-                std::istream& in)
-{
-    APP_DEBUG_FNAME;
-
-    mapping map;
-    mapping_pair m;
-
-    string s;
-    in
-        >> s
-        >> s;
-    //DEBUG("distance: %s", s.c_str());
-    map.distance = stoi(s);
-
-    while(true)
-    {
-        in >> s;
-        if (in.fail())
-            break;
-        m = split(s);
-        map.map.push_back(m);
-    }
-    return map;
-}
-
 /* static */ mapping::mapping_pair mapping::split(
                 const std::string& text)
 {

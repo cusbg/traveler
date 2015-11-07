@@ -53,7 +53,8 @@ rna_tree::rna_tree(
         << endl
         << print_tree(false);
 
-    logger.debugStream() << stream.str();
+    DEBUG("%s",
+            to_cstr(stream.str()));
 }
 
 rna_tree::rna_tree(

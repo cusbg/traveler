@@ -234,8 +234,6 @@ void app::run(
         args.templated = matcher(args.templated, args.matched).run(g.get_mapping());
         compact(args.templated).run();
 
-        auto overlaps = overlap_checks().run(args.templated);
-
         ps_writer ps;
         ps.init(args.all.psout);
 
@@ -458,7 +456,7 @@ void app::print(
             << endl
         << endl;
 
-    logger.infoStream() << str.str();
+    INFO("%s", to_cstr(str.str()));
 }
 
 

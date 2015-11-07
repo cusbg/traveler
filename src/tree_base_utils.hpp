@@ -155,7 +155,7 @@ std::string tree_base<label_type>::print_subtree(
 
     print_recursive(root, stream);
     if (debug_out)
-        logger.debugStream() << stream.str();
+        DEBUG("%s", to_cstr(stream.str()));
     return stream.str();
 }
 
