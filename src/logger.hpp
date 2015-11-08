@@ -25,6 +25,8 @@
 #include <cstdarg>
 #include <cstdio>
 #include <vector>
+#include <string>
+#include <sstream>
 
 
 class logger
@@ -44,9 +46,17 @@ class logger
         return can_log(priority::_priority); \
     }
 
-#define LOGGER_FUNCTION(_f, _p) \
+#define LOGGER_STREAM_FUNCTION(_fname, _priority) \
+    inline logger_stream _fname ##_stream() \
+    { \
+        return get_stream(_priority); \
+    }
+
+#define LOGGER_FUNCTIONS(_f, _p) \
     LOGGER_PRIORITY_FUNCTION(_f, _p); \
-    LOGGER_ENABLED_PRIORITY_FUNCTION(_f, _p);
+    LOGGER_ENABLED_PRIORITY_FUNCTION(_f, _p); \
+    LOGGER_STREAM_FUNCTION(_f, _p);
+
 
 public:
     enum priority : char
@@ -58,28 +68,33 @@ public:
         EMERG   = 4,
     };
 
-    class logger_stream;
+    class logger_stream
+    {
+    public:
+        logger_stream(
+                    logger& l,
+                    priority p);
+        logger_stream(
+                    const logger_stream& other);
+        void flush();
+        ~logger_stream();
+
+        template <typename T>
+        logger_stream& operator<<(
+                    const T value)
+        {
+            stream << value;
+            return *this;
+        }
+    private:
+        logger& l;
+        priority p;
+        std::ostringstream stream;
+    };
+
 public:
     logger();
-
-private:
-    void log(
-                priority p,
-                const char* msg,
-                va_list va);
-
-    inline bool can_log(
-                priority other) const
-    {
-        return other >= p;
-    }
-
-public:
-    LOGGER_FUNCTION(debug, DEBUG);
-    LOGGER_FUNCTION(info,   INFO);
-    LOGGER_FUNCTION(warn,   WARN);
-    LOGGER_FUNCTION(error,  ERROR);
-    LOGGER_FUNCTION(emerg,  EMERG);
+    ~logger();
 
 public:
     inline priority get_priority() const
@@ -92,15 +107,61 @@ public:
         p = other;
     }
 
+protected:
+    std::string message_header(
+                priority p);
+
+    void log(
+                priority p,
+                const char* msg,
+                va_list va);
+
+    inline logger_stream get_stream(
+                priority p)
+    {
+        return logger_stream(*this, p);
+    }
+
+    void check_errors();
+
 private:
+    inline bool can_log(
+                priority other) const
+    {
+        return other >= p;
+    }
+
+public:
+    LOGGER_FUNCTIONS(debug, DEBUG);
+    LOGGER_FUNCTIONS(info,  INFO);
+    LOGGER_FUNCTIONS(warn,  WARN);
+    LOGGER_FUNCTIONS(error, ERROR);
+    LOGGER_FUNCTIONS(emerg, EMERG);
+
+public:
+    inline std::vector<int> opened_files()
+    {
+        std::vector<int> vec;
+        for (FILE* f : out)
+            vec.push_back(fileno(f));
+        return vec;
+    }
+
+protected:
     priority p = priority::DEBUG;
     std::vector<FILE*> out;
 
 #undef LOGGER_PRIORITY_FUNCTION
-#undef LOGGER_PRIORITY_STREAM_FUNCTION
-#undef LOGGER_FUNCTION
+#undef LOGGER_ENABLED_PRIORITY_FUNCTION
+#undef LOGGER_STREAM_FUNCTION
+#undef LOGGER_FUNCTIONS
+
+    friend void signal_handler(int);
 };
 
+
+
+/* global */
 extern logger logger;
 
 

@@ -52,15 +52,21 @@ using namespace std;
 
 void signal_handler(int signal)
 {
-    // TODO: lepsi handler
-    string out =
-        "signal "
+    string out;
+    out += "\n\n"
+        + logger.message_header(logger::priority::EMERG)
+        + "ERROR: signal "
         + to_string(signal)
         + ":"
         + strsignal(signal)
         + " caught, exiting\n";
 
-    write(2, out.c_str(), out.length());
+    vector<int> output_fds = logger.opened_files();
+    output_fds.push_back(STDERR_FILENO);
+
+    for (int fd : output_fds)
+        write(fd, out.c_str(), out.length());
+
     exit(2);
 }
 
@@ -71,8 +77,18 @@ void set_signal_handler()
     bzero(&act, sizeof(struct sigaction));
     act.sa_handler = signal_handler;
 
-    for (int i = 0; i < 40; ++i)
-        sigaction(i, &act, NULL);
+    auto signals = {
+        SIGINT,
+        SIGSEGV,
+        SIGABRT,
+        SIGQUIT,
+        SIGTERM,
+    };
+    for (int sig : signals)
+        if (sigaction(sig, &act, NULL) != 0)
+        {
+            ERR("sigaction on signal %i failed, err: %s", sig, strerror(errno));
+        }
 }
 
 
@@ -90,7 +106,6 @@ void generate_seq()
         generate_seq_from_ps("precomputed/" + val + ".ps", "precomputed/" + val + ".seq");
     abort();
 }
-
 
 int main(int argc, char** argv)
 {

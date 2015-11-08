@@ -347,9 +347,11 @@ mapping gted::get_mapping()
         root2 = to_be_matched.back().second;
         to_be_matched.pop_back();
 
-        DEBUG("matching roots:\n%s\n%s",
-                to_cstr(tree_type::print_subtree(root1, false)),
-                to_cstr(tree_type::print_subtree(root2, false)));
+        logger.debug_stream()
+            << "matching roots:\n"
+            << tree_type::print_subtree(root1, false)
+            << '\n'
+            << tree_type::print_subtree(root2, false);
 
         fdist = compute_distance_local(root1, root2);
 
@@ -406,9 +408,11 @@ mapping gted::get_mapping()
                 }
                 else
                 {
-                    DEBUG("matching roots:\n%s\n%s",
-                            to_cstr(tree_type::print_subtree(it1, false)),
-                            to_cstr(tree_type::print_subtree(it2, false)));
+                    logger.debug_stream()
+                        << "matching roots:\n"
+                        << tree_type::print_subtree(it1, false)
+                        << '\n'
+                        << tree_type::print_subtree(it2, false);
 
                     to_be_matched.push_back({it1, it2});
 

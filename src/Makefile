@@ -8,7 +8,7 @@
 CC                      = g++
 DEBUG                   = -g -Wall
 #RELEASE                 = -DNDEBUG -O3
-RELEASE = -O3
+#RELEASE = -O3
 CFLAGS                  = -std=c++11 -c $(DEBUG) $(RELEASE)
 LFLAGS                  = $(DEBUG) $(RELEASE)
 SHELL                   = /bin/bash -o pipefail
@@ -48,7 +48,7 @@ $(BUILDDIR)/$(TARGET): $(BUILDDIR)/Makefile
 CORES                   = $(shell expr $(shell nproc) + 2)
 $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES))
 	@rm -f $@
-	@echo -e\
+	@echo -e \
 			\\nbuild : $(TARGET) \\n \
 			\\n \
 			\\n$(TARGET) : $(OBJECTS) \\n\\t \
@@ -81,8 +81,7 @@ rnafold:
 	../RNAPlot/bin/RNAfold --noPS << END \n SEQ \n END
 
 
-clean: cleanMK cleanCompiled
-	#rm -rf $(BUILDDIR)
+clean: cleanMK cleanCompiled cleanLog
 
 cleanCompiled:
 	rm -rf $(BUILDDIR)/*.o $(BUILDDIR)/$(TARGET)

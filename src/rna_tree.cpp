@@ -37,24 +37,17 @@ rna_tree::rna_tree(
     : tree_base<rna_pair_label>(
             trim(_brackets), convert(trim(_labels))), _name(_name)
 {
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    std::stringstream stream;
-
     set_postorder_ids();
 
-    stream
+    logger.debug_stream()
         << "TREE '"
         << id()
         << ":"
         << _name
         << "' WAS CONSTRUCTED, size = "
         << size()
-        << endl
+        << "\n"
         << print_tree(false);
-
-    DEBUG("%s",
-            to_cstr(stream.str()));
 }
 
 rna_tree::rna_tree(

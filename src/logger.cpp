@@ -22,6 +22,8 @@
 #include <cstdlib>
 #include <chrono>
 #include <string>
+#include <sstream>
+#include <iomanip>
 
 #include "logger.hpp"
 
@@ -36,6 +38,33 @@
 using namespace std;
 using namespace chrono;
 
+/* global */
+class logger logger;
+
+
+
+logger::logger()
+{
+    string file = "build/logs/program.log";
+    FILE * f = fopen(file.c_str(), "a");
+    out.push_back(stdout);
+
+    if (f == nullptr ||
+            ferror(f))
+    {
+        error("cannot open file %s",
+                file.c_str());
+        abort();
+    }
+    else
+        out.push_back(f);
+}
+
+logger::~logger()
+{
+    for (FILE* f : out)
+        fclose(f);
+}
 
 inline const char* to_cstr(
                 logger::priority p)
@@ -66,13 +95,30 @@ void logger::log(
 {
     if (!can_log(p))
         return;
-    //                    HH : MM : SS : mm [prior]
-#define PRINT_PATTERN   "%02lu:%02lu:%02lu:%03lu %lu:\t[%s]\t"
 
+    for (FILE* f : out)
+    {
+        va_list copy;
+        va_copy(copy, va);
+
+        fprintf(f, "%s", message_header(p).c_str());
+        vfprintf(f, msg, copy);
+        fprintf(f, "\n");
+
+        va_end(copy);
+    }
+
+    check_errors();
+}
+
+string logger::message_header(
+                priority p)
+{
     auto now = chrono::system_clock::now().time_since_epoch();
 
     size_t hour, minute, second, millisecond, cputacts;
     timespec cputime;
+    std::ostringstream stream;
 
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cputime);
 
@@ -82,45 +128,71 @@ void logger::log(
     millisecond = ((size_t)duration_cast<milliseconds>(now).count()) % 1000;
     cputacts = cputime.tv_sec * 1000000LL + cputime.tv_nsec / 1000;
 
+    // PATTERN:
+    //  %TIME% %CPUTACTS% [%PRIORITY%] %MESSAGE%
+    //
+    stream
+        << setfill('0') << setw(2)
+        << hour
+        << ':'
+        << setfill('0') << setw(2)
+        << minute
+        << ':'
+        << setfill('0') << setw(2)
+        << second
+        << ':'
+        << setfill('0') << setw(3)
+        << millisecond
+        << ' '
+        << cputacts
+        << "\t["
+        << to_cstr(p)
+        << "]\t";
+
+    return stream.str();
+}
+
+void logger::check_errors()
+{
     for (FILE* f : out)
     {
-        va_list copy;
-        va_copy(copy, va);
-
-        fprintf(f, PRINT_PATTERN,
-                hour,
-                minute,
-                second,
-                millisecond,
-                cputacts,
-                to_cstr(p));
-
-        vfprintf(f, msg, copy);
-
-        fprintf(f, "\n");
-
-        va_end(copy);
+        if (ferror(f))
+        {
+            for (FILE* f : out)
+                fprintf(f, "LOGGER FILE OUTPUT ERROR\n");
+            abort();
+        }
     }
-
-#undef PRINT_PATTERN
 }
 
-logger::logger()
+
+
+
+logger::logger_stream::logger_stream(
+                logger& _l,
+                priority _p)
+    : l(_l), p(_p)
+{ }
+
+logger::logger_stream::~logger_stream()
 {
-    string file = "build/logs/program.log";
-    FILE * f = fopen(file.c_str(), "a");
-    out.push_back(stdout);
-
-    if (f == nullptr ||
-            ferror(f))
-    {
-        error("cannot open file %s",
-                file.c_str());
-        abort();
-    }
-    else
-        out.push_back(f);
+    flush();
 }
 
-class logger logger;
+logger::logger_stream::logger_stream(
+        const logger_stream& other)
+    : l(other.l), p(other.p)
+{
+    stream << other.stream.str();
+}
+
+void logger::logger_stream::flush()
+{
+    for (FILE* f : l.out)
+    {
+        fprintf(f, "%s", l.message_header(p).c_str());
+        fprintf(f, "%s\n", stream.str().c_str());
+    }
+}
+
 

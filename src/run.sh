@@ -99,23 +99,9 @@ then
     EXECUTABLE="gdb --args ${EXECUTABLE}"
 fi
 
-#f
-
-g rabbit
-fail_function
-
 
 for file1 in $FILES
 do
-    #if [ ! -e "${EXECUTABLE}" ]
-    #then 
-        #read l;
-    #fi
-
-    g ${file1}
-    #run_all ${file1} artemia-salina
-    continue
-
     for file2 in $FILES
     do
         run_all ${file1} ${file2}
