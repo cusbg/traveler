@@ -19,6 +19,8 @@
  * USA.
  */
 
+#include <regex>
+
 #include "utils.hpp"
 #include "rna_tree.hpp"
 #include "mapping.hpp"
@@ -62,7 +64,9 @@ using namespace std;
 ps_document::ps_document(const std::string& name)
 {
     APP_DEBUG_FNAME;
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    DEBUG("reading ps_document(%s)",
+            to_cstr(name));
+    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     string line, str;
     assert_err(exist_file(name),
@@ -181,29 +185,14 @@ ps_document::ps_document(const std::string& name)
 
 bool ps_document::is_base_line(const std::string& line)
 {
-    const static vector<char> bases = {'A', 'C', 'G', 'U'};
-    point p;
-    string other;
-    stringstream str(line);
+    regex regexp(
+            // matches:
+            // (%BASE%) %DOUBLE% %DOUBLE% %LWSTRING%
+            "^\\([ACGU]\\)\\s+-?[0-9]+(\\.[0-9]+)?\\s+-?[0-9]+(\\.[0-9]+)?\\s+lwstring\\s*$"
+            );
+    smatch match;
 
-    str 
-        >> other
-        >> p.x
-        >> p.y
-        >> other;
-
-    return
-        !(
-            false
-            || line.size() < 3
-            || !contains(bases, line.at(1))
-            || line.at(2) != ')'
-            || find(bases.begin(), bases.end(), line.at(1)) == bases.end()
-            || line.find("lwstring") == string::npos
-            || str.fail()
-            || other != "lwstring"
-            || !str.eof()
-         );
+    return regex_search(line, match, regexp);
 }
 
 /* static */ std::string ps_document::default_prologue()

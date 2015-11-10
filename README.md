@@ -34,8 +34,8 @@ To compile project, run `make build` in src/ directory.
 	$ INDIR="../InFiles/"
 	$ OUTDIR="/tmp/"
 	$ ./build/program \
-		--match-tree $INDIR/frog.seq $INDIR/frog.fold \
-		--template-tree $INDIR/human.ps $INDIR/human.fold \
+		--match-tree $INDIR/frog.seq $INDIR/frog.fold --name frog \
+		--template-tree $INDIR/human.ps $INDIR/human.fold --name human \
 		--all $OUTDIR/frog_to_human.ps
 
 #### Note:
