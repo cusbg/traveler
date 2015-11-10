@@ -93,8 +93,6 @@ public:
     ps_document(
                 const std::string& filename);
 
-    static bool is_base_line(
-                const std::string& line);
     static std::string default_prologue();
 
     std::string labels;

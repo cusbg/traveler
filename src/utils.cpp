@@ -64,17 +64,20 @@ using namespace std;
 ps_document::ps_document(const std::string& name)
 {
     APP_DEBUG_FNAME;
-    DEBUG("reading ps_document(%s)",
-            to_cstr(name));
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
-    string line, str;
     assert_err(exist_file(name),
             "ps_document(%s): file does not exist", to_cstr(name));
 
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
+    string line, str;
     ifstream in(name);
     point p;
     auto stream_pos = in.tellg();
+    regex regexp(
+            "^\\([ACGU]\\)\\s+"                                 //(%BASE%)
+            "-?[0-9]+(\\.[0-9]+)?\\s+-?[0-9]+(\\.[0-9]+)?\\s+"  //+-%DOUBLE% +-%DOUBLE%
+            "lwstring\\s*$"                                     // %LWSTRING%
+            );
 
     auto ignore_line = [](const std::string& line)
     {
@@ -117,6 +120,12 @@ ps_document::ps_document(const std::string& name)
             !str.fail() &&
             str.eof() &&
             other == "setrgbcolor";
+    };
+    auto is_base_line = [&regexp](const std::string& line)
+    {
+        smatch match;
+
+        return regex_search(line, match, regexp);
     };
 
     // nacita prolog suboru
@@ -181,18 +190,6 @@ ps_document::ps_document(const std::string& name)
         epilog += line + "\n";
         DEBUG("epilog '%s'", line.c_str());
     }
-}
-
-bool ps_document::is_base_line(const std::string& line)
-{
-    regex regexp(
-            // matches:
-            // (%BASE%) %DOUBLE% %DOUBLE% %LWSTRING%
-            "^\\([ACGU]\\)\\s+-?[0-9]+(\\.[0-9]+)?\\s+-?[0-9]+(\\.[0-9]+)?\\s+lwstring\\s*$"
-            );
-    smatch match;
-
-    return regex_search(line, match, regexp);
 }
 
 /* static */ std::string ps_document::default_prologue()
