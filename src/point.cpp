@@ -293,7 +293,7 @@ bool lies_between(point p, point from, point to)
 
     return p.x / to.x <= 1 &&
         p.x / to.x >= 0 &&
-        p.x / to.x == p.y / to.y;
+        double_equals(p.x / to.x, p.y / to.y);
 }
 
 

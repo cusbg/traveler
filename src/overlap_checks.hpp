@@ -67,9 +67,14 @@ private:
      * find point in which edges are intersecting each other
      * if no point exist, return point::bad_point
      */
-    point intersection(
+    static point intersection(
                 const edge& e1,
-                const edge& e2) const;
+                const edge& e2);
+
+#ifdef TESTS
+public:
+    static void test();
+#endif
 };
 
 

@@ -104,6 +104,7 @@ overlap_checks::overlaps overlap_checks::run(
                     distance(p, e2.p2),
                 };
                 double radius = *std::max_element(distances.begin(), distances.end());
+                WARN("overlap occured");
 
                 vec.push_back({p, radius});
             }
@@ -113,11 +114,12 @@ overlap_checks::overlaps overlap_checks::run(
     return vec;
 }
 
-point overlap_checks::intersection(
+/* static */ point overlap_checks::intersection(
                 const edge& e1,
-                const edge& e2) const
+                const edge& e2)
 {
-    // sin(a)/alpha == sin(b)/beta == sin(c)/gamma
+    // a / sin(alpha) == b / sin(beta) == c / sin(gamma)
+    // => a = c * sin(alpha) / sin(gamma)
     //
     double alpha, beta, gamma;
     double a, c;
@@ -127,19 +129,34 @@ point overlap_checks::intersection(
     assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p2));
 
     c = distance(e1.p1, e2.p1);
+
     alpha = angle(e2.p1, e1.p1, e1.p2);
     beta = angle(e1.p1, e2.p1, e2.p2);
+
+    if (alpha > 180)
+        alpha = 360. - alpha;
+    if (beta > 180)
+        beta = 360. - beta;
+
     gamma = 180. - alpha - beta;
+
+    //DEBUG("alpha %f, beta %f, gamma %f",
+            //alpha, beta, gamma);
+
+    assert(double_equals(180, alpha + beta + gamma));
 
     if (gamma < 0 || iszero(gamma))
         return point::bad_point();
 
-    a = radians_to_degrees(c / sin(degrees_to_radians(gamma)) *
-            sin(degrees_to_radians(alpha)));
+    a = c * radians_to_degrees(sin(degrees_to_radians(alpha))) /
+        radians_to_degrees(sin(degrees_to_radians(gamma)));
 
     if (!iszero(a))
         p = move_point(e2.p1, e2.p2, a);
-    else p = e2.p1;
+    else
+        p = e2.p1;
+
+    //DEBUG("p=%s", to_cstr(p));
 
     if (lies_between(p, e1.p1, e1.p2) &&
             lies_between(p, e2.p1, e2.p2))
