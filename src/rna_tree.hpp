@@ -66,6 +66,15 @@ public:
 
     std::string name() const;
 
+public:
+    static std::string get_labels(
+                const iterator& root);
+    std::string get_labels() const;
+    static std::string get_brackets(
+                const iterator& root);
+    std::string get_brackets() const;
+
+
 private:
     std::string _name;
 };

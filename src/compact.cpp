@@ -143,7 +143,7 @@ void compact::init()
     iterator it;
     point p;
 
-    for (it = rna.begin(); it != rna.end(); ++it)
+    for (it = ++rna.begin(); it != rna.end(); ++it)
     {
         if (it->inited_points() || !it->paired())
             continue;

@@ -65,7 +65,8 @@ void signal_handler(int signal)
     output_fds.push_back(STDERR_FILENO);
 
     for (int fd : output_fds)
-        write(fd, out.c_str(), out.length());
+        (void)(write(fd, out.c_str(), out.length()) + 1);
+    // ^^ ((void) + 1)to prevent warning warn-unused-result
 
     exit(2);
 }
@@ -91,33 +92,36 @@ void set_signal_handler()
         }
 }
 
-
-void generate_seq_from_ps(
-                const std::string& psfile,
-                const std::string& seqfile)
-{
-    ps_document doc(psfile);
-    write_file(seqfile, doc.labels);
-}
-void generate_seq()
-{
-    std::vector<std::string> vec({"human", "rabbit", "frog", "mouse"});
-    for (auto val : vec)
-        generate_seq_from_ps("precomputed/" + val + ".ps", "precomputed/" + val + ".seq");
-    abort();
-}
-
-int main(int argc, char** argv)
+void init()
 {
     set_signal_handler();
     cout << boolalpha;
     srand(1);
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+}
 
+
+
+void f();
+
+int main(int argc, char** argv)
+{
+    init();
+    f();
     app app;
     app.run(vector<string>(argv, argv + argc));
 
     return 0;
 }
 
+#include "tests.hpp"
+#include "overlap_checks.hpp"
+#include "write_ps_document.hpp"
+
+void f()
+{
+    test t;
+    t.run();
+
+    exit(0);
+}
 #endif

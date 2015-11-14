@@ -50,7 +50,8 @@ tree_base<label_type>::tree_base(
             "tree: brackets.size:%lu != labels.size:%lu",
             _brackets.size(), _labels.size());
 
-    _tree.set_head(label_type("ROOT_" + std::to_string(_id)));
+    label_type root = label_type("ROOT_" + std::to_string(_id)) + label_type("");
+    _tree.set_head(root);
     _size = 1;  // ROOT
     it = begin();
 
@@ -121,46 +122,47 @@ std::string tree_base<label_type>::print_subtree(
                 const iterator& root,
                 bool debug_out)
 {
-    std::stringstream stream;
-    stream
+    std::ostringstream out;
+    out
         << "SUBTREE("
         << ::label(root)
         << ":"
         << ::id(root)
         << "): \t";
 
-    std::function<void(const iterator& it, std::stringstream& out)>
-        print_recursive = [&print_recursive](iterator it, std::stringstream& out)
+    auto f = [&out](const pre_post_order_iterator& iter)
+    {
+        if (is_leaf(iter))
         {
-            assert(it.node != nullptr);
+            out << label(iter);
 
-            out << label(it);
-
-            if (!is_leaf(it))
+            if (!is_last_child(iter))
+                out << ", ";
+        }
+        else
+        {
+            if (iter.preorder())
+                out << label(iter) << "(";
+            else
             {
-                out << "(";
-
-                assert(it.begin() != it.end());
-
-                for (sibling_iterator sib = it.begin(); sib != it.end(); ++sib)
-                {
-                    print_recursive(sib, out);
-
-                    if (!is_last_child(sib))
-                        out << ", ";
-                }
                 out << ")";
+                if (!is_last_child(iter) && !is_root(iter))
+                    out << ", ";
             }
-        };
+        }
+    };
 
-    print_recursive(root, stream);
+    pre_post_order_iterator begin(root, true);
+    pre_post_order_iterator end(root, false);
+    ++end;
+
+    for_each(begin, end, f);
 
     if (debug_out)
-        DEBUG("%s", to_cstr(stream.str()));
+        DEBUG("%s", to_cstr(out.str()));
 
-    return stream.str();
+    return out.str();
 }
-
 
 template <typename label_type>
 void tree_base<label_type>::set_postorder_ids()

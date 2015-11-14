@@ -1,5 +1,5 @@
 /*
- * File: tests.cpp
+ * File: tests.hpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
@@ -19,31 +19,35 @@
  * USA.
  */
 
-#define TESTS
+#ifndef TESTS_HPP
+#define TESTS_HPP
 
-#include "../types.hpp"
-#include "rted_test.cpp"
-#include "gted_test.cpp"
-#include "overlap_checks_test.cpp"
+#include "rna_tree.hpp"
 
+class rna_tree;
 
-using namespace std;
-
-void tests()
+class test
 {
-    APP_DEBUG_FNAME;
+private:
+    typedef rna_tree::iterator iterator;
 
-    //rted::test();
-    //gted::test();
-    overlap_checks::test();    
+public:
+    void run();
 
-    INFO("TESTS OK");
-}
+private:
+    rna_tree remove_leaf_nodes();
+    rna_tree remove_stem_nodes(rna_tree rna);
+    rna_tree remove_interior_loop_nodes(rna_tree rna);
 
-int main()
-{
-    tests();
+    rna_tree insert_leaf_nodes(rna_tree rna);
+    rna_tree insert_stem_nodes(rna_tree rna);
+    rna_tree insert_interior_loop_nodes(rna_tree rna);
 
-    return 0;
-}
+    void save(const rna_tree& rna);
+
+    void run_TED(rna_tree temp, rna_tree rna);
+};
+
+
+#endif /* !TESTS_HPP */
 

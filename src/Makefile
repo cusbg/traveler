@@ -8,7 +8,7 @@
 CC                      = g++
 DEBUG                   = -g -Wall
 #RELEASE                 = -DNDEBUG -O3
-#RELEASE = -O3
+RELEASE = -O3
 CFLAGS                  = -std=c++11 -c $(DEBUG) $(RELEASE)
 LFLAGS                  = $(DEBUG) $(RELEASE)
 SHELL                   = /bin/bash -o pipefail
@@ -26,15 +26,11 @@ MAKEFILES               = $(shell echo $(SOURCES) | sed 's@\.cpp@.mk@g; s@[^ ]*/
 MAKEDEPENDENCY          = $(CC) -MM -E 
 
 ARGS                    =
-run: build cleanLog
-	@echo "**********************************************************************"
-	@echo "********************* RUNNING  PROGRAM *******************************"
-	@echo "**********************************************************************"
-	@echo
+run: build cleanLog cp
 	sh -x run.sh
 
 
-build: mk_dirs $(BUILDDIR)/$(TARGET)
+build: $(BUILDDIR)/$(TARGET)
 
 debug: build
 	sh -x run.sh debug
@@ -45,7 +41,7 @@ analyse:
 
 $(BUILDDIR)/$(TARGET): $(BUILDDIR)/Makefile
 
-CORES                   = $(shell expr $(shell nproc) + 2)
+CORES = $(shell expr $(shell nproc) + 2)
 $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES))
 	@rm -f $@
 	@echo -e \
@@ -64,6 +60,9 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 
 mk_dirs:
 	@mkdir -p $(LOGDIR) $(FILESDIR)
+
+cp: mk_dirs
+	cp ../InFiles/* ./precomputed/
 
 
 $(BUILDDIR)/%.mk: %.cpp Makefile

@@ -64,6 +64,13 @@ public:
     inline size_t id() const;
     inline size_t size() const;
 
+protected:
+    template <typename iterator_type, typename funct>
+        static funct for_each(
+                iterator_type begin,
+                iterator_type end,
+                funct function);
+
 public:
     static std::string print_subtree(
                 const iterator& root,

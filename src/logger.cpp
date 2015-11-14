@@ -58,6 +58,14 @@ logger::logger()
     }
     else
         out.push_back(f);
+
+    debug("*****************************************");
+    debug("************ RUNNING PROGRAM ************");
+    debug("*****************************************");
+
+    //p = WARN;
+    //p = INFO;
+    p = DEBUG;
 }
 
 logger::~logger()
@@ -188,6 +196,8 @@ logger::logger_stream::logger_stream(
 
 void logger::logger_stream::flush()
 {
+    if (!l.can_log(p))
+        return;
     for (FILE* f : l.out)
     {
         fprintf(f, "%s", l.message_header(p).c_str());

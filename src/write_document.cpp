@@ -29,6 +29,7 @@ void document_writer::init(
                 const std::string& filename)
 {
     APP_DEBUG_FNAME;
+    DEBUG("init(%s)", to_cstr(filename));
     assert(!filename.empty());
 
     out.close();

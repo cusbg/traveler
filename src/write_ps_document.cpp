@@ -290,17 +290,21 @@ using namespace std;
 /* static */ std::string ps_writer::sprint_subtree(
                 pre_post_it it)
 {
-    pre_post_it beg, end;
+    if (rna_tree::is_leaf(it))
+        return sprint_formatted(it);
+
+    pre_post_it end;
     string out;
-    beg = pre_post_it(it, true);
+    it  = pre_post_it(it, true);
     end = pre_post_it(it, false);
+    ++end;
 
     assert(!rna_tree::is_leaf(it));
 
-    while (beg != end)
+    while (it != end)
     {
-        out += sprint(beg);
-        ++beg;
+        out += sprint(it);
+        ++it;
     }
     return out;
 }

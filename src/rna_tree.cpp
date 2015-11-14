@@ -140,6 +140,67 @@ std::string rna_tree::name() const
 }
 
 
+/* static */ std::string rna_tree::get_labels(
+                const iterator& root)
+{
+    std::ostringstream out;
+
+    auto f =
+        [&out](const pre_post_order_iterator& iter) {
+            out << iter->at(iter.label_index()).label;
+        };
+
+    pre_post_order_iterator begin(root, true);
+    pre_post_order_iterator end(root, false);
+    ++end;
+
+    for_each(begin, end, f);
+
+    return out.str();
+}
+
+std::string rna_tree::get_labels() const
+{
+    ostringstream out;
+    iterator root = _tree.begin();
+    for (sibling_iterator ch = root.begin(); ch != root.end(); ++ch)
+        out << get_labels(ch);
+    return out.str();
+}
+
+/* static */ std::string rna_tree::get_brackets(
+                const iterator& root)
+{
+    std::ostringstream out;
+
+    auto f =
+        [&out](const pre_post_order_iterator& iter) {
+            if (is_leaf(iter))
+                out << ".";
+            else if (iter.preorder())
+                out << "(";
+            else
+                out << ")";
+        };
+
+    pre_post_order_iterator begin(root, true);
+    pre_post_order_iterator end(root, false);
+    ++end;
+
+    for_each(begin, end, f);
+
+    return out.str();
+}
+
+std::string rna_tree::get_brackets() const
+{
+    ostringstream out;
+    iterator root = _tree.begin();
+    for (sibling_iterator ch = root.begin(); ch != root.end(); ++ch)
+        out << get_brackets(ch);
+    return out.str();
+}
+
 /* inline */ std::string trim(
                 std::string& s)
 {
@@ -155,6 +216,3 @@ std::string rna_tree::name() const
 
     return s;
 }
-
-
-

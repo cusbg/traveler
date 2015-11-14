@@ -33,6 +33,7 @@
 
 using namespace std;
 
+
 struct app::arguments
 {
     rna_tree templated;
@@ -64,7 +65,6 @@ struct app::arguments
         string ps_templated;
     } ps;
 };
-
 
 void app::run(
                 std::vector<std::string> args)
@@ -195,6 +195,12 @@ void app::run(
             }
             a.ps.ps = args.at(i + 1);
             ++i;
+            continue;
+        }
+        if (arg == "-d" || arg == "--debug")
+        {
+            logger.set_priority(logger::DEBUG);
+            DEBUG("enable debug mode");
             continue;
         }
 
@@ -400,7 +406,8 @@ void app::usage(
             << " [--ted-out <FILE>]"
             << " [--ted-in <FILE>]"
             << " [--mapping <FILE>]]" << endl
-        << "\t[--ps [--mapping <FILE>] <FILE>]" << endl;
+        << "\t[--ps [--mapping <FILE>] <FILE>]" << endl
+        << "\t[-d|--debug]" << endl;
 
     INFO("%s", to_cstr(str.str()));
 }

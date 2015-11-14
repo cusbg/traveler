@@ -1,7 +1,8 @@
 #~/bin/bash
 
 FILES="$(ls precomputed/*ps | sed 's@\.ps@@;s@precomputed/@@')"
-EXECUTABLE=build/program
+#DEBUG="--debug"
+EXECUTABLE="build/program ${DEBUG}"
 DIR=precomputed
 
 fail_function() {
@@ -9,12 +10,14 @@ fail_function() {
     exit 1
 }
 
-run_rted() {
-    file1=$1
-    file2=$2
+init_variables() {
     file="${DIR}/${file1}-${file2}"
     tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fold --name ${file1}"
     mt="--match-tree ${DIR}/${file2}.seq ${DIR}/${file2}.fold --name ${file2}"
+}
+
+run_rted() {
+    init_variables
 
     ${EXECUTABLE} \
         ${tt} ${mt} \
@@ -22,17 +25,18 @@ run_rted() {
         || fail_function
 }
 
-run_gted() {
-    file1=$1
-    file2=$2
-    file="${DIR}/${file1}-${file2}"
-    tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fold --name ${file1}"
-    mt="--match-tree ${DIR}/${file2}.seq ${DIR}/${file2}.fold --name ${file2}"
+run_gted_full() {
+    init_variables
 
-    #${EXECUTABLE} \
-        #${tt} ${mt} \
-        #--gted --strategies ${file}.rted --ted-out ${file}.ted \
-        #|| fail_function
+    ${EXECUTABLE} \
+        ${tt} ${mt} \
+        --gted --strategies ${file}.rted --ted-out ${file}.ted --mapping ${file}.map \
+        || fail_function
+
+}
+
+run_gted_mapping() {
+    init_variables
 
     ${EXECUTABLE} \
         ${tt} ${mt} \
@@ -41,11 +45,7 @@ run_gted() {
 }
 
 run_ps() {
-    file1=$1
-    file2=$2
-    file="${DIR}/${file1}-${file2}"
-    tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fold --name ${file1}"
-    mt="--match-tree ${DIR}/${file2}.seq ${DIR}/${file2}.fold --name ${file2}"
+    init_variables
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
@@ -55,14 +55,7 @@ run_ps() {
 }
 
 run_all() {
-    file1=$1
-    file2=$2
-    DIROUT=build/files/run
-    file="${DIROUT}/${file1}-${file2}"
-    tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fold --name ${file1}"
-    mt="--match-tree ${DIR}/${file2}.seq ${DIR}/${file2}.fold --name ${file2}"
-
-    mkdir -p ${DIROUT}
+    init_variables
 
     ${EXECUTABLE} \
         ${tt} ${mt} \
@@ -72,38 +65,23 @@ run_all() {
         || fail_function
 }
 
-f() {
-    run_all "human" "rabbit"
+run_tests() {
+    init_variables
 
-    exit 0
 }
 
-g() {
-    file1=$1
-    file2=artemia-salina
-    DIROUT=build/files/run
-    file="${DIROUT}/${file1}-${file2}"
-    tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fold --name ${file1}"
-    mt="--match-tree build/files/${file2}.seq build/files/${file2}.fold --name ${file2}"
-    #tt="--template-tree build/files/${file2}.ps build/files/${file2}.fold --name ${file2}"
-    #mt="--match-tree ${DIR}/${file1}.seq ${DIR}/${file1}.fold --name ${file1}"
 
-    ${EXECUTABLE} \
-        ${tt} ${mt} \
-        --all ${file}.ps \
-        #|| fail_function
-}
-
-if [ "$1" = "debug" ]
-then
-    EXECUTABLE="gdb --args ${EXECUTABLE}"
-fi
+${EXECUTABLE}
+exit 0
 
 
 for file1 in $FILES
 do
     for file2 in $FILES
     do
-        run_all ${file1} ${file2}
+        #run_rted
+        #run_gted_full
+        #run_gted_mapping
+        run_ps
     done
 done

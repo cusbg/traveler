@@ -124,7 +124,7 @@ protected:
 
     void check_errors();
 
-private:
+protected:
     inline bool can_log(
                 priority other) const
     {
@@ -148,7 +148,7 @@ public:
     }
 
 protected:
-    priority p = priority::DEBUG;
+    priority p;
     std::vector<FILE*> out;
 
 #undef LOGGER_PRIORITY_FUNCTION

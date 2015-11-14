@@ -372,5 +372,23 @@ bool tree_base<label_type>::is_valid(
 }
 
 
+
+/* static */
+template <typename label_type>
+template <typename iterator_type, typename funct>
+funct tree_base<label_type>::for_each(
+                iterator_type begin,
+                iterator_type end,
+                funct f)
+{
+    while (begin != end)
+    {
+        f(begin);
+        ++begin;
+    }
+    return std::move(f);
+}
+
+
 #endif /* !TREE_BASE_ITER_HPP */
 

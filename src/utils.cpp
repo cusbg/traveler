@@ -449,3 +449,19 @@ std::string convert_to_java_format(
 
 #endif
 
+
+// TODO: remove
+inline void generate_seq_from_ps(
+                const std::string& psfile,
+                const std::string& seqfile)
+{
+    ps_document doc(psfile);
+    write_file(seqfile, doc.labels);
+}
+inline void generate_seq()
+{
+    std::vector<std::string> vec({"human", "rabbit", "frog", "mouse"});
+    for (auto val : vec)
+        generate_seq_from_ps("precomputed/" + val + ".ps", "precomputed/" + val + ".seq");
+    abort();
+}

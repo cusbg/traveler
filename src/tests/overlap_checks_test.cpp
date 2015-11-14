@@ -1,5 +1,5 @@
 /*
- * File: tests.cpp
+ * File: overlap_checks_test.cpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
@@ -21,29 +21,49 @@
 
 #define TESTS
 
-#include "../types.hpp"
-#include "rted_test.cpp"
-#include "gted_test.cpp"
-#include "overlap_checks_test.cpp"
-
+#include "../overlap_checks.hpp"
 
 using namespace std;
 
-void tests()
+/* static */ void overlap_checks::test()
 {
     APP_DEBUG_FNAME;
 
-    //rted::test();
-    //gted::test();
-    overlap_checks::test();    
+    vector<point> v1, v2;
+    v1 = {{5, 0}, {0, 5}, {-5, 0}, {0, -5}};
+    v2 = {{2, 2}, {-2, 2}, {-2, -2}, {-2, 2}};
 
-    INFO("TESTS OK");
-}
+    //point shift = {23.5, -23.789};
 
-int main()
-{
-    tests();
+    //for (point& p : v1)
+        //p += shift;
+    //for (point& p : v2)
+        //p += shift;
 
-    return 0;
+    bool b = false;
+    edge e1, e2;
+
+    e1.p1 = {0, 0};
+    e2.p1 = {10, 10};
+
+    for (point p1 : v1)
+    {
+        e1.p2 = p1;
+        for (point p2 : v2)
+        {
+            e2.p2 = p2;
+            if (!intersection(e1, e2).bad())
+            {
+                b = true;
+            }
+        }
+    }
+
+    e1.p2 = {100, 0};
+    e2.p2 = {10, -10};
+
+    assert(!intersection(e1, e2).bad());
+
+    assert(b);
 }
 
