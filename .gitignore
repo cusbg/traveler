@@ -1,0 +1,9 @@
+
+MapovanieBaz/build/
+RNAPlot/
+RNAMotif/
+pslib*/
+build/
+bin/
+precomputed/
+.ycm_extra_conf.pyc
