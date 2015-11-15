@@ -30,22 +30,38 @@ class test
 {
 private:
     typedef rna_tree::iterator iterator;
+    typedef rna_tree::pre_post_order_iterator pre_post_order_iterator;
 
 public:
     void run();
 
 private:
-    rna_tree remove_leaf_nodes();
-    rna_tree remove_stem_nodes(rna_tree rna);
-    rna_tree remove_interior_loop_nodes(rna_tree rna);
+    //rna_tree remove_leaf_nodes();
+    //rna_tree remove_stem_nodes(rna_tree rna);
+    //rna_tree remove_interior_loop_nodes(rna_tree rna);
 
-    rna_tree insert_leaf_nodes(rna_tree rna);
-    rna_tree insert_stem_nodes(rna_tree rna);
-    rna_tree insert_interior_loop_nodes(rna_tree rna);
+    //rna_tree insert_leaf_nodes(rna_tree rna);
+    //rna_tree insert_stem_nodes(rna_tree rna);
+    //rna_tree insert_interior_loop_nodes(rna_tree rna);
 
-    void save(const rna_tree& rna);
+    void run1();
+    void run(std::string filetempl, std::string fileother);
 
-    void run_TED(rna_tree temp, rna_tree rna);
+    point top_right_corner(iterator root);
+    point bottom_left_corner(iterator root);
+
+    void save_subtree(iterator root, std::string name);
+    void save_seq_fold(rna_tree rna, std::string name);
+
+    std::vector<std::string> create_app_arguments(const std::string& file_in, const std::string& file_out);
+    //std::vector<std::string> create_app_arguments(const std::string& file);
+
+    void save_to_psout(const std::string& filename, iterator it);
+    std::string ending_strings(iterator it);
+    point get_direction(iterator it);
+
+public:
+    void generate();
 };
 
 

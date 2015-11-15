@@ -91,7 +91,46 @@ void rna_tree::update_points(
         it->set_points_exact(points[i], it.label_index());
 
     assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
+
+    update_ends_in_rna(*this);
 }
+
+void update_ends_in_rna(
+                rna_tree& rna)
+{
+    APP_DEBUG_FNAME;
+
+    typedef rna_tree::iterator iterator;
+
+    iterator root = rna.begin();
+    point p1, p2;
+    iterator f, l;
+
+    f = rna_tree::first_child(root);
+    l = rna_tree::last_child(root);
+
+    if (f == l && !f->paired())
+    {
+        WARN("cannot initialize rna ends, returning");
+        return;
+    }
+
+    p1 = f->at(0).p;
+    p2 = l->paired() ? l->at(1).p : l->at(0).p;
+
+    if (p1.bad() || p2.bad() || p1 == p2)
+    {
+        WARN("cannot initialize rna ends, returning");
+        return;
+    }
+    point dir = normalize(p2 - p1) * 7;
+
+    root->at(0).p = p1 - dir;
+    root->at(0).label = "5'";
+    root->at(1).p = p2 + dir;
+    root->at(1).label = "3'";
+}
+
 
 
 rna_tree::sibling_iterator rna_tree::erase(
@@ -150,11 +189,7 @@ std::string rna_tree::name() const
             out << iter->at(iter.label_index()).label;
         };
 
-    pre_post_order_iterator begin(root, true);
-    pre_post_order_iterator end(root, false);
-    ++end;
-
-    for_each(begin, end, f);
+    for_each_in_subtree(root, f);
 
     return out.str();
 }
@@ -165,6 +200,7 @@ std::string rna_tree::get_labels() const
     iterator root = _tree.begin();
     for (sibling_iterator ch = root.begin(); ch != root.end(); ++ch)
         out << get_labels(ch);
+
     return out.str();
 }
 
@@ -183,11 +219,7 @@ std::string rna_tree::get_labels() const
                 out << ")";
         };
 
-    pre_post_order_iterator begin(root, true);
-    pre_post_order_iterator end(root, false);
-    ++end;
-
-    for_each(begin, end, f);
+    for_each_in_subtree(root, f);
 
     return out.str();
 }
@@ -198,6 +230,7 @@ std::string rna_tree::get_brackets() const
     iterator root = _tree.begin();
     for (sibling_iterator ch = root.begin(); ch != root.end(); ++ch)
         out << get_brackets(ch);
+
     return out.str();
 }
 

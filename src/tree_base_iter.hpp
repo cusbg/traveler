@@ -372,6 +372,19 @@ bool tree_base<label_type>::is_valid(
 }
 
 
+/* static */
+template <typename label_type>
+template <typename iterator_type, typename funct>
+funct tree_base<label_type>::for_each_in_subtree(
+                iterator_type root,
+                funct f)
+{
+    pre_post_order_iterator begin(root, true);
+    pre_post_order_iterator end(root, false);
+    ++end;
+
+    return std::move(for_each(begin, end, f));
+}
 
 /* static */
 template <typename label_type>

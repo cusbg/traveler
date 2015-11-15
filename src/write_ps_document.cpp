@@ -256,7 +256,7 @@ using namespace std;
             break;
 
         case rna_pair_label::untouched:
-            WARN("UNTOUCHED!!");
+            //WARN("UNTOUCHED!!");
             out = sprint(it);
             break;
         default:
@@ -303,7 +303,7 @@ using namespace std;
 
     while (it != end)
     {
-        out += sprint(it);
+        out += sprint_formatted(it);
         ++it;
     }
     return out;

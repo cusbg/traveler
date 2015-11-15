@@ -76,6 +76,8 @@ void matcher::mark(
         it = plusplus(it, to_move);
         it->status = status;
         i = index;
+
+        DEBUG("node '%s' marked", clabel(it));
     }
 }
 
@@ -193,6 +195,9 @@ void matcher::compute_sizes()
 
     comp_f(t1, s1);
     comp_f(t2, s2);
+
+    assert(s1.at(id(t1.begin())) == s2.at(id(t2.begin())));
+
 }
 
 /* inline */

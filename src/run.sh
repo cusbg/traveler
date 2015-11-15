@@ -70,6 +70,10 @@ run_tests() {
 
 }
 
+if [ "$1" = "debug" ]
+then
+    EXECUTABLE="gdb --args ${EXECUTABLE}"
+fi
 
 ${EXECUTABLE}
 exit 0

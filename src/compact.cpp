@@ -156,7 +156,7 @@ void compact::init()
         {
             DEBUG("INIT_rec OK");
         }
-        else
+        else if (rna_tree::is_valid(get_onlyone_branch(rna_tree::parent(it))))
         {
             assert(rna_tree::is_valid(get_onlyone_branch(rna_tree::parent(it))));   // => 1 branch
 
@@ -173,6 +173,11 @@ void compact::init()
             // .. that means only initialization, to get direction where child should be
 
             DEBUG("INIT OK");
+        }
+        else
+        {
+            // TODO: initialize multibranch loop
+            abort();
         }
     }
 

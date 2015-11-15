@@ -74,6 +74,11 @@ public:
                 const iterator& root);
     std::string get_brackets() const;
 
+#ifdef TESTS
+public:
+    static void test();
+#endif
+
 
 private:
     std::string _name;
@@ -85,6 +90,9 @@ inline bool is(
 {
     return iter->status == s;
 }
+
+void update_ends_in_rna(
+                rna_tree& rna);
 
 
 #endif /* !RNA_TREE_HPP */
