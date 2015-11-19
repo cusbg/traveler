@@ -114,7 +114,7 @@ point compact::circle::rotate(
     {
         // TODO: skontrolovat kedy sa to stava, ale zrejme by sa to nemalo nikdy..
         WARN("output node does not lie in circle segment");
-        abort();
+        //abort();
     }
 
     return p;

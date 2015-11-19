@@ -67,7 +67,7 @@ ps_document::ps_document(const std::string& name)
     assert_err(exist_file(name),
             "ps_document(%s): file does not exist", to_cstr(name));
 
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     string line, str;
     ifstream in(name);

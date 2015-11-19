@@ -74,6 +74,11 @@ public:
                 const iterator& root);
     std::string get_brackets() const;
 
+    static point top_right_corner(
+                iterator root);
+    static point bottom_left_corner(
+                iterator root);
+
 #ifdef TESTS
 public:
     static void test();

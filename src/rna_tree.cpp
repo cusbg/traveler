@@ -19,6 +19,8 @@
  * USA.
  */
 
+#include <cfloat>
+
 #include "rna_tree.hpp"
 
 using namespace std;
@@ -169,6 +171,7 @@ rna_tree::sibling_iterator rna_tree::insert(
         ++end;
 
     _tree.reparent(pos, beg, end);
+    ++_size;
 
     return pos;
 }
@@ -234,6 +237,59 @@ std::string rna_tree::get_brackets() const
     return out.str();
 }
 
+
+/* static */ point rna_tree::top_right_corner(iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    // x, y should be maximal in subtree
+    point p = { -DBL_MAX, -DBL_MAX };
+
+    auto f = [&p] (const pre_post_order_iterator& it) {
+        if (rna_tree::is_root(it) || !it->inited_points())
+            return;
+        point o = it->at(it.label_index()).p;
+        if (o.x > p.x)
+            p.x = o.x;
+        if (o.y > p.y)
+            p.y = o.y;
+    };
+
+    rna_tree::for_each_in_subtree(root, f);
+
+    assert(p.x != -DBL_MAX && p.y != -DBL_MAX);
+
+    return p;
+}
+
+/* static */ point rna_tree::bottom_left_corner(iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    // x, y should be minimal in subtree
+    point p = { DBL_MAX, DBL_MAX };
+
+    auto f = [&p] (const pre_post_order_iterator& it) {
+        if (rna_tree::is_root(it) || !it->inited_points())
+            return;
+        point o = it->at(it.label_index()).p;
+        if (o.x < p.x)
+            p.x = o.x;
+        if (o.y < p.y)
+            p.y = o.y;
+    };
+
+    rna_tree::for_each_in_subtree(root, f);
+
+    assert(p.x != DBL_MAX && p.y != DBL_MAX);
+
+    return p;
+}
+
+
+
+
+
 /* inline */ std::string trim(
                 std::string& s)
 {
@@ -249,3 +305,5 @@ std::string rna_tree::get_brackets() const
 
     return s;
 }
+
+

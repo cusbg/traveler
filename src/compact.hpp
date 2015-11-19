@@ -62,6 +62,11 @@ private:
                 iterator parent,
                 point vec);
 
+    static void rotate_branch(
+                iterator parent,
+                circle c,
+                double alpha);
+
     /**
      * return only-branch-node if exist, otherwise return non-valid iterator
      */
@@ -109,6 +114,9 @@ private:
      */
     void make_branch_even(
                 sibling_iterator it);
+
+    void init_multibranch(
+                iterator parent);
     // INIT ^^
 
 private:
