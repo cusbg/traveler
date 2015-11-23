@@ -49,7 +49,7 @@ run_ps() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --ps --mapping ${file}.map build/files/${file1}-${file2}.ps \
+	    --ps --mapping ${file}.map --overlaps build/files/${file1}-${file2}.ps \
         || fail_function
 
 }
@@ -70,18 +70,23 @@ run_tests() {
 
 }
 
+run() {
+	init_variables
 
-${EXECUTABLE}
-exit 0
+	#run_rted
+	#run_gted_full
+	run_ps
+}
 
 
 for file1 in $FILES
 do
     for file2 in $FILES
     do
-        #run_rted
-        #run_gted_full
-        #run_gted_mapping
-        run_ps
+	    run&
+	#run_rted
+	#run_gted_full
+	#run_gted_mapping
+        #run_ps
     done
 done

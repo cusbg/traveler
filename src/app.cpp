@@ -60,6 +60,7 @@ struct app::arguments
     struct
     {
         bool run = false;
+        bool overlap_checks = false;
         string mapping;
         string ps;
         string ps_templated;
@@ -188,10 +189,20 @@ void app::run(
         {
             DEBUG("arg ps");
             a.ps.run = true;
-            if (nextarg() == "--mapping")
+            while (true)
             {
-                a.ps.mapping = args.at(i + 2);
-                i += 2;
+                if (nextarg() == "--mapping")
+                {
+                    a.ps.mapping = args.at(i + 2);
+                    i += 2;
+                }
+                else if (nextarg() == "--overlaps")
+                {
+                    a.ps.overlap_checks = true;
+                    i += 1;
+                }
+                else
+                    break;
             }
             a.ps.ps = args.at(i + 1);
             ++i;
@@ -244,7 +255,7 @@ void app::run(
         ps.init(args.all.psout);
 
         ps.print(ps_document::default_prologue(), true);
-        save(args.templated, ps);
+        save(args.templated, ps, args.ps.overlap_checks);
     }
     else
     {
@@ -286,12 +297,14 @@ void app::run(
 
             mapping map = load_mapping_table(args.ps.mapping);
 
+            args.templated.set_name(args.templated.name() + "-" + args.matched.name());
             args.templated = matcher(args.templated, args.matched).run(map);
             compact(args.templated).run();
 
             if (!args.ps.ps.empty())
             {
-                save(args.ps.ps, args.templated, args.ps.ps_templated);
+                save(args.ps.ps, args.templated,
+                        args.ps.ps_templated, args.ps.overlap_checks);
             }
         }
     }
@@ -305,7 +318,8 @@ void app::run(
 void app::save(
                 const std::string& filename,
                 rna_tree& rna,
-                const std::string& templated_ps)
+                const std::string& templated_ps,
+                bool overlaps)
 {
     APP_DEBUG_FNAME;
 
@@ -317,12 +331,13 @@ void app::save(
     ps.init(filename);
     ps.print(prolog);
 
-    save(rna, ps);
+    save(rna, ps, overlaps);
 }
 
 void app::save(
             rna_tree& rna,
-            ps_writer& writer)
+            ps_writer& writer,
+            bool overlap)
 {
     APP_DEBUG_FNAME;
 
@@ -330,11 +345,23 @@ void app::save(
 
     rna_tree::pre_post_order_iterator end(rna.begin(), false);
     rna_tree::pre_post_order_iterator it = ++rna.begin();
-    overlap_checks::overlaps overlaps = overlap_checks().run(rna);
+    overlap_checks::overlaps overlaps;
+    
+    if (overlap)
+        overlaps = overlap_checks().run(rna);
 
     if (!overlaps.empty())
+    {
+        ofstream out;
+        out.open("build/logs/overlaps.log", ios_base::app);
+        out
+            << rna.name()
+            << " : "
+            << overlaps.size()
+            << endl;
         WARN("overlaps occurs in %s, count=%lu",
                 to_cstr(rna.name()), overlaps.size());
+    }
 
     for (; it != end; ++it)
         str << ps_writer::sprint_formatted(it);
@@ -406,7 +433,9 @@ void app::usage(
             << " [--ted-out <FILE>]"
             << " [--ted-in <FILE>]"
             << " [--mapping <FILE>]]" << endl
-        << "\t[--ps [--mapping <FILE>] <FILE>]" << endl
+        << "\t[--ps"
+            << " [--mapping <FILE>]"
+            << " [--overlaps] <FILE>]" << endl
         << "\t[-d|--debug]" << endl;
 
     INFO("%s", to_cstr(str.str()));
@@ -456,6 +485,8 @@ void app::print(
         << "ps:"
             << endl << '\t'
             << " run=" << args.ps.run
+            << endl << '\t'
+            << " overlaps=" << args.ps.overlap_checks
             << endl << '\t'
             << " mapping-table-in-file=" << args.ps.mapping
             << endl << '\t'

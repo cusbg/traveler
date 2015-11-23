@@ -54,7 +54,8 @@ public:
      */
     void save(
                 rna_tree& rna,
-                ps_writer& writer);
+                ps_writer& writer,
+                bool overlaps);
 
     /**
      * save rna to document,
@@ -63,7 +64,8 @@ public:
     void save(
                 const std::string& filename,
                 rna_tree& rna,
-                const std::string& templated_ps);
+                const std::string& templated_ps,
+                bool overlaps);
 
     /**
      * print usage

@@ -65,6 +65,9 @@ public:
                 sibling_iterator sib);
 
     std::string name() const;
+    void set_name(
+                const std::string& name)
+    { _name = name; }
 
 public:
     static std::string get_labels(

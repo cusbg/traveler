@@ -106,7 +106,7 @@ void f();
 int main(int argc, char** argv)
 {
     init();
-    f();
+    //f();
     app app;
     app.run(vector<string>(argv, argv + argc));
 
