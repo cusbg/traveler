@@ -210,5 +210,6 @@ private:
 
 
 
+
 #endif /* !COMPACT_HPP */
 

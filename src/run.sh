@@ -1,15 +1,17 @@
 #~/bin/bash
 
-FILES1="frog mouse rabbit human"
-FILES2="frog mouse rabbit human"
-FILES="$(ls precomputed/*ps | sed 's@\.ps@@;s@precomputed/@@')"
-#DEBUG="--debug"
+#FILES1="african_frog mouse rabbit human"
+FILES1="african_frog artemia_salina blue_mussel cicadas cicade echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
+FILES2="african_frog artemia_salina blue_mussel cicadas cicade echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
+
 EXECUTABLE="build/program ${DEBUG}"
 DIR=precomputed
 
 fail_function() {
-    echo execution failed
-    exit 1
+    {
+        date
+        echo "execution of ${file1} <-> ${file2} failed"
+    } >> build/logs/fail.log
 }
 
 init_variables() {
@@ -67,9 +69,23 @@ run_all() {
         || fail_function
 }
 
-run_tests() {
+run() {
     init_variables
 
+    run_rted
+    run_gted_full
+    run_ps
+
+    #{
+        #date
+        #echo "run OK ${file1} <-> ${file2}"
+    #} >> build/logs/finished.log
+}
+run_loop() {
+	for file2 in $FILES2
+	do
+		run
+	done
 }
 
 if [ "$1" = "debug" ]
@@ -79,22 +95,8 @@ then
     exit 0
 fi
 
-run() {
-	init_variables
-
-	#run_rted
-	#run_gted_full
-	run_ps
-}
-
-run_loop() {
-	for file2 in $FILES2
-	do
-		run
-	done
-}
-
+I=
 for file1 in $FILES1
 do
-	run_loop &
+	run_loop&
 done

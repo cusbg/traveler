@@ -132,6 +132,16 @@ void compact::run()
          is(parent, rna_pair_label::inserted));
 }
 
+/* static */ void compact::rotate_branch(
+                iterator parent,
+                circle c,
+                double alpha)
+{
+    APP_DEBUG_FNAME;
+
+    assert(!rna_tree::is_leaf(parent));
+
+}
 
 
 void compact::init()

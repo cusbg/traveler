@@ -62,7 +62,7 @@ mk_dirs:
 	@mkdir -p $(LOGDIR) $(FILESDIR) precomputed $(FILESDIR)/run $(FILESDIR)/run-op
 
 cp: mk_dirs
-	cp `find ../InFiles/ -maxdepth 1 -type f` precomputed/
+	cp `find ../InFiles/ -type f` precomputed/
 
 
 $(BUILDDIR)/%.mk: %.cpp Makefile

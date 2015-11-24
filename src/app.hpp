@@ -64,7 +64,6 @@ public:
     void save(
                 const std::string& filename,
                 rna_tree& rna,
-                const std::string& templated_ps,
                 bool overlaps);
 
     /**
@@ -98,6 +97,9 @@ private:
 
 };
 
+#include "rna_tree.hpp"
+
+std::string ending_3_5_strings(rna_tree::iterator it);
 
 #endif /* !APP_HPP */
 

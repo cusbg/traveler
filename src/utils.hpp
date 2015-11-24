@@ -32,6 +32,9 @@
 class mapping;
 class rna_tree;
 
+
+rna_tree get_rna(const std::string& name); // TODO remove
+
 // TABLE-SAVING FUNCTIONS:
     
 /**

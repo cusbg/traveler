@@ -43,6 +43,11 @@ private:
     void run_multibranch();
     void run_fullbranch();
 
+    void run_delete(size_t n, rna_tree& rna, sibling_iterator sib);
+    void run_delete_leafs(size_t n, rna_tree& rna, sibling_iterator sib);
+    void run_insert(size_t n, rna_tree& rna, sibling_iterator sib);
+    void run_insert_leafs(size_t n, rna_tree& rna, sibling_iterator sib);
+
 private:
 
     void save_seq_fold_subtree(iterator root, std::string name);
@@ -51,7 +56,6 @@ private:
     std::vector<std::string> create_app_arguments(const std::string& file_in, const std::string& file_out);
 
     void save_to_psout(const std::string& filename, iterator it);
-    std::string ending_3_5_strings(iterator it);
 
     void insert_hairpin(
                 rna_tree& rna,
@@ -61,6 +65,14 @@ private:
 public:
     void generate();
 };
+
+#define INDIR           (string("precomputed/"))
+#define OUTDIR_OP       (string("build/files/run-op/"))
+
+#define FILES   (std::vector<string>({"1.hairpin", "2.interior", "3.multibranch", "4.fullbranch"}))
+
+#define FILEIN(index)  (INDIR + (FILES.at(index)))
+#define FILEOUT(index) (OUTDIR_OP + (FILES.at(index)) + ".out")
 
 
 #endif /* !TESTS_HPP */

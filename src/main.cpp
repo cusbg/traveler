@@ -30,6 +30,11 @@
 #include <iostream>
 #include <fstream>
 
+#include <csignal>
+#include <unistd.h>
+#include <strings.h>
+#include <string.h>
+
 #include "types.hpp"
 #include "utils.hpp"
 #include "app.hpp"
@@ -39,14 +44,11 @@
 #include "point.hpp"
 #include "rted.hpp"
 #include "gted.hpp"
+#include "tests.hpp"
 
 
 
 
-#include <csignal>
-#include <unistd.h>
-#include <strings.h>
-#include <string.h>
 
 using namespace std;
 
@@ -101,6 +103,35 @@ void init()
 
 
 
+void generate_seq_from_ps()
+{
+    APP_DEBUG_FNAME;
+
+    auto vec = {
+        "fruit_fly",
+        "echinococcus_granulosus",
+        "microciona_prolifera",
+        "mnemiopsis_leidyi",
+        "blue_mussel",
+        "cicadas",
+        "sea_scallop",
+        "tripedalia_cystophora",
+        "kenyan_frog",
+        "rat",
+    };
+
+    string dir = "/afs/ms/u/e/eliasr/RocnikovyProjekt/InFiles/TODO/";
+    for (string ps : vec)
+    {
+        ps_document doc(dir + ps + ".ps");
+
+        get_rna(dir + ps);
+        write_file(dir + ps + ".seq", doc.labels);
+    }
+    abort();
+}
+
+
 void f();
 
 int main(int argc, char** argv)
@@ -112,10 +143,6 @@ int main(int argc, char** argv)
 
     return 0;
 }
-
-#include "tests.hpp"
-#include "overlap_checks.hpp"
-#include "write_ps_document.hpp"
 
 void f()
 {

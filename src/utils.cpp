@@ -74,7 +74,7 @@ ps_document::ps_document(const std::string& name)
     point p;
     auto stream_pos = in.tellg();
     regex regexp_base_line(
-            "^\\([ACGUI]\\)\\s+"                                 //(%BASE%)
+            "^\\([A-Z]\\)\\s+"                                 //(%BASE%)
             "-?[0-9]+(\\.[0-9]+)?\\s+-?[0-9]+(\\.[0-9]+)?\\s+"  //+-%DOUBLE% +-%DOUBLE%
             "lwstring\\s*$"                                     // %LWSTRING%
             );
@@ -433,19 +433,18 @@ std::string convert_to_java_format(
 
 #endif
 
+rna_tree get_rna(const string& name)
+{
+    DEBUG("get_rna(%s)", to_cstr(name));
 
-// TODO: remove
-inline void generate_seq_from_ps(
-                const std::string& psfile,
-                const std::string& seqfile)
-{
-    ps_document doc(psfile);
-    write_file(seqfile, doc.labels);
+    string l, b;
+    l = read_file(name + ".seq");
+    b = read_file(name + ".fold");
+
+    ps_document doc(name + ".ps");
+
+    return rna_tree(b, l, doc.points, name);
 }
-inline void generate_seq()
-{
-    std::vector<std::string> vec({"human", "rabbit", "frog", "mouse"});
-    for (auto val : vec)
-        generate_seq_from_ps("precomputed/" + val + ".ps", "precomputed/" + val + ".seq");
-    abort();
-}
+
+
+

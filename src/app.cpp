@@ -251,11 +251,7 @@ void app::run(
         args.templated = matcher(args.templated, args.matched).run(g.get_mapping());
         compact(args.templated).run();
 
-        ps_writer ps;
-        ps.init(args.all.psout);
-
-        ps.print(ps.default_prologue(), true);
-        save(args.templated, ps, args.ps.overlap_checks);
+        save(args.all.psout, args.templated, true);
     }
     else
     {
@@ -303,8 +299,7 @@ void app::run(
 
             if (!args.ps.ps.empty())
             {
-                save(args.ps.ps, args.templated,
-                        args.ps.ps_templated, args.ps.overlap_checks);
+                save(args.ps.ps, args.templated, args.ps.overlap_checks);
             }
         }
     }
@@ -318,15 +313,12 @@ void app::run(
 void app::save(
                 const std::string& filename,
                 rna_tree& rna,
-                const std::string& templated_ps,
                 bool overlaps)
 {
     APP_DEBUG_FNAME;
 
     ps_writer ps;
     string prolog;
-
-    prolog = ps_document(templated_ps).prolog;
 
     ps.init_default(filename, rna.begin());
 
@@ -367,6 +359,8 @@ void app::save(
 
     for (const auto& p : overlaps)
         str << ps_writer::sprint_circle(p.centre, p.radius);
+
+    str << ending_3_5_strings(rna.begin());
 
     writer.print(str.str());
 }
@@ -497,4 +491,44 @@ void app::print(
 }
 
 
+std::string ending_3_5_strings(rna_tree::iterator it)
+{
+    typedef rna_tree::iterator iterator;
+
+    auto get_direction = [](iterator it) {
+        assert(!rna_tree::is_leaf(it));
+
+        point p1, p2, p, ch;
+
+        p1 = it->at(0).p;
+        p2 = it->at(1).p;
+
+        ch = it.begin()->centre();
+
+        p = -orthogonal(p2 - p1, ch - p1);
+
+        return p;
+    };
+
+    if (rna_tree::is_root(it))
+    {
+        //return ending_3_5_strings(it.begin());
+        return "";
+        // TODO
+    }
+
+    point dir = get_direction(it) * BASES_DISTANCE * 1.5;
+    point p1, p2;
+    p1 = it->at(0).p;
+    p2 = it->at(1).p;
+    std::ostringstream out;
+
+    out
+        << ps_writer::sprint(p1 + dir, "5'")
+        << ps_writer::sprint(p2 + dir, "3'")
+        << ps_writer::sprint_edge(p1, p1 + dir, true)
+        << ps_writer::sprint_edge(p2, p2 + dir, true);
+
+    return out.str();
+}
 

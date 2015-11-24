@@ -298,13 +298,13 @@ using namespace std;
     if (rna_tree::is_leaf(it))
         return sprint_formatted(it);
 
+    assert(!rna_tree::is_leaf(it));
+
     pre_post_it end;
     string out;
     it  = pre_post_it(it, true);
     end = pre_post_it(it, false);
     ++end;
-
-    assert(!rna_tree::is_leaf(it));
 
     while (it != end)
     {

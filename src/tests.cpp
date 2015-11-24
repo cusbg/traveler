@@ -28,22 +28,13 @@
 
 #include "write_ps_document.hpp"
 
-#define INDIR           (string("precomputed/"))
-#define OUTDIR_OP       (string("build/files/run-op/"))
-
-#define FILES   (std::vector<string>({"1.hairpin", "2.interior", "3.multibranch", "4.fullbranch"}))
-
 #define print(string)   psout.print((string), true)
 #define parent(iter)    rna_tree::parent(iter)
 
 
-#define FILEIN(index)  (INDIR + (FILES.at(index)))
-#define FILEOUT(index) (OUTDIR_OP + (FILES.at(index)) + ".out")
-
-
 static ps_writer psout;
-rna_pair_label lbl_leaf("I");
-rna_pair_label lbl_pair = lbl_leaf + lbl_leaf;
+static rna_pair_label lbl_leaf("I");
+static rna_pair_label lbl_pair = lbl_leaf + lbl_leaf;
 
 using namespace std;
 
@@ -98,18 +89,6 @@ void test::save_seq_fold(rna_tree rna, std::string name)
 
 
 
-rna_tree get_rna(const string& name)
-{
-    DEBUG("get_rna(%s)", to_cstr(name));
-
-    string l, b;
-    l = read_file(name + ".seq");
-    b = read_file(name + ".fold");
-
-    ps_document doc(name + ".ps");
-
-    return rna_tree(b, l, doc.points, name);
-}
 
 std::vector<std::string> test::create_app_arguments(const std::string& file_in, const std::string& file_out)
 {
@@ -138,40 +117,6 @@ std::vector<std::string> test::create_app_arguments(const std::string& file_in, 
     return vec;
 }
 
-string test::ending_3_5_strings(iterator it)
-{
-    if (rna_tree::is_root(it))
-        return "";
-    auto get_direction = [](iterator it) {
-        assert(!rna_tree::is_leaf(it));
-
-        point p1, p2, p, ch;
-
-        p1 = it->at(0).p;
-        p2 = it->at(1).p;
-
-        ch = it.begin()->centre();
-
-        p = -orthogonal(p2 - p1, ch - p1);
-
-        return p;
-    };
-
-    point dir = get_direction(it) * BASES_DISTANCE * 1.5;
-    point p1, p2;
-    p1 = it->at(0).p;
-    p2 = it->at(1).p;
-    ostringstream out;
-
-    out
-        << ps_writer::sprint(p1 + dir, "5'")
-        << ps_writer::sprint(p2 + dir, "3'")
-        << ps_writer::sprint_edge(p1, p1 + dir, true)
-        << ps_writer::sprint_edge(p2, p2 + dir, true);
-
-    return out.str();
-}
-
 void test::save_to_psout(const std::string& filename, iterator it)
 {
     APP_DEBUG_FNAME;
@@ -183,16 +128,13 @@ void test::save_to_psout(const std::string& filename, iterator it)
 }
 
 
-
-
-
-
 void test::run()
 {
     APP_DEBUG_FNAME;
 
     run_hairpin();
-    run_interior();
+    //run_interior();
+    run_multibranch();
 }
 
 
@@ -210,6 +152,29 @@ void test::insert_hairpin(
         ch = rna.insert(ch, lbl_pair, 1);
 }
 
+void test::run_delete(size_t n, rna_tree& rna, sibling_iterator sib)
+{
+    while (n-- != 0)
+        sib = rna.erase(sib);
+}
+void test::run_delete_leafs(size_t n, rna_tree& rna, sibling_iterator sib)
+{
+    while (n-- != 0)
+    {
+        assert(rna_tree::is_leaf(sib));
+        sib = rna.erase(sib);
+    }
+}
+void test::run_insert_leafs(size_t n, rna_tree& rna, sibling_iterator sib)
+{
+    while (n-- != 0)
+        sib = rna.insert(sib, lbl_leaf, 0);
+}
+void test::run_insert(size_t n, rna_tree& rna, sibling_iterator sib)
+{
+    while (n-- != 0)
+        sib = rna.insert(sib, lbl_pair, 1);
+}
 
 
 void test::run_app(std::string filetempl, std::string fileother)
@@ -221,8 +186,8 @@ void test::run_app(std::string filetempl, std::string fileother)
     app app;
     app.run(args);
 
-    rna_tree rna = get_rna(fileother);
-    save_to_psout(fileother + ".ps", rna.begin());
+    //rna_tree rna = get_rna(fileother);
+    //save_to_psout(fileother + ".ps", ++rna.begin());
 }
 
 void test::run_hairpin()
@@ -230,61 +195,127 @@ void test::run_hairpin()
     APP_DEBUG_FNAME;
 
 #define FILEINDEX 0
-
-    auto run_insert_bulge = [this](size_t n)
+    auto inserts = [this]()
     {
         string filein = FILEIN(FILEINDEX);
-        string fileout = FILEOUT(FILEINDEX) + ".bulge." + to_string(n);
+        string fileout = FILEOUT(FILEINDEX) + ".ins";
 
         rna_tree rna = get_rna(filein);
-        sibling_iterator it = plusplus(rna.begin(), 2);
+        sibling_iterator ch = plusplus(rna.begin(), 3);
+        sibling_iterator l = plusplus(rna.begin(), 5);
 
-        while (--n != 0)
-            it = rna.insert(it, lbl_leaf, 0);
+        run_insert_leafs(5, rna, ch.begin());
+        run_insert_leafs(1, rna, ch.end());
+        run_insert_leafs(4, rna, l.begin());
 
         rna.print_tree();
-        WAIT;
+        save_seq_fold(rna, fileout);
+        run_app(filein, fileout);
+    };
+    auto deletes = [this]()
+    {
+        string filein = FILEIN(FILEINDEX);
+        string fileout = FILEOUT(FILEINDEX) + ".del";
+
+        rna_tree rna = get_rna(filein);
+        sibling_iterator l = plusplus(rna.begin(), 5);
+
+        run_delete_leafs(3, rna, l.begin());
+
+        rna.print_tree();
         save_seq_fold(rna, fileout);
         run_app(filein, fileout);
     };
 
-    run_insert_bulge(4);
+    inserts();
+    deletes();
 
-
-    //iterator it;
-
-    //it = plusplus(rna.begin(), 2);
-
-    //rna.print_tree();
-
-    //insert_hairpin(rna, it.begin(), 4);
-    //insert_hairpin(rna, it.end(), 4);
-
-    //rna.print_tree();
-
-    //save_seq_fold(rna, FILEOUT(file_index));
-    //run_app(FILEIN(file_index), FILEOUT(file_index));
+#undef FILEINDEX
 }
 
-void test::run_interior()
+void test::run_multibranch()
 {
     APP_DEBUG_FNAME;
 
-    size_t file_index = 1;
-    rna_tree rna = get_rna(FILEIN(file_index));
-    iterator it;
-    sibling_iterator ch;
+#define FILEINDEX 2
 
-    it = plusplus(rna.begin(), 6);
+    auto deletes = [this]()
+    {
+        string filein = FILEIN(FILEINDEX);
+        string fileout = FILEOUT(FILEINDEX) + ".del";
 
-    rna.print_tree();
+        rna_tree rna = get_rna(filein);
+        sibling_iterator ch = plusplus(rna.begin(), 10);
 
-    insert_hairpin(rna, plusplus(it.begin(), 2), 4);
-    insert_hairpin(rna, plusplus(it.begin(), 5), 4);
+        for (int i = 0; i < 14; ++i)
+        {
+            while (rna_tree::is_leaf(ch))
+                ++ch;
+            ch = rna.erase(ch);
+        }
 
-    rna.print_tree();
+        rna.print_tree();
+        save_seq_fold(rna, fileout);
+        run_app(filein, fileout);
+    };
+    auto deletes_inserts = [this]()
+    {
+        string filein = FILEOUT(FILEINDEX) + ".del";
+        string fileout = FILEOUT(FILEINDEX) + ".del-ins";
 
-    save_seq_fold(rna, FILEOUT(file_index));
-    run_app(FILEIN(file_index), FILEOUT(file_index));
+        rna_tree rna = get_rna(filein);
+        sibling_iterator ch = plusplus(rna.begin(), 10);
+
+        ch = rna.insert(ch, lbl_pair, 9);
+
+        ch = plusplus(ch.begin(), 2);
+        ch = rna.insert(ch, lbl_pair, 5);
+
+        for (int i = 0; i < 7; ++i)
+            rna.insert(ch, lbl_pair, 1);
+
+        ch = plusplus(ch.begin(), 1);
+        ch = rna.insert(ch, lbl_pair, 4);
+        for (int i = 0; i < 4; ++i)
+            rna.insert(ch, lbl_pair, 1);
+
+        rna.print_tree();
+        save_seq_fold(rna, fileout);
+        run_app(filein, fileout);
+    };
+    auto inserts = [this]()
+    {
+        string filein = FILEIN(FILEINDEX);
+        string fileout = FILEOUT(FILEINDEX) + ".ins";
+
+        rna_tree rna = get_rna(filein);
+        sibling_iterator ch = plusplus(rna.begin(), 6);
+
+        ch = plusplus(ch.begin(), 4);
+
+        run_insert_leafs(5, rna, ch);
+
+        rna.print_tree();
+        save_seq_fold(rna, fileout);
+        run_app(filein, fileout);
+    };
+
+    deletes();
+    deletes_inserts();
+    inserts();
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
