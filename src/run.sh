@@ -1,5 +1,7 @@
 #~/bin/bash
 
+FILES1="frog mouse rabbit human"
+FILES2="frog mouse rabbit human"
 FILES="$(ls precomputed/*ps | sed 's@\.ps@@;s@precomputed/@@')"
 #DEBUG="--debug"
 EXECUTABLE="build/program ${DEBUG}"
@@ -49,7 +51,7 @@ run_ps() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --ps --mapping ${file}.map build/files/${file1}-${file2}.ps \
+	    --ps --mapping ${file}.map --overlaps build/files/${file1}-${file2}.ps \
         || fail_function
 
 }
@@ -74,7 +76,7 @@ if [ "$1" = "debug" ]
 then
     EXECUTABLE="gdb --args ${EXECUTABLE}"
     ${EXECUTABLE}
-    exit(0)
+    exit 0
 fi
 
 run() {
@@ -85,15 +87,14 @@ run() {
 	run_ps
 }
 
+run_loop() {
+	for file2 in $FILES2
+	do
+		run
+	done
+}
 
-for file1 in $FILES
+for file1 in $FILES1
 do
-    for file2 in $FILES
-    do
-	    run&
-	#run_rted
-	#run_gted_full
-	#run_gted_mapping
-        #run_ps
-    done
+	run_loop &
 done

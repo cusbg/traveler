@@ -23,25 +23,16 @@
 #include "write_ps_document.hpp"
 #include "compact_circle.hpp"
 #include "compact_utils.hpp"
-#include "utils.hpp"    // TODO: remove, only for psdocument default prolog
+
 
 using namespace std;
 
 #define MULTIBRANCH_MINIMUM_SPLIT   10
 
-static ps_writer psout;
-#define UPDATE(root) \
-    { \
-        auto seek = psout.print(psout.sprint_subtree(root)); \
-        psout.seek(seek); \
-    }
-
 compact::compact(
                 rna_tree& _rna)
     : rna(_rna)
-{
-    psout.init_default("build/files/run-op/doc.ps", rna.begin());
-}
+{ }
 
 void compact::run()
 {
@@ -83,53 +74,6 @@ void compact::run()
     size_t n;
     n = recursion(parent);
     DEBUG("shift #%lu '%s'", n, to_cstr(vector));
-}
-
-/* static */ void compact::rotate_branch(
-                iterator parent,
-                circle c,
-                double alpha)
-{
-    APP_DEBUG_FNAME;
-
-    function<size_t(iterator, circle&)> recursion =
-        [&recursion, alpha](iterator it, circle& c) {
-            sibling_iterator ch;
-            size_t count = 0;
-
-            for (ch = it.begin(); ch != it.end(); ++ch)
-                count += recursion(ch, c);
-
-            if (it->inited_points())
-            {
-                c.p1 = it->at(0).p;
-                c.p2 = c.centre + c.centre - c.p1;
-                //c.compute_sgn();
-
-                it->at(0).p = c.rotate(alpha);
-
-                if (it->paired())
-                {
-                    c.p1 = it->at(1).p;
-                    c.p2 = c.centre + c.centre - c.p1;
-
-                    it->at(1).p = c.rotate(alpha);
-                }
-
-                ++count;
-            }
-            return count;
-        };
-
-    c.p1 = parent->at(0).p;
-    c.p2 = parent->at(1).p;
-    c.compute_sgn();
-
-    size_t n = recursion(parent, c);
-
-    UPDATE(parent);
-
-    DEBUG("rotated #%lu of %s, angle %f", n, clabel(parent), alpha);
 }
 
 /* static */ void compact::set_distance(
@@ -194,7 +138,7 @@ void compact::init()
 {
     APP_DEBUG_FNAME;
 
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     iterator it;
     point p;
@@ -212,7 +156,7 @@ void compact::init()
         {
             DEBUG("INIT_rec OK");
         }
-        else if (rna_tree::is_valid(get_onlyone_branch(rna_tree::parent(it))))
+        else
         {
             assert(rna_tree::is_valid(get_onlyone_branch(rna_tree::parent(it))));   // => 1 branch
 
@@ -230,14 +174,6 @@ void compact::init()
 
             DEBUG("INIT OK");
         }
-        else
-        {
-            assert(it->paired());
-            assert(!rna_tree::is_root(it));
-
-            init_multibranch(rna_tree::parent(it));
-            init_branch_recursive(it, rna_tree::parent(it)->centre());
-        }
     }
 
     // for nodes in one branch, set them to lie on straight line
@@ -254,70 +190,6 @@ void compact::init()
         }
     }
     DEBUG("compact::init() OK");
-}
-
-void compact::init_multibranch(
-                iterator par)
-{
-    APP_DEBUG_FNAME;
-
-    size_t n = 0;
-    for (sibling_iterator ch = par.begin(); ch != par.end(); ++ch)
-        n += ch->paired() ? 3 : 1;
-
-    auto get_points = [](iterator iter, size_t n)
-    {
-        circle c;
-        c.p1 = iter->at(0).p;
-        c.p2 = iter->at(1).p;
-        c.centre = centre(c.p1, c.p2);
-        c.direction = rna_tree::parent(iter)->centre();
-        c.compute_sgn();
-        c.init(n);
-        return c.split(n);
-    };
-
-    auto points = get_points(par, n);
-    n = 0;
-    for (sibling_iterator ch = par.begin(); ch != par.end(); ++ch)
-    {
-        DEBUG("%s", clabel(ch));
-        if (ch->inited_points() && ch->paired())
-        {
-            DEBUG("rotate");
-            rna.print_subtree(ch);
-            double alpha;
-            double dist = distance(points.at(n + 1), par->centre());
-            alpha = angle(points.at(n + 1), par->centre(), ch->centre());
-            circle c;
-            c.direction = par->at(1).p;
-            c.centre = par->centre();
-
-            rotate_branch(ch, c, alpha);
-            set_distance(par, ch, dist);
-
-            //ch->at(0).p = points.at(n + 0);
-            //ch->at(1).p = points.at(n + 1);
-            n += 3;
-
-            UPDATE(par);
-            WAIT;
-        }
-        else if (ch->paired())
-        {
-            shift_branch(ch, points.at(n + 1) - par->centre());
-            ch->at(0).p = points.at(n + 1);
-            ch->at(1).p = points.at(n + 2);
-            n += 3;
-        }
-        else
-        {
-            ch->at(0).p = points.at(n);
-            n += 1;
-        }
-        ch->status = rna_pair_label::reinserted;
-    }
-    par->remake_ids.clear();
 }
 
 point compact::init_branch_recursive(
@@ -399,23 +271,8 @@ void compact::make_branch_even(
 
     shift = orthogonal(p1 - p2, vec[1]->centre() - p2);
 
-    circle c;
-    c.direction = vec[0]->at(0).p;
-    c.centre = vec[0]->centre();
-
     for (size_t i = 1; i < vec.size(); ++i)
     {
-        UPDATE(rna.begin());
-
-        //double alpha;
-        //point to = vec[0]->at(0).p +
-            //(normalize(shift) * distance(vec[0]->centre(), vec[i]->centre()));
-        //alpha = angle(vec[i]->centre(), c.centre, to);
-
-        //rotate_branch(vec[i], c, alpha);
-        //continue;
-
-
         // distances between nodes will be same..
         shift = normalize(shift) * distance(vec[0]->centre(), vec[i]->centre());
 
@@ -442,8 +299,6 @@ void compact::make_branch_even(
         vec[i]->at(0).p = p1 + shift;
         vec[i]->at(1).p = p2 + shift;
     }
-
-    WAIT;
 
     // shift rest of tree
     // (subtree of this branch)

@@ -80,6 +80,8 @@ public:
                 point p,
                 double size);
 
+    static std::string default_prologue();
+
 public:
     /**
      * print `text` to document

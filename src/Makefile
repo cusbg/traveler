@@ -59,10 +59,10 @@ $(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES
 	@make -j$(CORES) --directory=$(BUILDDIR) -f Makefile
 
 mk_dirs:
-	@mkdir -p $(LOGDIR) $(FILESDIR)
+	@mkdir -p $(LOGDIR) $(FILESDIR) precomputed $(FILESDIR)/run $(FILESDIR)/run-op
 
 cp: mk_dirs
-	cp ../InFiles/* ./precomputed/
+	cp `find ../InFiles/ -maxdepth 1 -type f` precomputed/
 
 
 $(BUILDDIR)/%.mk: %.cpp Makefile

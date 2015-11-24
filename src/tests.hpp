@@ -38,8 +38,10 @@ public:
 
 private:
     void run_app(std::string filetempl, std::string fileother);
-    void run1();
-    void run2();
+    void run_hairpin();
+    void run_interior();
+    void run_multibranch();
+    void run_fullbranch();
 
 private:
 

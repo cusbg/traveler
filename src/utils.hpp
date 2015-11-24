@@ -93,8 +93,6 @@ public:
     ps_document(
                 const std::string& filename);
 
-    static std::string default_prologue();
-
     std::string labels;
     std::vector<point> points;
 

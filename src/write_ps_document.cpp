@@ -330,7 +330,18 @@ using namespace std;
     return str.str();
 }
 
-#include "utils.hpp"
+/* static */ std::string ps_writer::default_prologue()
+{
+    APP_DEBUG_FNAME;
+
+    return
+        "%!\n"
+        "/lwline {newpath moveto lineto stroke} def\n"
+        "/lwstring {moveto show} def\n"
+        "/lwarc {newpath gsave translate scale /rad exch def /ang1 exch def"
+            " /ang2 exch def 0.0 0.0 rad ang1 ang2 arc stroke grestore} def\n"
+        "/Helvetica findfont 8.00 scalefont setfont\n";
+}
 
 void ps_writer::init_default(
                 const std::string& filename,
@@ -342,7 +353,7 @@ void ps_writer::init_default(
 
     init(filename);
 
-    scale = {0.8, 0.8};
+    scale = {0.54, 0.54};
     letter = {612, 792};
 
     letter.x /= scale.x;
@@ -359,7 +370,11 @@ void ps_writer::init_default(
     bl.x += 50;
     bl.y = letter.y + tr.y - 50;
 
-    print(ps_document::default_prologue());
+    print(default_prologue());
     print(to_string(scale) + " scale\n");
     print(to_string(bl) + " translate\n");
 }
+
+
+
+

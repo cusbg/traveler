@@ -188,17 +188,6 @@ ps_document::ps_document(const std::string& name)
     }
 }
 
-/* static */ std::string ps_document::default_prologue()
-{
-    return
-        "%!\n"
-        "/lwline {newpath moveto lineto stroke} def\n"
-        "/lwstring {moveto show} def\n"
-        "/lwarc {newpath gsave translate scale /rad exch def /ang1 exch def"
-            " /ang2 exch def 0.0 0.0 rad ang1 ang2 arc stroke grestore} def\n"
-        "/Helvetica findfont 8.00 scalefont setfont\n";
-}
-
 
 
 

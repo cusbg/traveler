@@ -254,7 +254,7 @@ void app::run(
         ps_writer ps;
         ps.init(args.all.psout);
 
-        ps.print(ps_document::default_prologue(), true);
+        ps.print(ps.default_prologue(), true);
         save(args.templated, ps, args.ps.overlap_checks);
     }
     else
@@ -328,8 +328,7 @@ void app::save(
 
     prolog = ps_document(templated_ps).prolog;
 
-    ps.init(filename);
-    ps.print(prolog);
+    ps.init_default(filename, rna.begin());
 
     save(rna, ps, overlaps);
 }

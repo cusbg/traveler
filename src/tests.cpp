@@ -29,7 +29,6 @@
 #include "write_ps_document.hpp"
 
 #define INDIR           (string("precomputed/"))
-#define OUTDIR_PART     (string("build/files/run-part/"))
 #define OUTDIR_OP       (string("build/files/run-op/"))
 
 #define FILES   (std::vector<string>({"1.hairpin", "2.interior", "3.multibranch", "4.fullbranch"}))
@@ -54,6 +53,7 @@ void test::save_seq_fold_subtree(iterator it, string name)
 {
     APP_DEBUG_FNAME;
 
+#define OUTDIR_PART     (string("build/files/run-part/"))
     name = OUTDIR_PART + name;
 
     write_file(name + ".seq", rna_tree::get_labels(it));
@@ -191,8 +191,8 @@ void test::run()
 {
     APP_DEBUG_FNAME;
 
-    run1();
-    run2();
+    run_hairpin();
+    run_interior();
 }
 
 
@@ -225,28 +225,48 @@ void test::run_app(std::string filetempl, std::string fileother)
     save_to_psout(fileother + ".ps", rna.begin());
 }
 
-void test::run1()
+void test::run_hairpin()
 {
     APP_DEBUG_FNAME;
 
-    size_t file_index = 0;
-    rna_tree rna = get_rna(FILEIN(file_index));
-    iterator it;
+#define FILEINDEX 0
 
-    it = plusplus(rna.begin(), 2);
+    auto run_insert_bulge = [this](size_t n)
+    {
+        string filein = FILEIN(FILEINDEX);
+        string fileout = FILEOUT(FILEINDEX) + ".bulge." + to_string(n);
 
-    rna.print_tree();
+        rna_tree rna = get_rna(filein);
+        sibling_iterator it = plusplus(rna.begin(), 2);
 
-    insert_hairpin(rna, it.begin(), 4);
-    insert_hairpin(rna, it.end(), 4);
+        while (--n != 0)
+            it = rna.insert(it, lbl_leaf, 0);
 
-    rna.print_tree();
+        rna.print_tree();
+        WAIT;
+        save_seq_fold(rna, fileout);
+        run_app(filein, fileout);
+    };
 
-    save_seq_fold(rna, FILEOUT(file_index));
-    run_app(FILEIN(file_index), FILEOUT(file_index));
+    run_insert_bulge(4);
+
+
+    //iterator it;
+
+    //it = plusplus(rna.begin(), 2);
+
+    //rna.print_tree();
+
+    //insert_hairpin(rna, it.begin(), 4);
+    //insert_hairpin(rna, it.end(), 4);
+
+    //rna.print_tree();
+
+    //save_seq_fold(rna, FILEOUT(file_index));
+    //run_app(FILEIN(file_index), FILEOUT(file_index));
 }
 
-void test::run2()
+void test::run_interior()
 {
     APP_DEBUG_FNAME;
 
