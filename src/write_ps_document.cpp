@@ -375,6 +375,34 @@ void ps_writer::init_default(
     print(to_string(bl) + " translate\n");
 }
 
+void ps_writer::print_rna_name(
+                rna_tree& rna)
+{
+    APP_DEBUG_FNAME;
+
+    point tr, bl, letter, scale;
+
+    scale = {0.54, 0.54};
+    letter = {612, 792};
+
+    letter.x /= scale.x;
+    letter.y /= scale.y;
+
+    tr = rna_tree::top_right_corner(rna.begin());
+    bl = rna_tree::bottom_left_corner(rna.begin());
+
+    DEBUG("tr %s, bl %s", to_cstr(tr), to_cstr(bl));
+    assert(distance(tr, bl) < size(letter));
+    tr = tr * -1;
+    bl = bl * -1;
+
+    bl.x += 50;
+    bl.y = letter.y + tr.y - 50;
+
+    point p = {bl.x - 100, tr.y - 100};
+
+    print(sprint(p, rna.name()));
+}
 
 
 

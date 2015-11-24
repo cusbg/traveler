@@ -50,6 +50,8 @@ public:
     void init_default(
                 const std::string& filename,
                 rna_tree::iterator root);
+    void print_rna_name(
+                rna_tree& rna);
 
 public:
     static std::string sprint(

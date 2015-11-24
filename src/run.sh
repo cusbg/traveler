@@ -72,8 +72,8 @@ run_all() {
 run() {
     init_variables
 
-    run_rted
-    run_gted_full
+    #run_rted
+    #run_gted_full
     run_ps
 
     #{

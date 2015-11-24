@@ -293,7 +293,8 @@ void app::run(
 
             mapping map = load_mapping_table(args.ps.mapping);
 
-            args.templated.set_name(args.templated.name() + "-" + args.matched.name());
+            args.templated.set_name(args.matched.name() + "_mapped_to_" + args.templated.name());
+
             args.templated = matcher(args.templated, args.matched).run(map);
             compact(args.templated).run();
 
@@ -321,6 +322,7 @@ void app::save(
     string prolog;
 
     ps.init_default(filename, rna.begin());
+    ps.print_rna_name(rna);
 
     save(rna, ps, overlaps);
 }
@@ -341,7 +343,6 @@ void app::save(
     if (overlap)
         overlaps = overlap_checks().run(rna);
 
-    if (!overlaps.empty())
     {
         ofstream out;
         out.open("build/logs/overlaps.log", ios_base::app);
@@ -350,8 +351,12 @@ void app::save(
             << " : "
             << overlaps.size()
             << endl;
-        WARN("overlaps occurs in %s, count=%lu",
-                to_cstr(rna.name()), overlaps.size());
+
+        if (!overlaps.empty())
+        {
+            WARN("overlaps occurs in %s, count=%lu",
+                    to_cstr(rna.name()), overlaps.size());
+        }
     }
 
     for (; it != end; ++it)
