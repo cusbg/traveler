@@ -132,7 +132,7 @@ inline void wait_for_input()
             logger.debug("%s", to_cstr(stream.str())); \
         }
 
-#define abort() ERR("abort(), line # %lu", __LINE__), ::abort()
+#define abort() ERR("abort(), line # %lu, file %s", __LINE__, __FILE__), ::abort()
 
 
 #endif /* !TYPES_HPP */

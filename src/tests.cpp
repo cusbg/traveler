@@ -19,116 +19,252 @@
  * USA.
  */
 
+
 #include "tests.hpp"
 #include "rna_tree.hpp"
 #include "utils.hpp"
 #include "app.hpp"
+#include "compact.hpp"
 
 #include "write_ps_document.hpp"
 
 #define INDIR           (string("precomputed/"))
-#define OUTDIR          (string("build/files/run/"))
+#define OUTDIR_PART     (string("build/files/run-part/"))
+#define OUTDIR_OP       (string("build/files/run-op/"))
+
+#define FILES   (std::vector<string>({"1.hairpin", "2.interior", "3.multibranch", "4.fullbranch"}))
 
 #define print(string)   psout.print((string), true)
 #define parent(iter)    rna_tree::parent(iter)
-ps_writer psout;
+
+
+#define FILEIN(index)  (INDIR + (FILES.at(index)))
+#define FILEOUT(index) (OUTDIR_OP + (FILES.at(index)) + ".out")
+
+
+static ps_writer psout;
+rna_pair_label lbl_leaf("I");
+rna_pair_label lbl_pair = lbl_leaf + lbl_leaf;
 
 using namespace std;
+
+#ifdef NODEF
+
+void test::save_seq_fold_subtree(iterator it, string name)
+{
+    APP_DEBUG_FNAME;
+
+    name = OUTDIR_PART + name;
+
+    write_file(name + ".seq", rna_tree::get_labels(it));
+    write_file(name + ".fold", rna_tree::get_brackets(it));
+}
+
+void test::generate()
+{
+    APP_DEBUG_FNAME;
+
+    size_t n = 100;
+    size_t i = 0;
+    rna_tree rna = get_rna(INDIR + "frog");
+
+    for (i = 0; i < 19; ++i)
+    {
+        iterator it = rna.begin();
+        it = plusplus(it, n);
+
+        while (rna_tree::is_leaf(it))
+            ++it;
+
+        string name = OUTDIR_PART + "rna_part." + to_string(i);
+        save_seq_fold_subtree(it, name);
+        save_to_psout(name + ".ps", it);
+
+        n += 100;
+    }
+}
+
+#endif
+
+void test::save_seq_fold(rna_tree rna, std::string name)
+{
+    APP_DEBUG_FNAME;
+
+    write_file(name + ".seq", rna.get_labels());
+    write_file(name + ".fold", rna.get_brackets());
+}
+
 
 
 
 
 rna_tree get_rna(const string& name)
 {
+    DEBUG("get_rna(%s)", to_cstr(name));
+
     string l, b;
-    l = read_file(INDIR + name + ".seq");
-    b = read_file(INDIR + name + ".fold");
+    l = read_file(name + ".seq");
+    b = read_file(name + ".fold");
 
-    ps_document doc(INDIR + name + ".ps");
-
-    psout.init(OUTDIR + "document.ps");
-    string p = doc.prolog;
-    DEBUG("%s", to_cstr(p));
-
-    print(p);
+    ps_document doc(name + ".ps");
 
     return rna_tree(b, l, doc.points, name);
 }
 
-vector<string> create_arguments(string file)
+std::vector<std::string> test::create_app_arguments(const std::string& file_in, const std::string& file_out)
 {
     vector<string> vec = {
-        file,
+        "program_name",
         "-tt",
-            INDIR + file + ".ps",
-            INDIR + file + ".fold",
-            "--name", file + "_templ",
+            file_in + ".ps",
+            file_in + ".fold",
+            "--name", file_in + "_templ",
         "-mt",
-            OUTDIR + file + ".matched.seq",
-            OUTDIR + file + ".matched.fold",
-            "--name", file + "_match",
+            file_out + ".seq",
+            file_out + ".fold",
+            "--name", file_out + "_match",
         //"-r",
-            //"--strategies", OUTDIR + file + ".matched.rted",
+            //"--strategies", file_out + ".matched.rted",
         //"-g",
-            //"--ted-out", OUTDIR + file + ".matched.ted",
-            //"--mapping", OUTDIR + file + ".matched.map",
-        "--ps",
-            "--mapping", OUTDIR + file + ".matched.map",
-            OUTDIR + file + ".matched.ps",
+            //"--ted-out", file_out + ".matched.ted",
+            //"--mapping", file_out + ".matched.map",
+        //"--ps",
+            //"--mapping", file_out + ".matched.map",
+            //file_out + ".matched.ps",
+        "-a",
+            file_out + ".ps",
     };
 
     return vec;
 }
 
+string test::ending_3_5_strings(iterator it)
+{
+    if (rna_tree::is_root(it))
+        return "";
+    auto get_direction = [](iterator it) {
+        assert(!rna_tree::is_leaf(it));
+
+        point p1, p2, p, ch;
+
+        p1 = it->at(0).p;
+        p2 = it->at(1).p;
+
+        ch = it.begin()->centre();
+
+        p = -orthogonal(p2 - p1, ch - p1);
+
+        return p;
+    };
+
+    point dir = get_direction(it) * BASES_DISTANCE * 1.5;
+    point p1, p2;
+    p1 = it->at(0).p;
+    p2 = it->at(1).p;
+    ostringstream out;
+
+    out
+        << ps_writer::sprint(p1 + dir, "5'")
+        << ps_writer::sprint(p2 + dir, "3'")
+        << ps_writer::sprint_edge(p1, p1 + dir, true)
+        << ps_writer::sprint_edge(p2, p2 + dir, true);
+
+    return out.str();
+}
+
+void test::save_to_psout(const std::string& filename, iterator it)
+{
+    APP_DEBUG_FNAME;
+
+    psout.init_default(filename, it);
+
+    print(psout.sprint_subtree(it));
+    print(ending_3_5_strings(it));
+}
+
+
+
+
+
+
 void test::run()
 {
     APP_DEBUG_FNAME;
 
-    remove_leaf_nodes();
-}
-
-rna_tree test::remove_leaf_nodes()
-{
-    APP_DEBUG_FNAME;
-
-    auto human = [&]() {
-        rna_tree rna = get_rna("human");
-
-        size_t n, m;
-        iterator it = rna.begin();
-        rna_pair_label lbl("I");
-
-        n = 975;
-        m = 10;
-
-        it = plusplus(it, n);
-
-        print(psout.sprint_subtree(it));
-
-        while (m-- != 0)
-        {
-            rna.insert(it, lbl, 0);
-        }
-
-        save(rna);
-
-        app app;
-        app.run(create_arguments("human"));
-
-        return rna;
-    };
-
-    return human();
+    run1();
+    run2();
 }
 
 
-void test::save(const rna_tree& rna)
+void test::insert_hairpin(
+                rna_tree& rna,
+                sibling_iterator ch,
+                size_t n)
+{
+    int i = 4;
+    while (--i != 0)
+        ch = rna.insert(ch, lbl_leaf, 0);
+    ch = rna.insert(ch, lbl_pair, 3);
+
+    while (--n != 0)
+        ch = rna.insert(ch, lbl_pair, 1);
+}
+
+
+
+void test::run_app(std::string filetempl, std::string fileother)
 {
     APP_DEBUG_FNAME;
 
-    string file = OUTDIR + rna.name();
+    auto args = create_app_arguments(filetempl, fileother);
 
-    write_file(file + ".matched.fold", rna.get_brackets());
-    write_file(file + ".matched.seq", rna.get_labels());
+    app app;
+    app.run(args);
+
+    rna_tree rna = get_rna(fileother);
+    save_to_psout(fileother + ".ps", rna.begin());
+}
+
+void test::run1()
+{
+    APP_DEBUG_FNAME;
+
+    size_t file_index = 0;
+    rna_tree rna = get_rna(FILEIN(file_index));
+    iterator it;
+
+    it = plusplus(rna.begin(), 2);
+
+    rna.print_tree();
+
+    insert_hairpin(rna, it.begin(), 4);
+    insert_hairpin(rna, it.end(), 4);
+
+    rna.print_tree();
+
+    save_seq_fold(rna, FILEOUT(file_index));
+    run_app(FILEIN(file_index), FILEOUT(file_index));
+}
+
+void test::run2()
+{
+    APP_DEBUG_FNAME;
+
+    size_t file_index = 1;
+    rna_tree rna = get_rna(FILEIN(file_index));
+    iterator it;
+    sibling_iterator ch;
+
+    it = plusplus(rna.begin(), 6);
+
+    rna.print_tree();
+
+    insert_hairpin(rna, plusplus(it.begin(), 2), 4);
+    insert_hairpin(rna, plusplus(it.begin(), 5), 4);
+
+    rna.print_tree();
+
+    save_seq_fold(rna, FILEOUT(file_index));
+    run_app(FILEIN(file_index), FILEOUT(file_index));
 }
 

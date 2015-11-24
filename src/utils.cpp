@@ -73,40 +73,34 @@ ps_document::ps_document(const std::string& name)
     ifstream in(name);
     point p;
     auto stream_pos = in.tellg();
-    regex regexp(
-            "^\\([ACGU]\\)\\s+"                                 //(%BASE%)
+    regex regexp_base_line(
+            "^\\([ACGUI]\\)\\s+"                                 //(%BASE%)
             "-?[0-9]+(\\.[0-9]+)?\\s+-?[0-9]+(\\.[0-9]+)?\\s+"  //+-%DOUBLE% +-%DOUBLE%
             "lwstring\\s*$"                                     // %LWSTRING%
             );
+    auto endings = {
+        "lwline",
+        "lwfarc",
+        "lwarc",
+        //"lwstring",
+        "lineto",
+        "moveto",
+        "setlinewidth",
+        "setlinecap",
+        "newpath",
+        "stroke",
+        "setrgbcolor",
+    };
+    vector<regex> ignore_regexps;
+    for (string val : endings)
+        ignore_regexps.push_back(regex(val + "\\s*$"));
 
-    auto ignore_line = [](const std::string& line)
+    auto ignore_line = [&ignore_regexps](const std::string& line)
     {
-        // ignorovanie parovacich hran a pod
-        //
-        auto ends_with = [](const std::string& str, const std::string& what)
-        {
-            return str.find(what) == str.size() - what.size();
-        };
+        smatch match;
 
-        auto endings = {
-            "lwline",
-            "lwfarc",
-            "lwarc",
-            //"lwstring",
-            "lineto",
-            "moveto",
-            "setlinewidth",
-            "setlinecap",
-        };
-        auto lines = {
-            "newpath",
-            "stroke",
-        };
-        for (auto val : endings)
-            if (ends_with(line, val))
-                return true;
-        for (auto val : lines)
-            if (line == val)
+        for (const auto& r : ignore_regexps)
+            if (regex_search(line, match, r))
                 return true;
         return false;
     };
@@ -121,11 +115,11 @@ ps_document::ps_document(const std::string& name)
             str.eof() &&
             other == "setrgbcolor";
     };
-    auto is_base_line = [&regexp](const std::string& line)
+    auto is_base_line = [&regexp_base_line](const std::string& line)
     {
         smatch match;
 
-        return regex_search(line, match, regexp);
+        return regex_search(line, match, regexp_base_line);
     };
 
     // nacita prolog suboru
@@ -160,6 +154,8 @@ ps_document::ps_document(const std::string& name)
             DEBUG("is_rgb_funct(%s), continue", line.c_str());
             continue;
         }
+        if (ignore_line(line))
+            continue;
         if (!is_base_line(line))
         {
             in.seekg(stream_pos);
@@ -198,9 +194,8 @@ ps_document::ps_document(const std::string& name)
         "%!\n"
         "/lwline {newpath moveto lineto stroke} def\n"
         "/lwstring {moveto show} def\n"
-        "306.00 396.00 translate\n"
-        "0.54 0.54 scale\n"
-        "-182.50 481.00 translate\n"
+        "/lwarc {newpath gsave translate scale /rad exch def /ang1 exch def"
+            " /ang2 exch def 0.0 0.0 rad ang1 ang2 arc stroke grestore} def\n"
         "/Helvetica findfont 8.00 scalefont setfont\n";
 }
 

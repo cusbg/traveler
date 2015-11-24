@@ -20,10 +20,22 @@
  */
 
 #define TESTS
-
 #include "../overlap_checks.hpp"
 
 using namespace std;
+
+static ostream& operator<<(
+            ostream& out, overlap_checks::edge e)
+{
+    out
+        << "E: ("
+        << e.p1
+        << ") ~> ("
+        << e.p2
+        << ")";
+
+    return out;
+}
 
 /* static */ void overlap_checks::test()
 {
@@ -32,13 +44,6 @@ using namespace std;
     vector<point> v1, v2;
     v1 = {{5, 0}, {0, 5}, {-5, 0}, {0, -5}};
     v2 = {{2, 2}, {-2, 2}, {-2, -2}, {-2, 2}};
-
-    //point shift = {23.5, -23.789};
-
-    //for (point& p : v1)
-        //p += shift;
-    //for (point& p : v2)
-        //p += shift;
 
     bool b = false;
     edge e1, e2;
@@ -52,8 +57,11 @@ using namespace std;
         for (point p2 : v2)
         {
             e2.p2 = p2;
-            if (!intersection(e1, e2).bad())
+            point i = intersection(e1, e2);
+            if (!i.bad())
             {
+                DEBUG("edges (%s) (%s) intersect in (%s)",
+                        to_cstr(e1), to_cstr(e2), to_cstr(i));
                 b = true;
             }
         }
@@ -63,7 +71,6 @@ using namespace std;
     e2.p2 = {10, -10};
 
     assert(!intersection(e1, e2).bad());
-
     assert(b);
 }
 

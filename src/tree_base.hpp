@@ -64,6 +64,12 @@ public:
     inline size_t id() const;
     inline size_t size() const;
 
+public:
+    template <typename iterator_type, typename funct>
+        static funct for_each_in_subtree(
+                iterator_type root,
+                funct function);
+
 protected:
     template <typename iterator_type, typename funct>
         static funct for_each(

@@ -152,11 +152,7 @@ std::string tree_base<label_type>::print_subtree(
         }
     };
 
-    pre_post_order_iterator begin(root, true);
-    pre_post_order_iterator end(root, false);
-    ++end;
-
-    for_each(begin, end, f);
+    for_each_in_subtree(root, f);
 
     if (debug_out)
         DEBUG("%s", to_cstr(out.str()));

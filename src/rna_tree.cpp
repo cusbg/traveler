@@ -19,6 +19,8 @@
  * USA.
  */
 
+#include <cfloat>
+
 #include "rna_tree.hpp"
 
 using namespace std;
@@ -91,7 +93,46 @@ void rna_tree::update_points(
         it->set_points_exact(points[i], it.label_index());
 
     assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
+
+    update_ends_in_rna(*this);
 }
+
+void update_ends_in_rna(
+                rna_tree& rna)
+{
+    APP_DEBUG_FNAME;
+
+    typedef rna_tree::iterator iterator;
+
+    iterator root = rna.begin();
+    point p1, p2;
+    iterator f, l;
+
+    f = rna_tree::first_child(root);
+    l = rna_tree::last_child(root);
+
+    if (f == l && !f->paired())
+    {
+        WARN("cannot initialize rna ends, returning");
+        return;
+    }
+
+    p1 = f->at(0).p;
+    p2 = l->paired() ? l->at(1).p : l->at(0).p;
+
+    if (p1.bad() || p2.bad() || p1 == p2)
+    {
+        WARN("cannot initialize rna ends, returning");
+        return;
+    }
+    point dir = normalize(p2 - p1) * 7;
+
+    root->at(0).p = p1 - dir;
+    root->at(0).label = "5'";
+    root->at(1).p = p2 + dir;
+    root->at(1).label = "3'";
+}
+
 
 
 rna_tree::sibling_iterator rna_tree::erase(
@@ -130,6 +171,7 @@ rna_tree::sibling_iterator rna_tree::insert(
         ++end;
 
     _tree.reparent(pos, beg, end);
+    ++_size;
 
     return pos;
 }
@@ -150,11 +192,7 @@ std::string rna_tree::name() const
             out << iter->at(iter.label_index()).label;
         };
 
-    pre_post_order_iterator begin(root, true);
-    pre_post_order_iterator end(root, false);
-    ++end;
-
-    for_each(begin, end, f);
+    for_each_in_subtree(root, f);
 
     return out.str();
 }
@@ -165,6 +203,7 @@ std::string rna_tree::get_labels() const
     iterator root = _tree.begin();
     for (sibling_iterator ch = root.begin(); ch != root.end(); ++ch)
         out << get_labels(ch);
+
     return out.str();
 }
 
@@ -183,11 +222,7 @@ std::string rna_tree::get_labels() const
                 out << ")";
         };
 
-    pre_post_order_iterator begin(root, true);
-    pre_post_order_iterator end(root, false);
-    ++end;
-
-    for_each(begin, end, f);
+    for_each_in_subtree(root, f);
 
     return out.str();
 }
@@ -198,8 +233,62 @@ std::string rna_tree::get_brackets() const
     iterator root = _tree.begin();
     for (sibling_iterator ch = root.begin(); ch != root.end(); ++ch)
         out << get_brackets(ch);
+
     return out.str();
 }
+
+
+/* static */ point rna_tree::top_right_corner(iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    // x, y should be maximal in subtree
+    point p = { -DBL_MAX, -DBL_MAX };
+
+    auto f = [&p] (const pre_post_order_iterator& it) {
+        if (rna_tree::is_root(it) || !it->inited_points())
+            return;
+        point o = it->at(it.label_index()).p;
+        if (o.x > p.x)
+            p.x = o.x;
+        if (o.y > p.y)
+            p.y = o.y;
+    };
+
+    rna_tree::for_each_in_subtree(root, f);
+
+    assert(p.x != -DBL_MAX && p.y != -DBL_MAX);
+
+    return p;
+}
+
+/* static */ point rna_tree::bottom_left_corner(iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    // x, y should be minimal in subtree
+    point p = { DBL_MAX, DBL_MAX };
+
+    auto f = [&p] (const pre_post_order_iterator& it) {
+        if (rna_tree::is_root(it) || !it->inited_points())
+            return;
+        point o = it->at(it.label_index()).p;
+        if (o.x < p.x)
+            p.x = o.x;
+        if (o.y < p.y)
+            p.y = o.y;
+    };
+
+    rna_tree::for_each_in_subtree(root, f);
+
+    assert(p.x != DBL_MAX && p.y != DBL_MAX);
+
+    return p;
+}
+
+
+
+
 
 /* inline */ std::string trim(
                 std::string& s)
@@ -216,3 +305,5 @@ std::string rna_tree::get_brackets() const
 
     return s;
 }
+
+

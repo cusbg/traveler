@@ -49,7 +49,7 @@ run_ps() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --ps --mapping ${file}.map --overlaps build/files/${file1}-${file2}.ps \
+	    --ps --mapping ${file}.map build/files/${file1}-${file2}.ps \
         || fail_function
 
 }
@@ -69,6 +69,13 @@ run_tests() {
     init_variables
 
 }
+
+if [ "$1" = "debug" ]
+then
+    EXECUTABLE="gdb --args ${EXECUTABLE}"
+    ${EXECUTABLE}
+    exit(0)
+fi
 
 run() {
 	init_variables

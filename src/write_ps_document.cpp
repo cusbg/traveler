@@ -235,6 +235,11 @@ using namespace std;
 
     string out;
 
+    if (!it->inited_points())
+    {
+        WARN("points not inited, returning");
+        return out;
+    }
     auto status = it->status;
 
     switch (status)
@@ -256,7 +261,7 @@ using namespace std;
             break;
 
         case rna_pair_label::untouched:
-            WARN("UNTOUCHED!!");
+            //WARN("UNTOUCHED!!");
             out = sprint(it);
             break;
         default:
@@ -303,7 +308,7 @@ using namespace std;
 
     while (it != end)
     {
-        out += sprint(it);
+        out += sprint_formatted(it);
         ++it;
     }
     return out;
@@ -325,3 +330,36 @@ using namespace std;
     return str.str();
 }
 
+#include "utils.hpp"
+
+void ps_writer::init_default(
+                const std::string& filename,
+                rna_tree::iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    point tr, bl, letter, scale;
+
+    init(filename);
+
+    scale = {0.8, 0.8};
+    letter = {612, 792};
+
+    letter.x /= scale.x;
+    letter.y /= scale.y;
+
+    tr = rna_tree::top_right_corner(root);
+    bl = rna_tree::bottom_left_corner(root);
+
+    DEBUG("tr %s, bl %s", to_cstr(tr), to_cstr(bl));
+    assert(distance(tr, bl) < size(letter));
+    tr = tr * -1;
+    bl = bl * -1;
+
+    bl.x += 50;
+    bl.y = letter.y + tr.y - 50;
+
+    print(ps_document::default_prologue());
+    print(to_string(scale) + " scale\n");
+    print(to_string(bl) + " translate\n");
+}

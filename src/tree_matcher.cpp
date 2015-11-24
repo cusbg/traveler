@@ -54,6 +54,8 @@ rna_tree& matcher::run(
 
     merge();
 
+    logger.debug_stream() << "MATCH OUT: " << t1.print_tree(false);
+
     return t1;
 }
 
@@ -74,9 +76,15 @@ void matcher::mark(
         --index;    // indexy cislovane od 1
         size_t to_move = index - i;
         it = plusplus(it, to_move);
+
+        assert(!rna_tree::is_root(it));
         it->status = status;
         i = index;
+
+        DEBUG("node '%s' marked", clabel(it));
     }
+
+    rna.print_tree();
 }
 
 void matcher::erase()
@@ -145,7 +153,10 @@ void matcher::merge()
                 set_remake(ch1);
             }
             else
+            {
+                DEBUG("modify %s -> %s", clabel(ch1), clabel(ch2));
                 ch1->set_label_strings(*ch2);
+            }
 
             ++ch2;
             ++ch1;
@@ -193,6 +204,9 @@ void matcher::compute_sizes()
 
     comp_f(t1, s1);
     comp_f(t2, s2);
+
+    assert(s1.at(id(t1.begin())) == s2.at(id(t2.begin())));
+
 }
 
 /* inline */

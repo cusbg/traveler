@@ -45,6 +45,12 @@ class ps_writer
 {
 public:
     typedef rna_tree::pre_post_order_iterator pre_post_it;
+
+public:
+    void init_default(
+                const std::string& filename,
+                rna_tree::iterator root);
+
 public:
     static std::string sprint(
                 const point p,

@@ -19,12 +19,11 @@
  * USA.
  */
 
-#define TESTS
-
 #include "../types.hpp"
-#include "rted_test.cpp"
-#include "gted_test.cpp"
-#include "overlap_checks_test.cpp"
+#include "rted.test.cpp"
+#include "gted.test.cpp"
+#include "overlap_checks.test.cpp"
+#include "rna_tree.test.cpp"
 
 
 using namespace std;
@@ -33,8 +32,9 @@ void tests()
 {
     APP_DEBUG_FNAME;
 
-    //rted::test();
-    //gted::test();
+    rna_tree::test();
+    rted::test();
+    gted::test();
     overlap_checks::test();    
 
     INFO("TESTS OK");
