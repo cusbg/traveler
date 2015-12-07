@@ -22,8 +22,6 @@
 #ifndef READER_HPP
 #define READER_HPP
 
-#include <fstream>
-
 #include "types.hpp"
 #include "strategy.hpp"
 #include "point.hpp"
@@ -86,22 +84,6 @@ void write_file(
                 const std::string& text);
 
 
-
-/**
- * ps document reader
- */
-class ps_document
-{
-public:
-    ps_document(
-                const std::string& filename);
-
-    std::string labels;
-    std::vector<point> points;
-
-    std::string prolog;
-    std::string epilog;
-};
 
 #endif /* !READER_HPP */
 

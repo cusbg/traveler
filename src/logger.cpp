@@ -28,13 +28,6 @@
 #include "logger.hpp"
 
 
-#define LOGGER_PRIORITY_FUNCTION(priority) \
-    void logger::priority(const char* msg, ...)
-#define LOGGER_PRIORITY_STREAM_FUNCTION(priority) \
-    logger::logger_stream logger::priority ##_stream()
-
-
-
 using namespace std;
 using namespace chrono;
 
@@ -49,15 +42,13 @@ logger::logger()
     FILE * f = fopen(file.c_str(), "a");
     out.push_back(stdout);
 
-    if (f == nullptr ||
-            ferror(f))
+    if (f == nullptr || ferror(f))
     {
-        error("cannot open file %s",
-                file.c_str());
+        error("cannot open file '%s' to log in", file.c_str());
         abort();
     }
-    else
-        out.push_back(f);
+
+    out.push_back(f);
 
     debug("*****************************************");
     debug("************ RUNNING PROGRAM ************");

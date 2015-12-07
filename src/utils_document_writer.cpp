@@ -1,7 +1,7 @@
 /*
- * File: write_document.cpp
+ * File: utils_document_writer.cpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,10 +19,11 @@
  * USA.
  */
 
-#include "write_document.hpp"
+#include "utils_document_writer.hpp"
 #include "types.hpp"
 
 using namespace std;
+
 
 
 void document_writer::init(
@@ -90,4 +91,5 @@ size_t document_writer::fill(char ch)
     seek(pos);
     return n;
 }
+
 

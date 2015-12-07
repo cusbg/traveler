@@ -1,7 +1,7 @@
 /*
- * File: write_ps_document.hpp
+ * File: utils_ps_writer.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,10 +19,11 @@
  * USA.
  */
 
-#ifndef WRITE_PS_DOCUMENT_HPP
-#define WRITE_PS_DOCUMENT_HPP
+#ifndef UTILS_PS_WRITER_HPP
+#define UTILS_PS_WRITER_HPP
 
-#include "write_document.hpp"
+
+#include "utils_document_writer.hpp"
 #include "rna_tree.hpp"
 
 
@@ -94,5 +95,6 @@ public:
 };
 
 
-#endif /* !WRITE_PS_DOCUMENT_HPP */
+
+#endif /* !UTILS_PS_WRITER_HPP */
 

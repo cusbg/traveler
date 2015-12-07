@@ -47,6 +47,7 @@
     { \
     if (!(boolean)) \
         { \
+            ERR("condition '%s' is FALSE", boolean); \
             ERR(__VA_ARGS__); \
             exit(1); \
         } \

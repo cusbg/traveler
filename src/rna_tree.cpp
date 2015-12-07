@@ -287,6 +287,19 @@ std::string rna_tree::get_brackets() const
 }
 
 
+bool rna_tree::correct_pairing()
+{
+    APP_DEBUG_FNAME;
+
+    for (iterator it = begin(); it != end(); ++it)
+    {
+        // if is leaf and is paired..
+        if (is_leaf(it) == it->paired())
+            return false;
+    }
+
+    return true;
+}
 
 
 

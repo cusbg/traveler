@@ -1,7 +1,7 @@
 /*
- * File: write_ps_document.cpp
+ * File: utils_ps_writer.cpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,7 +22,7 @@
 
 #include <iomanip>
 
-#include "write_ps_document.hpp"
+#include "utils_ps_writer.hpp"
 
 
 #define PS_COLUMNS_WIDTH 15
@@ -403,6 +403,8 @@ void ps_writer::print_rna_name(
 
     print(sprint(p, rna.name()));
 }
+
+
 
 
 

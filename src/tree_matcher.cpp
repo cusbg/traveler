@@ -58,6 +58,9 @@ rna_tree& matcher::run(
 
     logger.debug_stream() << "MATCH OUT: " << t1.print_tree(false);
 
+    assert_err(t1.correct_pairing(), "uncorrect tree pairing");
+    assert_err(t2.correct_pairing(), "uncorrect tree pairing");
+
     return t1;
 }
 
@@ -110,6 +113,8 @@ void matcher::erase()
             ++ch;
         }
     }
+
+    assert_err(t1.correct_pairing(), "uncorrect tree pairing");
 }
 
 void matcher::merge()

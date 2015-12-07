@@ -82,6 +82,8 @@ public:
     static point bottom_left_corner(
                 iterator root);
 
+    bool correct_pairing();
+
 #ifdef TESTS
 public:
     static void test();
@@ -102,6 +104,8 @@ inline bool is(
 void update_ends_in_rna(
                 rna_tree& rna);
 
+std::string ending_3_5_strings(
+                rna_tree::iterator it);
 
 #endif /* !RNA_TREE_HPP */
 

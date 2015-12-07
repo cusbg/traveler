@@ -1,7 +1,7 @@
 /*
- * File: write_document.hpp
+ * File: utils_document_writer.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,8 +19,8 @@
  * USA.
  */
 
-#ifndef WRITE_DOCUMENT_HPP
-#define WRITE_DOCUMENT_HPP
+#ifndef UTILS_DOCUMENT_WRITER_HPP
+#define UTILS_DOCUMENT_WRITER_HPP
 
 #include <fstream>
 
@@ -67,5 +67,5 @@ protected:
 };
 
 
-#endif /* !WRITE_DOCUMENT_HPP */
+#endif /* !UTILS_DOCUMENT_WRITER_HPP */
 

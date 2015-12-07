@@ -162,7 +162,7 @@ protected:
 
 
 /* global */
-extern logger logger;
+extern class logger logger;
 
 
 
