@@ -25,8 +25,8 @@
 #include "utils.hpp"
 #include "app.hpp"
 #include "compact.hpp"
+#include "utils_ps_writer.hpp"
 
-#include "write_ps_document.hpp"
 
 #define print(string)   psout.print((string), true)
 #define parent(iter)    rna_tree::parent(iter)

@@ -37,6 +37,7 @@
 
 #include "types.hpp"
 #include "utils.hpp"
+#include "utils_ps_reader.hpp"
 #include "app.hpp"
 #include "rna_tree.hpp"
 #include "mapping.hpp"

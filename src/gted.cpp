@@ -20,8 +20,6 @@
  */
 
 
-#include <fstream>
-
 #include "gted.hpp"
 #include "mapping.hpp"
 

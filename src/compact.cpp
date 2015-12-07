@@ -20,7 +20,7 @@
  */
 
 #include "compact.hpp"
-#include "write_ps_document.hpp"
+#include "utils_ps_writer.hpp"
 #include "compact_circle.hpp"
 #include "compact_utils.hpp"
 
