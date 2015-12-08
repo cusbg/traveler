@@ -131,6 +131,8 @@ void update_ends_in_rna(
     root->at(0).label = "5'";
     root->at(1).p = p2 + dir;
     root->at(1).label = "3'";
+
+    INFO("RNA ends updated OK");
 }
 
 
@@ -240,7 +242,7 @@ std::string rna_tree::get_brackets() const
 
 /* static */ point rna_tree::top_right_corner(iterator root)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
     // x, y should be maximal in subtree
     point p = { -DBL_MAX, -DBL_MAX };
@@ -264,7 +266,7 @@ std::string rna_tree::get_brackets() const
 
 /* static */ point rna_tree::bottom_left_corner(iterator root)
 {
-    APP_DEBUG_FNAME;
+    //APP_DEBUG_FNAME;
 
     // x, y should be minimal in subtree
     point p = { DBL_MAX, DBL_MAX };

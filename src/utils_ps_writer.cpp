@@ -284,7 +284,8 @@ using namespace std;
             abort();
         }
 
-        out += sprint_edge(it);
+        if (!rna_tree::is_root(it))
+            out += sprint_edge(it);
     }
 
     return out;
@@ -362,7 +363,7 @@ void ps_writer::init_default(
     tr = rna_tree::top_right_corner(root);
     bl = rna_tree::bottom_left_corner(root);
 
-    DEBUG("tr %s, bl %s", to_cstr(tr), to_cstr(bl));
+    //DEBUG("tr %s, bl %s", to_cstr(tr), to_cstr(bl));
     assert(distance(tr, bl) < size(letter));
     tr = tr * -1;
     bl = bl * -1;

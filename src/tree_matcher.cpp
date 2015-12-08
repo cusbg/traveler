@@ -61,6 +61,8 @@ rna_tree& matcher::run(
     assert_err(t1.correct_pairing(), "uncorrect tree pairing");
     assert_err(t2.correct_pairing(), "uncorrect tree pairing");
 
+    update_ends_in_rna(t1);
+
     return t1;
 }
 

@@ -24,6 +24,16 @@
 #include "compact_circle.hpp"
 #include "compact_utils.hpp"
 
+/*
+static ps_writer psout;
+
+#define UPDATE(root) \
+    { \
+        psout.init_default("build/files/run/doc.ps", root); \
+        psout.print(psout.sprint_subtree(root)); \
+        rna_tree::print_subtree(root); \
+    }
+*/
 
 using namespace std;
 
@@ -148,7 +158,7 @@ void compact::init()
 {
     APP_DEBUG_FNAME;
 
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     iterator it;
     point p;
@@ -158,11 +168,16 @@ void compact::init()
         if (it->inited_points() || !it->paired())
             continue;
 
-        p = rna_tree::parent(it)->centre();
+        iterator par = rna_tree::parent(it);
+        p = par->centre();
 
         assert(!p.bad());
 
-        if (!init_branch_recursive(it, p).bad())    // => is good
+        if (rna_tree::is_root(par))
+        {
+            init_branch_recursive(it);
+        }
+        else if (!init_branch_recursive(it, p).bad())    // => is good
         {
             DEBUG("INIT_rec OK");
         }
@@ -242,6 +257,38 @@ point compact::init_branch_recursive(
     }
 
     return point::bad_point();
+}
+
+point compact::init_branch_recursive(
+                sibling_iterator it)
+{
+    APP_DEBUG_FNAME;
+
+    point p;
+    sibling_iterator ch;
+
+    if (it->inited_points())
+    {
+        for (ch = it.begin(); ch != it.end(); ++ch)
+        {
+            if (ch->inited_points())
+            {
+                p = it->centre() - ch->centre();
+                return p;
+            }
+        }
+        abort();
+    }
+    ch = get_onlyone_branch(it);
+    assert(rna_tree::is_valid(ch));
+
+    p = init_branch_recursive(ch);
+
+    it->at(0).p = ch->at(0).p;
+    it->at(1).p = ch->at(1).p;
+    shift_branch(ch, -p);
+
+    return p;
 }
 
 void compact::make_branch_even(

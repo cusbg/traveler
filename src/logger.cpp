@@ -55,8 +55,8 @@ logger::logger()
     debug("*****************************************");
 
     //p = WARN;
-    //p = INFO;
-    p = DEBUG;
+    p = INFO;
+    //p = DEBUG;
 }
 
 logger::~logger()

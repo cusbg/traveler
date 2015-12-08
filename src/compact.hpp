@@ -109,6 +109,9 @@ private:
                 sibling_iterator it,
                 point from);
 
+    point init_branch_recursive(
+                sibling_iterator it);
+
     /**
      * set branch nodes to lie on straight line
      */

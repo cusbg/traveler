@@ -337,8 +337,8 @@ void app::save(
 
     stringstream str;
 
-    rna_tree::pre_post_order_iterator end(rna.begin(), false);
-    rna_tree::pre_post_order_iterator it = ++rna.begin();
+    rna_tree::pre_post_order_iterator end = rna.end_pre_post();
+    rna_tree::pre_post_order_iterator it = rna.begin_pre_post();
     overlap_checks::overlaps overlaps;
     
     if (overlap)
