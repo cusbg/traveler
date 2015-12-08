@@ -31,6 +31,7 @@
 #define ps_end_str      "showpage\n"
 #define ps_end_length   (sizeof(ps_end_str) - 1)
 
+#define LETTER          {612, 792}
 
 using namespace std;
 
@@ -354,8 +355,19 @@ void ps_writer::init_default(
 
     init(filename);
 
+    print(default_prologue(root));
+}
+
+/* static */ std::string ps_writer::default_prologue(
+                pre_post_it root)
+{
+    APP_DEBUG_FNAME;
+
+    ostringstream str;
+    point tr, bl, letter, scale;
+
     scale = {0.54, 0.54};
-    letter = {612, 792};
+    letter = LETTER;
 
     letter.x /= scale.x;
     letter.y /= scale.y;
@@ -363,46 +375,45 @@ void ps_writer::init_default(
     tr = rna_tree::top_right_corner(root);
     bl = rna_tree::bottom_left_corner(root);
 
-    //DEBUG("tr %s, bl %s", to_cstr(tr), to_cstr(bl));
-    assert(distance(tr, bl) < size(letter));
-    tr = tr * -1;
-    bl = bl * -1;
+    if (size(letter) > distance(tr, bl))
+        WARN("rna probably wont fit document");
+
+    tr = -tr;
+    bl = -bl;
 
     bl.x += 50;
     bl.y = letter.y + tr.y - 50;
 
-    print(default_prologue());
-    print(to_string(scale) + " scale\n");
-    print(to_string(bl) + " translate\n");
+    str
+        << default_prologue()
+        << scale
+            << " scale"
+            << endl
+        << bl
+            << " translate"
+            << endl;
+
+    return str.str();
 }
 
-void ps_writer::print_rna_name(
+streampos ps_writer::print(
                 rna_tree& rna)
 {
     APP_DEBUG_FNAME;
 
-    point tr, bl, letter, scale;
+    streampos pos = get_pos();
+    point p;
 
-    scale = {0.54, 0.54};
-    letter = {612, 792};
+    p.x = rna_tree::top_right_corner(rna.begin()).x - 100;
+    p.y = rna_tree::bottom_left_corner(rna.begin()).y + 100;
 
-    letter.x /= scale.x;
-    letter.y /= scale.y;
-
-    tr = rna_tree::top_right_corner(rna.begin());
-    bl = rna_tree::bottom_left_corner(rna.begin());
-
-    DEBUG("tr %s, bl %s", to_cstr(tr), to_cstr(bl));
-    assert(distance(tr, bl) < size(letter));
-    tr = tr * -1;
-    bl = bl * -1;
-
-    bl.x += 50;
-    bl.y = letter.y + tr.y - 50;
-
-    point p = {bl.x - 100, tr.y - 100};
-
+    print(default_prologue(rna.begin()));
     print(sprint(p, rna.name()));
+
+    for (pre_post_it it = rna.begin_pre_post(); it != rna.end_pre_post(); ++it)
+        print(sprint_formatted(it));
+
+    return pos;
 }
 
 

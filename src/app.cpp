@@ -320,10 +320,9 @@ void app::save(
     APP_DEBUG_FNAME;
 
     ps_writer ps;
-    string prolog;
 
-    ps.init_default(filename, rna.begin());
-    ps.print_rna_name(rna);
+    ps.init(filename);
+    INFO("save(%s)", to_cstr(filename));
 
     save(rna, ps, overlaps);
 }
@@ -335,42 +334,38 @@ void app::save(
 {
     APP_DEBUG_FNAME;
 
-    stringstream str;
-
-    rna_tree::pre_post_order_iterator end = rna.end_pre_post();
-    rna_tree::pre_post_order_iterator it = rna.begin_pre_post();
     overlap_checks::overlaps overlaps;
     
-    if (overlap)
-        overlaps = overlap_checks().run(rna);
+    //if (overlap)
+        //overlaps = overlap_checks().run(rna);
 
-    {
-        ofstream out;
-        out.open("build/logs/overlaps.log", ios_base::app);
-        out
-            << rna.name()
-            << " : "
-            << overlaps.size()
-            << endl;
+    log_overlaps(rna.name(), overlaps.size());
 
-        if (!overlaps.empty())
-        {
-            WARN("overlaps occurs in %s, count=%lu",
-                    to_cstr(rna.name()), overlaps.size());
-        }
-    }
-
-    for (; it != end; ++it)
-        str << ps_writer::sprint_formatted(it);
+    writer.print(rna);
 
     for (const auto& p : overlaps)
-        str << ps_writer::sprint_circle(p.centre, p.radius);
-
-    str << ending_3_5_strings(rna.begin());
-
-    writer.print(str.str());
+        writer.print(ps_writer::sprint_circle(p.centre, p.radius));
 }
 
+void app::log_overlaps(
+                const std::string& name,
+                size_t size)
+{
+    ofstream out;
+    out.open("build/logs/overlaps.log", ios_base::app);
+
+    out
+        << name
+        << " : "
+        << size
+        << endl;
+
+    if (size != 0)
+    {
+        WARN("overlaps occurs in %s, count=%lu",
+                to_cstr(name), size);
+    }
+}
 
 
 

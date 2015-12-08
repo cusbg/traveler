@@ -89,6 +89,10 @@ private:
                 const std::string& foldfile,
                 const std::string& name);
 
+    void log_overlaps(
+                const std::string& name,
+                size_t size);
+
     /**
      * print arguments
      */
@@ -96,10 +100,6 @@ private:
                 const arguments& args);
 
 };
-
-#include "rna_tree.hpp"
-
-std::string ending_3_5_strings(rna_tree::iterator it);
 
 #endif /* !APP_HPP */
 

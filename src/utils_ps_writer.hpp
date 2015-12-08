@@ -51,7 +51,7 @@ public:
     void init_default(
                 const std::string& filename,
                 rna_tree::iterator root);
-    void print_rna_name(
+    streampos print(
                 rna_tree& rna);
 
 public:
@@ -84,6 +84,8 @@ public:
                 double size);
 
     static std::string default_prologue();
+    static std::string default_prologue(
+                pre_post_it root);
 
 public:
     /**
