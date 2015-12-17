@@ -1,0 +1,90 @@
+%%% Tento soubor obsahuje definice různých užitečných maker a prostředí %%%
+%%% Další makra připisujte sem, ať nepřekáží v ostatních souborech.     %%%
+
+%%% Drobné úpravy stylu
+
+% Tato makra přesvědčují mírně ošklivým trikem LaTeX, aby hlavičky kapitol
+% sázel příčetněji a nevynechával nad nimi spoustu místa. Směle ignorujte.
+\makeatletter
+\def\@makechapterhead#1{
+  {\parindent \z@ \raggedright \normalfont
+   \Huge\bfseries \thechapter. #1
+   \par\nobreak
+   \vskip 20\p@
+}}
+\def\@makeschapterhead#1{
+  {\parindent \z@ \raggedright \normalfont
+   \Huge\bfseries #1
+   \par\nobreak
+   \vskip 20\p@
+}}
+\makeatother
+
+% Toto makro definuje kapitolu, která není očíslovaná, ale je uvedena v obsahu.
+\def\chapwithtoc#1{
+\chapter*{#1}
+\addcontentsline{toc}{chapter}{#1}
+}
+
+% Trochu volnější nastavení dělení slov, než je default.
+\lefthyphenmin=2
+\righthyphenmin=2
+
+% Zapne černé "slimáky" na koncích řádků, které přetekly, abychom si
+% jich lépe všimli.
+\overfullrule=1mm
+
+%%% Makra pro definice, věty, tvrzení, příklady, ... (vyžaduje baliček amsthm)
+
+\theoremstyle{plain}
+\newtheorem{veta}{Věta}
+\newtheorem{lemma}[veta]{Lemma}
+\newtheorem{tvrz}[veta]{Tvrzení}
+
+\theoremstyle{plain}
+\newtheorem{definice}{Definice}
+
+\theoremstyle{remark}
+\newtheorem*{dusl}{Důsledek}
+\newtheorem*{pozn}{Poznámka}
+\newtheorem*{prikl}{Příklad}
+
+%%% Prostředí pro důkazy
+
+\newenvironment{dukaz}{
+  \par\medskip\noindent
+  \textit{Důkaz}.
+}{
+\newline
+\rightline{$\square$}  % nebo \SquareCastShadowBottomRight z balíčku bbding
+}
+
+%%% Prostředí pro sazbu kódu, případně vstupu/výstupu počítačových
+%%% programů. (Vyžaduje balíček fancyvrb -- fancy verbatim.)
+
+\DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small, frame=single}
+
+%%% Prostor reálných, resp. přirozených čísel
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\N}{\mathbb{N}}
+
+%%% Užitečné operátory pro statistiku a pravděpodobnost
+\DeclareMathOperator{\pr}{\textsf{P}}
+\DeclareMathOperator{\E}{\textsf{E}\,}
+\DeclareMathOperator{\var}{\textrm{var}}
+\DeclareMathOperator{\sd}{\textrm{sd}}
+
+%%% Příkaz pro transpozici vektoru/matice
+\newcommand{\T}[1]{#1^\top}
+
+%%% Vychytávky pro matematiku
+\newcommand{\goto}{\rightarrow}
+\newcommand{\gotop}{\stackrel{P}{\longrightarrow}}
+\newcommand{\maon}[1]{o(n^{#1})}
+\newcommand{\abs}[1]{\left|{#1}\right|}
+\newcommand{\dint}{\int_0^\tau\!\!\int_0^\tau}
+\newcommand{\isqr}[1]{\frac{1}{\sqrt{#1}}}
+
+%%% Vychytávky pro tabulky
+\newcommand{\pulrad}[1]{\raisebox{1.5ex}[0pt]{#1}}
+\newcommand{\mc}[1]{\multicolumn{1}{c}{#1}}

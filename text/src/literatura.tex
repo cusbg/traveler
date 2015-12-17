@@ -1,0 +1,35 @@
+%%% Seznam použité literatury (bibliografie)
+%%%
+%%% Pro vytváření bibliografie používáme bibTeX. Ten zpracovává
+%%% citace v textu (např. makro \cite{...}) a vyhledává k nim literaturu
+%%% v souboru literatura.bib.
+%%%
+%%% Příkaz \bibliographystyle určuje, jakým stylem budou citovány odkazy
+%%% v textu. V závorce je název zvoleného souboru .bst. Styly plainnat
+%%% a unsrt jsou standardní součástí latexových distribucí. Styl czplainnat
+%%% je dodáván s touto šablonou a bibTeX ho hledá v aktuálním adresáři.
+
+\bibliographystyle{czplainnat}    %% Autor (rok) s českými spojkami
+% \bibliographystyle{plainnat}    %% Autor (rok) s anglickými spojkami
+% \bibliographystyle{unsrt}       %% [číslo]
+
+\renewcommand{\bibname}{Seznam použité literatury}
+
+%%% Vytvoření seznamu literatury. Pozor, pokud jste necitovali ani jednu
+%%% položku, seznam se automaticky vynechá.
+
+\bibliography{literatura}
+
+%%% Kdybyste chtěli bibliografii vytvářet ručně (bez bibTeXu), lze to udělat
+%%% následovně. V takovém případě se řiďte normou ISO 690 a zvyklostmi v oboru.
+
+% \begin{thebibliography}{99}
+%
+% \bibitem{lamport94}
+%   {\sc Lamport,} Leslie.
+%   \emph{\LaTeX: A Document Preparation System}.
+%   2. vydání.
+%   Massachusetts: Addison Wesley, 1994.
+%   ISBN 0-201-52983-1.
+%
+% \end{thebibliography}
