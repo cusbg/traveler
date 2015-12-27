@@ -15,7 +15,7 @@ Because of a few bugs in application, many (about 70) molecule pairs dont succee
 Our overlap detection algorithm is based on crossings between RNA outer edges and has some defects. If molecule contains list of unpaired bases, it often detects overlaps, but there is any. If there is large overlapping, but only 2 crossings between edges, only 2 are added to log count.
 
 ### HOW TO GET OUTPUT FROM INPUT
-As described in man README project page, run:
+	As described in man README project page, run:
 	$ # SET VARIABLES:
 	$ INDIR="src/"
 	$ OUTDIR="/tmp/"
