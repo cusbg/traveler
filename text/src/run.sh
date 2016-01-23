@@ -23,6 +23,7 @@ run() {
 	run_bibtex
 	run_pdflatex
 	run_pdflatex
+	make clear
 }
 
 run

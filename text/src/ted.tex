@@ -1,0 +1,22 @@
+
+\chapter{Tree-edit-distance algoritmus}
+
+Jadro nasej aplikacie tvori tree-edit-distance algoritmus. 
+
+
+\begin{align*}
+\delta(\emptyset, \emptyset) &=
+	0 \\
+\delta(F, \emptyset) &=
+	\delta(F - r_{F}, \emptyset) + c_{del}(r_{F}) \\
+\delta(\emptyset, G) &=
+	\delta(\emptyset, G - r_{G}) + c_{ins}(r_{G}) \\
+\delta(F, G) &=
+	\begin{cases}
+	\delta(F - r_{F}, G) + c_{del}(r_{F}) \\
+	\delta(F, G - r_{G}) + c_{ins}(r_{G}) \\
+	\delta(F - F_{r_{F}}, G - G_{r_{G}} +
+		\delta(F_{r_{F}} - r_{F}, G_{r_{G}} - r_{G}) + c_{upd}(r_{F}, r_{G})
+	\end{cases}
+\end{align*}
+\citet{RTED}
