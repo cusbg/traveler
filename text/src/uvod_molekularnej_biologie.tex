@@ -59,11 +59,21 @@ rRNA velmi nemeni.
 		\item $i < k < l < j$, cize par \Par{i}{j} obsahuje par \Par{k}{l}
 	\end{itemize}
 \end{definice}
+
 Prva podmienka zabezpecuje, ze nukleotid je najviac v jednom bazickom pare, druha a tretia
 hovoria o usporiadani parov, bud su na sebe nezavisle alebo na seba nadvazuju.
 Posledna podmienka zakazuje existenciu pseudouzlov (pseudoknots).
 
 %TODO: 2 obrazky RNA napriec fylogenetickym stromom
+%TODO: pseudoknot obrazok
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=140mm, height=120mm]{../img/RNA_circular_reprezentation.png}
+\caption{Circular Feynman - kruhova reprezentacia sekundarnej struktury}
+\label{obr:RNA_motifs}
+\end{figure}
+
 
 \subsection{Motivy}
 
@@ -87,9 +97,10 @@ ako usporiadany les.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=100mm, height=50mm]{../img/rna_to_tree.png}
-\caption{Stromova reprezentacia RNA}
-\label{obr:RNA_stromova_reprezentacia}
+%TODO: vlastny obrazok... namiesto clankoveho
+\includegraphics[width=130mm, height=70mm]{../img/stromova_reprezentacia_rna.png}
+\caption{Varianty reprezentacie vrcholov}
+\label{obr:RNA_vrcholy}
 \end{figure}
 
 \begin{definice}\label{def:strom}
@@ -102,17 +113,4 @@ ako usporiadany les.
 \end{definice}
 
 Kazdy vrchol moze reprezentovat napriklad motiv v strukture RNA, alebo nukleotid, bazovy par, ...
-
-\begin{figure}[H]
-\centering
-%TODO: vlastny obrazok... namiesto clankoveho
-\includegraphics[width=130mm, height=70mm]{../img/stromova_reprezentacia_rna.png}
-\caption{Varianty reprezentacie vrcholov}
-\label{obr:RNA_vrcholy}
-\end{figure}
-
-
-
-
-
 

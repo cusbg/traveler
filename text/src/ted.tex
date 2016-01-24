@@ -1,22 +1,55 @@
+%\newcommand{\F}{\mathbb{F}}
+%\newcommand{\G}{\mathbb{G}}
 
 \chapter{Tree-edit-distance algoritmus}
 
-Jadro nasej aplikacie tvori tree-edit-distance algoritmus. 
+Jadro aplikacie lezi v pouziti tree-edit-distance (TED) algoritmu,
+vdaka ktoremu dostaneme mapovanie medzi 2 RNA stromami. Mapovanie nam ukaze
+spolocne casti oboch RNA stromov. TED algoritmus je obdoba Levenstheinoveho
+string-edit-distance algoritmu. Problem u retazcov je specialnym pripadom
+TED-u, kedy stromy zdegenerovali na cesty (spojovy zoznam).
 
+\section{Hlavna myslienka TED-u}
 
-\begin{align*}
-\delta(\emptyset, \emptyset) &=
-	0 \\
-\delta(F, \emptyset) &=
-	\delta(F - r_{F}, \emptyset) + c_{del}(r_{F}) \\
-\delta(\emptyset, G) &=
-	\delta(\emptyset, G - r_{G}) + c_{ins}(r_{G}) \\
-\delta(F, G) &=
-	\begin{cases}
-	\delta(F - r_{F}, G) + c_{del}(r_{F}) \\
-	\delta(F, G - r_{G}) + c_{ins}(r_{G}) \\
-	\delta(F - F_{r_{F}}, G - G_{r_{G}} +
-		\delta(F_{r_{F}} - r_{F}, G_{r_{G}} - r_{G}) + c_{upd}(r_{F}, r_{G})
-	\end{cases}
-\end{align*}
+Zakladom TED algoritmu je v rekurzivnom vzorci \ref{eq:ted}. Vzdialenost medzi
+lesmi F a G, $\delta(F, G)$ je definovana ako minimalny pocet editacnych operacii,
+ktore z F urobia G. Pouzivame standardne editacne operacie - delete, insert, update.
+Delete, zmazanie vrcholu, znamena pripojit k predkovi vsetkych jeho potomkov so
+zachovanim poradia medzi nimi. Insert, vlozenie vrcholu, je opacna operacia k
+delete, co znamena, ze vkladame vrchol medzi rodica nejakych jeho, po sebe
+nasledujucich potomkov. Update iba zmeni hodnotu vo vrchole stromu.
+
+\begin{figure}[H]
+\begin{subequations}
+\begin{align}
+	\begin{split}
+	\delta(\emptyset, \emptyset) &=
+		0
+		\\
+	\delta(F, \emptyset) &=
+		\delta(F - r_{F}, \emptyset) + c_{del}(r_{F})
+		\\
+	\delta(\emptyset, G) &=
+		\delta(\emptyset, G - r_{G}) + c_{ins}(r_{G})
+	\end{split}
+	\\[1ex]
+	\delta(F, G) &=
+		\begin{cases}
+			\delta(F - r_{F}, G) + c_{del}(r_{F}) \\
+			\delta(F, G - r_{G}) + c_{ins}(r_{G}) \\
+			\!
+			\begin{aligned}
+				\delta(F -& F_{r_{F}}, G - G_{r_{G}}) + \\
+				& \delta(F_{r_{F}} - r_{F}, G_{r_{G}} - r_{G}) + c_{upd}(r_{F}, r_{G})
+			\end{aligned}
+		\end{cases}
+\end{align}
+\end{subequations}
+\label{eq:ted} \caption{Rekurzivny vzorec pre vypocet tree-edit-distance}
+\end{figure}
+
 \citet{RTED}
+\\
+
+
+
