@@ -53,6 +53,15 @@
 \usepackage[usenames]{xcolor}  % barevná sazba
 \usepackage{float}
 
+\usepackage[noend]{algpseudocode}
+\usepackage{algorithm}
+\usepackage{cases}
+\usepackage{tikz}
+\usepackage{amssymb}
+\usetikzlibrary{decorations.pathmorphing} % noisy shapes
+\usetikzlibrary{fit}					% fitting shapes to coordinates
+\usetikzlibrary{backgrounds}	% drawing the background after the foreground
+
 %%% Údaje o práci
 
 % Název práce v jazyce práce (přesně podle zadání)
@@ -147,7 +156,9 @@ RNA secondary structure, visualization, homology
 \include{uvod}
 \include{uvod_molekularnej_biologie}
 \include{motivacia}
+\include{rna_tree}
 \include{ted}
+\include{draw}
 \include{kap}
 \include{zaver}
 

@@ -7,3 +7,5 @@ build/
 bin/
 precomputed/
 .ycm_extra_conf.pyc
+
+generated-images*
