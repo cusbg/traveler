@@ -123,6 +123,200 @@ s aplikovanim danej strategie.
 	v ktoreho podstrome je najviac vrcholov. 
 \end{definice}
 
+
+Zacneme principom fungovania GTED algoritmu. Detaily pre LRH strategie su
+v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy strategiu.
+
+\begin{algorithm}
+  \caption{General Tree Edit Distance for LRH strategies}
+  \label{alg:gted}
+  \begin{algorithmic}[1]
+    \Procedure {gted}{$F, G, TreeDistance, S$}
+      \State $\sigma \gets S[F, G]$
+      \If {$\sigma \in \sigma^{*}(F)$}
+        \ForAll {$F' \in F - \sigma$}
+          \State $TreeDistance \gets TreeDistance \cup \Call{gted}{F', G, TreeDistance, S}$
+        \EndFor
+        \State $TreeDistance \gets TreeDistance \cup \Call{$\Delta$}{F, G, TreeDistance, \sigma}$
+      \Else
+        \State $TreeDistance \gets TreeDistance \cup (\Call{gted}{G, F, TreeDistance^{T}, S^{T}})^{T}$
+      \EndIf
+      \State \Return{$TreeDistance$}
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{Single path function - part I}
+  \label{alg:spf}
+  \begin{algorithmic}[1]
+    \Procedure {$\Delta$}{$F, G, TreeDistance, \sigma$}
+      \State $ForestDistance \gets$ empty array $|F| + 1 \times |G| + 1$
+      \label{alg:spf:init}
+      \State $ForestDistance[\emptyset][\emptyset] := 0$
+      \For {$F'$ subforest in \Call{get ordered subforests}{$F, \sigma$}}
+        \State $Last_{F} \gets$ last added node to $F'$
+        \State $ForestDistance[F'][\emptyset] := ForestDistance[F' - Last_{F}][\emptyset] +$
+        \Indent
+          \State $C_{del}(Last_{F})$
+        \EndIndent
+      \EndFor
+      \For {$G'$ subforest in \Call{get ordered subforests}{$G, \sigma$}}
+        \State $Last_{G} \gets$ last added node to $G'$
+        \State $ForestDistance[\emptyset][G'] := ForestDistance[\emptyset][G' - Last_{G}] +$
+        \Indent
+          \State $C_{ins}(Last_{G})$
+        \EndIndent
+      \EndFor
+      \For {$F'$ subforest in \Call{get ordered subforests}{$F, \sigma$}}
+        \For {$G'$ subforest in \Call{get ordered subforests}{$G, \sigma$}}
+          \State $Last_{F} \gets$ last added node to $F'$
+          \State $Last_{G} \gets$ last added node to $G'$
+          \If {both $F'$ and $G'$ are trees}
+          \label{alg:spf:iftrees}
+            \State $C_{min} := min \{$
+            \Indent
+            \State $ForestDistance[F' - Last_{F}][G'] +$
+              \Indent
+                \State $C_{del}(Last_{F})$,
+              \EndIndent
+              \State $ForestDistance[F'][G' - Last_{G}] +$
+              \Indent
+                \State $C_{ins}(Last_{G})$,
+              \EndIndent
+              \State $ForestDistance[F' - Last_{F}][G' - Last_{G}] +$
+              \Indent
+                \State $C_{upd}(Last_{F}, Last_{G})$
+              \EndIndent
+            \EndIndent
+            \State $ForestDistance[F', G'] := C_{min}$
+            \State $TreeDistance[Last_{F}][Last_{G}] := C_{min}$
+          \Else
+          \label{alg:spf:ifforests}
+            \State $C_{min} := min \{$
+            \Indent
+              \State $ForestDistance[F' - Last_{F})][G'] +$
+              \Indent
+                \State $C_{del}(Last_{F})$,
+              \EndIndent
+              \State $ForestDistance[F'][G' - Last_{G}] +$
+              \Indent
+                \State $C_{ins}(Last_{G})$,
+              \EndIndent
+              \State $ForestDistance[F' - F_{Last_{F}}][G' - G_{Last_{G}}] +$
+              \Indent
+                \State $TreeDistance[F_{Last_{F}}][G_{Last_{G}}]\}$
+              \EndIndent
+            \EndIndent
+            \State $ForestDistance[F'][G'] := C_{min}$
+          \EndIf
+        \EndFor
+      \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{Single path function - part II}
+  \label{alg:spf_subforest_ordering}
+  \begin{algorithmic}[1]
+    \Procedure {get ordered subforests}{$Tree, Strategy$}
+      \State $\gamma \gets$ path on $Tree$ corresponding to $Strategy$
+      \State $Forests \gets$ empty list
+      \For {$v :=$ nodes on $\gamma$ from leaf to root}
+        \State $Forests \gets Forests \cup Tree[v]$
+        \State $l \gets v - 1$
+        \While {$l$ is not in subtree $Tree[v]$}
+          \State \Comment {$l$ is in subtree of left sibling of $v$}
+          \State $Forests \gets Forests \cup Tree[l \dotsc v]$
+          \State $l \gets l - 1$
+        \EndWhile
+        \State $r \gets v + 1$
+        \While {$r$ is not in subtree $Tree[v]$}
+          \State \Comment {$r$ is in subtree of right sibling of $v$}
+          \State $Forests \gets Forests \cup Tree[l \dotsc r]$
+          \State $r \gets r + 1$
+        \EndWhile
+      \EndFor
+      \State $Forests \gets \{Forest | Forest = Tree[i \dotsc j], v \in Forest\}$
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+Algoritmus \ref{alg:gted} funguje v dvoch krokoch.
+
+Najprv podla strategie dekomponuje jeden zo stromov podla cesty $\gamma$,
+bez ujmy na obecnosti, nech je to $F$ a rekurzivne spocita editacnu vzdialenost
+medzi vsetkymi podstromami ktore susedia s dekompozicnou cestou a stromom $G$.
+
+Nasledne sa dorata vzdialenost medzi vsetkymi vrcholmi na ceste $\gamma$ a $G$.
+Tym mame dopocitane vzdialenosti medzi vsetkymi podstromami $F_{v}$ a $G_{w}$.
+
+\begin{lemma}
+  \label{lemma:gted}
+  Ak single-path funkcia dopocita editacnu vzdialenost medzi vrcholmi
+  na ceste $\gamma$, tak GTED po navrate z rekurzie vrati maticu vzdialenosti
+  medzi vsetkymi dvojicami podstromov $F$ a $G$.
+\end{lemma}
+
+\begin{dukaz}
+  \label{dukaz:gted}
+  Nech $\gamma \in F$. Po vyratani editacnej vzdialenosti medzi stromami
+  $F - \gamma$ a $G$ nam staci dopocitat uz len vrcholy na ceste,
+  teda vzdialenosti medzi stromami $F_{v}$ a $G$ pre $v \in \gamma_{F}$.
+\end{dukaz}
+
+Vdaka doslednemu usporiadaniu lesov v \ref{alg:spf_subforest_ordering} si v kazdom
+kroku pripravime potrebne data pre dalsi krok algoritmu \ref{alg:spf}.
+
+\begin{lemma}
+  Nech $\gamma \in F$. Ak mam vypocitanu editacnu vzdialenost medzi vsetkymi
+  stromami z $F - \gamma$, tak single-path funkcia pocita vzdialenost spravne.
+\end{lemma}
+
+% TODO: este raz preformulovat nasledujuce odstavce aj s dokazom, striktnejsie rozdelit co je vysvetlenie hodnot, a dokaz spravnosti.
+
+Pred samotnym dokazom vysvetlime hodnoty v podmienkach na riadkoch \ref{alg:spf:iftrees} a
+\ref{alg:spf:ifforests}. Prve dva su v oboch rovnake. Pocitame hodnotu zmazania vrcholu z $F$,
+resp. vlozenia vrcholu z $G$ do $F$. Cize v kazdom kroku pridavam nove vrcholy do lesov a dane
+dva hodnoty odpovedaju ich zmazaniu (hodnota z predchadzajuceho kroku $+ C_{del}()$), alebo
+vlozeniu (hodnota z predchadzajuceho kroku $+ C_{ins}()$).
+
+Tretia hodnota sa lisi podla toho, ci su lesy zaroven aj stromami. Ak su, mozeme strom $F'$
+priamo namapovat na $G'$ a updatneme hodnotu korena prveho na hodnotu druheho. Nasledne
+este nastavime hodnoty $ForestDistance$ a $TreeDistance$ v danych stromoch.
+
+V pripade, ze aspon jeden z lesov nieje stromom vyuzivame rekurziu $GTEDu$, ktora vypocitala
+editacnu vzdialenost medzi stromami zakorenenymi v poslednych pridanych vrcholoch ($Last_{F}$
+a $Last_{G}$).
+
+To dokazeme tym, ze ak BUNO sme dekomponovali $F$ a $F'$ nieje stromom,
+potom $Last_{F}$ je v podstrome nejakeho zo stromov $F - \gamma$, a tak
+vzdialenost $F_{Last_{F}}$ a $G$ uz je vyratana, takze aj vzdialenost $F_{Last_{F}}$ a $G_{Last_{G}}$.
+
+Ak naopak $F'$ je strom a $G'$ nieje, mozu nastat zase 2 pripady, $Last_{F} \in \gamma$,
+potom sme hodnotu medzi $F' - Last_{F}$ a $G' - Last_{G}$ vyratali v predchadzajucom kroku
+algoritmu. Ak $Last_{F}$ je mimo cesty, potom rovnako sme vzdialenost vyratali v rekurzii $GTEDu$.
+
+\begin{dukaz}
+  Indukciou najprv ukazeme, ze v single-path funkcii pouzivame vzdy inicializovane hodnoty.
+  Na zaciatku mame inicializaciu medzi vsetkymi podlesmi $F'$ a prazdnym lesom $G' = \emptyset$
+  a rovnako pre $F' = \emptyset$ a podlesmi $G'$.
+
+  Hlavny cyklus algoritmu zaciname v oboch stromoch na cestach, ktore odpovedaju strategii $\sigma$.
+  Obidva lesy $F'$ a $G'$ su zaroven stromami, takze pouzijeme prvu cast podmienky zacinajucu
+  riadkom \ref{alg:spf:iftrees}. Algoritmus vyrata 3 hodnoty, prva sa rovna suctu ceny zmazania
+  korena $F'$ a vzdialenosti $ForestDistance[\emptyset][G']$, teda $1 + 1 = 2$.
+  Pri druhej vkladame korenovy vrchol $G'$ do $F$, co znamena scitat cenu vlozenia
+  a vzdialenost $ForestDistance[F'][\emptyset]$, teda zase $1 + 1 = 2$.
+  Tretia podmienka 
+\end{dukaz}
+
+
+
+
+\subsection{TODO: pokracovanie} %TODO
+
 \begin{definice}
 	Celkova dekompozicia lesa (full decomposition) $F$, $\mathcal{A}(F)$ je mnozina
 	vsetkych podlesov F, ktore dostaneme rekurzivnym odstranenim najlavejsieho
@@ -168,120 +362,6 @@ vzdialenost medzi stromami $F$ a $G$.
 
 
 
-
-\subsubsection{GTED: General Tree Edit Distance algoritmus}
-
-Pozn. $D^{T}$ budeme oznacovat transponovanu maticu, teda
-$D[F_{v}][G_{w}] = D^{T}[G_{w}][F_{v}]$, podobne $S^{T}$.
-
-\begin{itemize}
-  \item Vstup: Stromy $F$ a $G$, funkcia $S(F_{v}, G_{w}) = \gamma$
-    na vypocet dekompozicnej strategie.
-  \item Vystup: matica $D$ vzdialenosti medzi vsetkymi podstromami $F$ a $G$.
-\end{itemize}
-
-%TODO: napisat par teplych slov ako budu dane algoritmy fungovat, a az potom pridat detaily
-
-\begin{algorithm}
-  \caption{General Tree Edit Distance for LRH strategies}\label{alg:gted}
-  \begin{algorithmic}[1]
-    \Procedure {gted}{$F, G, D$}
-      \State \Comment {Usporiadanie vrcholov je zlava doprava v postorder}
-      \State \Comment {Plati, $id(root(F)) = \abs{F} - id(mostleft(F))$}
-      \State $\gamma \gets S(F, G)$
-      \If {$\gamma \in \gamma^{*}(F)$}
-        \ForAll {$F' \in F - \gamma$}
-          \State $D \gets D \cup \Call{gted}{F', G, D}$
-        \EndFor
-        \If {$\gamma = \gamma^{L}(F)$}
-          \State $D \gets D \cup \Delta^{L}(F, G, \gamma, D)$
-        \ElsIf {$\gamma = \gamma^{R}(F)$}
-          \State $D \gets D \cup \Delta^{R}(F, G, \gamma, D)$
-        \Else
-          \State $D \gets D \cup \Delta^{H}(F, G, \gamma, D)$
-        \EndIf
-      \Else
-      \State $D \gets D \cup (\Call{gted}{G, F, S^{T}, D^{T}})^{T}$
-      \EndIf
-      \State \Return {$D$}
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{definice}[Single path function]\label{def:single_path_function}
-  Oznacme $D$ maticu vzdialenosti medzi stromami $F_{v}$ a $G_{w}$,
-  teda $D[F_{v}][G_{w}] = \delta(F_{v}, G_{w})$.
-  Potom funkcia $\Delta(F, G, \gamma_{F}, D)$ ktora pocita vzdialenosti medzi podstromami
-  stromov $F$ a $G$ pre root-leaf cestu $\gamma_{F}$ nazveme single-path funkciou.
-\end{definice}
-
-Nasledovat budu 2 algoritmy na vypocet single-path-function, algoritmus \ref{alg:ZHANGSHASHA}
-je z dielne \citet{ZHANGSHASHA} a algoritmus \ref{alg:DMRW} je od \citet{DMRW}.
-
-
-\begin{algorithm}
-  \caption{Zhang \& Shasha: Single path function}
-  \label{alg:ZHANGSHASHA}
-  \begin{algorithmic}[1]
-    \Procedure {$\Delta^{L}$}{$F, G, \gamma, D$}
-      \State $L_{F} \gets id(mostleft(F))$
-      \State $L_{G} \gets id(mostleft(G))$
-      \State $R_{F} \gets id(root(F))$
-      \State $R_{G} \gets id(root(G))$
-
-      \State $forestdistance \gets$ pole indexovane podlesmi stromov $F$ a $G$
-      \State $forestdistance[\emptyset, \emptyset] := 0$
-      \For {$i := L_{F}$ to $R_{F}$}
-        \State $forestdistance[F[L_{F} \dotsc i], \emptyset] :=$
-        \Indent
-          \State $forestdistance[L_{F} \dotsc i$ - $1] + C_{del}(F[i])$
-        \EndIndent
-      \EndFor
-
-      \For {$j := L_{G}$ to $R_{G}$}
-        \State $forestdistance[\emptyset, G[L_{G} \dotsc j]] :=$
-        \Indent
-          \State $forestdistance[\emptyset, G[L_{G} \dotsc j$ - $1]] + C_{ins}(G[j])$
-        \EndIndent
-      \EndFor
-
-      \For {$i := L_{F}$ to $R_{F}$}
-        \For {$j := L_{G}$ to $R_{G}$}
-          \If {both subtrees $F[L_{F} \dotsc i] \land G[L_{G} \dotsc j]$ are trees}
-            \State $C_{min} := min \{$
-            \Indent
-              \State $forestdistance(F[L_{F} \dotsc i$ - $1], G[L_{G} \dotsc j] + C_{del}(F[i])$,
-              \State $forestdistance(F[L_{F} \dotsc i], G[L_{G} \dotsc j$ - $1] + C_{ins}(G[j])$,
-              \State $forestdistance(F[L_{F} \dotsc i$ - $1], G[L_{G} \dotsc j$ - $1] +$
-              \Indent
-                \State $C_{upd}(F[i], G[j]) \}$
-              \EndIndent
-            \EndIndent
-            \State $forestdistance[F[L_{F} \dotsc i], G[L_{G} \dotsc j]] := C_{min}$
-            \State $D[i, j] := C_{min}$
-          \Else
-            \State $C_{min} := min \{$
-            \Indent
-              \State $forestdistance(F[L_{F} \dotsc i$ - $1], G[L_{G} \dotsc j] + C_{del}(F[i])$,
-              \State $forestdistance(F[L_{F} \dotsc i], G[L_{G} \dotsc j$ - $1] + C_{ins}(G[j])$,
-              \State $forestdistance(F[L_{F} \dotsc id(mostleft(F[i]))$ - $1]$,
-              \Indent
-                \State $G[L_{G} \dotsc id(mostleft(G[j]))$ - $1] + D[i, j] \}$
-              \EndIndent
-            \EndIndent
-            \State $forestdistance[F[L_{F} \dotsc i], G[L_{G} \dotsc j]] := C_{min}$
-          \EndIf
-        \EndFor
-      \EndFor
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-  \caption{DMRW}
-  \label{alg:DMRW}
-  %TODO
-\end{algorithm}
 
 
 

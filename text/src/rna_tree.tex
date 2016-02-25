@@ -5,9 +5,12 @@
 % (((((...))(...))..))
 
 \begin{center}
+  %\begin{minipage}{.450\textwidth}
 	\begin{tikzpicture}[
 			baseline,
 			level distance = 1.5 cm,
+      scale=0.6,
+      every node/.style={scale=0.6},
 			basepair/.style = {ellipse, draw, minimum height = 0.3 cm, minimum width = 0.7 cm},
 			unpaired/.style = {circle, draw, minimum width = 0.3 cm},
 			level 2/.style={sibling distance = 3 cm},
@@ -59,7 +62,11 @@
 \end{center}
 
 \begin{center}
-	\begin{tikzpicture}[on grid, -latex,
+	\begin{tikzpicture}[
+      on grid,
+      -latex,
+      scale=0.6,
+      every node/.style={scale=0.6},
 			base/.style = {circle, draw, minimum width = 0.5 cm},
 			ends/.style = {draw = none, fill = none}]
 
