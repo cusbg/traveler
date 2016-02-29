@@ -3,7 +3,14 @@
 \newcommand{\Cdel}{\ensuremath{c_{del}}}
 \newcommand{\Cins}{\ensuremath{c_{ins}}}
 \newcommand{\Cupd}{\ensuremath{c_{upd}}}
-\renewcommand{\O}[1]{\ensuremath{\mathcal{O}(#1)}}
+
+\newcommand{\AfullDecomposition}{\ensuremath{\mathcal{A}}}
+\newcommand{\FrelevantSubforests}{\ensuremath{\mathcal{F}}}
+\newcommand{\pluseq}{\stackrel{+}{=}}
+\newcommand{\AlgCase}{$\left\{\rule{0pt}{\baselineskip}\right.$\parbox{\textwidth}}
+
+\newcommand{\rtedCostSum}[3]{\sum_{{#1}' \in #1 - \gamma^{#2}(#1)}cena({#1}', #3)}
+
 
 %indentation in code:
 \algdef{SE}[SUBALG]{Indent}{EndIndent}{}{\algorithmicend\ }
@@ -89,22 +96,22 @@ najpravejsi/najlavejsi strom lesa a jeho koren).
 
 \section{Algoritmy dynamickeho programovania}
 
-\citet{TAI} predstavil algoritmus s priestorovou a casovou zlozitostou \O{m^3 \cdot n^3},
+\citet{TAI} predstavil algoritmus s priestorovou a casovou zlozitostou \O{$m^3 \cdot n^3$},
 \citet{ZHANGSHASHA} algoritmus nasledne vylepsili pozorovanim toho, ze nepotrebujeme
-vzdialenosti medzi vsetkymi parmi podlesov. Algoritmus mal casovu zlozitost \O{m^2 \cdot n^2}
-a priestorovu \O{m \cdot n}. \citet{KLEIN} dosiahol casovu zlozitost \O{m^2 \cdot n \cdot \log{n}},
+vzdialenosti medzi vsetkymi parmi podlesov. Algoritmus mal casovu zlozitost \O{$m^2 \cdot n^2$}
+a priestorovu \O{$m \cdot n$}. \citet{KLEIN} dosiahol casovu zlozitost \O{$m^2 \cdot n \cdot \log{n}$},
 avsak jeho riesenie potrebovalo rovnako vela pamete.
-\citet{DALUCQ} ukazali, ze minimalny cas na beh algoritmu je \O{m \cdot n \cdot \log{m} \cdot \log{n}}.
+\citet{DALUCQ} ukazali, ze minimalny cas na beh algoritmu je \O{$m \cdot n \cdot \log{m} \cdot \log{n}$}.
 \citet{DMRW} predviedli worst-case optimalny algoritmus pre tree-edit-distance.
-Jeho casova a priestorova zlozitost je \O{m^2 \cdot n \cdot (1 + \log{\frac{n}{m}})} a
-\O{m \cdot n}. \citet{RTED} ukazali spojitost medzi efektivnostou predchadzajucich algoritmov
+Jeho casova a priestorova zlozitost je \O{$m^2 \cdot n \cdot (1 + \log{\frac{n}{m}})$} a
+\O{$m \cdot n$}. \citet{RTED} ukazali spojitost medzi efektivnostou predchadzajucich algoritmov
 a tvarom stromov. Zovseobecnili predchadzajuce pristupy a vytvorili algoritmus beziaci
-vo worst-case case \O{m^3} a priestore \O{m \cdot n}. Ich algoritmus je teda efektivny pre vsetky
+vo worst-case case \O{$m^3$} a priestore \O{$m \cdot n$}. Ich algoritmus je teda efektivny pre vsetky
 tvary stromov a nikdy nespadne do worst-case, ak existuje lepsi smer vypoctu. 
 
 
 
-\subsection{RTED: Robust Tree Edit Distance algoritmus}
+\subsection{RTED}
 
 Dalej sa v nasej praci budeme venovat vyhradne algoritmu RTED od tvorcov \citet{RTED}.
 Ich algoritmus rozdelime na 2 casti, rovnako pomenovany RTED a GTED.
@@ -123,6 +130,7 @@ s aplikovanim danej strategie.
 	v ktoreho podstrome je najviac vrcholov. 
 \end{definice}
 
+\subsubsection{GTED: General Tree Edit Distance algoritmu}
 
 Zacneme principom fungovania GTED algoritmu. Detaily pre LRH strategie su
 v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy strategiu.
@@ -137,7 +145,10 @@ v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy strategiu.
         \ForAll {$F' \in F - \sigma$}
           \State $TreeDistance \gets TreeDistance \cup \Call{gted}{F', G, TreeDistance, S}$
         \EndFor
-        \State $TreeDistance \gets TreeDistance \cup \Call{$\Delta$}{F, G, TreeDistance, \sigma}$
+        \State $TreeDistance \gets TreeDistance \cup$
+        \Indent
+          \State $\Call{Compute Distance}{F, G, TreeDistance, \sigma}$
+        \EndIndent
       \Else
         \State $TreeDistance \gets TreeDistance \cup (\Call{gted}{G, F, TreeDistance^{T}, S^{T}})^{T}$
       \EndIf
@@ -147,10 +158,22 @@ v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy strategiu.
 \end{algorithm}
 
 \begin{algorithm}
-  \caption{Single path function - part I}
+  \caption{Single path function}
   \label{alg:spf}
   \begin{algorithmic}[1]
-    \Procedure {$\Delta$}{$F, G, TreeDistance, \sigma$}
+    \Procedure {Compute Distance}{$F, G, TreeDistance, \sigma$}
+      \If {$\sigma \in \sigma^{*}(F)$}
+        \ForAll {$G' \in \Call{Relevant Subtrees}{G}$}
+          \State $\Call{Single Path}{F, G', TreeDistance, \sigma}$
+        \EndFor
+      \Else
+        \ForAll {$F' \in \Call{Relevant Subtrees}{F}$}
+          \State $\Call{Single Path}{F, G, TreeDistance, \sigma}$
+        \EndFor
+      \EndIf
+    \EndProcedure
+    \\
+    \Procedure {Single Path}{$F, G, TreeDistance, \sigma$}
       \State $ForestDistance \gets$ empty array $|F| + 1 \times |G| + 1$
       \label{alg:spf:init}
       \State $ForestDistance[\emptyset][\emptyset] := 0$
@@ -216,106 +239,120 @@ v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy strategiu.
   \end{algorithmic}
 \end{algorithm}
 
-\begin{algorithm}
-  \caption{Single path function - part II}
-  \label{alg:spf_subforest_ordering}
-  \begin{algorithmic}[1]
-    \Procedure {get ordered subforests}{$Tree, Strategy$}
-      \State $\gamma \gets$ path on $Tree$ corresponding to $Strategy$
-      \State $Forests \gets$ empty list
-      \For {$v :=$ nodes on $\gamma$ from leaf to root}
-        \State $Forests \gets Forests \cup Tree[v]$
-        \State $l \gets v - 1$
-        \While {$l$ is not in subtree $Tree[v]$}
-          \State \Comment {$l$ is in subtree of left sibling of $v$}
-          \State $Forests \gets Forests \cup Tree[l \dotsc v]$
-          \State $l \gets l - 1$
-        \EndWhile
-        \State $r \gets v + 1$
-        \While {$r$ is not in subtree $Tree[v]$}
-          \State \Comment {$r$ is in subtree of right sibling of $v$}
-          \State $Forests \gets Forests \cup Tree[l \dotsc r]$
-          \State $r \gets r + 1$
-        \EndWhile
-      \EndFor
-      \State $Forests \gets \{Forest | Forest = Tree[i \dotsc j], v \in Forest\}$
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
 
-Algoritmus \ref{alg:gted} funguje v dvoch krokoch.
+\begin{pozn}
+  Funkcia $Get Ordered Subforests()$ v algoritme \ref{alg:spf} vracia lesy zoradene
+  v opacnom poradi, ako ich pridavame v definicii \ref{def:relevant_subforests}.
+\end{pozn}
+
+Algoritmus \ref{alg:gted} funguje v troch krokoch.
 
 Najprv podla strategie dekomponuje jeden zo stromov podla cesty $\gamma$,
 bez ujmy na obecnosti, nech je to $F$ a rekurzivne spocita editacnu vzdialenost
 medzi vsetkymi podstromami ktore susedia s dekompozicnou cestou a stromom $G$.
 
-Nasledne sa dorata vzdialenost medzi vsetkymi vrcholmi na ceste $\gamma$ a $G$.
-Tym mame dopocitane vzdialenosti medzi vsetkymi podstromami $F_{v}$ a $G_{w}$.
+Nasledne pre vsetky relevant-subtrees (viz definice \ref{def:relevant_subforests})
+podstromy $G'$ stromu $G$ vyrata vzdialenosti medzi $F_{v}$ a $G'$ pomocou single-path funkcie.
+Ta dopocita vzdialenosti medzi vrcholmi $v \in \gamma_{F}$ a stromami $G'$.
+
+\begin{definice}
+  \label{def:relevant_subforests}
+	Relevant subtrees stromu $F$ pre root-leaf cestu $\gamma$ su definovane ako $F - \gamma$.
+	Relevant subforests stromu $F$ pre nejaku root-leaf cestu $\gamma$ su definovane rekurzivne ako
+	\begin{align*}
+    \mathcal{F}(\emptyset, \gamma) &= \emptyset
+		\\
+		\mathcal{F}(F, \gamma) &= \{F\} \cup
+		\begin{cases}
+      \mathcal{F}(F - r_{R}(F), \gamma), \quad{} &\text{ak $r_{L}(F) \in \gamma$}
+			\\
+      \mathcal{F}(F - r_{L}(F), \gamma), &\text{v ostatnych pripadoch}
+		\end{cases}
+	\end{align*}
+\end{definice}
 
 \begin{lemma}
-  \label{lemma:gted}
-  Ak single-path funkcia dopocita editacnu vzdialenost medzi vrcholmi
-  na ceste $\gamma$, tak GTED po navrate z rekurzie vrati maticu vzdialenosti
-  medzi vsetkymi dvojicami podstromov $F$ a $G$.
+  Ak compute-distance funkcia dopocita editacnu vzdialenost medzi vrcholmi na ceste $\gamma$
+  a vsetkymi podstromami druheho stromu, potom GTED vrati maticu vzdialenosti
+  medzi vsetkymi dvojicami podstromov $F_{v}$ a $G_{w}$, pre $v \in F; w \in G$.
 \end{lemma}
 
 \begin{dukaz}
-  \label{dukaz:gted}
   Nech $\gamma \in F$. Po vyratani editacnej vzdialenosti medzi stromami
   $F - \gamma$ a $G$ nam staci dopocitat uz len vrcholy na ceste,
   teda vzdialenosti medzi stromami $F_{v}$ a $G$ pre $v \in \gamma_{F}$.
 \end{dukaz}
 
-Vdaka doslednemu usporiadaniu lesov v \ref{alg:spf_subforest_ordering} si v kazdom
-kroku pripravime potrebne data pre dalsi krok algoritmu \ref{alg:spf}.
+Vdaka doslednemu usporiadaniu lesov si v kazdom kroku pripravime potrebne
+data pre dalsi krok algoritmu \ref{alg:spf}.
 
-\begin{lemma}
-  Nech $\gamma \in F$. Ak mam vypocitanu editacnu vzdialenost medzi vsetkymi
-  stromami z $F - \gamma$, tak single-path funkcia pocita vzdialenost spravne.
-\end{lemma}
+Najprv si este ale vysvetlime hodnoty pouzivane v algoritme \ref{alg:spf} v podmienkach
+na riadkoch \ref{alg:spf:iftrees} a \ref{alg:spf:ifforests}. Prve dva su v oboch rovnake.
+Pocitame hodnotu zmazania vrcholu z $F$, resp. vlozenia vrcholu do $F$.
 
-% TODO: este raz preformulovat nasledujuce odstavce aj s dokazom, striktnejsie rozdelit co je vysvetlenie hodnot, a dokaz spravnosti.
+Tretia hodnota sa lisi podla toho, ci su lesy zaroven aj stromami. Ak su, tak na danom mieste
+je cena namapovania podstromov $F_{v} - v$ na $F_{w} - w$ a updatu vrcholu $v$ na $w$.
+Inac, ked aspon jeden z lesov nieje stromom, tak cenu medzi $F_{Last_{F}}$ a $G_{Last_{G}}$
+mame vyratanu z predchadzajucich krokoch, alebo z inej vetvy rekurzie.
 
-Pred samotnym dokazom vysvetlime hodnoty v podmienkach na riadkoch \ref{alg:spf:iftrees} a
-\ref{alg:spf:ifforests}. Prve dva su v oboch rovnake. Pocitame hodnotu zmazania vrcholu z $F$,
-resp. vlozenia vrcholu z $G$ do $F$. Cize v kazdom kroku pridavam nove vrcholy do lesov a dane
-dva hodnoty odpovedaju ich zmazaniu (hodnota z predchadzajuceho kroku $+ C_{del}()$), alebo
-vlozeniu (hodnota z predchadzajuceho kroku $+ C_{ins}()$).
+Potom nastavime hodnotu vzdialenosti medzi lesmi na minimum a v pripade ze su to obidva stromy,
+tak nastavime aj ich vzdialenost.
 
-Tretia hodnota sa lisi podla toho, ci su lesy zaroven aj stromami. Ak su, mozeme strom $F'$
-priamo namapovat na $G'$ a updatneme hodnotu korena prveho na hodnotu druheho. Nasledne
-este nastavime hodnoty $ForestDistance$ a $TreeDistance$ v danych stromoch.
+Najprv este ukazeme, ze SPF pouziva vzdy inicializovane hodnoty, a kazdu hodnotu nastavuje prave raz.
 
-V pripade, ze aspon jeden z lesov nieje stromom vyuzivame rekurziu $GTEDu$, ktora vypocitala
-editacnu vzdialenost medzi stromami zakorenenymi v poslednych pridanych vrcholoch ($Last_{F}$
-a $Last_{G}$).
+\begin{pozn}
+  Nikdy nepouzivam 2x rovnaku cestu $\gamma$ v strome. To vyplyva z toho, ze po dekompozicii
+  stromu podla $\gamma$, cesta v ostatnych stromoch neexistuje.
+\end{pozn}
 
-To dokazeme tym, ze ak BUNO sme dekomponovali $F$ a $F'$ nieje stromom,
-potom $Last_{F}$ je v podstrome nejakeho zo stromov $F - \gamma$, a tak
-vzdialenost $F_{Last_{F}}$ a $G$ uz je vyratana, takze aj vzdialenost $F_{Last_{F}}$ a $G_{Last_{G}}$.
-
-Ak naopak $F'$ je strom a $G'$ nieje, mozu nastat zase 2 pripady, $Last_{F} \in \gamma$,
-potom sme hodnotu medzi $F' - Last_{F}$ a $G' - Last_{G}$ vyratali v predchadzajucom kroku
-algoritmu. Ak $Last_{F}$ je mimo cesty, potom rovnako sme vzdialenost vyratali v rekurzii $GTEDu$.
+\begin{pozn}
+  Single-path funkcia kazdu hodnotu $ForestDistance$, rovnako ako $TreeDistance$ nastavuje
+  prave raz.
+\end{pozn}
 
 \begin{dukaz}
-  Indukciou najprv ukazeme, ze v single-path funkcii pouzivame vzdy inicializovane hodnoty.
-  Na zaciatku mame inicializaciu medzi vsetkymi podlesmi $F'$ a prazdnym lesom $G' = \emptyset$
-  a rovnako pre $F' = \emptyset$ a podlesmi $G'$.
-
-  Hlavny cyklus algoritmu zaciname v oboch stromoch na cestach, ktore odpovedaju strategii $\sigma$.
-  Obidva lesy $F'$ a $G'$ su zaroven stromami, takze pouzijeme prvu cast podmienky zacinajucu
-  riadkom \ref{alg:spf:iftrees}. Algoritmus vyrata 3 hodnoty, prva sa rovna suctu ceny zmazania
-  korena $F'$ a vzdialenosti $ForestDistance[\emptyset][G']$, teda $1 + 1 = 2$.
-  Pri druhej vkladame korenovy vrchol $G'$ do $F$, co znamena scitat cenu vlozenia
-  a vzdialenost $ForestDistance[F'][\emptyset]$, teda zase $1 + 1 = 2$.
-  Tretia podmienka 
+  Ziadnu cestu nepouzivam opakovane. Hodnotu v $TreeDistance$ nastavujem iba v momente,
+  ked su obidva lesy stromami (teda ich korene lezia na cestach $\gamma_{F}$ a $\gamma_{G}$)
+  a to sa udeje prave raz.
+  Lesy vzdy iba zvacsujem, takze nikdy sa nedostanem do mensieho aby som mohol mu znovu nastavit
+  hodnotu. To iste plati aj pre $ForestDistance$.
 \end{dukaz}
 
+\begin{lemma}
+  Nikdy nepouzivame neinicializovane hodnoty $TreeDistance$ a $ForestDistance$.
+\end{lemma}
 
+\begin{dukaz}
+  Hodnota $ForestDistance$ pre pouzitie s prazdnym lesom je inicializovana, a pri kazdej iteracii
+  algoritmu citam iba z hodnot z predchadzajucich iteracii, napr
+  $ForestDistance[F - Last_{F}][G - Last_{G}]$, alebo $ForestDistance[F - F_{Last_{F}}][G - G_{Last_{G}}]$.
+  V prvom pripade mazem iba jeden vrchol, v druhom cely jeho podstrom.
 
+  Hodnoty $TreeDistance$ pouzivame iba v pripade, ze aspon jeden z lesov $F'$ alebo $G'$ nieje stromom.
+  To znamena, ze ak posledne pridany vrchol $Last_{F}$ je mimo cesty $\gamma_{F}$, tak sme vzdialenost
+  od $Last_{G}$ vyratali rekurzivne po dekompozicii $F$ uz skor.
+  Naopak ak $Last_{F}$ lezi na ceste, potom $Last_{G}$ je mimo cesty, a editacnu vzdialenost
+  sme vyratali pri pocitani relevant-subtrees.
+\end{dukaz}
 
-\subsection{TODO: pokracovanie} %TODO
+\begin{dusl}
+  Algoritmus funguje.
+\end{dusl}
+
+\begin{dukaz}
+  V predchadzajucich castiach sme dokazali, ze v kazdom kroku pouzivame iba korektne hodnoty a
+  vsetky casti algoritmu pocitaju spravne, takze algoritmus GTED je v poriadku.
+\end{dukaz}
+
+%TODO priklad
+
+\subsubsection{RTED: Robust Tree Edit Distance algoritmus}
+
+RTED budeme vnimat ako algoritmus na vypocitanie optimalnej strategie - teda algoritmus,
+ktory nam poradi ako najlepsie dekomponovat obidva stromy.
+
+Funguje tak, ze si predpocita kolko podproblemov budeme musiet vyriesit, ak pouzijeme strategiu
+$left$, $right$, alebo $heavy$.
 
 \begin{definice}
 	Celkova dekompozicia lesa (full decomposition) $F$, $\mathcal{A}(F)$ je mnozina
@@ -337,31 +374,141 @@ algoritmu. Ak $Last_{F}$ je mimo cesty, potom rovnako sme vzdialenost vyratali v
 \label{obr:LRH_decomposition}
 \end{figure}
 
+\begin{lemma}
+  Pocet podproblemov (relevant-subproblems) pocitanych single-path funkciou pre dvojicu
+  stromov $F$ a $G$ je rovna
+  \begin{align*}
+    \# = 
+    \begin{cases}
+      \abs{F} \times \abs{\FrelevantSubforests(G, \Gamma^{L}(G))} & \text{pre left-paths}
+      \\
+      \abs{F} \times \abs{\FrelevantSubforests(G, \Gamma^{R}(G))} & \text{pre right-paths}
+      \\
+      \abs{F} \times \abs{\AfullDecomposition(G)} & \text{pre heavy-paths}
+    \end{cases}
+  \end{align*}
+\end{lemma}
+
+\begin{dukaz}
+  \citet{DMRW} dokazali, ze vzorec pre tazke cesty je v poriadku. Rovnako tak,
+  \citet{ZHANGSHASHA} to dokazali pre lave cesty. Jednoduchou upravou vieme upravit
+  ich vzorec na pouzitie pravych ciest.
+\end{dukaz}
+
 \begin{definice}
-	Relevant subtrees stromu $F$ pre root-leaf cestu $\gamma$ su definovane ako $F - \gamma$.
-	Relevant subforests stromu $F$ pre nejaku root-leaf cestu $\gamma$ su definovane rekurzivne ako
-	\begin{align*}
-    \mathcal{F}(\emptyset, \gamma) &= \emptyset
-		\\
-		\mathcal{F}(F, \gamma) &= \{F\} \cup
-		\begin{cases}
-      \mathcal{F}(F - r_{R}(F), \gamma), \quad{} &\text{ak $r_{L}(F) \in \gamma$}
-			\\
-      \mathcal{F}(F - r_{L}(F), \gamma), &\text{v ostatnych pripadoch}
-		\end{cases}
-	\end{align*}
+  Minimalny pocet podproblemov ktore potrebujeme vyratat pri pouziti GTEDu je
+  \begin{align*}
+    cena(F, G) =
+    \begin{cases}
+      \abs{F} \times \abs{\AfullDecomposition(G)} &+ \rtedCostSum{F}{H}{G}
+      \\
+      \abs{G} \times \abs{\AfullDecomposition(F)} &+ \rtedCostSum{G}{H}{F}
+      \\
+      \abs{F} \times \abs{\FrelevantSubforests(G, \Gamma^{L}(G))} &+ \rtedCostSum{F}{L}{G}
+      \\
+      \abs{G} \times \abs{\FrelevantSubforests(F, \Gamma^{L}(F))} &+ \rtedCostSum{G}{L}{F}
+      \\
+      \abs{F} \times \abs{\FrelevantSubforests(G, \Gamma^{R}(G))} &+ \rtedCostSum{F}{R}{G}
+      \\
+      \abs{G} \times \abs{\FrelevantSubforests(F, \Gamma^{R}(F))} &+ \rtedCostSum{G}{R}{F}
+    \end{cases}
+  \end{align*}
 \end{definice}
 
-Kazdy krok rekurzie \ref{eq:ted} je vypocitana v konstantnom case z inych podproblemov.
-Doba behu zavisi na pocte podproblemov ktore potrebujeme vyratat, takze dekompozicna
-strategia hraje velku ulohu v dobe behu algoritmu.
+\begin{dukaz}
+  je uvedeny v \citet{RTED}
+\end{dukaz}
 
-Ulohou RTEDu je najst strategiu s najnizsim poctom problemov, ktore potrebujeme vyratat,
-zatial co ulohou GTEDu je podla danej strategie prejst celou rekurziou \ref{eq:ted} a vratit
-vzdialenost medzi stromami $F$ a $G$.
+Namiesto \O{$n^3$} rekurzie potrebujeme algoritmus, ktory optimalnu strategiu vyrata
+s nizsimi casovymi narokmi ako potrebuje optimalny beh $GTED$u.
 
+Popiseme teda algoritmus \ref{alg:rted} - RTED, od tvorcov \citet{RTED}.
+Beziaci v case \O{$n^2$}.
 
+\begin{algorithm}
+  \caption{Optimalna strategia}
+  \label{alg:rted}
+  \begin{algorithmic}[1]
+    \Procedure {rted}{$F, G$}
+      \State $L_{v}, R_{v}, H_{v} \gets$ polia velkosti $\abs{F} \times \abs{G}$
+      \State $L_{w}, R_{w}, H_{w} \gets$ polia velkosti $\abs{G}$
+      \ForAll {$v$ postorder v $F$}
+        \ForAll {$w$ postorder v $G$}
+          \If {$v$ je list}
+            \State $L_{v}[v, w] \gets R_{v}[v, w] \gets H_{v}[v, w] \gets 0$
+          \EndIf
+          \If {$w$ je list}
+            \State $L_{w}[w] \gets R_{w}[w] \gets  H_{w}[w] \gets 0$
+          \EndIf
 
+          \State $C := \{$
+            \Indent
+              \State $(\abs{F_{v}} \times \AfullDecomposition(G_{w}) +
+                H_{v}[v, w], \gamma^{H}(F)),$
+              \State $(\abs{G_{w}} \times \AfullDecomposition(F_{v}) +
+                H_{w}[w], \gamma^{H}(G)),$
+              \State $(\abs{F_{v}} \times
+                \abs{\FrelevantSubforests(G_{w}, \Gamma^{L}(G))} +
+                L_{v}[v, w], \gamma^{L}(F)),$
+              \State $(\abs{G_{w}} \times
+                \abs{\FrelevantSubforests(F_{v}, \Gamma^{L}(F)}) +
+                L_{w}[w], \gamma^{L}(G)),$
+              \State $(\abs{F_{v}} \times
+                \abs{\FrelevantSubforests(G_{w}, \Gamma^{R}(G))} +
+                R_{v}[v, w], \gamma^{R}(F)),$
+              \State $(\abs{G_{w}} \times
+                \abs{\FrelevantSubforests(F_{v}, \Gamma^{R}(F))} +
+                R_{w}[w], \gamma^{R}(G))$
+              \State $\}$
+            \EndIndent
+
+            \State $(c_{min}, \gamma_{min}) \gets (c, \gamma)$ take, ze
+              $(c, \gamma) \in C \wedge c = min\{c' | (c', \gamma) \in C\}$
+            \State $Strategies[v, w] := \gamma_{min}$
+
+            \If {$v$ nieje koren}
+            \State \Call{update}{$L_{v}$, v, w, $c_{min}$, $\gamma^{L}(parent(v)$}
+              \State \Call{update}{$R_{v}$, v, w, $c_{min}$, $\gamma^{R}(parent(v)$}
+              \State \Call{update}{$H_{v}$, v, w, $c_{min}$, $\gamma^{H}(parent(v)$}
+            \EndIf
+            \If {$w$ nieje koren}
+              \State \Call{update}{$L_{w}$, w, $c_{min}$, $\gamma^{L}(parent(w)$}
+              \State \Call{update}{$R_{w}$, w, $c_{min}$, $\gamma^{R}(parent(w)$}
+              \State \Call{update}{$H_{w}$, w, $c_{min}$, $\gamma^{H}(parent(w)$}
+            \EndIf
+        \EndFor
+      \EndFor
+      \State \Return {$Strategies$}
+    \EndProcedure
+
+  \item[]
+
+    \Procedure {update}{$Table, v, w, c_{min}, \gamma$}
+      \State $Table[parent(v), w] \pluseq
+        \begin{cases}
+          Table[v, w] & \text{ak $v \in \gamma$}
+          \\
+          c_{min} & \text{v opacnom pripade}
+        \end{cases}$
+    \EndProcedure
+
+    \Procedure {update}{$Table, w, c_{min}, \gamma$}
+      \State $Table[parent(w)] \pluseq
+        \begin{cases}
+          Table[w] & \text{ak $v \in \gamma$}
+          \\
+          c_{min} & \text{v opacnom pripade}
+        \end{cases}$
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\citet{RTED} dokazali, ze algoritmus \ref{alg:rted} ma \O{$n^2$} casovu narocnost a vyrata optimalnu LRH
+strategiu pre $GTED$ medzi vsetkymi parmi podstromov $(F_{v}, G_{w}); v \in F, w \in G$.
+
+Prechadza vrcholmi v postorder, aby sa znizila pametova narocnost algoritmu a nemuseli ukladat hodnoty
+medzi dvojicami relevant-subforest. Namiesto toho inkrementujeme hodnotu v rodicovskom vrchole pri
+kazdej navsteve jeho potomka.
 
 
 
