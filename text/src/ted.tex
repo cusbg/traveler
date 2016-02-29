@@ -503,13 +503,48 @@ Beziaci v case \O{$n^2$}.
   \end{algorithmic}
 \end{algorithm}
 
-\citet{RTED} dokazali, ze algoritmus \ref{alg:rted} ma \O{$n^2$} casovu narocnost a vyrata optimalnu LRH
-strategiu pre $GTED$ medzi vsetkymi parmi podstromov $(F_{v}, G_{w}); v \in F, w \in G$.
-
 Prechadza vrcholmi v postorder, aby sa znizila pametova narocnost algoritmu a nemuseli ukladat hodnoty
 medzi dvojicami relevant-subforest. Namiesto toho inkrementujeme hodnotu v rodicovskom vrchole pri
 kazdej navsteve jeho potomka.
 
+\begin{lemma}
+  Algoritmus \ref{alg:rted} vyrata optimalnu LRH strategiu pre dvojicu podstromov $F$ a $G$ a
+  casova narocnost algoritmu je \O{$n^2$}.
+\end{lemma}
 
+\begin{dukaz}
+  Toto tvrdenie dokazali \citet{RTED}.
+\end{dukaz}
+
+
+\section{Mapovanie medzi stromami}
+
+Tabulka vzdialenosti z $GTED$u medzi stromami $F$ a $G$ nam nebude stacit.
+Potrebujeme vediet ako strom $F$ namapovat na $G$.
+
+\begin{algorithm}
+  \caption{Pocitanie mapovania}
+  \label{alg:rted}
+  \begin{algorithmic}[1]
+    \Procedure {mapping}{$F, G, TreeDistance$}
+      %TODO: sigma?
+      \State $ForestDistance \gets$ \Call{Single Path}{$F, G, TreeDistance, \sigma$}
+      \State $Forests_{F} \gets$ \Call{Get Ordered Subforests}{$F, \sigma$}
+      \State $Forests_{G} \gets$ \Call{Get Ordered Subforests}{$G, \sigma$}
+      \While {$Forests_{F} \vee Forests_{G}$ nieje prazdny}
+        \State $F' \gets \Call{get forest}{Forests_{F}}$
+        \State $G' \gets \Call{get forest}{Forests_{G}}$
+        \While {$F'$ nieje prazdny alebo $G'$ nieje prazdny les}
+        \EndWhile
+      \EndWhile
+      \ForAll {$F' \in Forests_{F}$}
+      \EndFor
+    \EndProcedure
+  \item[]
+    \Procedure {get forest}{$Forests$}
+      \State \Return $Forests$ is empty $? \empty : Forests.pop()$
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
 
 
