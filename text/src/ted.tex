@@ -175,7 +175,6 @@ v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy strategiu.
     \\
     \Procedure {Single Path}{$F, G, TreeDistance, \sigma$}
       \State $ForestDistance \gets$ empty array $|F| + 1 \times |G| + 1$
-      \label{alg:spf:init}
       \State $ForestDistance[\emptyset][\emptyset] := 0$
       \For {$F'$ subforest in \Call{get ordered subforests}{$F, \sigma$}}
         \State $Last_{F} \gets$ last added node to $F'$
@@ -524,27 +523,53 @@ Potrebujeme vediet ako strom $F$ namapovat na $G$.
 
 \begin{algorithm}
   \caption{Pocitanie mapovania}
-  \label{alg:rted}
+  \label{alg:ted:mapping}
   \begin{algorithmic}[1]
-    \Procedure {mapping}{$F, G, TreeDistance$}
-      %TODO: sigma?
-      \State $ForestDistance \gets$ \Call{Single Path}{$F, G, TreeDistance, \sigma$}
-      \State $Forests_{F} \gets$ \Call{Get Ordered Subforests}{$F, \sigma$}
-      \State $Forests_{G} \gets$ \Call{Get Ordered Subforests}{$G, \sigma$}
-      \While {$Forests_{F} \vee Forests_{G}$ nieje prazdny}
-        \State $F' \gets \Call{get forest}{Forests_{F}}$
-        \State $G' \gets \Call{get forest}{Forests_{G}}$
-        \While {$F'$ nieje prazdny alebo $G'$ nieje prazdny les}
-        \EndWhile
+    \Procedure {Mapping}{$F, G, TreeDistance$}
+      \State $\sigma \gets$ lubovolna LRH strategia
+      \State $ForestDistance \gets \Call{Single Path}{F, G, TreeDistance, \sigma}$
+      \While {$F \neq \emptyset \wedge G \neq \emptyset$}
+        \State $v \gets \Call{Update}{F, \sigma}$
+        \State $w \gets \Call{Update}{G, \sigma}$
+        \If {$ForestDistance[F, G] = ForestDistance[F - v, G] + C_{del}$}
+          \State $Mapping \gets Mapping \cup (v \rightarrow 0)$
+          \State $F \gets F - v$
+        \ElsIf {$ForestDistance[F, G] = ForestDistance[F, G - w] + C_{ins}$}
+          \State $Mapping \gets Mapping \cup (0 \rightarrow w)$
+          \State $G \gets G - w$
+        \Else
+          \If {$F$ a $G$ su stromy}
+            \State $Mapping \gets Mapping \cup (v \rightarrow w)$
+            \State $F \gets F - v$
+            \State $G \gets G - w$
+          \Else
+            \State $Mapping \gets Mapping \cup$
+            \Indent
+              \State $\Call{Mapping}{F - F_{v}, G - G_{w}, TreeDistance}$
+            \EndIndent
+            \State $F \gets F - F_{v}$
+            \State $G \gets G - G_{w}$
+          \EndIf
+        \EndIf
       \EndWhile
-      \ForAll {$F' \in Forests_{F}$}
-      \EndFor
     \EndProcedure
   \item[]
-    \Procedure {get forest}{$Forests$}
-      \State \Return $Forests$ is empty $? \empty : Forests.pop()$
+    \Procedure {Update}{$Forest, \sigma$}
+      \State $\gamma \gets$ cesta v lese $Forest$ podla strategie $\sigma$
+      \State \Return vrchol $r_{L}(Forest)$ alebo $r_{R}(Forest)$ alebo
+        $\emptyset$ z $Forest$
+        \Indent
+          \State rovnako ako v definicii \ref{def:relevant_subforests}
+        \EndIndent
+      \label{alg:ted:mapping:update}
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
+
+Princip je v backtrackovani matice $ForestDistance$, teda zistujeme, aku operaciu sme v ktorom
+bode pouzili, podobne ako v zistovani operacii pri editacnej vzdialenosti retazcov.
+Musime ale pouzivat $ForestDistance$ maticu, nie $TreeDistance$, kedze v nej
+sa odzrkadluje detailnejsia struktura stromov. Maticu $TreeDistance$ pouzivame iba na
+pocitanie single-path funkcie.
 
 
