@@ -67,30 +67,31 @@ Vo vzorci \ref{eq:ted} pocitame editacnu vzdialenost $\delta(F, G)$,
 a $r_{F}$ a $r_{G}$ su korene, bud obidva najpravejsie alebo najlavejsie (tzn. vyberieme
 najpravejsi/najlavejsi strom lesa a jeho koren).
 
-\begin{figure}[H]\label{eq:ted}
-\begin{subequations}
-\begin{align}
-	\begin{split}
-	\delta(\emptyset, \emptyset) &=
-		0
-		\\
-	\delta(F, \emptyset) &=
-		\delta(F - r_{F}, \emptyset) + \Cdel(r_{F})
-		\\
-	\delta(\emptyset, G) &=
-		\delta(\emptyset, G - r_{G}) + \Cins(r_{G})
-	\end{split}
-	\\[1ex]
-	\delta(F, G) &=
-		\begin{cases}
-			\delta(F - r_{F}, G) + \Cdel(r_{F}) \\
-			\delta(F, G - r_{G}) + \Cins(r_{G}) \\
-			\delta(F - F_{r_{F}}, G - G_{r_{G}}) + \\
-				\quad \delta(F_{r_{F}} - r_{F}, G_{r_{G}} - r_{G}) + \Cupd(r_{F}, r_{G})
-		\end{cases}
-\end{align}
-\end{subequations}
-\caption{Rekurzivny vzorec pre vypocet tree-edit-distance}
+\begin{figure}[H]
+  \begin{subequations}
+  \begin{align*}
+    \begin{split}
+    \delta(\emptyset, \emptyset) &=
+      0
+      \\
+    \delta(F, \emptyset) &=
+      \delta(F - r_{F}, \emptyset) + \Cdel(r_{F})
+      \\
+    \delta(\emptyset, G) &=
+      \delta(\emptyset, G - r_{G}) + \Cins(r_{G})
+    \end{split}
+    \\[1ex]
+    \delta(F, G) &=
+      \begin{cases}
+        \delta(F - r_{F}, G) + \Cdel(r_{F}) \\
+        \delta(F, G - r_{G}) + \Cins(r_{G}) \\
+        \delta(F - F_{r_{F}}, G - G_{r_{G}}) + \\
+          \quad \delta(F_{r_{F}} - r_{F}, G_{r_{G}} - r_{G}) + \Cupd(r_{F}, r_{G})
+      \end{cases}
+  \end{align*}
+  \end{subequations}
+  \caption{Rekurzivny vzorec pre vypocet tree-edit-distance}
+  \label{eq:ted}
 \end{figure}
 
 
