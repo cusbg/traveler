@@ -1,4 +1,4 @@
-#~/bin/bash
+#!/bin/bash
 
 #FILES1="african_frog mouse rabbit human"
 FILES1="african_frog artemia_salina blue_mussel cicadas cicade echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"

@@ -19,6 +19,7 @@
  * USA.
  */
 
+#ifdef NODEF
 
 #include "tests.hpp"
 #include "rna_tree.hpp"
@@ -308,6 +309,7 @@ void test::run_multibranch()
 
 
 
+#endif
 
 
 

@@ -45,7 +45,6 @@
 #include "point.hpp"
 #include "rted.hpp"
 #include "gted.hpp"
-#include "tests.hpp"
 
 
 
@@ -133,23 +132,14 @@ void generate_seq_from_ps()
 }
 
 
-void f();
 
 int main(int argc, char** argv)
 {
     init();
-    //f();
     app app;
     app.run(vector<string>(argv, argv + argc));
 
     return 0;
 }
 
-void f()
-{
-    test t;
-    t.run();
-
-    exit(0);
-}
 #endif

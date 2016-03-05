@@ -36,11 +36,13 @@ flags = [
 # use 'c' for C projects
 '-x',
 'c++',
-'-I/usr/include/'
+'-I/usr/include/',
 
 # include third party libraries
 #'-isystem',
 #'/usr/include/python2.7',
+
+'-I./include/',
 ]
 
 # youcompleteme is calling this function to get flags

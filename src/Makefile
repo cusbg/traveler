@@ -4,81 +4,55 @@
 # By: eliasr <eliasr@u-pl22>
 #
 
-
 CC                      = g++
 DEBUG                   = -g -Wall
-#RELEASE                 = -DNDEBUG -O3
-RELEASE = -O3
-CFLAGS                  = -std=c++11 -c $(DEBUG) $(RELEASE)
-LFLAGS                  = $(DEBUG) $(RELEASE)
+RELEASE                 = -O3
+CFLAGS                  = -std=c++11 -c ${DEBUG} ${RELEASE} -I../include/
+LFLAGS                  = ${DEBUG} ${RELEASE} -std=c++11
 SHELL                   = /bin/bash -o pipefail
 
-BUILDDIR                = build
+MODULES                 = tree ted utils draw main
+
 LOGDIR                  = $(BUILDDIR)/logs
-FILESDIR                = $(BUILDDIR)/files
-
+ROOTDIR                 = .
+BUILDDIR                = ${ROOTDIR}/build
 TARGET                  = program
-SOURCES                 = $(shell find ./ -maxdepth 1 -name "*.cpp" | sed 's@\./@@g')
-HEADERS                 = $(shell find ./ -name "*.hpp" | sed 's@\./@@g')
-OBJECTS                 = $(shell echo $(SOURCES) | sed 's@\.cpp@.o@ g; s@[^ ]*/@@g')
-MAKEFILES               = $(shell echo $(SOURCES) | sed 's@\.cpp@.mk@g; s@[^ ]*/@@g')
 
-MAKEDEPENDENCY          = $(CC) -MM -E 
-
-ARGS                    =
-run: build cleanLog cp
+#GLOBAL targets
+run: build cleanLog
 	sh -x run.sh
 
+build: mk_dirs ${BUILDDIR}/Makefile compile
 
-build: $(BUILDDIR)/$(TARGET)
+make_modules:
+	sh -x make.sh make ${MODULES}
 
-debug: build
-	sh -x run.sh debug
-
-analyse:
-	gprof $(BUILDDIR)/$(TARGET) | less
-
-
-$(BUILDDIR)/$(TARGET): $(BUILDDIR)/Makefile
-
-CORES = $(shell expr $(shell nproc) + 2)
-$(BUILDDIR)/Makefile: $(SOURCES) $(HEADERS) $(addprefix $(BUILDDIR)/,$(MAKEFILES))
+${BUILDDIR}/Makefile:
 	@rm -f $@
 	@echo -e \
-			\\nbuild : $(TARGET) \\n \
-			\\n \
-			\\n$(TARGET) : $(OBJECTS) \\n\\t \
-			@echo "****************LINKING:****************" \\n\\t \
-			@echo \\n\\t \
-			$(CC) $(LFLAGS) $(OBJECTS) -o $(TARGET) \\n\\t \
-			@echo \\n\\t \
-			@echo "**************END-LINKING:**************" \\n\\t \
-			\\n \
-			\\ninclude $(MAKEFILES) \
+			build: ${TARGET} \\n\
+			\\n${TARGET}: ${MODULES} \\n\\t\
+				@echo "****************LINKING:****************" \\n\\t \
+				@echo \\n\\t \
+				${CC} ${LFLAGS} \*.o -o ${TARGET} \\n\\t \
+				@echo \\n\\t \
+				@echo "**************END-LINKING:**************" \\n \
+			\\nclean: \
+				\\n\\trm -rf \*.o ${TARGET} \
 					>> $@
-	@make -j$(CORES) --directory=$(BUILDDIR) -f Makefile
 
+CORES                   = 2
+compile: make_modules
+	@echo "****************COMPILE:****************"
+	@echo
+	make -j${CORES} --directory=${BUILDDIR} -f Makefile
+	@echo
+	@echo "**************END-COMPILE:**************"
+
+
+#OTHER GLOBAL targets
 mk_dirs:
-	@mkdir -p $(LOGDIR) $(FILESDIR) precomputed $(FILESDIR)/run $(FILESDIR)/run-op
-
-cp: mk_dirs
-	cp `find ../InFiles/ -type f` precomputed/
-
-
-$(BUILDDIR)/%.mk: %.cpp Makefile
-	@mkdir -p $(BUILDDIR)
-	@rm -f $@
-	@$(MAKEDEPENDENCY) $(CFLAGS) $< | sed 's@\([^ :]*\.\([hc]pp\|hh\|h\)\)@../\1@g' \
-					>> $@
-	@echo '	$(CC) $(CFLAGS) $$< -o $$@ ' \
-					>> $@
-
-java_rted:
-	java -cp java_RTED util.RTEDCommandLine --costs 1 1 0 --mapping --verbose --trees #'T1' 'T2'
-
-rnafold:
-	../RNAPlot/bin/RNAfold --noPS << END \n SEQ \n END
-
+	@mkdir -p $(LOGDIR)
 
 clean: cleanMK cleanCompiled cleanLog
 
@@ -91,6 +65,4 @@ cleanMK:
 cleanLog:
 	rm -f $(LOGDIR)/*.log
 
-.PHONY: $(BUILDDIR)/Makefile clean cleanMK
-
-
+.PHONY: ${BUILDDIR}/Makefile ${BUILDDIR}/*.mk clean cleanMK
