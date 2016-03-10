@@ -1,10 +1,9 @@
 \renewcommand{\SS}{\mathbb{S}}
 \newcommand{\Par}[2]{\mbox{$( #1, #2 )$}}
 
-\chapter{Uvod do molekularnej genetiky a bioinformatiky}
+\chapter{Uvod do studia struktury RNA}
 
-Na zaciatku prace strucne zoznamime citatela s vybranymi pojmami
-z bioinformatiky i genetiky.
+Na zaciatku prace strucne zoznamime citatela s pojmamy, ktore s RNA a jej strukturou suvisia.
 
 \section{Co je RNA}
 
@@ -13,46 +12,54 @@ tvorene retazcami nukleotidov, ktore su zakladnymi stavebnymi jednotkami
 nukleovych kyselin. Vyskytuje sa niekolko variant nukleotidov (baz). U RNA su to
 adein (A), guanin (G), cytozin (C), uracyl (U),
 pri DNA sa namiesto uracylu vyskytuje tymin (T).
+Medzi jednotlivymi bazami sa mozu vyskytovat vodikove vazby. Nukleotidy maju
+vzajomnu preferenciu, co znamena, ze bazy vznikaju najcastejsie medzi A-U a C-G
+u RNA a podobne A-T a C-G u DNA.
 Medzi jednotlivymi bazami existuju vazby na principe komplementarity.
 Vodikove vazby existuju medzi bazami A-U a C-G u RNA a podobne A-T a C-G u DNA.
 Strukturu nukleovych kyselin mozeme chapat podla stupna zjednodusenia
 \begin{itemize}
 	\item Primarna struktura - je urcena poradim jednotlivych nukleotidov
 		do polynukleotidoveho retazca
-	\item Sekundarna struktura - je dana 2D priestorovym usporiadanim molekuly
+	\item Sekundarna struktura - je dana parovanim medzi bazami molekuly
 	\item Terciarna struktura - 3D priestorove usporiadanie molekuly
 \end{itemize}
 DNA je dvojvlaknova molekula u ktorej spojenie medzi vlaknami sa realizuje na principe
 komplementarity.
-Naopak, RNA je iba jednovlaknova molekula. V snahe minimalizovat energiu molekuly,
-RNA komplementaritou vytvara v molekule bazove pary. Tie tvoria sekundarnu strukturu.
+Naopak, RNA je iba jednovlaknova molekula a v snahe minimalizovat volnu energiu molekuly
+sa paruje sama na seba. V tomto hraju rolu pritazlive sily medzi bazami.
 
-V praci budeme primarnou a sekundarnou strukturou mysliet prave primarnu a sekundarnu
-strukturu RNA, ak nebude povedane inak.
+V praci budeme strukturou mysliet prave sekundarnu strukturu RNA, ak nebude povedane inak.
 
-Az donedavna sa myslelo, ze funkcia RNA je iba pri tvorbe bielkovin (mRNA), alebo
-ako transporter aminokyselin (tRNA). Avsak existuje mnoho dalsich, od relativne
+Az donedavna sa myslelo, ze funkcia RNA je obmedzena na prenos genetickej informacie z DNA
+v jadre bunky do ribozomu. Napriklad pri tvorbe bielkovin (mRNA), alebo transporter aminokyselin
+v ribozome bunky (tRNA).
+% TODO: citacie k druhom RNA
+Avsak existuje mnoho dalsich, od relativne
 malych molekul tvorenych desiatkami baz, ktore pomahaju pri expresii genov
 (miRNA, siRNA, tmRNA a dalsie), az po velke, tvorene tisickami nukleotidov (rRNA).
 
-\begin{definice}\label{def:RNA_primarna_struktura}
+\section{Sekundarna struktura rRNA + konzervovanost}
+
+Ako hlavny objekt zaujmu sme si spomedzi vsetkych druhov RNA vybrali prave ribozomalnu,
+najma kvoli jej velkosti a tomu, ze existujucim nastrojom prave velkost robi najvacsie problemy
+pri vizualizacii.
+
+\begin{definice}[Primarna struktura RNA]
+  \label{def:RNA_primarna_struktura}
 	Nech $\Sigma$ je abeceda $\{A, C, G, U\}$. Potom slovo $W \in \Sigma^n$ nad touto abecedou
 	je sekvencia nukleotidov (baz) RNA.
 \end{definice}
 
-%TODO: obrazok prim/sek/terc struktury RNA
+Jednotlive nukleotidy sekvencie RNA budeme, ak bude jasne o co ide, oznacovat priamo poradovym
+cislom, teda $i$ bude oznacovat nukleotid $W_{i}$, resp. $W[i]$.
 
-\section{Sekundarna struktura rRNA + konzervovanost}
-
-Ako hlavny objekt zaujmu sme si spomedzi RNA vybrali ribozomalnu.
-Je to hlavne kvoli jej velkosti a konzervovanosti.
-Konzervovanostou myslime to, ze napriec celym spektrom organizmov sa sekundarna struktura
-rRNA velmi nemeni. 
-
-\begin{definice}\label{def:RNA_sekundarna_struktura}
-	Nech W je sekvencia podla definicie \ref{def:RNA_primarna_struktura} dlzky n.
-	Sekundarnou strukturou oznacime mnozinu $\SS$ parov \Par{i}{j} takych, ze
-	pre dva pary \Par{i}{j} a \Par{k}{l} $\in \SS$ (BUNO $i \leq k$) plati jedno z nasledujucich:
+\begin{definice}[Sekundarna struktura RNA]
+  \label{def:RNA_sekundarna_struktura}
+	Nech $W$ je sekvencia podla definicie \ref{def:RNA_primarna_struktura} dlzky n.
+	Sekundarnou strukturou oznacime mnozinu $\SS$ parov nukleotidov \Par{i}{j} takych, ze
+	pre dva pary \Par{i}{j} a \Par{k}{l} $\in \SS$ (bez ujmy na obecnosti $i \leq k$)
+  plati jedno z nasledujucich:
 	\begin{itemize}
 		\item $i = k \iff j = l$
 		\item $i < j < k < l$, cize par \Par{i}{j} predchadza par \Par{k}{l}
@@ -60,25 +67,33 @@ rRNA velmi nemeni.
 	\end{itemize}
 \end{definice}
 
+%TODO: obrazok prim/sek/terc struktury RNA
+
 Prva podmienka zabezpecuje, ze nukleotid je najviac v jednom bazickom pare, druha a tretia
 hovoria o usporiadani parov, bud su na sebe nezavisle alebo na seba nadvazuju.
 Posledna podmienka zakazuje existenciu pseudouzlov (pseudoknots).
 
-%TODO: 2 obrazky RNA napriec fylogenetickym stromom
 %TODO: pseudoknot obrazok
+%TODO: 2 obrazky RNA napriec fylogenetickym stromom
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=140mm, height=120mm]{../img/RNA_circular_reprezentation.png}
 \caption{Circular Feynman - kruhova reprezentacia sekundarnej struktury}
-\label{obr:RNA_motifs}
+\label{obr:RNA_circular_representation}
 \end{figure}
 
 
 \subsection{Motivy}
 
-Na obrazkoch mozeme pozorovat motivy RNA molekul, stem/loop, s dalsim
-moznym delenim loopov na bulge, interior loop a multibranch loop.
+Motivom v RNA mame na mysli casti molekuly, ktore vytvaraju urcite struktury.
+Na obrazku \ref{obr:RNA_motifs} vidime motivy, ktore sa mozu v RNA vyskytovat.
+
+Stem (stonka) je cast molekuly kde sa na seba paruju dva suvisle casti RNA vlakna.
+Interior loop spaja dva stemy a medzi nimi na oboch stranach obsahuje nesparovane
+bazy. Podobna je bulge (vypuklina), ale nesparovane nukleotidy ma iba z jednej strany.
+Hairpin je medzi castami vlakna ktore sa paruju sami na seba.
+Multibranch loop je podobna ako interior loop, ale spaja dokopy viac stemov.
 V dalsom rozpravani nam bude stacit rozdelenie na stem a loop.
 
 %TODO: ako nazyvat strukturne motivy v RNA: anglicky, alebo hladat vhodny preklad
@@ -89,28 +104,4 @@ V dalsom rozpravani nam bude stacit rozdelenie na stem a loop.
 \caption{Strukturalne motivy v RNA}
 \label{obr:RNA_motifs}
 \end{figure}
-
-\section{Reprezentacia sekundarnej struktury}
-
-Definicia \ref{def:RNA_sekundarna_struktura} nam ponuka reprezentovat sekundarnu strukturu
-ako usporiadany les.
-
-\begin{figure}[H]
-\centering
-%TODO: vlastny obrazok... namiesto clankoveho
-\includegraphics[width=130mm, height=70mm]{../img/stromova_reprezentacia_rna.png}
-\caption{Varianty reprezentacie vrcholov}
-\label{obr:RNA_vrcholy}
-\end{figure}
-
-\begin{definice}\label{def:strom}
-	Usporiadany zakoreneny strom je orientovany graf, v ktorom plati, ze hrany su orientovane
-	vzdy v smere z predka na potomka. Okrem korena ma kazdy vrchol svojho predka. Existuje tu
-	dalej usporiadanie medzi potomkami.
-	\\
-	Usporiadany les je usporiadana mnozina stromov.
-	%TODO: obrazok usporiadania stromov
-\end{definice}
-
-Kazdy vrchol moze reprezentovat napriklad motiv v strukture RNA, alebo nukleotid, bazovy par, ...
 
