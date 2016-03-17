@@ -22,7 +22,7 @@
 #include <fstream>
 #include <regex>
 
-#include "utils_ps_reader.hpp"
+#include "ps_reader.hpp"
 #include "utils.hpp"
 
 using namespace std;

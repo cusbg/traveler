@@ -23,35 +23,12 @@
 #define TYPES_HPP
 
 #include <iostream>
-#include <cassert>
 #include <string>
 #include <vector>
-#include <sstream>
 #include <algorithm>
 #include <stdexcept>
 #include "logger.hpp"
 
-#define DEBUG(...) \
-    if (logger.is_debug_enabled()) \
-        logger.debug(__VA_ARGS__)
-#define INFO(...) \
-    if (logger.is_info_enabled()) \
-        logger.info(__VA_ARGS__)
-#define WARN(...) \
-    logger.warn(__VA_ARGS__)
-#define ERR(...) \
-    logger.error(__VA_ARGS__)
-
-
-#define assert_err(boolean, ...) \
-    { \
-    if (!(boolean)) \
-        { \
-            ERR("condition '%s' is FALSE", boolean); \
-            ERR(__VA_ARGS__); \
-            exit(1); \
-        } \
-    }
 
 
 template <typename T>
@@ -81,6 +58,13 @@ inline bool operator!=(const T& t1, const T& t2)
 
 
 
+inline void wait_for_input()
+{
+    logger.emerg("%s", __PRETTY_FUNCTION__);
+    char ch;
+    std::cin.read(&ch, 1);
+}
+
 
 
 struct logger_end_of_function_priority
@@ -104,13 +88,31 @@ private:
     std::string fname;
 };
 
-inline void wait_for_input()
+class abort_exception : public std::exception
 {
-    logger.emerg("%s", __PRETTY_FUNCTION__);
-    char ch;
-    std::cin.read(&ch, 1);
-}
+public:
+    virtual ~abort_exception() = default;
+    abort_exception(int _line, const std::string& _file);
+    virtual const char* what() const noexcept;
+private:
+    std::string msg;
+};
 
+
+#endif /* !TYPES_HPP */
+
+// should always redefine, e.g. assert(), abort(), ..
+
+#define DEBUG(...) \
+    if (logger.is_debug_enabled()) \
+        logger.debug(__VA_ARGS__)
+#define INFO(...) \
+    if (logger.is_info_enabled()) \
+        logger.info(__VA_ARGS__)
+#define WARN(...) \
+    logger.warn(__VA_ARGS__)
+#define ERR(...) \
+    logger.error(__VA_ARGS__)
 
 
 #define WAIT \
@@ -133,8 +135,27 @@ inline void wait_for_input()
             logger.debug("%s", to_cstr(stream.str())); \
         }
 
-#define abort() ERR("abort(), line # %lu, file %s", __LINE__, __FILE__), ::abort()
 
+#define abort() \
+    throw abort_exception(__LINE__, __FILE__);
 
-#endif /* !TYPES_HPP */
+#undef assert
+#define assert(boolean) \
+    { \
+        if (!(boolean)) \
+        { \
+            ERR("condition '%s' is FALSE", #boolean); \
+            abort(); \
+        } \
+    }
+
+#define assert_err(boolean, ...) \
+    { \
+        if (!(boolean)) \
+        { \
+            ERR("condition '%s' is FALSE", #boolean); \
+            ERR(__VA_ARGS__); \
+            abort(); \
+        } \
+    }
 

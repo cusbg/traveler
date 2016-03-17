@@ -24,7 +24,7 @@
 #include "utils.hpp"
 #include "rna_tree.hpp"
 #include "mapping.hpp"
-#include "utils_ps_reader.hpp"
+#include "ps_reader.hpp"
 
 using namespace std;
 

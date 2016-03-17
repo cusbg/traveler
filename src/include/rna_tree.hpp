@@ -24,6 +24,7 @@
 
 #include "tree_base.hpp"
 #include "rna_tree_label.hpp"
+#include "types.hpp"
 
 struct point;
 

@@ -63,6 +63,7 @@ double compact::circle::segment_angle() const
 {
     CIRCLE_POINTS_INITED();
     CIRCLE_SGN_INITED();
+    assert(double_equals(distance(p1, centre), distance(p2, centre)));
 
     if (sgn == 1)
         return angle(p1, centre, p2);
@@ -143,6 +144,7 @@ void compact::circle::compute_sgn()
 
     assert(centre != direction);
     assert(!lies_on_line(p1, p2, direction));
+    assert(double_equals(distance(p1, centre), distance(p2, centre)));
     assert(!double_equals(angle(p1, centre, direction), 0)
             && !double_equals(angle(p1, centre, direction), 180));
 
@@ -159,6 +161,7 @@ void compact::circle::init(
 {
     CIRCLE_POINTS_INITED();
     CIRCLE_SGN_INITED();
+    assert(double_equals(distance(p1, centre), distance(p2, centre)));
 
     circle c = *this;   // TODO: only to debug output... remove?
     if (n == 0)

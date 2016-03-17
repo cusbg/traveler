@@ -23,7 +23,7 @@
 #define UTILS_PS_WRITER_HPP
 
 
-#include "utils_document_writer.hpp"
+#include "document_writer.hpp"
 #include "rna_tree.hpp"
 
 

@@ -22,9 +22,7 @@
 #ifndef TREE_BASE_ITER_HPP
 #define TREE_BASE_ITER_HPP
 
-#ifndef TREE_BASE_HPP
 #include "tree_base.hpp"
-#endif
 
 /**
  * visit every non-leaf node 2x, once when going in the subtree, once going up

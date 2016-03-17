@@ -22,7 +22,7 @@
 
 #include <iomanip>
 
-#include "utils_ps_writer.hpp"
+#include "ps_writer.hpp"
 
 
 #define PS_COLUMNS_WIDTH 15

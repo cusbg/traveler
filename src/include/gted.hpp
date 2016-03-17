@@ -126,11 +126,6 @@ private: // functions allowing some checks..
 
     inline void checks();
 
-#ifdef TESTS
-public:
-    static void test();
-#endif
-
 private:
     tree_type t1, t2;
     strategy_table_type STR;

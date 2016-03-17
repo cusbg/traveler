@@ -1,5 +1,5 @@
 /*
- * File: utils_document_writer.cpp
+ * File: document_writer.cpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
@@ -19,7 +19,7 @@
  * USA.
  */
 
-#include "utils_document_writer.hpp"
+#include "document_writer.hpp"
 #include "types.hpp"
 
 using namespace std;

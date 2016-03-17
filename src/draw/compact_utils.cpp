@@ -20,7 +20,7 @@
  */
 
 #include "compact_utils.hpp"
-#include "utils_ps_writer.hpp"
+#include "ps_writer.hpp"
 
 
 using namespace std;

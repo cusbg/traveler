@@ -23,10 +23,8 @@
 #define APP_HPP
 
 #include "types.hpp"
-#include "overlap_checks.hpp"
 
 class rna_tree;
-class mapping;
 class ps_writer;
 
 class app
@@ -43,6 +41,13 @@ public:
     void run(
                 std::vector<std::string> args);
 
+    /**
+     * print usage
+     */
+    void usage(
+                const std::string& appname = "");
+
+private:
     /**
      * run with handled command line arguments
      */
@@ -66,12 +71,6 @@ public:
                 rna_tree& rna,
                 bool overlaps);
 
-    /**
-     * print usage
-     */
-    void usage(
-                const std::string& appname = "");
-
 private:
     /**
      * reads both seq & fold file and construct rna tree
@@ -80,6 +79,7 @@ private:
                 const std::string& seqfile,
                 const std::string& foldfile,
                 const std::string& name);
+
     /**
      * reads ps & fold file and construct rna tree
      * from ps extract rna sequence and node positions in image

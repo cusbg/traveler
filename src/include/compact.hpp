@@ -31,6 +31,9 @@
 
 class compact
 {
+#ifdef TEST
+public:
+#endif
     struct circle;
     struct intervals;
     struct interval;
@@ -112,6 +115,9 @@ private:
     point init_branch_recursive(
                 sibling_iterator it);
 
+    void init_by_ancestor(
+                sibling_iterator it);
+
     /**
      * set branch nodes to lie on straight line
      */
@@ -119,7 +125,7 @@ private:
                 sibling_iterator it);
 
     void init_multibranch(
-                iterator parent);
+                sibling_iterator parent);
     // INIT ^^
 
 private:

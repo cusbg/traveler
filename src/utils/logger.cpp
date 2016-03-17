@@ -24,6 +24,8 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include <sys/types.h>
+#include <unistd.h>
 
 #include "logger.hpp"
 
@@ -103,6 +105,7 @@ void logger::log(
         fprintf(f, "%s", message_header(p).c_str());
         vfprintf(f, msg, copy);
         fprintf(f, "\n");
+        fflush(f);
 
         va_end(copy);
     }
@@ -128,7 +131,7 @@ string logger::message_header(
     cputacts = cputime.tv_sec * 1000000LL + cputime.tv_nsec / 1000;
 
     // PATTERN:
-    //  %TIME% %CPUTACTS% [%PRIORITY%] %MESSAGE%
+    //  %TIME% %CPUTACTS% <%PID%> [%PRIORITY%] %MESSAGE%
     //
     stream
         << setfill('0') << setw(2)
@@ -144,7 +147,9 @@ string logger::message_header(
         << millisecond
         << ' '
         << cputacts
-        << "\t["
+        << " <"
+        << (int)getpid()
+        << ">\t["
         << to_cstr(p)
         << "]\t";
 
@@ -189,11 +194,7 @@ void logger::logger_stream::flush()
 {
     if (!l.can_log(p))
         return;
-    for (FILE* f : l.out)
-    {
-        fprintf(f, "%s", l.message_header(p).c_str());
-        fprintf(f, "%s\n", stream.str().c_str());
-    }
+    l.log(p, "%s", stream.str().c_str());
 }
 
 

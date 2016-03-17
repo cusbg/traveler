@@ -111,6 +111,16 @@ protected:
     std::string message_header(
                 priority p);
 
+    void log(   priority p,
+                const char* msg,
+                ...)
+    {
+        va_list va;
+        va_start(va, msg);
+        log(p, msg, va);
+        va_end(va);
+    }
+
     void log(
                 priority p,
                 const char* msg,

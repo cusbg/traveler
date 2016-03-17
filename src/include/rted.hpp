@@ -230,10 +230,6 @@ private:
     std::vector<partial_result_arr>
                 T1_Hv_partials;
 
-#ifdef TESTS
-public:
-    static void test();
-#endif
 };
 
 

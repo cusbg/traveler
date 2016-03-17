@@ -19,55 +19,39 @@
  * USA.
  */
 
-//#define TESTS
-
-#ifdef TESTS
-
-#include "tests/tests.cpp"
-
-#else
-
-#include <iostream>
-#include <fstream>
 
 #include <csignal>
 #include <unistd.h>
-#include <strings.h>
 #include <string.h>
 
 #include "types.hpp"
 #include "utils.hpp"
-#include "utils_ps_reader.hpp"
 #include "app.hpp"
 #include "rna_tree.hpp"
-#include "mapping.hpp"
-
-#include "point.hpp"
-#include "rted.hpp"
-#include "gted.hpp"
-
-
-
-
 
 using namespace std;
 
+void run_test();
+
 void signal_handler(int signal)
 {
-    string out;
-    out += "\n\n"
-        + logger.message_header(logger::priority::EMERG)
-        + "ERROR: signal "
-        + to_string(signal)
-        + ":"
-        + strsignal(signal)
-        + " caught, exiting\n";
+    ostringstream out;
+    out
+        << endl
+        << endl
+        << logger.message_header(logger::priority::EMERG)
+        << "ERROR: signal "
+        << to_string(signal)
+        << ":"
+        << strsignal(signal)
+        << " caught, exiting"
+        << endl;
 
     vector<int> output_fds = logger.opened_files();
     output_fds.push_back(STDERR_FILENO);
 
     for (int fd : output_fds)
-        (void)(write(fd, out.c_str(), out.length()) + 1);
+        (void)(write(fd, out.str().c_str(), out.str().length()) + 1);
     // ^^ ((void) + 1)to prevent warning warn-unused-result
 
     exit(2);
@@ -101,40 +85,13 @@ void init()
     srand(1);
 }
 
-
-
-void generate_seq_from_ps()
-{
-    APP_DEBUG_FNAME;
-
-    auto vec = {
-        "fruit_fly",
-        "echinococcus_granulosus",
-        "microciona_prolifera",
-        "mnemiopsis_leidyi",
-        "blue_mussel",
-        "cicadas",
-        "sea_scallop",
-        "tripedalia_cystophora",
-        "kenyan_frog",
-        "rat",
-    };
-
-    string dir = "/afs/ms/u/e/eliasr/RocnikovyProjekt/InFiles/TODO/";
-    for (string ps : vec)
-    {
-        ps_document doc(dir + ps + ".ps");
-
-        get_rna(dir + ps);
-        write_file(dir + ps + ".seq", doc.labels);
-    }
-    abort();
-}
-
-
-
 int main(int argc, char** argv)
 {
+#ifdef TESTS
+    run_test();
+    return 0;
+#endif
+
     init();
     app app;
     app.run(vector<string>(argv, argv + argc));
@@ -142,4 +99,4 @@ int main(int argc, char** argv)
     return 0;
 }
 
-#endif
+
