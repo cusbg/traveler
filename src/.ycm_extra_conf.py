@@ -43,6 +43,9 @@ flags = [
 #'/usr/include/python2.7',
 
 '-I./include/',
+'-I./include/tests',
+'-I../include/',
+'-I../include/tests',
 ]
 
 # youcompleteme is calling this function to get flags

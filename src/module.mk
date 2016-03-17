@@ -1,8 +1,7 @@
 
 CC                      = g++
 DEBUG                   = -g -Wall
-RELEASE                 = -O3
-CFLAGS                  = -std=c++11 -c ${DEBUG} ${RELEASE} -I../include/
+CFLAGS                  = -std=c++11 -c ${DEBUG} ${RELEASE} -I${ROOTDIR}/include/ -I${ROOTDIR}/include/tests/
 LFLAGS                  = ${DEBUG} ${RELEASE} -std=c++11
 SHELL                   = /bin/bash -o pipefail
 
@@ -14,30 +13,40 @@ OBJECTS                 = $(shell echo $(SOURCES) | sed 's@\.cpp@.o@ g; s@[^ ]*/
 SHELL                   = /bin/bash
 BUILDDIR                = ${ROOTDIR}/build
 RUNSH                   = sh -x ${ROOTDIR}/make.sh
-INCLUDEDIR              = -I${ROOTDIR}/include/
+
+MODULEVAR               = $(shell echo ${MODULE} | tr 'a-z' 'A-Z')
 
 make: $(addprefix ${BUILDDIR}/,${MAKEFILES})
 	@echo -e \
-		\\n${MODULE}: ${OBJECTS} \
-		\\n\\ttouch ${MODULE} \
-		\\n \
 		\\ninclude ${MAKEFILES} \
+		\\n \
+		\\n${MODULEVAR} = ${OBJECTS} \
+		\\n \
 			>> ${BUILDDIR}/Makefile
 
 
+testmake: prepare_test make
+
+prepare_test:
+	$(eval CFLAGS := ${CFLAGS} -DTESTS)
+
+
 ${BUILDDIR}/%.cpp.mk: %.cpp
-	@${MAKEDEPENDENCY} ${INCLUDEDIR} $< | \
-		sed "s@\([^ :]*\.\([hc]pp\|hh\|h\)\)@../${MODULE}/\1@g" \
-			>> $@
+	@${MAKEDEPENDENCY} $< | \
+		sed "s@\([^ :]*\.cpp\)@${ROOTDIR}/${MODULE}/\1@g" \
+			>> $@ || rm -rf $@
 	@echo -e \
-		\\t ${CC} ${CFLAGS} ${INCLUDEDIR} $$\< -o $$\@ \
-			>> $@
+		\\t ${CC} ${CFLAGS} $$\< -o $$\@ \
+			>> $@ || rm -rf $@
 
 
 build:
 	make --directory=${ROOTDIR} --file=Makefile $@
 
 run:
+	make --directory=${ROOTDIR} --file=Makefile $@
+
+test:
 	make --directory=${ROOTDIR} --file=Makefile $@
 
 clean:

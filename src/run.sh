@@ -3,9 +3,22 @@
 #FILES1="african_frog mouse rabbit human"
 FILES1="african_frog artemia_salina blue_mussel cicadas cicade echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
 FILES2="african_frog artemia_salina blue_mussel cicadas cicade echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
+FILES1="artemia_salina"
+FILES2="cicadas"
 
-EXECUTABLE="build/program ${DEBUG}"
+EXECUTABLE="build/program"
 DIR=precomputed
+ONCE=false
+
+mv ${EXECUTABLE} ${EXECUTABLE}2
+EXECUTABLE="${EXECUTABLE}2"
+
+if [ "$1" = "debug" ]
+then
+    EXECUTABLE="gdb --args ${EXECUTABLE}"
+    ONCE=true
+fi
+
 
 fail_function() {
     {
@@ -85,18 +98,15 @@ run_loop() {
 	for file2 in $FILES2
 	do
 		run
+
+        if [ "$ONCE" = true ]
+        then
+            exit
+        fi
 	done
 }
 
-if [ "$1" = "debug" ]
-then
-    EXECUTABLE="gdb --args ${EXECUTABLE}"
-    ${EXECUTABLE}
-    exit 0
-fi
-
-I=
 for file1 in $FILES1
 do
-	run_loop&
+	run_loop
 done

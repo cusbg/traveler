@@ -1,59 +1,85 @@
 #
-# File: Makefile
+# File: src/Makefile
 # Created: 2014-09-01 14:42
 # By: eliasr <eliasr@u-pl22>
 #
 
-CC                      = g++
-DEBUG                   = -g -Wall
-RELEASE                 = -O3
-CFLAGS                  = -std=c++11 -c ${DEBUG} ${RELEASE} -I../include/
-LFLAGS                  = ${DEBUG} ${RELEASE} -std=c++11
-SHELL                   = /bin/bash -o pipefail
-
-MODULES                 = tree ted utils draw main
-
+TARGET                  = program
 LOGDIR                  = $(BUILDDIR)/logs
 ROOTDIR                 = .
 BUILDDIR                = ${ROOTDIR}/build
-TARGET                  = program
 
-#GLOBAL targets
-run: build cleanLog
+MODULES                 = tree ted utils draw main tests
+MODULESVARS             = $$\{TREE} $$\{TED} $$\{UTILS} $$\{DRAW} $$\{MAIN} $$\{TESTS}
+MODULETARGET            = make
+
+CC                      = g++
+DEBUG                   = -g -Wall
+RELEASE                 = -O3
+LFLAGS                  = ${DEBUG} ${RELEASE} -std=c++11
+SHELL                   = /bin/bash -o pipefail
+
+
+run: build cleanLog cp mkdir
 	sh -x run.sh
 
-build: mk_dirs ${BUILDDIR}/Makefile compile
+debug: build cp mkdir
+	sh -x run.sh debug
 
-make_modules:
-	sh -x make.sh make ${MODULES}
+build: mk_dirs make_modules ${BUILDDIR}/Makefile compile
+
+CORES                   = 2
+compile:
+	@echo "****************COMPILE:****************"
+	@echo
+	make -j${CORES} --directory=${BUILDDIR} -f Makefile build
+	@echo
+	@echo "**************END-COMPILE:**************"
+
+make_modules: force_rebuild_main
+	@rm -rf ${BUILDDIR}/Makefile
+	@echo "****************MAKEFILE-GENERATING:****************"
+	@echo
+	@for module in ${MODULES}; \
+	do \
+	    make --directory=$${module} --makefile=Makefile ${MODULETARGET}; \
+	done
+	@echo
+	@echo "****************END-MAKEFILE-GENERATING:****************"
+
+test: prepare_test build
+	${BUILDDIR}/${TARGET}
+
+prepare_test:
+	$(eval MODULETARGET := testmake)
+
+force_rebuild_main:
+	@rm -rf ${BUILDDIR}/main* ${BUILDDIR}/${TARGET}
+
+cp:
+	cp -R ../InFiles ./precomputed
+
+mkdir:
+	@mkdir -p ${BUILDDIR}/files
 
 ${BUILDDIR}/Makefile:
-	@rm -f $@
 	@echo -e \
 			build: ${TARGET} \\n\
-			\\n${TARGET}: ${MODULES} \\n\\t\
+			\\n${TARGET}: ${MODULESVARS} \\n\\t\
 				@echo "****************LINKING:****************" \\n\\t \
 				@echo \\n\\t \
-				${CC} ${LFLAGS} \*.o -o ${TARGET} \\n\\t \
+				${CC} ${LFLAGS} ${MODULESVARS} -o ${TARGET} \\n\\t \
 				@echo \\n\\t \
 				@echo "**************END-LINKING:**************" \\n \
 			\\nclean: \
 				\\n\\trm -rf \*.o ${TARGET} \
-					>> $@
-
-CORES                   = 2
-compile: make_modules
-	@echo "****************COMPILE:****************"
-	@echo
-	make -j${CORES} --directory=${BUILDDIR} -f Makefile
-	@echo
-	@echo "**************END-COMPILE:**************"
+					>>$@
 
 
-#OTHER GLOBAL targets
 mk_dirs:
 	@mkdir -p $(LOGDIR)
 
+#OTHER GLOBAL targets
 clean: cleanMK cleanCompiled cleanLog
 
 cleanCompiled:
@@ -65,4 +91,5 @@ cleanMK:
 cleanLog:
 	rm -f $(LOGDIR)/*.log
 
-.PHONY: ${BUILDDIR}/Makefile ${BUILDDIR}/*.mk clean cleanMK
+
+.PHONY: ${BUILDDIR}/Makefile clean cleanMK

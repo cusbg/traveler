@@ -21,9 +21,9 @@
 
 #define TESTS
 
-#include "../rna_tree.hpp"
+#include "rna_tree.test.hpp"
+#include "rna_tree.hpp"
 
-using namespace std;
 
 #define LABELS          "1234565731"
 #define BRACKETS        "(.(.(.).))"
@@ -33,10 +33,18 @@ using namespace std;
 
 #define INDEX       2
 
-/* static */
-void rna_tree::test()
+
+using namespace std;
+
+rna_tree_test::rna_tree_test()
+    : test("rna_tree")
+{ }
+
+void rna_tree_test::run()
 {
     APP_DEBUG_FNAME;
+
+    typedef rna_tree::iterator iterator;
 
     rna_tree rna(BRACKETS, LABELS);
     iterator it;
@@ -46,8 +54,8 @@ void rna_tree::test()
 
     it = plusplus(rna.begin(), INDEX);
 
-    assert(get_labels(it) == "2");
-    assert(get_brackets(it) == ".");
+    assert(rna.get_labels(it) == "2");
+    assert(rna.get_brackets(it) == ".");
 
     rna.erase(it);
 

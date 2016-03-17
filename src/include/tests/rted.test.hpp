@@ -1,7 +1,7 @@
 /*
- * File: tests.cpp
+ * File: rted.test.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard@ba30.eu>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,31 +19,19 @@
  * USA.
  */
 
-#include "../types.hpp"
-#include "rted.test.cpp"
-#include "gted.test.cpp"
-#include "overlap_checks.test.cpp"
-#include "rna_tree.test.cpp"
+#ifndef RTED_TEST_HPP
+#define RTED_TEST_HPP
 
+#include "test.test.hpp"
+#include "rted.hpp"
 
-using namespace std;
-
-void tests()
+class rted_test : public test
 {
-    APP_DEBUG_FNAME;
+public:
+    virtual ~rted_test() = default;
+    virtual void run();
+};
 
-    rna_tree::test();
-    rted::test();
-    gted::test();
-    overlap_checks::test();    
 
-    INFO("TESTS OK");
-}
-
-int main()
-{
-    tests();
-
-    return 0;
-}
+#endif /* !RTED_TEST_HPP */
 
