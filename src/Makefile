@@ -16,7 +16,7 @@ MODULETARGET            = make
 CC                      = g++
 DEBUG                   = -g -Wall
 RELEASE                 = -O3
-LFLAGS                  = ${DEBUG} ${RELEASE} -std=c++11
+LFLAGS                  = ${DEBUG} ${RELEASE} -std=c++11 -lrt
 SHELL                   = /bin/bash -o pipefail
 
 

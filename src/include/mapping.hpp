@@ -34,7 +34,7 @@ public:
     {
         size_t from, to;
 
-        bool operator< (const mapping_pair& other);
+        bool operator< (const mapping_pair& other) const;
     };
 
 private:

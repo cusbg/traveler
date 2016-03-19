@@ -91,7 +91,7 @@ private:
 class abort_exception : public std::exception
 {
 public:
-    virtual ~abort_exception() = default;
+    virtual ~abort_exception() noexcept = default;
     abort_exception(int _line, const std::string& _file);
     virtual const char* what() const noexcept;
 private:

@@ -326,14 +326,14 @@ void compact::init_multibranch(
             for (sibling_iterator ch = root.begin(); ch != root.end(); ++ch)
             {
                 if (ch->paired())
-                    n += 2 * PAIRED_POINTS;
+                    n += PAIRED_POINTS;
                 else
                     n += LEAF_POINTS;
             }
             return n;
         };
     auto set_accurate_distance =
-        [](sibling_iterator ch, point centre, double finaldistance)
+        [this](sibling_iterator ch, point centre, double finaldistance)
         {
             point vec = ch->centre() - centre;
             double actual = size(vec);
@@ -341,7 +341,7 @@ void compact::init_multibranch(
             shift_branch(ch, vec);
         };
     auto rotate_subtree =
-        [](iterator iter, sibling_iterator ch, circle c)
+        [this](iterator iter, sibling_iterator ch, circle c)
         {
             assert(rna_tree::parent(ch) == iter);
             assert(!rna_tree::is_leaf(ch));

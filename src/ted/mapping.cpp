@@ -81,7 +81,7 @@ mapping::indexes mapping::get_to_remove() const
 }
 
 
-bool mapping::mapping_pair::operator< (const mapping_pair& other)
+bool mapping::mapping_pair::operator< (const mapping_pair& other) const
 {
     return from < other.from ||
         (from == other.from &&
