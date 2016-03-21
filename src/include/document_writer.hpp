@@ -88,15 +88,15 @@ public: // formatters
     virtual std::string get_circle_formatted(
                 point centre,
                 double radius) const = 0;
-    virtual std::string get_edge_formatted(
+    std::string get_edge_formatted(
                 point from,
                 point to,
-                bool is_base_pair = true) const = 0;
+                bool is_base_pair = true) const;
     virtual std::string get_text_formatted(
                 point p,
                 const std::string& text) const = 0;
-    virtual std::string get_pair_formatted(
-                rna_tree::pre_post_order_iterator it) const = 0;
+    std::string get_label_formatted(
+                rna_tree::pre_post_order_iterator it) const;
     virtual std::string get_label_formatted(
                 const rna_label& label,
                 const RGB& color) const = 0;
@@ -138,6 +138,9 @@ public:
     streampos get_pos();
 
 protected:
+    virtual std::string get_line(
+                point from,
+                point to) const = 0;
     void print_to_stream(
                 const std::string& text);
     void seek_from_current_pos(

@@ -1,7 +1,7 @@
 /*
- * File: utils_ps_writer.hpp
+ * File: svg_writer.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,28 +19,18 @@
  * USA.
  */
 
-#ifndef UTILS_PS_WRITER_HPP
-#define UTILS_PS_WRITER_HPP
-
+#ifndef SVG_WRITER_HPP
+#define SVG_WRITER_HPP
 
 #include "document_writer.hpp"
-#include "rna_tree.hpp"
 
-
-struct point;
-
-
-class ps_writer
-    : public document_writer
+class svg_writer : public document_writer
 {
 public:
     virtual streampos print(
                 const std::string& text);
-    void init_default(
-                const std::string& filename,
-                rna_tree::iterator root);
 
-public:
+public: // formatters
     virtual std::string get_circle_formatted(
                 point centre,
                 double radius) const;
@@ -55,17 +45,8 @@ protected:
     virtual std::string get_line(
                 point from,
                 point to) const;
-
-private:
-    std::string get_color_formatted(
-                const RGB& color) const;
-    std::string get_default_prologue() const;
-    std::string get_default_prologue(
-                rna_tree::pre_post_order_iterator root) const;
-
 };
 
 
-
-#endif /* !UTILS_PS_WRITER_HPP */
+#endif /* !SVG_WRITER_HPP */
 

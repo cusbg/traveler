@@ -57,6 +57,51 @@ bool RGB::operator==(
 }
 
 
+
+
+std::string document_writer::get_edge_formatted(
+                point from,
+                point to,
+                bool is_base_pair) const
+{
+    if (from.bad() || to.bad())
+    {
+        WARN("cannot draw line between bad points");
+        return "";
+    }
+    if (is_base_pair)
+    {
+        point tmp = base_pair_edge_point(from, to);
+        to = base_pair_edge_point(to, from);
+        from = tmp;
+    }
+
+    return get_line(from, to);
+}
+
+std::string document_writer::get_label_formatted(
+                rna_tree::pre_post_order_iterator it) const
+{
+    if (!it->inited_points())
+        return "";
+
+    ostringstream out;
+
+    out
+        << get_label_formatted(it->at(it.label_index()), get_default_color(it->status));
+
+    if (it->paired() &&
+            it.preorder() &&
+            it->inited_points() &&
+            !rna_tree::is_root(it))
+    {
+        out
+            << get_edge_formatted(it->at(0).p, it->at(1).p, true);
+    }
+
+    return out.str();
+}
+
 const RGB& document_writer::get_default_color(
                 rna_pair_label::status_type status) const
 {
@@ -109,16 +154,7 @@ std::string document_writer::get_rna_subtree_formatted(
     for (rna_tree::pre_post_order_iterator it = beg; it != end; ++it)
     {
         out
-            << get_label_formatted(it->at(it.label_index()), get_default_color(it->status));
-
-        if (it->paired() &&
-                it.preorder() &&
-                it->inited_points() &&
-                !rna_tree::is_root(it))
-        {
-            out
-                << get_edge_formatted(it->at(0).p, it->at(1).p, true);
-        }
+            << get_label_formatted(it);
     }
     return out.str();
 }

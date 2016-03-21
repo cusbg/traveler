@@ -60,24 +60,14 @@ using namespace std;
     return out.str();
 }
 
-/* virtual */ std::string ps_writer::get_edge_formatted(
+/* virtual */ std::string ps_writer::get_line(
                 point from,
-                point to,
-                bool is_base_pair) const
+                point to) const
 {
     ostringstream out;
 
     if (from.bad() || to.bad())
-    {
-        WARN("cannot draw line between bad points");
         return "";
-    }
-    if (is_base_pair)
-    {
-        point tmp = base_pair_edge_point(from, to);
-        to = base_pair_edge_point(to, from);
-        from = tmp;
-    }
 
     for (double coordinates : {from.x, from.y, to.x, to.y})
     {
@@ -111,20 +101,6 @@ using namespace std;
         << std::setw(PS_COLUMNS_WIDTH)
         << " lwstring"
         << endl;
-
-    return out.str();
-}
-
-/* virtual */ std::string ps_writer::get_pair_formatted(
-                rna_tree::pre_post_order_iterator it) const
-{
-    if (!it->inited_points())
-        return "";
-
-    ostringstream out;
-
-    out
-        << get_label_formatted(it->at(it.label_index()), get_default_color(it->status));
 
     return out.str();
 }
