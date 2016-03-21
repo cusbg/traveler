@@ -72,6 +72,7 @@ class document_writer
 {
 public:
     typedef std::fstream::streampos             streampos;
+    typedef std::fstream::off_type              off_type;
 
 protected:
     document_writer() = default;
@@ -94,9 +95,11 @@ public: // formatters
     virtual std::string get_text_formatted(
                 point p,
                 const std::string& text) const = 0;
+    virtual std::string get_pair_formatted(
+                rna_tree::pre_post_order_iterator it) const = 0;
     virtual std::string get_label_formatted(
                 const rna_label& label,
-                const RGB& color = RGB::BLACK) const = 0;
+                const RGB& color) const = 0;
 
 public:
     std::string get_rna_formatted(
@@ -135,9 +138,18 @@ public:
     streampos get_pos();
 
 protected:
+    void print_to_stream(
+                const std::string& text);
+    void seek_from_current_pos(
+                off_type offset);
+
+    const RGB& get_default_color(
+                rna_pair_label::status_type status) const;
+
+private:
     void validate_stream() const;
 
-protected:
+private:
     std::ofstream out;
 };
 

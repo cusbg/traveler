@@ -27,6 +27,7 @@
 #define PS_END_STRING       "showpage\n"
 #define PS_END_LENGTH       (sizeof(PS_END_STRING) - 1)
 
+
 using namespace std;
 
 /* virtual */ streampos ps_writer::print(
@@ -36,13 +37,8 @@ using namespace std;
 
     fill();
 
-    out
-        << text
-        << PS_END_STRING;
-
-    seek(-PS_END_LENGTH);
-
-    validate_stream();
+    print_to_stream(text + PS_END_STRING);
+    seek_from_current_pos(-PS_END_LENGTH);
 
     return pos;
 }
@@ -115,6 +111,20 @@ using namespace std;
         << std::setw(PS_COLUMNS_WIDTH)
         << " lwstring"
         << endl;
+
+    return out.str();
+}
+
+/* virtual */ std::string ps_writer::get_pair_formatted(
+                rna_tree::pre_post_order_iterator it) const
+{
+    if (!it->inited_points())
+        return "";
+
+    ostringstream out;
+
+    out
+        << get_label_formatted(it->at(it.label_index()), get_default_color(it->status));
 
     return out.str();
 }
@@ -220,12 +230,6 @@ std::string ps_writer::get_default_prologue() const
             " /ang2 exch def 0.0 0.0 rad ang1 ang2 arc stroke grestore} def\n"
         "/Helvetica findfont 8.00 scalefont setfont\n"
         ;
-}
-
-/* virtual */ void ps_writer::after_text_print()
-{
-    out
-        << PS_END_STRING;
 }
 
 

@@ -51,12 +51,11 @@ public:
     virtual std::string get_text_formatted(
                 point p,
                 const std::string& text) const;
+    virtual std::string get_pair_formatted(
+                rna_tree::pre_post_order_iterator it) const;
     virtual std::string get_label_formatted(
                 const rna_label& label,
                 const RGB& color) const;
-
-protected:
-    virtual void after_text_print();
 
 private:
     std::string get_color_formatted(

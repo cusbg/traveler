@@ -25,6 +25,12 @@
 
 using namespace std;
 
+#define COLOR_DELETE        RGB::GRAY
+#define COLOR_INSERT        RGB::RED
+#define COLOR_REINSERT      RGB::BLUE
+#define COLOR_EDIT          RGB::GREEN
+#define COLOR_DEFAULT       RGB::BLACK
+
 // initialize RGB constants:
 const RGB RGB::RED = RGB(1, 0, 0);
 const RGB RGB::GREEN = RGB(0, 1, 0);
@@ -50,13 +56,45 @@ bool RGB::operator==(
         blue == other.blue;
 }
 
+
+const RGB& document_writer::get_default_color(
+                rna_pair_label::status_type status) const
+{
+    switch (status)
+    {
+#define switchcase(status, rgb) \
+        case rna_pair_label::status: \
+            return COLOR_ ## rgb;
+
+        switchcase(deleted, DELETE);
+        switchcase(edited, EDIT);
+        switchcase(inserted, INSERT);
+        switchcase(reinserted, REINSERT);
+        switchcase(touched, DEFAULT);
+        switchcase(untouched, DEFAULT);
+        default:
+            abort();
+#undef switchcase
+    }
+}
+
+void document_writer::print_to_stream(
+                const std::string& text)
+{
+    out << text;
+    validate_stream();
+}
+
+void document_writer::seek_from_current_pos(
+                off_type offset)
+{
+    out.seekp(offset, fstream::cur);
+    validate_stream();
+}
+
 void document_writer::validate_stream() const
 {
-    if (out.fail())
-    {
-        ERR("ps print fail");
-        exit(1);
-    }
+    assert_err(!out.fail(), "Error in document stream");
 }
 
 std::string document_writer::get_rna_subtree_formatted(
@@ -71,7 +109,16 @@ std::string document_writer::get_rna_subtree_formatted(
     for (rna_tree::pre_post_order_iterator it = beg; it != end; ++it)
     {
         out
-            << get_label_formatted(it->at(it.label_index()));
+            << get_label_formatted(it->at(it.label_index()), get_default_color(it->status));
+
+        if (it->paired() &&
+                it.preorder() &&
+                it->inited_points() &&
+                !rna_tree::is_root(it))
+        {
+            out
+                << get_edge_formatted(it->at(0).p, it->at(1).p, true);
+        }
     }
     return out.str();
 }
@@ -107,7 +154,7 @@ void document_writer::init(
 void document_writer::seek(
                 streampos pos)
 {
-    out.seekp(pos, ostream::cur);
+    out.seekp(pos);
 
     assert(out.good());
 }
