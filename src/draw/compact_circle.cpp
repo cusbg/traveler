@@ -63,7 +63,8 @@ double compact::circle::segment_angle() const
 {
     CIRCLE_POINTS_INITED();
     CIRCLE_SGN_INITED();
-    assert(double_equals(distance(p1, centre), distance(p2, centre)));
+    assert_err(double_equals(distance(p1, centre), distance(p2, centre)),
+            "%s != %s", to_cstr(distance(p1, centre)), to_cstr(distance(p2, centre)));
 
     if (sgn == 1)
         return angle(p1, centre, p2);

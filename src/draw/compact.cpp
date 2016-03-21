@@ -329,7 +329,7 @@ void compact::init_multibranch(
 #define PAIRED_POINTS 5 /* we use only # 1 and 3; # 0,2,4 will be free space */
 
     auto create_circle =
-        [](iterator iter, int n)
+        [](iterator iter)
         {
             circle c;
             c.p1 = iter->at(0).p;
@@ -337,7 +337,6 @@ void compact::init_multibranch(
             c.direction = rna_tree::parent(iter)->at(0).p;
             c.centre = centre(c.p1, c.p2);
             c.compute_sgn();
-            c.init(n);
             return c;
         };
     auto get_number_of_places_for_bases =
@@ -361,13 +360,32 @@ void compact::init_multibranch(
             rotate_branch(ch, c, c.segment_angle());
         };
     auto rotate_out_of_circle =
-        [this](sibling_iterator ch, point p1, point p2)
+        [this](iterator it, point p1, point p2, point direction)
         {
-            assert(ch->paired());
+            assert(it->paired());
+
+            circle c;
+            c.p1 = p1;
+            c.p2 = p2;
+            c.centre = centre(p1, p2);
+            c.direction = direction;
+            c.compute_sgn();
+
+            double alpha = angle(direction, it->centre(), get_onlyone_branch(it)->centre());
+            alpha = alpha - angle(direction, it->centre(), move_point(direction, it->centre(), 10000));
+
+            rotate_branch(it, c, alpha);
+
+            it->at(0).p = p1;
+            it->at(1).p = p2;
+            int i = 0;
+            for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch)
+                it->remake_ids.push_back(i++);
         };
 
     int bases = get_number_of_places_for_bases(it);
-    circle c = create_circle(it, bases);
+    circle c = create_circle(it);
+    c.init(bases);
     auto points = c.split(bases);
 
     int i = 0;
@@ -397,7 +415,7 @@ void compact::init_multibranch(
                 psout.print(psout.sprint_subtree(ch));
                 WAIT;
 
-                rotate_out_of_circle(ch, points[i + 1], points[i + 2]);
+                rotate_out_of_circle(ch, points[i + 1], points[i + 2], c.centre);
 
                 psout.print(psout.sprint_subtree(ch));
                 WAIT;
