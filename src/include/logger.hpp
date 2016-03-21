@@ -93,7 +93,7 @@ public:
     };
 
 public:
-    logger();
+    logger(priority priority);
     ~logger();
 
 public:
@@ -111,7 +111,7 @@ protected:
     std::string message_header(
                 priority p);
 
-    void log(   priority p,
+    inline void log(   priority p,
                 const char* msg,
                 ...)
     {

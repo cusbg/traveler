@@ -29,7 +29,7 @@ static ps_writer psout;
 #define UPDATE(root) \
     { \
         psout.init_default("build/files/doc.ps", root); \
-        psout.print(psout.sprint_subtree(root)); \
+        psout.print(psout.get_rna_subtree_formatted(root)); \
         rna_tree::print_subtree(root); \
     }
 
@@ -407,17 +407,17 @@ void compact::init_multibranch(
                 set_distance(ch, c.centre, c.radius());
 
                 UPDATE(it);
-                psout.print(psout.sprint_circle(c.centre, c.radius()));
+                psout.print(psout.get_circle_formatted(c.centre, c.radius()));
                 WAIT;
 
                 rotate_subtree(ch, c, points[i + 2]);
 
-                psout.print(psout.sprint_subtree(ch));
+                psout.print(psout.get_rna_subtree_formatted(ch));
                 WAIT;
 
                 rotate_out_of_circle(ch, points[i + 1], points[i + 2], c.centre);
 
-                psout.print(psout.sprint_subtree(ch));
+                psout.print(psout.get_rna_subtree_formatted(ch));
                 WAIT;
             }
             else

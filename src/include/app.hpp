@@ -25,7 +25,7 @@
 #include "types.hpp"
 
 class rna_tree;
-class ps_writer;
+class document_writer;
 
 class app
 {
@@ -59,7 +59,7 @@ private:
      */
     void save(
                 rna_tree& rna,
-                ps_writer& writer,
+                document_writer& writer,
                 bool overlaps);
 
     /**

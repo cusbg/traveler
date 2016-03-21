@@ -85,12 +85,6 @@ public:
 
     bool correct_pairing();
 
-#ifdef TESTS
-public:
-    static void test();
-#endif
-
-
 private:
     std::string _name;
 };
@@ -104,9 +98,6 @@ inline bool is(
 
 void update_ends_in_rna(
                 rna_tree& rna);
-
-std::string ending_3_5_strings(
-                rna_tree::iterator it);
 
 size_t child_index(
                 rna_tree::sibling_iterator sib);

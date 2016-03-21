@@ -22,6 +22,7 @@
 
 #include <csignal>
 #include <unistd.h>
+#include <fcntl.h>
 #include <string.h>
 
 #include "types.hpp"
@@ -32,6 +33,15 @@
 using namespace std;
 
 void run_test();
+
+vector<string> args;
+
+static ostream& operator<<(ostream& out, const vector<string>& vec)
+{
+    for (const string& str : vec)
+        out << str << endl;
+    return out;
+}
 
 void signal_handler(int signal)
 {
@@ -45,14 +55,21 @@ void signal_handler(int signal)
         << ":"
         << strsignal(signal)
         << " caught, exiting"
+        << endl
+        << "Args:"
+        << endl
+        << args
         << endl;
 
     vector<int> output_fds = logger.opened_files();
     output_fds.push_back(STDERR_FILENO);
 
     for (int fd : output_fds)
+    {
+        fcntl(fd, F_SETFD, O_NONBLOCK);
         (void)(write(fd, out.str().c_str(), out.str().length()) + 1);
-    // ^^ ((void) + 1)to prevent warning warn-unused-result
+        // ^^ ((void) + 1)to prevent warning warn-unused-result
+    }
 
     exit(2);
 }
@@ -80,6 +97,7 @@ void set_signal_handler()
 
 void init()
 {
+    logger.set_priority(logger::INFO);
     set_signal_handler();
     cout << boolalpha;
     srand(1);
@@ -94,7 +112,8 @@ int main(int argc, char** argv)
 
     init();
     app app;
-    app.run(vector<string>(argv, argv + argc));
+    args = vector<string>(argv, argv + argc);
+    app.run(args);
 
     return 0;
 }

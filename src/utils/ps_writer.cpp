@@ -19,22 +19,236 @@
  * USA.
  */
 
-
 #include <iomanip>
-
 #include "ps_writer.hpp"
 
+#define PS_COLUMNS_WIDTH    15
+#define LETTER              {612, 792}
+#define PS_END_STRING       "showpage\n"
+#define PS_END_LENGTH       (sizeof(PS_END_STRING) - 1)
 
-#define PS_COLUMNS_WIDTH 15
+using namespace std;
+
+/* virtual */ streampos ps_writer::print(
+                const std::string& text)
+{
+    streampos pos = get_pos();
+
+    fill();
+
+    out
+        << text
+        << PS_END_STRING;
+
+    seek(-PS_END_LENGTH);
+
+    validate_stream();
+
+    return pos;
+}
+
+/* virtual */ std::string ps_writer::get_circle_formatted(
+                point centre,
+                double radius) const
+{
+    ostringstream out;
+
+    out
+        << "360 0 "
+        << radius
+        << " 1.0 1.0 "
+        << centre
+        << " lwarc"
+        << endl;
+
+    return out.str();
+}
+
+/* virtual */ std::string ps_writer::get_edge_formatted(
+                point from,
+                point to,
+                bool is_base_pair) const
+{
+    ostringstream out;
+
+    if (from.bad() || to.bad())
+    {
+        WARN("cannot draw line between bad points");
+        return "";
+    }
+    if (is_base_pair)
+    {
+        point tmp = base_pair_edge_point(from, to);
+        to = base_pair_edge_point(to, from);
+        from = tmp;
+    }
+
+    for (double coordinates : {from.x, from.y, to.x, to.y})
+    {
+        out
+            << std::left
+            << std::setw(PS_COLUMNS_WIDTH)
+            << coordinates;
+    }
+    out
+        << " lwline"
+        << endl;
+
+    return out.str();
+}
+
+/* virtual */ std::string ps_writer::get_text_formatted(
+                point p,
+                const std::string& text) const
+{
+    ostringstream out;
+
+    out
+        << std::left
+        << std::setw(PS_COLUMNS_WIDTH)
+        << ("(" + text + ")")   // full text should have aligned width
+        << " "
+        << std::setw(PS_COLUMNS_WIDTH)
+        << p.x
+        << std::setw(PS_COLUMNS_WIDTH)
+        << p.y
+        << std::setw(PS_COLUMNS_WIDTH)
+        << " lwstring"
+        << endl;
+
+    return out.str();
+}
+
+/* virtual */ std::string ps_writer::get_label_formatted(
+                const rna_label& label,
+                const RGB& color) const
+{
+    ostringstream out;
+
+    if (color == RGB::BLACK)
+    {
+        out
+            << get_text_formatted(label.p, label.label);
+    }
+    else
+    {
+        out
+            << get_color_formatted(color)
+            << get_text_formatted(label.p, label.label)
+            << get_color_formatted(RGB::BLACK);
+    }
+
+    return out.str();
+}
+
+std::string ps_writer::get_color_formatted(
+                const RGB& color) const
+{
+    ostringstream out;
+
+    for (double fragment : {color.get_red(), color.get_green(), color.get_blue()})
+    {
+        out
+            << std::left
+            << std::setw(PS_COLUMNS_WIDTH)
+            << fragment;
+    }
+    out
+        << " setrgbcolor"
+        << endl;
+
+    return out.str();
+}
+
+
+void ps_writer::init_default(
+                const std::string& filename,
+                rna_tree::iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    init(filename);
+
+    print(get_default_prologue(root));
+}
+
+std::string ps_writer::get_default_prologue(
+                rna_tree::pre_post_order_iterator root) const
+{
+    APP_DEBUG_FNAME;
+
+    ostringstream str;
+    point tr, bl, letter, scale;
+
+    scale = {0.54, 0.54};
+    letter = LETTER;
+
+    letter.x /= scale.x;
+    letter.y /= scale.y;
+
+    tr = rna_tree::top_right_corner(root);
+    bl = rna_tree::bottom_left_corner(root);
+
+    if (size(letter) > distance(tr, bl))
+        WARN("rna probably wont fit document");
+
+    tr = -tr;
+    bl = -bl;
+
+    bl.x += 50;
+    bl.y = letter.y + tr.y - 50;
+
+    str
+        << get_default_prologue()
+        << scale
+            << " scale"
+            << endl
+        << bl
+            << " translate"
+            << endl;
+
+    return str.str();
+}
+
+std::string ps_writer::get_default_prologue() const
+{
+    return
+        "%!\n"
+        "/lwline {newpath moveto lineto stroke} def\n"
+        "/lwstring {moveto show} def\n"
+        "/lwarc {newpath gsave translate scale /rad exch def /ang1 exch def"
+            " /ang2 exch def 0.0 0.0 rad ang1 ang2 arc stroke grestore} def\n"
+        "/Helvetica findfont 8.00 scalefont setfont\n"
+        ;
+}
+
+/* virtual */ void ps_writer::after_text_print()
+{
+    out
+        << PS_END_STRING;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+#ifdef NODEF
+
+
+
 
 // end of ps document..
 #define ps_end_str      "showpage\n"
 #define ps_end_length   (sizeof(ps_end_str) - 1)
 
 #define LETTER          {612, 792}
-
-using namespace std;
-
 
 /* virtual */ streampos ps_writer::print(
                 const std::string& text,
@@ -365,44 +579,6 @@ void ps_writer::init_default(
     print(default_prologue(root));
 }
 
-/* static */ std::string ps_writer::default_prologue(
-                pre_post_it root)
-{
-    APP_DEBUG_FNAME;
-
-    ostringstream str;
-    point tr, bl, letter, scale;
-
-    scale = {0.54, 0.54};
-    letter = LETTER;
-
-    letter.x /= scale.x;
-    letter.y /= scale.y;
-
-    tr = rna_tree::top_right_corner(root);
-    bl = rna_tree::bottom_left_corner(root);
-
-    if (size(letter) > distance(tr, bl))
-        WARN("rna probably wont fit document");
-
-    tr = -tr;
-    bl = -bl;
-
-    bl.x += 50;
-    bl.y = letter.y + tr.y - 50;
-
-    str
-        << default_prologue()
-        << scale
-            << " scale"
-            << endl
-        << bl
-            << " translate"
-            << endl;
-
-    return str.str();
-}
-
 streampos ps_writer::print(
                 rna_tree& rna)
 {
@@ -426,4 +602,4 @@ streampos ps_writer::print(
 
 
 
-
+#endif

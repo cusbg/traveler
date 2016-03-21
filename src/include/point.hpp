@@ -103,6 +103,7 @@ point orthogonal(point p, point direction);
 
 point move_point(point p, point move_to, double length);
 
+// TODO : presunut do RNA triedy
 point base_pair_edge_point(point from, point to);
 
 bool lies_on_line(point p1, point p2, point p3);

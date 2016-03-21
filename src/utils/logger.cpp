@@ -33,20 +33,22 @@
 using namespace std;
 using namespace chrono;
 
+#define LOG_FILE "build/logs/program.log"
+
 /* global */
-class logger logger;
+class logger logger(logger::DEBUG);
 
 
 
-logger::logger()
+logger::logger(priority priority)
 {
-    string file = "build/logs/program.log";
-    FILE * f = fopen(file.c_str(), "a");
+    p = priority;
+    FILE* f = fopen(LOG_FILE, "a");
     out.push_back(stdout);
 
     if (f == nullptr || ferror(f))
     {
-        error("cannot open file '%s' to log in", file.c_str());
+        error("cannot open file '%s' to log in", LOG_FILE);
         abort();
     }
 
@@ -55,10 +57,6 @@ logger::logger()
     debug("*****************************************");
     debug("************ RUNNING PROGRAM ************");
     debug("*****************************************");
-
-    //p = WARN;
-    p = INFO;
-    //p = DEBUG;
 }
 
 logger::~logger()
@@ -70,23 +68,20 @@ logger::~logger()
 inline const char* to_cstr(
                 logger::priority p)
 {
-#define t(p) logger::priority::p
+#define switchcase(p) \
+    case logger::priority::p: \
+        return #p
     switch (p)
     {
-        case t(DEBUG):
-            return "DEBUG";
-        case t(INFO):
-            return "INFO";
-        case t(WARN):
-            return "WARN";
-        case t(ERROR):
-            return "ERROR";
-        case t(EMERG):
-            return "EMERG";
+        switchcase(DEBUG);
+        switchcase(INFO);
+        switchcase(WARN);
+        switchcase(ERROR);
+        switchcase(EMERG);
         default:
             abort();
     }
-#undef t
+#undef switchcase
 }
 
 void logger::log(

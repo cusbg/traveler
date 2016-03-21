@@ -321,7 +321,7 @@ void app::save(
 
     ps_writer ps;
 
-    ps.init(filename);
+    ps.init_default(filename, rna.begin());
     INFO("save(%s)", to_cstr(filename));
 
     save(rna, ps, overlaps);
@@ -329,22 +329,22 @@ void app::save(
 
 void app::save(
             rna_tree& rna,
-            ps_writer& writer,
+            document_writer& writer,
             bool overlap)
 {
     APP_DEBUG_FNAME;
 
     overlap_checks::overlaps overlaps;
     
-    //if (overlap)
-        //overlaps = overlap_checks().run(rna);
+    if (overlap)
+        overlaps = overlap_checks().run(rna);
 
     log_overlaps(rna.name(), overlaps.size());
 
-    writer.print(rna);
+    writer.print(writer.get_rna_formatted(rna));
 
     for (const auto& p : overlaps)
-        writer.print(ps_writer::sprint_circle(p.centre, p.radius));
+        writer.print(writer.get_circle_formatted(p.centre, p.radius));
 }
 
 void app::log_overlaps(
@@ -492,44 +492,4 @@ void app::print(
 }
 
 
-std::string ending_3_5_strings(rna_tree::iterator it)
-{
-    typedef rna_tree::iterator iterator;
-
-    auto get_direction = [](iterator it) {
-        assert(!rna_tree::is_leaf(it));
-
-        point p1, p2, p, ch;
-
-        p1 = it->at(0).p;
-        p2 = it->at(1).p;
-
-        ch = it.begin()->centre();
-
-        p = -orthogonal(p2 - p1, ch - p1);
-
-        return p;
-    };
-
-    if (rna_tree::is_root(it))
-    {
-        //return ending_3_5_strings(it.begin());
-        return "";
-        // TODO
-    }
-
-    point dir = get_direction(it) * BASES_DISTANCE * 1.5;
-    point p1, p2;
-    p1 = it->at(0).p;
-    p2 = it->at(1).p;
-    std::ostringstream out;
-
-    out
-        << ps_writer::sprint(p1 + dir, "5'")
-        << ps_writer::sprint(p2 + dir, "3'")
-        << ps_writer::sprint_edge(p1, p1 + dir, true)
-        << ps_writer::sprint_edge(p2, p2 + dir, true);
-
-    return out.str();
-}
 
