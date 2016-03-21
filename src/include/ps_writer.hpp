@@ -86,6 +86,9 @@ public:
     static std::string default_prologue();
     static std::string default_prologue(
                 pre_post_it root);
+    static std::string sprint_fromto(
+                point from,
+                point to);
 
 public:
     /**

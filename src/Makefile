@@ -28,7 +28,7 @@ debug: build cp mkdir
 
 build: mk_dirs make_modules ${BUILDDIR}/Makefile compile
 
-CORES                   = 2
+CORES                   = $(shell nproc)
 compile:
 	@echo "****************COMPILE:****************"
 	@echo
@@ -36,18 +36,19 @@ compile:
 	@echo
 	@echo "**************END-COMPILE:**************"
 
-make_modules: force_rebuild_main
-	@rm -rf ${BUILDDIR}/Makefile
-	@echo "****************MAKEFILE-GENERATING:****************"
-	@echo
-	@for module in ${MODULES}; \
-	do \
-	    make --directory=$${module} --makefile=Makefile ${MODULETARGET}; \
-	done
-	@echo
-	@echo "****************END-MAKEFILE-GENERATING:****************"
+make_modules: prepare_make ${MODULES}
 
-test: prepare_test build
+prepare_make:
+	@rm -rf ${BUILDDIR}/Makefile
+
+${MODULES}:
+	@echo "****************MAKEFILE-GENERATING:$@****************"
+	@echo
+	make --directory=$@ --makefile=Makefile ${MODULETARGET}
+	@echo
+	@echo "****************END-MAKEFILE-GENERATING:$@****************"
+
+test: prepare_test force_rebuild_main build
 	${BUILDDIR}/${TARGET}
 
 prepare_test:
@@ -92,4 +93,4 @@ cleanLog:
 	rm -f $(LOGDIR)/*.log
 
 
-.PHONY: ${BUILDDIR}/Makefile clean cleanMK
+.PHONY: ${BUILDDIR}/Makefile clean cleanMK ${MODULES}

@@ -28,6 +28,7 @@
 #include <algorithm>
 #include <stdexcept>
 #include "logger.hpp"
+#include "exception.hpp"
 
 
 
@@ -65,8 +66,6 @@ inline void wait_for_input()
     std::cin.read(&ch, 1);
 }
 
-
-
 struct logger_end_of_function_priority
 {
 public:
@@ -88,20 +87,6 @@ private:
     std::string fname;
 };
 
-class abort_exception : public std::exception
-{
-public:
-    virtual ~abort_exception() noexcept = default;
-    abort_exception(int _line, const std::string& _file);
-    virtual const char* what() const noexcept;
-private:
-    std::string msg;
-};
-
-
-#endif /* !TYPES_HPP */
-
-// should always redefine, e.g. assert(), abort(), ..
 
 #define DEBUG(...) \
     if (logger.is_debug_enabled()) \
@@ -135,27 +120,5 @@ private:
             logger.debug("%s", to_cstr(stream.str())); \
         }
 
-
-#define abort() \
-    throw abort_exception(__LINE__, __FILE__);
-
-#undef assert
-#define assert(boolean) \
-    { \
-        if (!(boolean)) \
-        { \
-            ERR("condition '%s' is FALSE", #boolean); \
-            abort(); \
-        } \
-    }
-
-#define assert_err(boolean, ...) \
-    { \
-        if (!(boolean)) \
-        { \
-            ERR("condition '%s' is FALSE", #boolean); \
-            ERR(__VA_ARGS__); \
-            abort(); \
-        } \
-    }
+#endif /* !TYPES_HPP */
 

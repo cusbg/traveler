@@ -238,7 +238,7 @@ using namespace std;
 
     if (!it->inited_points())
     {
-        WARN("points not inited, returning");
+        //WARN("points not inited, returning");
         return out;
     }
     auto status = it->status;
@@ -332,6 +332,14 @@ using namespace std;
     return str.str();
 }
 
+/* static */ std::string ps_writer::sprint_fromto(
+                point from,
+                point to)
+{
+    return sprint_edge(from, to, false) + sprint(from, "From") + sprint(to, "To");
+}
+
+
 /* static */ std::string ps_writer::default_prologue()
 {
     APP_DEBUG_FNAME;
@@ -342,7 +350,8 @@ using namespace std;
         "/lwstring {moveto show} def\n"
         "/lwarc {newpath gsave translate scale /rad exch def /ang1 exch def"
             " /ang2 exch def 0.0 0.0 rad ang1 ang2 arc stroke grestore} def\n"
-        "/Helvetica findfont 8.00 scalefont setfont\n";
+        "/Helvetica findfont 8.00 scalefont setfont\n"
+        ;
 }
 
 void ps_writer::init_default(
@@ -350,8 +359,6 @@ void ps_writer::init_default(
                 rna_tree::iterator root)
 {
     APP_DEBUG_FNAME;
-
-    point tr, bl, letter, scale;
 
     init(filename);
 

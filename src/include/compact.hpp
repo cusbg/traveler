@@ -40,6 +40,8 @@ public:
 
 public:
     typedef rna_tree::iterator                  iterator;
+    typedef rna_tree::post_order_iterator       post_order_iterator;
+    typedef rna_tree::pre_post_order_iterator   pre_post_order_iterator;
     typedef rna_tree::sibling_iterator          sibling_iterator;
     typedef std::vector<point>                  points_vec;
     typedef std::vector<sibling_iterator>       nodes_vec;
@@ -56,6 +58,11 @@ private:
     static void set_distance(
                 iterator parent,
                 iterator child,
+                double distance);
+
+    static void set_distance(
+                iterator it,
+                point from,
                 double distance);
 
     /**
@@ -101,6 +108,8 @@ private:
      * (only primitive initialization)
      */
     void init();
+
+    void init_even_branches();
 
     /**
      * recursively find inited only-branch node,

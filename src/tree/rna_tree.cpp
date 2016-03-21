@@ -303,6 +303,16 @@ bool rna_tree::correct_pairing()
     return true;
 }
 
+/* global */ size_t child_index(rna_tree::sibling_iterator sib)
+{
+    size_t n = 0;
+    while (!rna_tree::is_first_child(sib))
+    {
+        ++n;
+        --sib;
+    }
+    return n;
+}
 
 
 /* inline */ std::string trim(

@@ -49,22 +49,3 @@ print_class_BEG_END_name::~print_class_BEG_END_name()
     DEBUG("END function: %s", fname.c_str());
 }
 
-abort_exception::abort_exception(int _line, const std::string& _file)
-{
-    stringstream stream;
-    stream
-        << "Exception thrown from line "
-        << _line
-        << " of file "
-        << _file;
-    msg = stream.str();
-    ERR("%s", msg.c_str());
-}
-
-const char* abort_exception::what() const noexcept
-{
-    DEBUG("%s", msg.c_str());
-    return msg.c_str();
-}
-
-

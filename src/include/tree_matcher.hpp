@@ -68,8 +68,6 @@ private:
      * compute subtree sizes for each node in trees
      */
     inline void compute_sizes();
-    inline size_t child_index(
-                sibling_iterator sib);
     /**
      * unique sort of remake_ids
      */

@@ -228,16 +228,4 @@ void matcher::make_unique(
     vec.erase(end, vec.end());
 }
 
-/* inline */
-size_t matcher::child_index(rna_tree::sibling_iterator sib)
-{
-    size_t n = 0;
-    while (!rna_tree::is_first_child(sib))
-    {
-        ++n;
-        --sib;
-    }
-    return n;
-}
-
 

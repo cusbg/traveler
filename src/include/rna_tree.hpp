@@ -108,5 +108,8 @@ void update_ends_in_rna(
 std::string ending_3_5_strings(
                 rna_tree::iterator it);
 
+size_t child_index(
+                rna_tree::sibling_iterator sib);
+
 #endif /* !RNA_TREE_HPP */
 

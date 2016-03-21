@@ -24,16 +24,14 @@
 #include "compact_circle.hpp"
 #include "compact_utils.hpp"
 
-/*
 static ps_writer psout;
 
 #define UPDATE(root) \
     { \
-        psout.init_default("build/files/run/doc.ps", root); \
+        psout.init_default("build/files/doc.ps", root); \
         psout.print(psout.sprint_subtree(root)); \
         rna_tree::print_subtree(root); \
     }
-*/
 
 using namespace std;
 
@@ -95,16 +93,22 @@ void compact::run()
 
     assert(rna_tree::parent(child) == parent);
 
-    point p1, p2, vec, shift;
-    double actual;
+    set_distance(child, parent->centre(), dist);
+}
 
-    p1 = parent->centre();
-    p2 = child->centre();
-    vec = normalize(p2 - p1);
-    actual = distance(p1, p2);
-    shift = vec * (dist - actual);
+/* static */ void compact::set_distance(
+                iterator it,
+                point from,
+                double dist)
+{
+    APP_DEBUG_FNAME;
 
-    shift_branch(child, shift);
+    point p = it->centre();
+    point vec = normalize(p - from);
+    double actual = distance(p, from);
+    vec = vec * (dist - actual);
+
+    shift_branch(it, vec);
 }
 
 /* static */ compact::sibling_iterator compact::get_onlyone_branch(
@@ -143,14 +147,27 @@ void compact::run()
 }
 
 /* static */ void compact::rotate_branch(
-                iterator parent,
+                iterator it,
                 circle c,
                 double alpha)
 {
     APP_DEBUG_FNAME;
 
-    assert(!rna_tree::is_leaf(parent));
+    assert(!rna_tree::is_leaf(it));
 
+    DEBUG("rotate %s by %f", clabel(it), alpha);
+
+    for (pre_post_order_iterator ch = pre_post_order_iterator(it, true); id(ch) <= id(it); ++ch)
+    {
+        if (!ch->inited_points())
+            continue;
+
+        double dist = distance(c.centre, ch->at(ch.label_index()).p);
+        c.p1 = ch->at(ch.label_index()).p;
+        c.p2 = move_point(c.centre, c.p2, dist);
+
+        ch->set_points_exact(c.rotate(alpha), ch.label_index());
+    }
 }
 
 
@@ -158,18 +175,15 @@ void compact::init()
 {
     APP_DEBUG_FNAME;
 
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
 
-    iterator it;
-    point p;
-
-    for (it = ++rna.begin(); it != rna.end(); ++it)
+    for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     {
         if (it->inited_points() || !it->paired())
             continue;
 
         iterator par = rna_tree::parent(it);
-        p = par->centre();
+        point p = par->centre();
 
         assert(!p.bad());
 
@@ -194,8 +208,15 @@ void compact::init()
         }
     }
 
+    init_even_branches();
+
+    DEBUG("compact::init() OK");
+}
+
+void compact::init_even_branches()
+{
     // for nodes in one branch, set them to lie on straight line
-    for (it = rna.begin(); it != rna.end(); ++it)
+    for (iterator it = rna.begin(); it != rna.end(); ++it)
     {
         if (rna_tree::is_leaf(it))
             continue;
@@ -207,7 +228,6 @@ void compact::init()
                     make_branch_even(ch);
         }
     }
-    DEBUG("compact::init() OK");
 }
 
 point compact::init_branch_recursive(
@@ -309,7 +329,7 @@ void compact::init_multibranch(
 #define PAIRED_POINTS 5 /* we use only # 1 and 3; # 0,2,4 will be free space */
 
     auto create_circle =
-        [](iterator iter)
+        [](iterator iter, int n)
         {
             circle c;
             c.p1 = iter->at(0).p;
@@ -317,6 +337,7 @@ void compact::init_multibranch(
             c.direction = rna_tree::parent(iter)->at(0).p;
             c.centre = centre(c.p1, c.p2);
             c.compute_sgn();
+            c.init(n);
             return c;
         };
     auto get_number_of_places_for_bases =
@@ -332,37 +353,31 @@ void compact::init_multibranch(
             }
             return n;
         };
-    auto set_accurate_distance =
-        [this](sibling_iterator ch, point centre, double finaldistance)
-        {
-            point vec = ch->centre() - centre;
-            double actual = size(vec);
-            vec = vec * (finaldistance / actual);
-            shift_branch(ch, vec);
-        };
     auto rotate_subtree =
-        [this](iterator iter, sibling_iterator ch, circle c)
+        [this](sibling_iterator ch, circle c, point newpos)
         {
-            assert(rna_tree::parent(ch) == iter);
-            assert(!rna_tree::is_leaf(ch));
-
-            double rotate = fmod(c.segment_angle() - angle(iter->centre(), c.centre, ch->centre()), 360);
-
-            rotate_branch(iter, c, rotate);
+            c.p1 = ch->centre();
+            c.p2 = newpos;
+            rotate_branch(ch, c, c.segment_angle());
+        };
+    auto rotate_out_of_circle =
+        [this](sibling_iterator ch, point p1, point p2)
+        {
+            assert(ch->paired());
         };
 
-    circle c = create_circle(it);
-    int n = get_number_of_places_for_bases(it);
-    c.init(n);
-    auto points = c.split(n);
+    int bases = get_number_of_places_for_bases(it);
+    circle c = create_circle(it, bases);
+    auto points = c.split(bases);
 
-    n = 0;
+    int i = 0;
     for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch)
     {
         if (rna_tree::is_leaf(ch))
         {
-            ch->set_points_exact(points[n], 0);
-            ++n;
+            ch->set_points_exact(points[i], 0);
+
+            i += LEAF_POINTS;
         }
         else
         {
@@ -371,21 +386,29 @@ void compact::init_multibranch(
                 // we will use only points # 1 and 3;
                 // # 0, 2, 4 will be free space
 
-                point newpos = points[n + 2];
-                point p = it->centre();
-                set_accurate_distance(ch, p, distance(p, newpos));
+                set_distance(ch, c.centre, c.radius());
 
-                c.p1 = it->at(0).p;
-                c.p2 = newpos;
-                rotate_subtree(it, ch, c);
+                UPDATE(it);
+                psout.print(psout.sprint_circle(c.centre, c.radius()));
+                WAIT;
+
+                rotate_subtree(ch, c, points[i + 2]);
+
+                psout.print(psout.sprint_subtree(ch));
+                WAIT;
+
+                rotate_out_of_circle(ch, points[i + 1], points[i + 2]);
+
+                psout.print(psout.sprint_subtree(ch));
+                WAIT;
             }
             else
             {
-                ch->set_points_exact(points[n + 1], 0);
-                ch->set_points_exact(points[n + 3], 1);
+                ch->set_points_exact(points[i + 1], 0);
+                ch->set_points_exact(points[i + 3], 1);
             }
 
-            n += PAIRED_POINTS;
+            i += PAIRED_POINTS;
         }
     }
 }

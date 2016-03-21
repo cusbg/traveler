@@ -17,6 +17,7 @@ RUNSH                   = sh -x ${ROOTDIR}/make.sh
 MODULEVAR               = $(shell echo ${MODULE} | tr 'a-z' 'A-Z')
 
 make: $(addprefix ${BUILDDIR}/,${MAKEFILES})
+	echo $(addprefix ${BUILDDIR}/,${MAKEFILES})
 	@echo -e \
 		\\ninclude ${MAKEFILES} \
 		\\n \
@@ -31,14 +32,13 @@ prepare_test:
 	$(eval CFLAGS := ${CFLAGS} -DTESTS)
 
 
-${BUILDDIR}/%.cpp.mk: %.cpp
+${BUILDDIR}/%.cpp.mk: %.cpp FORCEREBUILD
 	@${MAKEDEPENDENCY} $< | \
 		sed "s@\([^ :]*\.cpp\)@${ROOTDIR}/${MODULE}/\1@g" \
 			>> $@ || rm -rf $@
 	@echo -e \
 		\\t ${CC} ${CFLAGS} $$\< -o $$\@ \
 			>> $@ || rm -rf $@
-
 
 build:
 	make --directory=${ROOTDIR} --file=Makefile $@
@@ -52,4 +52,6 @@ test:
 clean:
 	make --directory=${ROOTDIR} --file=Makefile $@
 
-.PHONY:make ${BUILDDIR}/%.cpp.mk
+FORCEREBUILD:
+
+.PHONY: make testmake *.mk FORCEREBUILD
