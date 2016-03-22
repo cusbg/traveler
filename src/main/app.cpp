@@ -31,6 +31,8 @@
 #include "rted.hpp"
 #include "gted.hpp"
 
+#include "svg_writer.hpp"
+
 
 using namespace std;
 
@@ -319,9 +321,10 @@ void app::save(
 {
     APP_DEBUG_FNAME;
 
-    ps_writer ps;
+    //ps_writer ps;
+    svg_writer ps;
 
-    ps.init_default(filename, rna.begin());
+    ps.init(filename, rna.begin());
     INFO("save(%s)", to_cstr(filename));
 
     save(rna, ps, overlaps);

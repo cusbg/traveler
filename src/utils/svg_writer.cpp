@@ -24,30 +24,51 @@
 #define SVG_END_STRING      "</svg>\n"
 #define SVG_END_LENGTH      (sizeof(SVG_END_STRING) - 1)
 
+#define quoted(text)        (string() + "\"" + to_string(text) + "\"")
+
 using namespace std;
 
-struct svg_point_coordinate_string
-{
-    std::string pre, post;
-};
 
-static std::string get_point_formatted(point p, const svg_point_coordinate_string& strings)
+static std::string get_point_formatted(
+                point p,
+                const string& prefix,
+                const string& postfix)
 {
     ostringstream out;
 
     out
-        << strings.pre
+        << prefix
         << "x"
-        << strings.post
-        << "='"
-        << p.x
-        << "' "
-        << strings.pre
+        << postfix
+        << "="
+        << quoted(p.x)
+        << " "
+        << prefix
         << "y"
-        << strings.post
-        << "='"
-        << p.y
-        << "'";
+        << postfix
+        << "="
+        << quoted(p.y);
+
+    return out.str();
+}
+
+static std::string get_svg_color_style(
+                const RGB& color)
+{
+    ostringstream out;
+
+#define rgb_value(value)    (255 * value)
+
+    out
+        << "stroke: rgb("
+        << rgb_value(color.get_red())
+        << ", "
+        << rgb_value(color.get_green())
+        << ", "
+        << rgb_value(color.get_blue())
+        << ")";
+
+#undef rgb_value
 
     return out.str();
 }
@@ -59,7 +80,9 @@ static std::string get_point_formatted(point p, const svg_point_coordinate_strin
 
     fill();
 
-    print_to_stream(text + SVG_END_STRING);
+    print_to_stream(text);
+    print_to_stream(SVG_END_STRING);
+
     seek_from_current_pos(-SVG_END_LENGTH);
 
     return pos;
@@ -73,10 +96,12 @@ static std::string get_point_formatted(point p, const svg_point_coordinate_strin
 
     out <<
         "<circle "
-        << get_point_formatted(centre, {"c", ""})
-        << " r='"
-        << radius
-        << "' />"
+        << get_point_formatted(centre, "c", "")
+        << " r="
+        << quoted(radius)
+        << " style="
+        << quoted(get_svg_color_style(RGB::BLACK) + "; fill:none;")
+        << " />"
         << endl;
 
     return out.str();
@@ -90,7 +115,7 @@ static std::string get_point_formatted(point p, const svg_point_coordinate_strin
 
     out
         << "<text "
-        << get_point_formatted(p, {"", ""})
+        << get_point_formatted(p, "", "")
         << ">"
         << text
         << "</text>"
@@ -99,13 +124,23 @@ static std::string get_point_formatted(point p, const svg_point_coordinate_strin
     return out.str();
 }
 
-
 /* virtual */ std::string svg_writer::get_label_formatted(
                 const rna_label& label,
                 const RGB& color) const
 {
-    // TODO
-    return "";
+    ostringstream out;
+
+    out
+        << "<text "
+        << get_point_formatted(label.p, "", "")
+        << " style="
+        << quoted(get_svg_color_style(color))
+        << ">"
+        << label.label
+        << "</text>"
+        << endl;
+
+    return out.str();
 }
 
 /* virtual */ std::string svg_writer::get_line(
@@ -116,12 +151,44 @@ static std::string get_point_formatted(point p, const svg_point_coordinate_strin
 
     out
         << "<line "
-        << get_point_formatted(from, {"", "1"})
+        << get_point_formatted(from, "", "1")
         << " "
-        << get_point_formatted(to, {"", "2"})
+        << get_point_formatted(to, "", "2")
+        << " style="
+        << quoted(get_svg_color_style(RGB::BLACK) + "; stroke-width: 2;")
         << " />"
         << endl;
 
     return out.str();
 }
+
+void svg_writer::init(
+                const std::string& filename,
+                rna_tree::iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    document_writer::init(filename);
+
+    print(get_header_element());
+}
+
+std::string svg_writer::get_header_element() const
+{
+    APP_DEBUG_FNAME;
+
+    ostringstream out;
+
+    out
+        << "<svg xmlns="
+        << quoted("http://www.w3.org/2000/svg")
+        << " xmlns:xlink="
+        << quoted("http://www.w3.org/1999/xlink")
+        << ">"
+        << endl;
+
+    return out.str();
+}
+
+
 

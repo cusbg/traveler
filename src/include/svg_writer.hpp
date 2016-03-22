@@ -29,6 +29,9 @@ class svg_writer : public document_writer
 public:
     virtual streampos print(
                 const std::string& text);
+    void init(
+                const std::string& filename,
+                rna_tree::iterator root);
 
 public: // formatters
     virtual std::string get_circle_formatted(
@@ -45,6 +48,9 @@ protected:
     virtual std::string get_line(
                 point from,
                 point to) const;
+
+private:
+    std::string get_header_element() const;
 };
 
 

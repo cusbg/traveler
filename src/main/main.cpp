@@ -30,7 +30,10 @@
 #include "app.hpp"
 #include "rna_tree.hpp"
 
+#include "svg_writer.hpp"
+
 using namespace std;
+
 
 void run_test();
 

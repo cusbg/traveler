@@ -28,7 +28,7 @@ static ps_writer psout;
 
 #define UPDATE(root) \
     { \
-        psout.init_default("build/files/doc.ps", root); \
+        psout.init("build/files/doc.ps", root); \
         psout.print(psout.get_rna_subtree_formatted(root)); \
         rna_tree::print_subtree(root); \
     }
