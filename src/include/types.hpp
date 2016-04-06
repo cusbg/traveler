@@ -28,7 +28,6 @@
 #include <algorithm>
 #include <stdexcept>
 #include "logger.hpp"
-#include "exception.hpp"
 
 
 
@@ -121,4 +120,7 @@ private:
         }
 
 #endif /* !TYPES_HPP */
+
+/* always include and redefine assert and abort macros */
+#include "exception.hpp"
 

@@ -26,27 +26,25 @@
 #include <string.h>
 
 #include "types.hpp"
-#include "utils.hpp"
+#include "test.test.hpp"
 #include "app.hpp"
-#include "rna_tree.hpp"
-
-#include "svg_writer.hpp"
 
 using namespace std;
 
 
-void run_test();
-
 vector<string> args;
 
-static ostream& operator<<(ostream& out, const vector<string>& vec)
+static std::ostream& operator<<(
+                std::ostream& out,
+                const std::vector<std::string>& vec)
 {
-    for (const string& str : vec)
+    for (const auto& str : vec)
         out << str << endl;
     return out;
 }
 
-void signal_handler(int signal)
+void signal_handler(
+                int signal)
 {
     ostringstream out;
     out
@@ -77,7 +75,7 @@ void signal_handler(int signal)
     exit(2);
 }
 
-void set_signal_handler()
+static void set_signal_handler()
 {
     APP_DEBUG_FNAME;
     struct sigaction act;
@@ -92,15 +90,17 @@ void set_signal_handler()
         SIGTERM,
     };
     for (int sig : signals)
+    {
         if (sigaction(sig, &act, NULL) != 0)
         {
             ERR("sigaction on signal %i failed, err: %s", sig, strerror(errno));
         }
+    }
 }
 
 void init()
 {
-    logger.set_priority(logger::INFO);
+    logger.set_priority(logger::DEBUG);
     set_signal_handler();
     cout << boolalpha;
     srand(1);

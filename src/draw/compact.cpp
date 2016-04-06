@@ -26,12 +26,6 @@
 
 static ps_writer psout;
 
-#define UPDATE(root) \
-    { \
-        psout.init("build/files/doc.ps", root); \
-        psout.print(psout.get_rna_subtree_formatted(root)); \
-        rna_tree::print_subtree(root); \
-    }
 
 using namespace std;
 
@@ -175,7 +169,7 @@ void compact::init()
 {
     APP_DEBUG_FNAME;
 
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+    //LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
 
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     {
@@ -405,20 +399,8 @@ void compact::init_multibranch(
                 // # 0, 2, 4 will be free space
 
                 set_distance(ch, c.centre, c.radius());
-
-                UPDATE(it);
-                psout.print(psout.get_circle_formatted(c.centre, c.radius()));
-                WAIT;
-
                 rotate_subtree(ch, c, points[i + 2]);
-
-                psout.print(psout.get_rna_subtree_formatted(ch));
-                WAIT;
-
                 rotate_out_of_circle(ch, points[i + 1], points[i + 2], c.centre);
-
-                psout.print(psout.get_rna_subtree_formatted(ch));
-                WAIT;
             }
             else
             {

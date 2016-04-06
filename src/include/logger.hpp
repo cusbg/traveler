@@ -23,9 +23,7 @@
 #define LOGGER_HPP
 
 #include <cstdarg>
-#include <cstdio>
 #include <vector>
-#include <string>
 #include <sstream>
 
 
@@ -149,13 +147,7 @@ public:
     LOGGER_FUNCTIONS(emerg, EMERG);
 
 public:
-    inline std::vector<int> opened_files()
-    {
-        std::vector<int> vec;
-        for (FILE* f : out)
-            vec.push_back(fileno(f));
-        return vec;
-    }
+    std::vector<int> opened_files() const;
 
 protected:
     priority p;

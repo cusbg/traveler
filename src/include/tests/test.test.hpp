@@ -89,7 +89,10 @@ private:
             set_args(#operation); \
             try  \
             { \
-                operation; \
+                { \
+                    LOGGER_PRIORITY_ON_FUNCTION(EMERG); \
+                    operation; \
+                } \
                 add_failed_test(); \
             } \
             catch (...) \

@@ -76,7 +76,7 @@ std::string document_writer::get_edge_formatted(
         from = tmp;
     }
 
-    return get_line(from, to);
+    return get_line_formatted(from, to);
 }
 
 std::string document_writer::get_label_formatted(

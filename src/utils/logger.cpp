@@ -36,15 +36,15 @@ using namespace chrono;
 #define LOG_FILE "build/logs/program.log"
 
 /* global */
-class logger logger(logger::DEBUG);
+class logger logger(logger::WARN);
 
 
 
 logger::logger(priority priority)
 {
     p = priority;
-    FILE* f = fopen(LOG_FILE, "a");
     out.push_back(stdout);
+    FILE* f = fopen(LOG_FILE, "a");
 
     if (f == nullptr || ferror(f))
     {
@@ -53,6 +53,9 @@ logger::logger(priority priority)
     }
 
     out.push_back(f);
+
+    setvbuf(stdout, NULL, _IOFBF, 0);
+    setvbuf(f, NULL, _IOFBF, 0);
 
     debug("*****************************************");
     debug("************ RUNNING PROGRAM ************");
@@ -164,6 +167,13 @@ void logger::check_errors()
     }
 }
 
+std::vector<int> logger::opened_files() const
+{
+    std::vector<int> vec;
+    for (FILE* f : out)
+        vec.push_back(fileno(f));
+    return vec;
+}
 
 
 

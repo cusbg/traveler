@@ -43,8 +43,6 @@ void run_test()
         t->run();
         delete t;
     }
-
-    exit(0);
 }
 
 
@@ -73,6 +71,8 @@ test::~test()
 
 void test::add_failed_test()
 {
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+
     logger.emerg("TEST %s on line %li of %s failed: %s",
             test_name.c_str(), line_number, file.c_str(), condition.c_str());
 

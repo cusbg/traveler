@@ -321,13 +321,15 @@ void app::save(
 {
     APP_DEBUG_FNAME;
 
-    //ps_writer ps;
-    svg_writer ps;
+    ps_writer ps;
+    svg_writer svg;
 
     ps.init(filename, rna.begin());
+    svg.init(filename, rna.begin());
     INFO("save(%s)", to_cstr(filename));
 
     save(rna, ps, overlaps);
+    save(rna, svg, overlaps);
 }
 
 void app::save(
@@ -339,8 +341,8 @@ void app::save(
 
     overlap_checks::overlaps overlaps;
     
-    if (overlap)
-        overlaps = overlap_checks().run(rna);
+    //if (overlap)
+        //overlaps = overlap_checks().run(rna);
 
     log_overlaps(rna.name(), overlaps.size());
 

@@ -60,7 +60,7 @@ using namespace std;
     return out.str();
 }
 
-/* virtual */ std::string ps_writer::get_line(
+/* virtual */ std::string ps_writer::get_line_formatted(
                 point from,
                 point to) const
 {

@@ -138,7 +138,7 @@ public:
     streampos get_pos();
 
 protected:
-    virtual std::string get_line(
+    virtual std::string get_line_formatted(
                 point from,
                 point to) const = 0;
     void print_to_stream(

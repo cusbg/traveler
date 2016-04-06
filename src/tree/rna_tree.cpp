@@ -242,7 +242,7 @@ std::string rna_tree::get_brackets() const
 
 /* static */ point rna_tree::top_right_corner(iterator root)
 {
-    //APP_DEBUG_FNAME;
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
 
     // x, y should be maximal in subtree
     point p = { -DBL_MAX, -DBL_MAX };
@@ -260,13 +260,14 @@ std::string rna_tree::get_brackets() const
     rna_tree::for_each_in_subtree(root, f);
 
     assert(p.x != -DBL_MAX && p.y != -DBL_MAX);
+    DEBUG("top_right_corner = %s", to_cstr(p));
 
     return p;
 }
 
 /* static */ point rna_tree::bottom_left_corner(iterator root)
 {
-    //APP_DEBUG_FNAME;
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
 
     // x, y should be minimal in subtree
     point p = { DBL_MAX, DBL_MAX };
@@ -284,6 +285,7 @@ std::string rna_tree::get_brackets() const
     rna_tree::for_each_in_subtree(root, f);
 
     assert(p.x != DBL_MAX && p.y != DBL_MAX);
+    DEBUG("bottom_left_corner = %s", to_cstr(p));
 
     return p;
 }

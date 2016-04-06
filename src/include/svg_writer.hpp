@@ -26,6 +26,10 @@
 
 class svg_writer : public document_writer
 {
+private:
+    struct style;
+    struct property;
+
 public:
     virtual streampos print(
                 const std::string& text);
@@ -45,12 +49,36 @@ public: // formatters
                 const RGB& color) const;
 
 protected:
-    virtual std::string get_line(
+    virtual std::string get_line_formatted(
                 point from,
                 point to) const;
 
 private:
-    std::string get_header_element() const;
+    std::string get_header_element(
+                rna_tree::iterator root);
+    style get_svg_color_style(
+                const RGB& color) const;
+    template <typename value_type>
+    std::string create_property(
+                const std::string& name,
+                const value_type& value) const;
+    std::string create_style(
+                const std::vector<style> styles) const;
+    std::string create_element(
+                const std::string& name,
+                const std::string& properties,
+                const std::string& value = "") const;
+    std::string create_white_background() const;
+
+    std::string get_point_formatted(
+                point p,
+                const std::string& prefix,
+                const std::string& postfix,
+                bool change_y_direction = true) const;
+
+private:
+    point shift;
+    point letter;
 };
 
 

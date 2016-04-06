@@ -22,7 +22,6 @@
 #ifndef COMPACT_HPP
 #define COMPACT_HPP
 
-#include "types.hpp"
 #include "rna_tree.hpp"
 
 
