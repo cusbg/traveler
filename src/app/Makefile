@@ -1,5 +1,5 @@
 
-MODULE                  = main
+MODULE                  = app
 ROOTDIR                 = ..
 RELEASE                 = -O3
 

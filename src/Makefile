@@ -9,8 +9,8 @@ LOGDIR                  = $(BUILDDIR)/logs
 ROOTDIR                 = .
 BUILDDIR                = ${ROOTDIR}/build
 
-MODULES                 = tree ted utils draw main tests
-MODULESVARS             = $$\{TREE} $$\{TED} $$\{UTILS} $$\{DRAW} $$\{MAIN} $$\{TESTS}
+MODULES                 = tree ted utils draw app tests
+MODULESVARS             = $$\{TREE} $$\{TED} $$\{UTILS} $$\{DRAW} $$\{APP} $$\{TESTS}
 MODULETARGET            = make
 
 CC                      = g++
