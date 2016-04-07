@@ -116,7 +116,6 @@ int main(int argc, char** argv)
 
     try
     {
-        assert(1 != 1);
         init();
         app app;
         args = vector<string>(argv, argv + argc);
