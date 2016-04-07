@@ -22,9 +22,48 @@
 #ifndef POINT_HPP
 #define POINT_HPP
 
-#include "types.hpp"
+#include <sstream>
+#include <cmath>
 
 #define PI              M_PI
+
+
+struct point
+{
+    double x;
+    double y;
+
+    point();
+    point(double _x, double _y);
+    bool operator==(point other) const;
+
+    point operator+(point other) const;
+    point operator-(point other) const;
+    point operator-() const;
+    point operator/(point other) const;
+    point operator/(double value) const;
+    point operator*(double value) const;
+
+#define OPERATION_FUNCTION(operation) \
+    point& operator operation ## = (const point& other) \
+    { \
+        *this = *this operation other; \
+        return *this; \
+    }
+    OPERATION_FUNCTION(+);
+    OPERATION_FUNCTION(-);
+    OPERATION_FUNCTION(/);
+#undef OPERATION_FUNCTION
+
+
+    bool bad() const;
+    static point bad_point();
+
+    friend std::ostream& operator<<(std::ostream& out, point p);
+
+};
+
+
 
 inline bool double_equals_precision(
                 double val1,
@@ -59,30 +98,6 @@ inline bool iszero(
     return double_equals(val, 0);
 }
 
-
-struct point
-{
-    double x;
-    double y;
-
-    point();
-    point(double _x, double _y);
-    bool operator==(point other) const;
-
-    point operator+(point other) const;
-    point operator-(point other) const;
-    point operator-() const;
-    point operator/(double value) const;
-    point operator*(double value) const;
-    point& operator+=(point other);
-    point& operator-=(point other);
-
-    bool bad() const;
-    static point bad_point();
-
-    friend std::ostream& operator<<(std::ostream& out, point p);
-};
-
 point operator*(double value, point p);
 
 point centre(point p1, point p2);
@@ -102,9 +117,6 @@ point orthogonal(point p);
 point orthogonal(point p, point direction);
 
 point move_point(point p, point move_to, double length);
-
-// TODO : presunut do RNA triedy
-point base_pair_edge_point(point from, point to);
 
 bool lies_on_line(point p1, point p2, point p3);
 

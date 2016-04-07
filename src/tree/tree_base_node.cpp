@@ -20,6 +20,7 @@
  */
 
 #include "tree_base_node.hpp"
+#include "types.hpp"
 
 using namespace std;
 

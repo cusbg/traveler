@@ -20,8 +20,6 @@
  */
 
 #include "document_writer.hpp"
-#include "types.hpp"
-#include "rna_tree.hpp"
 
 using namespace std;
 
@@ -71,8 +69,8 @@ std::string document_writer::get_edge_formatted(
     }
     if (is_base_pair)
     {
-        point tmp = base_pair_edge_point(from, to);
-        to = base_pair_edge_point(to, from);
+        point tmp = rna_tree::base_pair_edge_point(from, to);
+        to = rna_tree::base_pair_edge_point(to, from);
         from = tmp;
     }
 
@@ -210,7 +208,8 @@ streampos document_writer::get_pos()
     return pos;
 }
 
-size_t document_writer::fill(char ch)
+size_t document_writer::fill(
+                char ch)
 {
     streampos pos, end;
 

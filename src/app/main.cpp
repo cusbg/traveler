@@ -24,10 +24,11 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
+#include <iostream>
 
+#include "app.hpp"
 #include "types.hpp"
 #include "test.test.hpp"
-#include "app.hpp"
 
 using namespace std;
 
@@ -113,10 +114,19 @@ int main(int argc, char** argv)
     return 0;
 #endif
 
-    init();
-    app app;
-    args = vector<string>(argv, argv + argc);
-    app.run(args);
+    try
+    {
+        assert(1 != 1);
+        init();
+        app app;
+        args = vector<string>(argv, argv + argc);
+        app.run(args);
+    }
+    catch (const exception& e)
+    {
+        ERR("Exception %s caught", e.what());
+        return 1;
+    }
 
     return 0;
 }

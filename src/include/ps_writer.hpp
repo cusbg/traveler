@@ -24,14 +24,12 @@
 
 
 #include "document_writer.hpp"
-#include "rna_tree.hpp"
 
 
 struct point;
 
 
-class ps_writer
-    : public document_writer
+class ps_writer : public document_writer
 {
 public:
     virtual streampos print(

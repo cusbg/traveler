@@ -33,6 +33,7 @@ prepare_test:
 
 
 ${BUILDDIR}/%.cpp.mk: %.cpp FORCEREBUILD
+	@rm -f $@
 	@${MAKEDEPENDENCY} $< | \
 		sed "s@\([^ :]*\.cpp\)@${ROOTDIR}/${MODULE}/\1@g" \
 			>> $@ || rm -rf $@

@@ -24,20 +24,18 @@
 
 #include "tree_base.hpp"
 #include "rna_tree_label.hpp"
-#include "types.hpp"
 
 struct point;
 
-class rna_tree
-    : public tree_base<rna_pair_label>
+class rna_tree : public tree_base<rna_pair_label>
 {
 public:
     virtual ~rna_tree() = default;
     rna_tree() = default;
     rna_tree(
-                std::string _brackets,
-                std::string _labels,
-                std::string _name = "");
+                const std::string& _brackets,
+                const std::string& _labels,
+                const std::string& _name = "");
     rna_tree(
                 const std::string& _brackets,
                 const std::string& _labels,
@@ -67,8 +65,7 @@ public:
 
     std::string name() const;
     void set_name(
-                const std::string& name)
-    { _name = name; }
+                const std::string& name);
 
 public:
     static std::string get_labels(
@@ -78,12 +75,12 @@ public:
                 const iterator& root);
     std::string get_brackets() const;
 
-    static point top_right_corner(
-                iterator root);
-    static point bottom_left_corner(
-                iterator root);
+    bool correct_pairing() const;
 
-    bool correct_pairing();
+public:
+    static point base_pair_edge_point(
+                point from,
+                point to);
 
 private:
     std::string _name;

@@ -22,7 +22,6 @@
 #ifndef RTED_HPP
 #define RTED_HPP
 
-#include "types.hpp"
 #include "strategy.hpp"
 #include "rna_tree.hpp"
 
@@ -175,8 +174,7 @@ private:
     void check_postorder();
 
 public:
-    strategy_table_type& get_strategies()
-        { return STR; } 
+    strategy_table_type& get_strategies();
 
 private:
     tree_type

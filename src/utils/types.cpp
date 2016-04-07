@@ -19,6 +19,8 @@
  * USA.
  */
 
+#include <iostream>
+
 #include "types.hpp"
 
 using namespace std;
@@ -49,3 +51,10 @@ print_class_BEG_END_name::~print_class_BEG_END_name()
     DEBUG("END function: %s", fname.c_str());
 }
 
+
+void wait_for_input()
+{
+    logger.emerg("%s", __PRETTY_FUNCTION__);
+    char ch;
+    std::cin.read(&ch, 1);
+}

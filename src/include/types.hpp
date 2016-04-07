@@ -22,17 +22,16 @@
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include <algorithm>
-#include <stdexcept>
+
 #include "logger.hpp"
 
 
-
 template <typename T>
-inline std::string to_string(const T& t)
+inline std::string to_string(
+                const T& t)
 {
     // pri funkcii operator<<() to nefunguje!!
     // funkcia sa pouziva aj pri operator<<(bool/char[]/..)
@@ -45,25 +44,30 @@ inline std::string to_string(const T& t)
 #define to_cstr(val) to_string(val).c_str()
 
 template <typename container_type, typename value_type>
-inline bool contains(const container_type& c, const value_type& v)
+inline bool contains(
+                const container_type& c,
+                const value_type& v)
 {
     return std::find(std::begin(c), std::end(c), v) != std::end(c);
 }
 
 template <typename T>
-inline bool operator!=(const T& t1, const T& t2)
+inline bool operator!=(
+                const T& t1,
+                const T& t2)
 {
     return !(t1 == t2);
 }
 
 
+void wait_for_input();
 
-inline void wait_for_input()
-{
-    logger.emerg("%s", __PRETTY_FUNCTION__);
-    char ch;
-    std::cin.read(&ch, 1);
-}
+#define WAIT \
+        { \
+            DEBUG("%s: %lu", __PRETTY_FUNCTION__, __LINE__); \
+            wait_for_input(); \
+        }
+
 
 struct logger_end_of_function_priority
 {
@@ -87,24 +91,6 @@ private:
 };
 
 
-#define DEBUG(...) \
-    if (logger.is_debug_enabled()) \
-        logger.debug(__VA_ARGS__)
-#define INFO(...) \
-    if (logger.is_info_enabled()) \
-        logger.info(__VA_ARGS__)
-#define WARN(...) \
-    logger.warn(__VA_ARGS__)
-#define ERR(...) \
-    logger.error(__VA_ARGS__)
-
-
-#define WAIT \
-        { \
-            DEBUG("%s: %lu", __PRETTY_FUNCTION__, __LINE__); \
-            wait_for_input(); \
-        }
-
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
     logger_end_of_function_priority __logger_priority(logger::PRIORITY)
 
@@ -118,6 +104,8 @@ private:
                 stream << to_string(__value) << " "; \
             logger.debug("%s", to_cstr(stream.str())); \
         }
+
+
 
 #endif /* !TYPES_HPP */
 

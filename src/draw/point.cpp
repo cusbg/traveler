@@ -23,6 +23,7 @@
 #include <iomanip>
 
 #include "point.hpp"
+#include "types.hpp"
 
 using namespace std;
 
@@ -107,6 +108,15 @@ point point::operator-() const
     return {-x, -y};
 }
 
+point point::operator/(point other) const
+{
+    BINARY(*this, other);
+    for (double value : {other.x, other.y})
+        assert(!iszero(value) && !::isnan(x / value) && !::isnan(y / value));
+
+    return {x / other.x, y / other.y};
+}
+
 point point::operator/(double value) const
 {
     UNARY(*this);
@@ -121,22 +131,6 @@ point point::operator*(double value) const
     assert(!iszero(value) && !::isnan(x * value) && !::isnan(y * value));
 
     return {x * value, y * value};
-}
-
-point& point::operator+=(point other)
-{
-    BINARY(*this, other);
-
-    *this = *this + other;
-    return *this;
-}
-
-point& point::operator-=(point other)
-{
-    BINARY(*this, other);
-
-    *this = *this - other;
-    return *this;
 }
 
 bool point::bad() const
@@ -239,15 +233,6 @@ point move_point(point p, point move_to, double length)
     point vec = normalize(move_to - p);
 
     return p + length * vec;
-}
-
-point base_pair_edge_point(point from, point to)
-{
-    BINARY(from, to);
-
-    point vec = {3, 3};
-    vec = vec + normalize(to - from) * 4;
-    return from + vec;
 }
 
 bool lies_on_line(point p1, point p2, point p3)

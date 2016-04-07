@@ -22,7 +22,7 @@
 #ifndef OVERLAP_CHECKS_HPP
 #define OVERLAP_CHECKS_HPP
 
-#include "types.hpp"
+#include <vector>
 #include "point.hpp"
 
 class rna_tree;
@@ -71,10 +71,6 @@ private:
                 const edge& e1,
                 const edge& e2);
 
-#ifdef TESTS
-public:
-    static void test();
-#endif
 };
 
 

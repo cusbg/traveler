@@ -44,7 +44,7 @@ public:
     /**
      * print usage
      */
-    void usage(
+    static void usage(
                 const std::string& appname = "");
 
 private:
@@ -75,7 +75,7 @@ private:
     /**
      * reads both seq & fold file and construct rna tree
      */
-    rna_tree create_matched(
+    static rna_tree create_matched(
                 const std::string& seqfile,
                 const std::string& foldfile,
                 const std::string& name);
@@ -84,7 +84,7 @@ private:
      * reads ps & fold file and construct rna tree
      * from ps extract rna sequence and node positions in image
      */
-    rna_tree create_templated(
+    static rna_tree create_templated(
                 const std::string& psfile,
                 const std::string& foldfile,
                 const std::string& name);

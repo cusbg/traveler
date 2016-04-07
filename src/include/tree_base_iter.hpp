@@ -220,6 +220,7 @@ tree_base<label_type>::_reverse_post_order_iterator::operator--()
 }
 
 
+
 //
 // TREE->ITERATOR functions:
 //
@@ -279,6 +280,42 @@ tree_base<label_type>::end_rev_post()
 {
     return --begin();
 }
+
+
+
+//
+// protected TREE->ITERATOR functions:
+//
+template <typename label_type>
+typename tree_base<label_type>::iterator
+tree_base<label_type>::begin() const
+{
+    return _tree.begin();
+}
+
+template <typename label_type>
+typename tree_base<label_type>::iterator
+tree_base<label_type>::end() const
+{
+    return _tree.end();
+}
+
+template <typename label_type>
+typename tree_base<label_type>::post_order_iterator
+tree_base<label_type>::begin_post() const
+{
+    return _tree.begin_post();
+}
+
+template <typename label_type>
+typename tree_base<label_type>::post_order_iterator
+tree_base<label_type>::end_post() const
+{
+    return _tree.end_post();
+}
+
+
+
 
 
 

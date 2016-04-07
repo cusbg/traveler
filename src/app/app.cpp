@@ -21,17 +21,16 @@
 
 #include "app.hpp"
 #include "utils.hpp"
-#include "rna_tree.hpp"
 #include "mapping.hpp"
 #include "tree_matcher.hpp"
-#include "ps_writer.hpp"
 #include "ps_reader.hpp"
+#include "ps_writer.hpp"
+#include "svg_writer.hpp"
 #include "compact.hpp"
 #include "overlap_checks.hpp"
 #include "rted.hpp"
 #include "gted.hpp"
 
-#include "svg_writer.hpp"
 
 
 using namespace std;
@@ -45,7 +44,7 @@ struct app::arguments
     struct
     {
         bool run = false;
-        string psout;
+        string file;
     } all;
     struct
     {
@@ -65,172 +64,27 @@ struct app::arguments
         bool run = false;
         bool overlap_checks = false;
         string mapping;
-        string ps;
+        string file;
         string ps_templated;
-    } ps;
+    } document;
+
+public:
+    static arguments parse(
+                const std::vector<std::string>& args);
+
+private:
+    arguments() = default;
 };
+
+
 
 void app::run(
                 std::vector<std::string> args)
 {
     APP_DEBUG_FNAME;
 
-    string arg;
-    arguments a;
-    size_t i;
     args.push_back("");
-    bool mt, tt;
-
-    auto nextarg = [&args, &i]() {
-        if (i + 1 < args.size())
-            return args[i + 1];
-        else
-            return args.back();
-    };
-
-    mt = tt = false;
-
-    for (i = 1; i < args.size(); ++i)
-    {
-        arg = args.at(i);
-        if (arg.empty())
-            continue;
-
-        if (arg == "-h" || arg == "--help")
-        {
-            DEBUG("arg help");
-            usage(args.at(0));
-            exit(0);
-        }
-        if (arg == "-mt" || arg == "--match-tree")
-        {
-            DEBUG("arg match-tree");
-            string seq, fold, name;
-
-            seq = args.at(i + 1);
-            fold = args.at(i + 2);
-            i += 2;
-            if (nextarg() == "--name")
-            {
-                name = args.at(i + 2);
-                i+= 2;
-            }
-            a.matched = create_matched(seq, fold, name);
-            mt = true;
-            continue;
-        }
-        if (arg == "-tt" || arg == "--template-tree")
-        {
-            DEBUG("arg template-tree");
-            string ps, fold, name;
-            ps = args.at(i + 1);
-            fold = args.at(i + 2);
-            i += 2;
-            if (nextarg() == "--name")
-            {
-                name = args.at(i + 2);
-                i+= 2;
-            }
-            a.templated = create_templated(ps, fold, name);
-            a.ps.ps_templated = ps;
-            tt = true;
-            continue;
-        }
-        if (arg == "-a" || arg == "--all")
-        {
-            DEBUG("arg all");
-            a.all.run = true;
-            a.all.psout = args.at(i + 1);
-            ++i;
-            continue;
-        }
-        if (arg == "-r" || arg == "--rted")
-        {
-            DEBUG("arg rted");
-            a.rted.run = true;
-            if (nextarg() == "--strategies")
-            {
-                a.rted.strategies = args.at(i + 2);
-                i += 2;
-            }
-            continue;
-        }
-        if (arg == "-g" || arg == "--gted")
-        {
-            DEBUG("arg gted");
-            a.gted.run = true;
-            bool arg = true;
-
-            while (arg)
-            {
-                if (nextarg() == "--strategies")
-                {
-                    a.gted.strategies = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--ted-out")
-                {
-                    a.gted.ted_out = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--ted-in")
-                {
-                    a.gted.ted_in = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--mapping")
-                {
-                    a.gted.mapping = args.at(i + 2);
-                    i += 2;
-                }
-                else
-                    arg = false;
-            }
-            continue;
-        }
-        if (arg == "--ps")
-        {
-            DEBUG("arg ps");
-            a.ps.run = true;
-            while (true)
-            {
-                if (nextarg() == "--mapping")
-                {
-                    a.ps.mapping = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--overlaps")
-                {
-                    a.ps.overlap_checks = true;
-                    i += 1;
-                }
-                else
-                    break;
-            }
-            a.ps.ps = args.at(i + 1);
-            ++i;
-            continue;
-        }
-        if (arg == "-d" || arg == "--debug")
-        {
-            logger.set_priority(logger::DEBUG);
-            DEBUG("enable debug mode");
-            continue;
-        }
-
-        WARN("wrong parameter no.%lu: '%s'", i, to_cstr(arg));
-        usage(args.at(0));
-        exit(1);
-    }
-
-    if (!mt || !tt)
-    {
-        ERR("trees are missing");
-        usage(args.at(0));
-        abort();
-    }
-
-    run(a);
+    run(arguments::parse(args));
 }
 
 
@@ -254,7 +108,7 @@ void app::run(
         args.templated = matcher(args.templated, args.matched).run(g.get_mapping());
         compact(args.templated).run();
 
-        save(args.all.psout, args.templated, true);
+        save(args.all.file, args.templated, true);
     }
     else
     {
@@ -285,26 +139,23 @@ void app::run(
             if (!args.gted.mapping.empty())
             {
                 save_tree_mapping_table(args.gted.mapping, g.get_mapping());
-                if (args.ps.mapping.empty())
-                    args.ps.mapping = args.gted.mapping;
+                if (args.document.mapping.empty())
+                    args.document.mapping = args.gted.mapping;
             }
         }
-        if (args.ps.run)
+        if (args.document.run)
         {
-            assert(!args.ps.mapping.empty());
-            assert(!args.ps.ps.empty());
+            assert(!args.document.mapping.empty());
+            assert(!args.document.file.empty());
 
-            mapping map = load_mapping_table(args.ps.mapping);
+            mapping map = load_mapping_table(args.document.mapping);
 
             args.templated.set_name(args.matched.name() + "_mapped_to_" + args.templated.name());
 
             args.templated = matcher(args.templated, args.matched).run(map);
             compact(args.templated).run();
 
-            if (!args.ps.ps.empty())
-            {
-                save(args.ps.ps, args.templated, args.ps.overlap_checks);
-            }
+            save(args.document.file, args.templated, args.document.overlap_checks);
         }
     }
 
@@ -333,9 +184,9 @@ void app::save(
 }
 
 void app::save(
-            rna_tree& rna,
-            document_writer& writer,
-            bool overlap)
+                rna_tree& rna,
+                document_writer& writer,
+                bool overlap)
 {
     APP_DEBUG_FNAME;
 
@@ -408,12 +259,9 @@ rna_tree app::create_templated(
 void app::usage(
                 const string& appname)
 {
-    APP_DEBUG_FNAME;
-
     stringstream str;
 
     str
-        << endl
         << "usage():"
         << endl
         << appname
@@ -437,6 +285,8 @@ void app::usage(
             << " [--overlaps] <FILE>]" << endl
         << "\t[-d|--debug]" << endl;
 
+    INFO("");
+    INFO("");
     INFO("%s", to_cstr(str.str()));
 }
 
@@ -461,7 +311,7 @@ void app::print(
             << endl << '\t'
             << " run=" << args.all.run << ";"
             << endl << '\t'
-            << " psout=" << args.all.psout
+            << " file=" << args.all.file
             << endl
         << "rted:"
             << endl << '\t'
@@ -483,18 +333,182 @@ void app::print(
             << endl
         << "ps:"
             << endl << '\t'
-            << " run=" << args.ps.run
+            << " run=" << args.document.run
             << endl << '\t'
-            << " overlaps=" << args.ps.overlap_checks
+            << " overlaps=" << args.document.overlap_checks
             << endl << '\t'
-            << " mapping-table-in-file=" << args.ps.mapping
+            << " mapping-table-in-file=" << args.document.mapping
             << endl << '\t'
-            << " ps-out-file=" << args.ps.ps
+            << " document-out-file=" << args.document.file
             << endl
         << endl;
 
     INFO("%s", to_cstr(str.str()));
 }
 
+
+/* static */ app::arguments app::arguments::parse(
+                const std::vector<std::string>& args)
+{
+    APP_DEBUG_FNAME;
+
+    size_t i;
+    bool mt, tt;
+    string arg;
+    arguments a;
+
+    auto nextarg =
+        [&args, &i]()
+        {
+            if (i + 1 < args.size())
+                return args[i + 1];
+            else
+                return args.back();
+        };
+
+    mt = tt = false;
+
+    for (i = 1; i < args.size(); ++i)
+    {
+        arg = args.at(i);
+        if (arg.empty())
+            continue;
+
+        if (arg == "-h" || arg == "--help")
+        {
+            DEBUG("arg help");
+            app::usage(args.at(0));
+            exit(0);
+        }
+        if (arg == "-mt" || arg == "--match-tree")
+        {
+            DEBUG("arg match-tree");
+            string seq, fold, name;
+
+            seq = args.at(i + 1);
+            fold = args.at(i + 2);
+            i += 2;
+            if (nextarg() == "--name")
+            {
+                name = args.at(i + 2);
+                i+= 2;
+            }
+            a.matched = app::create_matched(seq, fold, name);
+            mt = true;
+            continue;
+        }
+        if (arg == "-tt" || arg == "--template-tree")
+        {
+            DEBUG("arg template-tree");
+            string ps, fold, name;
+            ps = args.at(i + 1);
+            fold = args.at(i + 2);
+            i += 2;
+            if (nextarg() == "--name")
+            {
+                name = args.at(i + 2);
+                i+= 2;
+            }
+            a.templated = app::create_templated(ps, fold, name);
+            a.document.ps_templated = ps;
+            tt = true;
+            continue;
+        }
+        if (arg == "-a" || arg == "--all")
+        {
+            DEBUG("arg all");
+            a.all.run = true;
+            a.all.file = args.at(i + 1);
+            ++i;
+            continue;
+        }
+        if (arg == "-r" || arg == "--rted")
+        {
+            DEBUG("arg rted");
+            a.rted.run = true;
+            if (nextarg() == "--strategies")
+            {
+                a.rted.strategies = args.at(i + 2);
+                i += 2;
+            }
+            continue;
+        }
+        if (arg == "-g" || arg == "--gted")
+        {
+            DEBUG("arg gted");
+            a.gted.run = true;
+            bool arg = true;
+
+            while (arg)
+            {
+                if (nextarg() == "--strategies")
+                {
+                    a.gted.strategies = args.at(i + 2);
+                    i += 2;
+                }
+                else if (nextarg() == "--ted-out")
+                {
+                    a.gted.ted_out = args.at(i + 2);
+                    i += 2;
+                }
+                else if (nextarg() == "--ted-in")
+                {
+                    a.gted.ted_in = args.at(i + 2);
+                    i += 2;
+                }
+                else if (nextarg() == "--mapping")
+                {
+                    a.gted.mapping = args.at(i + 2);
+                    i += 2;
+                }
+                else
+                    arg = false;
+            }
+            continue;
+        }
+        if (arg == "--ps")
+        {
+            DEBUG("arg ps");
+            a.document.run = true;
+            while (true)
+            {
+                if (nextarg() == "--mapping")
+                {
+                    a.document.mapping = args.at(i + 2);
+                    i += 2;
+                }
+                else if (nextarg() == "--overlaps")
+                {
+                    a.document.overlap_checks = true;
+                    i += 1;
+                }
+                else
+                    break;
+            }
+            a.document.file = args.at(i + 1);
+            ++i;
+            continue;
+        }
+        if (arg == "-d" || arg == "--debug")
+        {
+            logger.set_priority(logger::DEBUG);
+            DEBUG("enable debug mode");
+            continue;
+        }
+
+        WARN("wrong parameter no.%lu: '%s'", i, to_cstr(arg));
+        usage(args.at(0));
+        exit(1);
+    }
+
+    if (!mt || !tt)
+    {
+        ERR("trees are missing");
+        usage(args.at(0));
+        abort();
+    }
+
+    return a;
+}
 
 

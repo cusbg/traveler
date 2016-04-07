@@ -22,7 +22,7 @@
 #ifndef TREE_BASE_HPP
 #define TREE_BASE_HPP
 
-#include "tree.hh"
+#include "tree_hh/tree.hh"
 #undef assert
 #include "types.hpp"
 
@@ -99,6 +99,13 @@ public:
     inline pre_post_order_iterator end_pre_post();
     inline reverse_post_order_iterator begin_rev_post();
     inline reverse_post_order_iterator end_rev_post();
+
+protected:
+    /* constant functions */
+    inline iterator begin() const;
+    inline iterator end() const;
+    inline post_order_iterator begin_post() const;
+    inline post_order_iterator end_post() const;
 
 public:
     /* STATIC functions: */

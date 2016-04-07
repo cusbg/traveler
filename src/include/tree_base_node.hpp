@@ -22,7 +22,7 @@
 #ifndef TREE_BASE_NODE_HPP
 #define TREE_BASE_NODE_HPP
 
-#include "types.hpp"
+#include <cstddef>
 
 class node_base
 {

@@ -25,10 +25,6 @@
 #include <fstream>
 #include "rna_tree.hpp"
 
-struct rna_label;
-struct point;
-class rna_tree;
-
 
 class RGB
 {
@@ -48,15 +44,15 @@ private:
 public:
     bool operator==(
                 const RGB& other) const;
-    double get_red() const
+    inline double get_red() const
     {
         return red;
     }
-    double get_green() const
+    inline double get_green() const
     {
         return green;
     }
-    double get_blue() const
+    inline double get_blue() const
     {
         return blue;
     }
@@ -118,7 +114,8 @@ public:
      * fill document from actual position to end of file with `ch`-chars
      * and seek to actual position
      */
-    size_t fill(char ch = ' ');
+    size_t fill(
+                char ch = ' ');
 
 public:
     /**

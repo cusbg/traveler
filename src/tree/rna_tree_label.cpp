@@ -20,6 +20,7 @@
  */
 
 #include "rna_tree_label.hpp"
+#include "types.hpp"
 
 using namespace std;
 
@@ -48,10 +49,9 @@ const rna_label& rna_pair_label::operator[](
     {
         return labels.at(index);
     }
-    catch (...)
+    catch (const out_of_range& e)
     {
-        DEBUG("label(%s)[%lu]", to_cstr(*this), index);
-        abort();
+        assert_err(false, "label(%s)[%lu]: %s", to_cstr(*this), index, e.what());
     }
 }
 
@@ -64,10 +64,9 @@ rna_label& rna_pair_label::operator[](
     {
         return labels.at(index);
     }
-    catch (...)
+    catch (const out_of_range& e)
     {
-        DEBUG("label(%s)[%lu]", to_cstr(*this), index);
-        abort();
+        assert_err(false, "label(%s)[%lu]: %s", to_cstr(*this), index, e.what());
     }
 }
 

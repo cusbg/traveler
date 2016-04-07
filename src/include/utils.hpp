@@ -22,16 +22,12 @@
 #ifndef READER_HPP
 #define READER_HPP
 
-#include "types.hpp"
 #include "strategy.hpp"
-#include "point.hpp"
+#include "rna_tree.hpp"
 
 
 class mapping;
-class rna_tree;
 
-
-rna_tree get_rna(const std::string& name); // TODO remove
 
 // TABLE-SAVING FUNCTIONS:
     
@@ -84,6 +80,12 @@ void write_file(
                 const std::string& text);
 
 
+
+point top_right_corner(
+                rna_tree::iterator root);
+
+point bottom_left_corner(
+                rna_tree::iterator root);
 
 #endif /* !READER_HPP */
 

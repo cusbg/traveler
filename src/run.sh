@@ -6,7 +6,7 @@ FILES2=${ALL}
 FILES1="artemia_salina"
 FILES2="cicadas"
 
-EXECUTABLE="build/program"
+EXECUTABLE="build/traveler"
 DIR=precomputed
 ONCE=false
 
@@ -66,7 +66,7 @@ run_ps() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --ps --mapping ${file}.map --overlaps build/files/${file1}-${file2}.ps \
+	    --ps --mapping ${file}.map --overlaps build/files/${file1}-${file2} \
         || fail_function
 }
 
@@ -77,7 +77,7 @@ run_all() {
         ${tt} ${mt} \
         --rted --strategies ${file}.rted \
         --gted --ted-out ${file}.ted --mapping ${file}.map \
-        --ps ${file}.ps \
+        --ps ${file} \
         || fail_function
 }
 

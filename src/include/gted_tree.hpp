@@ -22,11 +22,9 @@
 #ifndef GTED_TREE_HPP
 #define GTED_TREE_HPP
 
-#include "types.hpp"
 #include "rna_tree.hpp"
 
-struct gted_tree
-    : public rna_tree
+struct gted_tree : public rna_tree
 {
 public:
     struct LRH
@@ -39,13 +37,15 @@ public:
     };
 
 public:
-    gted_tree(const rna_tree& t);
+    gted_tree(
+                const rna_tree& t);
     void init();
 
 private:
     inline size_t id(
                 iterator it) const
     {
+        // should be here, because of tree_base::id() function without arguments
         return ::id(it);
     }
 

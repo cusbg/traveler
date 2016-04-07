@@ -22,9 +22,10 @@
 #ifndef UTILS_PS_READER_HPP
 #define UTILS_PS_READER_HPP
 
+#include <vector>
+#include <string>
 
-#include "types.hpp"
-#include "point.hpp"
+struct point;
 
 /**
  * ps document reader

@@ -19,8 +19,6 @@
  * USA.
  */
 
-#include <fstream>
-
 #include "rted.hpp"
 
 #define RTED_BAD        0xBADF00D
@@ -579,6 +577,11 @@ void rted::check_postorder()
         ERR("trees arent postorder");
         abort();
     }
+}
+
+strategy_table_type& rted::get_strategies()
+{
+    return STR;
 }
 
 

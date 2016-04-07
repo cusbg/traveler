@@ -29,13 +29,18 @@
 
 class logger
 {
-#define LOGGER_PRIORITY_FUNCTION(_fname, _priority) \
-    inline void _fname(const char* msg, ...) \
+#define LOGGER_PRIORITY_FUNCTION_BODY(_priority) \
     { \
         va_list va; \
         va_start(va, msg); \
-        log(priority::_priority, msg, va); \
+        log(_priority, msg, va); \
         va_end(va); \
+    }
+
+#define LOGGER_PRIORITY_FUNCTION(_fname, _priority) \
+    inline void _fname(const char* msg, ...) \
+    { \
+        LOGGER_PRIORITY_FUNCTION_BODY(logger::_priority) \
     }
 
 #define LOGGER_ENABLED_PRIORITY_FUNCTION(_fname, _priority) \
@@ -68,22 +73,22 @@ public:
 
     class logger_stream
     {
-    public:
+        friend logger;
+
+    protected:
         logger_stream(
                     logger& l,
                     priority p);
+    public:
         logger_stream(
                     const logger_stream& other);
-        void flush();
         ~logger_stream();
+
+        void flush();
 
         template <typename T>
         logger_stream& operator<<(
-                    const T value)
-        {
-            stream << value;
-            return *this;
-        }
+                    const T value);
     private:
         logger& l;
         priority p;
@@ -91,7 +96,8 @@ public:
     };
 
 public:
-    logger(priority priority);
+    logger(
+                priority priority);
     ~logger();
 
 public:
@@ -107,16 +113,14 @@ public:
 
 protected:
     std::string message_header(
-                priority p);
+                priority p) const;
 
-    inline void log(   priority p,
+    inline void log(
+                priority p,
                 const char* msg,
                 ...)
     {
-        va_list va;
-        va_start(va, msg);
-        log(p, msg, va);
-        va_end(va);
+        LOGGER_PRIORITY_FUNCTION_BODY(p);
     }
 
     void log(
@@ -153,6 +157,7 @@ protected:
     priority p;
     std::vector<FILE*> out;
 
+#undef LOGGER_PRIORITY_FUNCTION_BODY
 #undef LOGGER_PRIORITY_FUNCTION
 #undef LOGGER_ENABLED_PRIORITY_FUNCTION
 #undef LOGGER_STREAM_FUNCTION
@@ -166,6 +171,32 @@ protected:
 /* global */
 extern class logger logger;
 
+
+
+template <typename T>
+logger::logger_stream& logger::logger_stream::operator<<(
+                    const T value)
+{
+    stream << value;
+    return *this;
+}
+
+
+std::ostream& operator<<(
+                    std::ostream& out,
+                    logger::priority p);
+
+
+#define DEBUG(...) \
+    if (logger.is_debug_enabled()) \
+        ::logger.debug(__VA_ARGS__)
+#define INFO(...) \
+    if (logger.is_info_enabled()) \
+        ::logger.info(__VA_ARGS__)
+#define WARN(...) \
+    ::logger.warn(__VA_ARGS__)
+#define ERR(...) \
+    ::logger.error(__VA_ARGS__)
 
 
 #endif /* !LOGGER_HPP */

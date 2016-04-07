@@ -21,7 +21,6 @@
 
 #include "overlap_checks.hpp"
 #include "rna_tree.hpp"
-#include "point.hpp"
 
 using namespace std;
 

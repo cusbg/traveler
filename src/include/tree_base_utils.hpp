@@ -23,7 +23,6 @@
 #define TREE_BASE_UTILS_HPP
 
 #include "tree_base.hpp"
-#include "tree_base_iter.hpp"
 
 
 //
@@ -155,7 +154,7 @@ std::string tree_base<label_type>::print_subtree(
     for_each_in_subtree(root, f);
 
     if (debug_out)
-        DEBUG("%s", to_cstr(out.str()));
+        DEBUG("%s", out.str().c_str());
 
     return out.str();
 }

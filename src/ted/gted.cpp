@@ -26,7 +26,10 @@
 
 using namespace std;
 
-#define BAD 0xBADF00D
+#define GTED_COST_MODIFY    0
+#define GTED_COST_DELETE    1
+
+#define BAD                 0xBADF00D
 
 #define get_table(str, tblname) \
     (str.is_left() ? (tblname).left : \
@@ -40,8 +43,7 @@ gted::gted(
                 const rna_tree& _t1,
                 const rna_tree& _t2)
     : t1(_t1), t2(_t2)
-{
-}
+{ }
 
 void gted::run(
                 const strategy_table_type& _str)
@@ -562,5 +564,18 @@ mapping gted::get_mapping()
     for (auto it = t2.begin_post(); it != t2.end_post(); ++it, ++i)
         assert(id(it) == i);
 }
+
+
+void gted::set_tdist_table(
+                const tree_distance_table_type& _tdist)
+{
+    tdist = _tdist;
+}
+
+gted::tree_distance_table_type& gted::get_tree_distances()
+{
+    return tdist;
+}
+
 
 

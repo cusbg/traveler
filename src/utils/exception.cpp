@@ -19,23 +19,11 @@
  * USA.
  */
 
+#include <sstream>
+
 #include "exception.hpp"
-#include "types.hpp"
 
 using namespace std;
-
-inline static std::string create_msg(int line, const std::string& file, const std::string& fname)
-{
-    ostringstream stream;
-    stream
-        << "exception in "
-        << fname
-        << ":"
-        << line
-        << ":"
-        << file;
-    return stream.str();
-}
 
 my_exception::my_exception(const std::string& _msg)
     : msg(_msg)
@@ -46,13 +34,39 @@ const char* my_exception::what() const noexcept
     return msg.c_str();
 }
 
-abort_exception::abort_exception(int line, const std::string& file, const std::string& fname)
-    : my_exception(create_msg(line, file, fname))
+
+inline static std::string create_msg(
+                const std::string& exception_type,
+                int line,
+                const std::string& file,
+                const std::string& fname)
+{
+    ostringstream stream;
+    stream
+        << exception_type
+        << ": in "
+        << file
+        << ":"
+        << line
+        << ":"
+        << fname;
+    return stream.str();
+}
+
+abort_exception::abort_exception(
+                int line,
+                const std::string& file,
+                const std::string& fname)
+    : my_exception(create_msg("abort()", line, file, fname))
 { }
 
 
-assert_exception::assert_exception(const std::string& condition, int line, const std::string& file, const std::string& fname)
-    : my_exception(create_msg(line, file, fname) + " - condition " + condition + " failed")
+assert_exception::assert_exception(
+                const std::string& condition,
+                int line,
+                const std::string& file,
+                const std::string& fname)
+    : my_exception(create_msg("assert(" + condition + ") failed:", line, file, fname))
 { }
 
 

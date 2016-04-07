@@ -4,7 +4,7 @@
 # By: eliasr <eliasr@u-pl22>
 #
 
-TARGET                  = program
+TARGET                  = traveler
 LOGDIR                  = $(BUILDDIR)/logs
 ROOTDIR                 = .
 BUILDDIR                = ${ROOTDIR}/build

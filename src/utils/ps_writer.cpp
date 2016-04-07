@@ -20,7 +20,9 @@
  */
 
 #include <iomanip>
+
 #include "ps_writer.hpp"
+#include "utils.hpp"
 
 #define PS_COLUMNS_WIDTH    15
 #define LETTER              {612, 792}
@@ -172,8 +174,8 @@ std::string ps_writer::get_default_prologue(
     letter.x /= scale.x;
     letter.y /= scale.y;
 
-    tr = rna_tree::top_right_corner(root);
-    bl = rna_tree::bottom_left_corner(root);
+    tr = top_right_corner(root);
+    bl = bottom_left_corner(root);
 
     if (size(letter) > distance(tr, bl))
         WARN("rna probably wont fit document");

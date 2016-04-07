@@ -85,7 +85,7 @@ public:
     point direction;
 
 private:
-    /*
+    /**
      * sgn =  1 ~> clockwise
      *              (v smere hodinovych ruciciek)
      * sgn = -1 ~> counterclockwise

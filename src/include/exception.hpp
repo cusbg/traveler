@@ -26,10 +26,13 @@
 
 class my_exception : public std::exception
 {
-protected:
-    my_exception(const std::string& _msg);
-    virtual ~my_exception() noexcept = default;
+public:
     virtual const char* what() const noexcept;
+
+protected:
+    my_exception(
+                const std::string& _msg);
+    virtual ~my_exception() noexcept = default;
 
 private:
     std::string msg;
@@ -40,7 +43,10 @@ class abort_exception : public my_exception
 {
 public:
     virtual ~abort_exception() noexcept = default;
-    abort_exception(int line, const std::string& file, const std::string& fname);
+    abort_exception(
+                int line,
+                const std::string& file,
+                const std::string& fname);
 };
 
 
@@ -48,7 +54,11 @@ class assert_exception : public my_exception
 {
 public:
     virtual ~assert_exception() noexcept = default;
-    assert_exception(const std::string& condiniton, int line, const std::string& file, const std::string& fname);
+    assert_exception(
+                const std::string& condiniton,
+                int line,
+                const std::string& file,
+                const std::string& fname);
 };
 
 

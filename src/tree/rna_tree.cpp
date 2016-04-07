@@ -19,23 +19,22 @@
  * USA.
  */
 
-#include <cfloat>
 
 #include "rna_tree.hpp"
 
 using namespace std;
 
-inline std::vector<rna_pair_label> convert(
+inline static std::vector<rna_pair_label> convert(
                 const std::string& labels);
 
-inline std::string trim(
-                std::string& s);
+inline static std::string trim(
+                std::string s);
 
 
 rna_tree::rna_tree(
-                std::string _brackets,
-                std::string _labels,
-                std::string _name)
+                const std::string& _brackets,
+                const std::string& _labels,
+                const std::string& _name)
     : tree_base<rna_pair_label>(
             trim(_brackets), convert(trim(_labels))), _name(_name)
 {
@@ -62,9 +61,15 @@ rna_tree::rna_tree(
     update_points(_points);
 }
 
+void rna_tree::set_name(
+                const std::string& name)
+{
+    _name = name;
+}
 
 
-std::vector<rna_pair_label> convert(
+
+/* inline, local */ std::vector<rna_pair_label> convert(
                 const std::string& labels)
 {
     vector<rna_pair_label> vec;
@@ -202,7 +207,7 @@ std::string rna_tree::name() const
 std::string rna_tree::get_labels() const
 {
     ostringstream out;
-    iterator root = _tree.begin();
+    iterator root = begin();
     for (sibling_iterator ch = root.begin(); ch != root.end(); ++ch)
         out << get_labels(ch);
 
@@ -232,7 +237,7 @@ std::string rna_tree::get_labels() const
 std::string rna_tree::get_brackets() const
 {
     ostringstream out;
-    iterator root = _tree.begin();
+    iterator root = begin();
     for (sibling_iterator ch = root.begin(); ch != root.end(); ++ch)
         out << get_brackets(ch);
 
@@ -240,58 +245,7 @@ std::string rna_tree::get_brackets() const
 }
 
 
-/* static */ point rna_tree::top_right_corner(iterator root)
-{
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
-
-    // x, y should be maximal in subtree
-    point p = { -DBL_MAX, -DBL_MAX };
-
-    auto f = [&p] (const pre_post_order_iterator& it) {
-        if (rna_tree::is_root(it) || !it->inited_points())
-            return;
-        point o = it->at(it.label_index()).p;
-        if (o.x > p.x)
-            p.x = o.x;
-        if (o.y > p.y)
-            p.y = o.y;
-    };
-
-    rna_tree::for_each_in_subtree(root, f);
-
-    assert(p.x != -DBL_MAX && p.y != -DBL_MAX);
-    DEBUG("top_right_corner = %s", to_cstr(p));
-
-    return p;
-}
-
-/* static */ point rna_tree::bottom_left_corner(iterator root)
-{
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
-
-    // x, y should be minimal in subtree
-    point p = { DBL_MAX, DBL_MAX };
-
-    auto f = [&p] (const pre_post_order_iterator& it) {
-        if (rna_tree::is_root(it) || !it->inited_points())
-            return;
-        point o = it->at(it.label_index()).p;
-        if (o.x < p.x)
-            p.x = o.x;
-        if (o.y < p.y)
-            p.y = o.y;
-    };
-
-    rna_tree::for_each_in_subtree(root, f);
-
-    assert(p.x != DBL_MAX && p.y != DBL_MAX);
-    DEBUG("bottom_left_corner = %s", to_cstr(p));
-
-    return p;
-}
-
-
-bool rna_tree::correct_pairing()
+bool rna_tree::correct_pairing() const
 {
     APP_DEBUG_FNAME;
 
@@ -305,7 +259,8 @@ bool rna_tree::correct_pairing()
     return true;
 }
 
-/* global */ size_t child_index(rna_tree::sibling_iterator sib)
+/* global */ size_t child_index(
+                rna_tree::sibling_iterator sib)
 {
     size_t n = 0;
     while (!rna_tree::is_first_child(sib))
@@ -317,8 +272,8 @@ bool rna_tree::correct_pairing()
 }
 
 
-/* inline */ std::string trim(
-                std::string& s)
+/* inline, local */ std::string trim(
+                std::string s)
 {
 #define WHITESPACES " \t\n\r\f\v"
     size_t pos;
@@ -333,4 +288,15 @@ bool rna_tree::correct_pairing()
     return s;
 }
 
+
+/* static */ point rna_tree::base_pair_edge_point(
+                point from,
+                point to)
+{
+    assert(!from.bad() && !to.bad());
+
+    point vec = {3, 3};
+    vec = vec + normalize(to - from) * 4;
+    return from + vec;
+}
 

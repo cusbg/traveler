@@ -20,11 +20,8 @@
  */
 
 #include "compact.hpp"
-#include "ps_writer.hpp"
 #include "compact_circle.hpp"
 #include "compact_utils.hpp"
-
-static ps_writer psout;
 
 
 using namespace std;

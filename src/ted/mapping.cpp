@@ -20,7 +20,7 @@
  */
 
 #include "mapping.hpp"
-#include "utils.hpp"
+#include "types.hpp"
 
 using namespace std;
 

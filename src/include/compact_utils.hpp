@@ -36,7 +36,8 @@ struct compact::intervals
     /**
      * create intervals for `parent`-s children
      */
-    void init(iterator parent);
+    void init(
+                iterator parent);
     point get_circle_direction() const;
 
     std::vector<interval> vec;

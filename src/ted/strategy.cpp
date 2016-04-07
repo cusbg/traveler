@@ -20,6 +20,7 @@
  */
 
 #include "strategy.hpp"
+#include "types.hpp"
 
 using namespace std;
 
@@ -38,7 +39,12 @@ int strategy::to_index() const
     return out;
 }
 
-strategy::strategy(int index)
+strategy::strategy(
+                int index)
+    : strategy(static_cast<rted_strategy>(index))
+{ }
+
+strategy::strategy(rted_strategy index)
 {
     assert(index >= 0 && index < 6);
 

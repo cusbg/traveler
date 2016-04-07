@@ -26,7 +26,8 @@ using namespace std;
 #define heavy_child(iter)   (heavy_children[id(iter)])
 #define insert(from, to)    ((to).insert((to).end(), (from).begin(), (from).end()))
 
-gted_tree::gted_tree(const rna_tree& t)
+gted_tree::gted_tree(
+                const rna_tree& t)
     : rna_tree(t)
 {
     init();
@@ -130,17 +131,6 @@ void gted_tree::init()
             else
                 insert(keyroots[chid].heavy, keyroot.heavy);
         }
-/*
-            DEBUG("it: %s", clabel(it));
-            DEBUG("sub");
-            LOGGER_PRINT_CONTAINER(subforests[id(it)].left, "left");
-            LOGGER_PRINT_CONTAINER(subforests[id(it)].right, "right");
-            LOGGER_PRINT_CONTAINER(subforests[id(it)].heavy, "heavy");
-            DEBUG("key");
-            LOGGER_PRINT_CONTAINER(keyroots[id(it)].left, "left");
-            LOGGER_PRINT_CONTAINER(keyroots[id(it)].right, "right");
-            LOGGER_PRINT_CONTAINER(keyroots[id(it)].heavy, "heavy");
-*/
     }
 
     assert(size() == get_size(begin()));

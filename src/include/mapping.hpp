@@ -22,8 +22,8 @@
 #ifndef MAPPING_HPP
 #define MAPPING_HPP
 
-#include "types.hpp"
-#include "rna_tree.hpp"
+#include <vector>
+#include <istream>
 
 class mapping
 {

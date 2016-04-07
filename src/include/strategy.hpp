@@ -22,9 +22,10 @@
 #ifndef STRATEGY_HPP
 #define STRATEGY_HPP
 
-#include "types.hpp"
+#include <vector>
+#include <ostream>
 
-enum rted_strategy
+enum rted_strategy : char
 {
     RTED_T1_LEFT  = 0,
     RTED_T2_LEFT  = 1,
@@ -39,6 +40,8 @@ struct strategy
     strategy() = default;
     strategy(
                 int index);
+    strategy(
+                rted_strategy index);
     strategy(
                 const std::string& text);
 
@@ -93,10 +96,12 @@ private:
 typedef std::vector<std::vector<strategy>>  strategy_table_type;
 
 std::ostream& operator<<(
-                std::ostream& out, strategy_table_type strategies);
+                std::ostream& out,
+                strategy_table_type strategies);
 
 std::ostream& operator<<(
-                std::ostream& out, rted_strategy str);
+                std::ostream& out,
+                rted_strategy str);
 
 #endif /* !STRATEGY_HPP */
 

@@ -19,15 +19,12 @@
  * USA.
  */
 
-#include <cstdlib>
 #include <chrono>
-#include <string>
-#include <sstream>
 #include <iomanip>
-#include <sys/types.h>
 #include <unistd.h>
 
 #include "logger.hpp"
+#include "types.hpp"
 
 
 using namespace std;
@@ -40,22 +37,20 @@ class logger logger(logger::WARN);
 
 
 
-logger::logger(priority priority)
+logger::logger(
+                priority priority)
 {
     p = priority;
     out.push_back(stdout);
     FILE* f = fopen(LOG_FILE, "a");
 
-    if (f == nullptr || ferror(f))
-    {
-        error("cannot open file '%s' to log in", LOG_FILE);
-        abort();
-    }
+    assert_err(f != nullptr && !ferror(f),
+            "cannot open file '%s' to log in", LOG_FILE);
 
     out.push_back(f);
 
-    setvbuf(stdout, NULL, _IOFBF, 0);
-    setvbuf(f, NULL, _IOFBF, 0);
+    for (FILE *f : out)
+        setvbuf(f, NULL, _IOFBF, 0);
 
     debug("*****************************************");
     debug("************ RUNNING PROGRAM ************");
@@ -66,25 +61,6 @@ logger::~logger()
 {
     for (FILE* f : out)
         fclose(f);
-}
-
-inline const char* to_cstr(
-                logger::priority p)
-{
-#define switchcase(p) \
-    case logger::priority::p: \
-        return #p
-    switch (p)
-    {
-        switchcase(DEBUG);
-        switchcase(INFO);
-        switchcase(WARN);
-        switchcase(ERROR);
-        switchcase(EMERG);
-        default:
-            abort();
-    }
-#undef switchcase
 }
 
 void logger::log(
@@ -112,7 +88,7 @@ void logger::log(
 }
 
 string logger::message_header(
-                priority p)
+                priority p) const
 {
     auto now = chrono::system_clock::now().time_since_epoch();
 
@@ -148,7 +124,7 @@ string logger::message_header(
         << " <"
         << (int)getpid()
         << ">\t["
-        << to_cstr(p)
+        << p
         << "]\t";
 
     return stream.str();
@@ -157,14 +133,7 @@ string logger::message_header(
 void logger::check_errors()
 {
     for (FILE* f : out)
-    {
-        if (ferror(f))
-        {
-            for (FILE* f : out)
-                fprintf(f, "LOGGER FILE OUTPUT ERROR\n");
-            abort();
-        }
-    }
+        assert_err(!ferror(f), "LOGGER FILE OUTPUT ERROR");
 }
 
 std::vector<int> logger::opened_files() const
@@ -200,6 +169,31 @@ void logger::logger_stream::flush()
     if (!l.can_log(p))
         return;
     l.log(p, "%s", stream.str().c_str());
+}
+
+
+
+std::ostream& operator<<(
+                    std::ostream& out,
+                    logger::priority p)
+{
+#define switchcase(p) \
+    case logger::priority::p: \
+        out << #p; \
+        break;
+    switch (p)
+    {
+        switchcase(DEBUG);
+        switchcase(INFO);
+        switchcase(WARN);
+        switchcase(ERROR);
+        switchcase(EMERG);
+        default:
+            abort();
+    }
+#undef switchcase
+
+    return out;
 }
 
 

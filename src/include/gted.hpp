@@ -23,13 +23,9 @@
 #define GTED_HPP
 
 
-#include "types.hpp"
 #include "strategy.hpp"
 #include "gted_tree.hpp"
 
-
-#define GTED_COST_MODIFY    0
-#define GTED_COST_DELETE    1
 
 class mapping;
 
@@ -39,9 +35,9 @@ public:
     typedef gted_tree                                   tree_type;
     typedef typename tree_type::iterator                iterator;
     typedef typename tree_type::post_order_iterator     post_order_iterator;
+    typedef typename tree_type::sibling_iterator        sibling_iterator;
     typedef typename tree_type::reverse_post_order_iterator
                                                         rev_post_order_iterator;
-    typedef typename tree_type::sibling_iterator        sibling_iterator;
     typedef std::vector<std::vector<size_t>>            tree_distance_table_type;
     typedef std::vector<std::vector<size_t>>            forest_distance_table_type;
 
@@ -59,11 +55,9 @@ public:
     mapping get_mapping();
 
 public:
-    inline void set_tdist_table(
-                const tree_distance_table_type& _tdist)
-    { tdist = _tdist; }
-    inline tree_distance_table_type& get_tree_distances()
-    { return tdist; }
+    void set_tdist_table(
+                const tree_distance_table_type& _tdist);
+    tree_distance_table_type& get_tree_distances();
 
 
 private:

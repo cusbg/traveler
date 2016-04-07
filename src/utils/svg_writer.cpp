@@ -20,6 +20,7 @@
  */
 
 #include "svg_writer.hpp"
+#include "utils.hpp"
 
 #define SVG_END_STRING      "</svg>\n"
 #define SVG_END_LENGTH      (sizeof(SVG_END_STRING) - 1)
@@ -190,7 +191,7 @@ std::string svg_writer::get_header_element(
     letter.x /= scale.x;
     letter.y /= scale.y;
 
-    shift = -rna_tree::bottom_left_corner(root) + point({50, 59});
+    shift = -bottom_left_corner(root) + point({50, 59});
 
     DEBUG("sh %s, lt %s", to_cstr(shift), to_cstr(letter));
 

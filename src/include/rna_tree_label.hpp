@@ -22,6 +22,8 @@
 #ifndef RNA_TREE_LABEL_HPP
 #define RNA_TREE_LABEL_HPP
 
+#include <vector>
+
 #include "tree_base_node.hpp"
 #include "point.hpp"
 
@@ -35,8 +37,7 @@ struct rna_label
 };
 
 
-class rna_pair_label
-    : public node_base
+class rna_pair_label : public node_base
 {
 public:
     enum status_type
