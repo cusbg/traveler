@@ -85,7 +85,8 @@ private:
      * from ps extract rna sequence and node positions in image
      */
     static rna_tree create_templated(
-                const std::string& psfile,
+                const std::string& templatefile,
+                const std::string& templatetype,
                 const std::string& foldfile,
                 const std::string& name);
 

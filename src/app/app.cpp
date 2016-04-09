@@ -23,7 +23,7 @@
 #include "utils.hpp"
 #include "mapping.hpp"
 #include "tree_matcher.hpp"
-#include "ps_reader.hpp"
+#include "ps_extractor.hpp"
 #include "ps_writer.hpp"
 #include "svg_writer.hpp"
 #include "compact.hpp"
@@ -65,7 +65,7 @@ struct app::arguments
         bool overlap_checks = false;
         string mapping;
         string file;
-        string ps_templated;
+        string file_templated;
     } document;
 
 public:
@@ -242,15 +242,16 @@ rna_tree app::create_matched(
 }
 
 rna_tree app::create_templated(
-                const std::string& psfile,
+                const std::string& docfile,
+                const std::string& doctype,
                 const std::string& foldfile,
                 const std::string& name)
 {
     APP_DEBUG_FNAME;
 
     string brackets = read_file(foldfile);
-    ps_document ps(psfile);
-    return rna_tree(brackets, ps.labels, ps.points, name);
+    extractor& doc = extractor::get_extractor(docfile, doctype);
+    return rna_tree(brackets, doc.labels, doc.points, name);
 }
 
 
@@ -270,7 +271,7 @@ void app::usage(
         << appname
             << " [OPTIONS]"
             << " <-mt|--match-tree> SEQ FOLD"
-            << " <-tt|--template-tree> PS FOLD"
+            << " <-tt|--template-tree> [--type TYPE] DOCUMENT FOLD"
             << endl
         << endl
         << "OPTIONS:" << endl
@@ -400,8 +401,17 @@ void app::print(
         if (arg == "-tt" || arg == "--template-tree")
         {
             DEBUG("arg template-tree");
-            string ps, fold, name;
-            ps = args.at(i + 1);
+            string doc, doctype, fold, name;
+            if (nextarg() == "--type")
+            {
+                doctype = args.at(i + 2);
+                i += 2;
+            }
+            else
+            {
+                doctype = "ps";
+            }
+            doc = args.at(i + 1);
             fold = args.at(i + 2);
             i += 2;
             if (nextarg() == "--name")
@@ -409,8 +419,8 @@ void app::print(
                 name = args.at(i + 2);
                 i+= 2;
             }
-            a.templated = app::create_templated(ps, fold, name);
-            a.document.ps_templated = ps;
+            a.templated = app::create_templated(doc, doctype, fold, name);
+            a.document.file_templated = doc;
             tt = true;
             continue;
         }

@@ -1,7 +1,7 @@
 /*
- * File: utils_ps_reader.hpp
+ * File: extractor.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2016 Richard Eliáš <richard@ba30.eu>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,30 +19,31 @@
  * USA.
  */
 
-#ifndef UTILS_PS_READER_HPP
-#define UTILS_PS_READER_HPP
+#ifndef EXTRACTOR_HPP
+#define EXTRACTOR_HPP
 
-#include <vector>
 #include <string>
-
-struct point;
+#include <vector>
+#include "point.hpp"
 
 /**
- * ps document reader
+ * extracts labels and points from document
  */
-class ps_document
+class extractor
 {
 public:
-    ps_document(
-                const std::string& filename);
+    static extractor& get_extractor(
+                const std::string& filename,
+                const std::string& type);
+protected:
+    virtual void init(
+                const std::string& filename) = 0;
 
+public:
     std::string labels;
     std::vector<point> points;
-
-    std::string prolog;
-    std::string epilog;
 };
 
 
-#endif /* !UTILS_PS_READER_HPP */
+#endif /* !EXTRACTOR_HPP */
 

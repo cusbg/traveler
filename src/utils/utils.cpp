@@ -24,7 +24,7 @@
 
 #include "utils.hpp"
 #include "mapping.hpp"
-#include "ps_reader.hpp"
+#include "ps_extractor.hpp"
 
 using namespace std;
 
@@ -370,7 +370,7 @@ rna_tree get_rna(const string& name)
     l = read_file(name + ".seq");
     b = read_file(name + ".fold");
 
-    ps_document doc(name + ".ps");
+    extractor& doc = extractor::get_extractor(name + ".ps", "ps");
 
     return rna_tree(b, l, doc.points, name);
 }

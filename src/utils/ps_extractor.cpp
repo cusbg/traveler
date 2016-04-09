@@ -22,23 +22,23 @@
 #include <fstream>
 #include <regex>
 
-#include "ps_reader.hpp"
+#include "ps_extractor.hpp"
 #include "utils.hpp"
 
 using namespace std;
 
 
-
-ps_document::ps_document(const std::string& name)
+void ps_extractor::init(
+                const std::string& filename)
 {
     APP_DEBUG_FNAME;
-    assert_err(exist_file(name),
-            "ps_document(%s): file does not exist", to_cstr(name));
+    assert_err(exist_file(filename),
+            "ps_document(%s): file does not exist", to_cstr(filename));
 
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     string line, str;
-    ifstream in(name);
+    ifstream in(filename);
     point p;
     auto stream_pos = in.tellg();
     regex regexp_base_line(
