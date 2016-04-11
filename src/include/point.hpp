@@ -112,6 +112,8 @@ double angle(point p);
 
 double angle(point p1, point centre, point p2);
 
+point rotate(point p, point centre, double alpha);
+
 point orthogonal(point p);
 
 point orthogonal(point p, point direction);

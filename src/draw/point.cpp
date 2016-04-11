@@ -205,6 +205,32 @@ double angle(point p1, point centre, point p2)
     return out;
 }
 
+point rotate(point p, point centre, double alpha)
+{
+    UNARY(p);
+    UNARY(centre);
+
+    double r = distance(p, centre);
+    point out({
+            centre.x + r * cos(degrees_to_radians(alpha)),
+            centre.y + r * sin(degrees_to_radians(alpha))
+            });
+
+    return out;
+}
+
+point point_with_angle(point centre, double alpha, double radius)
+{
+    UNARY(centre);
+
+    point p({
+            centre.x + radius * cos(degrees_to_radians(alpha)),
+            centre.y + radius * sin(degrees_to_radians(alpha))
+            });
+
+    return p;
+}
+
 point orthogonal(point p)
 {
     UNARY(p);

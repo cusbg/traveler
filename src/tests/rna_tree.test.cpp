@@ -19,8 +19,6 @@
  * USA.
  */
 
-#define TESTS
-
 #include "rna_tree.test.hpp"
 #include "rna_tree.hpp"
 

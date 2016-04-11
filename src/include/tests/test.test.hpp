@@ -36,8 +36,10 @@ protected:
 
 protected:
     void add_failed_test();
+    void add_failed_test(const my_exception& e);
 
     void set(int line_number, const std::string& file, const std::string& condition);
+    void set(const std::string& expected, const std::string& value);
     void test_ok();
 
 
@@ -62,25 +64,28 @@ private:
                 test_assert_true(out); \
                 test_ok(); \
             } \
-            catch (...) \
+            catch (const my_exception& e) \
             { \
-                add_failed_test(); \
+                add_failed_test(e); \
             } \
         }
 
-#define assert_equals(val1, val2) \
+#define assert_false(condition) \
+    assert_true(!condition)
+
+#define assert_equals(value, expected) \
         { \
-            set_args(#val1 " == " #val2); \
+            set_args(#expected " == " #value); \
+            set(to_string(expected), to_string(value)); \
             try  \
             { \
-                bool result = (val1) == (val2); \
-                INFO("%s == %s", to_cstr(val1), to_cstr(val2)); \
+                bool result = (expected) == (value); \
                 test_assert_true(result); \
                 test_ok(); \
             } \
-            catch (...) \
+            catch (const my_exception& e) \
             { \
-                add_failed_test(); \
+                add_failed_test(e); \
             } \
         }
 

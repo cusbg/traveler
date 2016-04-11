@@ -46,7 +46,8 @@ void run_test()
 }
 
 
-test::test(const std::string& test_name)
+test::test(
+                const std::string& test_name)
     : test_name(test_name)
 {
     logger.set_priority(logger::EMERG);
@@ -79,19 +80,41 @@ void test::add_failed_test()
     failed_tests.push_back(file + ":" + to_string(line_number) + " - " + condition);
 }
 
-void test::test_assert_true(bool condition)
+void test::add_failed_test(
+                const my_exception& e)
+{
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+
+    logger.emerg("TEST %s on line %li of %s failed: %s",
+            test_name.c_str(), line_number, file.c_str(), condition.c_str());
+
+    failed_tests.push_back(file + ":" + to_string(line_number) + " - " + condition + ": Exception: " + e.what());
+}
+
+void test::test_assert_true(
+                bool condition)
 {
     if (!condition)
         add_failed_test();
 }
 
-void test::set(int _line_number, const std::string& _file, const std::string& _condition)
+void test::set(
+                int _line_number,
+                const std::string& _file,
+                const std::string& _condition)
 {
     line_number = _line_number;
     condition = _condition;
     file = _file;
 
     DEBUG("TEST line #%li: %s", line_number, condition.c_str());
+}
+
+void test::set(
+                const std::string& expected,
+                const std::string& value)
+{
+    condition = condition + ", " + expected + " == " + value;
 }
 
 void test::test_ok()

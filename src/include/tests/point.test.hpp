@@ -33,9 +33,9 @@ public:
     virtual void run();
 
 private:
-    void test_operations_success();
-    void test_operations_fail();
-
+    void test_basics();
+    void test_operations();
+    void test_functions();
 };
 
 
