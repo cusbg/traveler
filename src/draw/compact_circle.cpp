@@ -104,19 +104,9 @@ point compact::circle::rotate(
     CIRCLE_SGN_INITED();
     assert(double_equals(distance(p1, centre), distance(p2, centre)));
 
-    double r = radius();
     double alpha = sgn * delta + angle(p1 - centre);
 
-    point p({
-            centre.x + r * cos(degrees_to_radians(alpha)),
-            centre.y + r * sin(degrees_to_radians(alpha))
-            });
-
-    if (!lies_in_segment(p))
-    {
-        WARN("output node does not lie in circle segment");
-        //abort();
-    }
+    point p = ::rotate(centre, alpha, radius());
 
     return p;
 }

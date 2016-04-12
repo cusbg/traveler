@@ -49,7 +49,7 @@ ${MODULES}:
 	@echo "****************END-MAKEFILE-GENERATING:$@****************"
 
 test: prepare_test force_rebuild_main build
-	gdb ${BUILDDIR}/${TARGET}
+	${BUILDDIR}/${TARGET}
 
 prepare_test:
 	$(eval MODULETARGET := testmake)

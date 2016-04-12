@@ -30,7 +30,9 @@ using namespace std;
 #define point_0_3 point(0, 3)
 
 #define point_1_1 point(1, 1)
+#define point_1_0 point(1, 0)
 #define point_0_m1 point(0, -1)
+#define point_m1_0 point(-1, 0)
 #define point_90deg point(1, 0)
 
 #define point_bad point({0xBADF00D, 0xBADF00D})
@@ -73,9 +75,12 @@ void test_point::test_functions()
     assert_equals(angle(point_90deg), 0);
     assert_equals(angle(point_0_1), 90);
 
-    assert_equals(rotate(point_0_1, point_0_0, 90), point_1_1);
-    assert_equals(rotate(point_0_1, point_0_0, 180), point_0_m1);
-    assert_equals(rotate(point_1_1, point_0_0, 270), point_0_1);
+    assert_equals(rotate(point_0_0, 0, 1), point_1_0);
+    assert_equals(rotate(point_0_0, 45, sqrt(2.)), point_1_1);
+    assert_equals(rotate(point_0_0, 90, 1), point_0_1);
+    assert_equals(rotate(point_0_0, 180, 1), point_m1_0);
+    assert_equals(rotate(point_0_0, 270, 1), point_0_m1);
+    assert_equals(rotate(point_0_0, 360, 1), point_1_0);
 
     assert_equals(orthogonal(point_90deg), point_0_m1);
     assert_equals(orthogonal(point_90deg, point_0_1), point_0_1);
