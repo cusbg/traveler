@@ -193,7 +193,7 @@ private:
      * reinserts nodes to lie on circle
      */
     void reinsert(
-                const circle& c,
+                const points_vec& points,
                 const nodes_vec& nodes);
 
     /**

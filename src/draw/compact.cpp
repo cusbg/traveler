@@ -609,9 +609,9 @@ void compact::split(
         p = move_point(p, p1.at(i), l);
         p2[j] = p;
     }
-    DEBUG("i %lu, j %lu, p1 %lu, p2 %lu",
+
+    assert_err(j == p2.size(), "i %lu, j %lu, p1 %lu, p2 %lu",
             i, j, p1.size(), p2.size());
-    assert(j == p2.size());
 
     j = 0;
     for (auto val : in.vec)
@@ -619,7 +619,7 @@ void compact::split(
 }
 
 void compact::reinsert(
-                const circle& c,
+                const points_vec& points,
                 const nodes_vec& nodes)
 {
     APP_DEBUG_FNAME;
@@ -628,8 +628,6 @@ void compact::reinsert(
         return;
 
     assert(!nodes.empty());
-
-    points_vec points = c.split(nodes.size());
 
     assert(points.size() == nodes.size());
     for (size_t i = 0; i < points.size(); ++i)
@@ -656,9 +654,8 @@ void compact::remake(
     c.direction = direction;
     c.centre = centre(c.p1, c.p2);
     c.compute_sgn();
-    c.init(i.vec.size());
 
-    reinsert(c, i.vec);
+    reinsert(c.init(i.vec.size()), i.vec);
 }
 
 double compact::get_length(

@@ -66,7 +66,7 @@ run_ps() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --ps --mapping ${file}.map --overlaps build/files/${file1}-${file2} \
+	    --image --mapping ${file}.map --overlaps build/files/${file1}-${file2} \
         || fail_function
 }
 
@@ -77,7 +77,7 @@ run_all() {
         ${tt} ${mt} \
         --rted --strategies ${file}.rted \
         --gted --ted-out ${file}.ted --mapping ${file}.map \
-        --ps ${file} \
+        --image ${file} \
         || fail_function
 }
 

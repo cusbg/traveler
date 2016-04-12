@@ -63,7 +63,7 @@ public:
     /**
      * initialize circle (length) for `n` nodes
      */
-    void init(
+    std::vector<point> init(
                 size_t n);
 
 public:

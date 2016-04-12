@@ -263,6 +263,8 @@ void app::usage(
     stringstream str;
 
     str
+        << endl
+        << endl
         << "usage():"
         << endl
         << appname
@@ -281,13 +283,11 @@ void app::usage(
             << " [--ted-out <FILE>]"
             << " [--ted-in <FILE>]"
             << " [--mapping <FILE>]]" << endl
-        << "\t[--ps"
+        << "\t[--image"
             << " [--mapping <FILE>]"
             << " [--overlaps] <FILE>]" << endl
         << "\t[-d|--debug]" << endl;
 
-    INFO("");
-    INFO("");
     INFO("%s", to_cstr(str.str()));
 }
 
@@ -476,9 +476,9 @@ void app::print(
             }
             continue;
         }
-        if (arg == "--ps")
+        if (arg == "--image")
         {
-            DEBUG("arg ps");
+            DEBUG("arg image");
             a.document.run = true;
             while (true)
             {

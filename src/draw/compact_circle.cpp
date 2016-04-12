@@ -146,16 +146,17 @@ void compact::circle::compute_sgn()
     assert(!lies_in_segment(direction));
 }
 
-void compact::circle::init(
+std::vector<point> compact::circle::init(
                 size_t n)
 {
     CIRCLE_POINTS_INITED();
     CIRCLE_SGN_INITED();
     assert(double_equals(distance(p1, centre), distance(p2, centre)));
 
-    circle c = *this;   // TODO: only to debug output... remove?
     if (n == 0)
-        return;
+        return split(0);
+
+    circle c = *this;   // TODO: only to debug output... remove?
 
     DEBUG("init(%lu, %s)", n, to_cstr(*this));
 
@@ -197,6 +198,8 @@ void compact::circle::init(
         WARN("max_iterations reached");
 
     DEBUG("from circle \n%s -> to \n%s", to_cstr(c), to_cstr(*this));
+
+    return split(n);
 }
 
 
