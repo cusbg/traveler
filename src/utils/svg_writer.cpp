@@ -26,12 +26,12 @@
 #define SVG_END_LENGTH      (sizeof(SVG_END_STRING) - 1)
 
 #define quoted(text)        (string() + "\"" + to_string(text) + "\"")
-#define LETTER              {612, 792}
 
 using namespace std;
 
 
 static int indentation = 0;
+
 
 static std::string indent()
 {
@@ -65,6 +65,63 @@ struct svg_writer::style
         return out;
     }
 };
+
+
+svg_writer::svg_writer()
+{
+    assert(indentation == 0);
+}
+
+std::string svg_writer::get_header_element(
+                rna_tree::iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    ostringstream out;
+
+    letter = LETTER;
+
+    point scale = {0.54, 0.54};
+    letter.x /= scale.x;
+    letter.y /= scale.y;
+
+    shift = -bottom_left_corner(root) + point({50, 50});
+
+    point bl = bottom_left_corner(root);
+    point tr = top_right_corner(root);
+    point size = abs(bl) + abs(tr) + point({100, 100});
+
+    DEBUG("shift %s, lt %s, size %s", to_cstr(shift), to_cstr(letter), to_cstr(size));
+
+    WAIT;
+
+    out
+        << "<svg"
+        << create_property("xmlns", "http://www.w3.org/2000/svg")
+        << create_property("xmlns:xlink", "http://www.w3.org/1999/xlink")
+        << create_property("width", letter.x)
+        << create_property("height", letter.y)
+        << create_property("viewBox", "0 0 " + to_string(size.x) + "px " + to_string(size.y) + "px")
+        << create_style({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
+        << ">"
+        << endl;
+
+    ++indentation;
+
+    return out.str();
+}
+
+void svg_writer::init(
+                const std::string& filename,
+                rna_tree::iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    document_writer::init(filename + ".svg");
+
+    print(get_header_element(root) + create_white_background());
+}
+
 
 svg_writer::style svg_writer::get_svg_color_style(
                 const RGB& color) const
@@ -176,50 +233,6 @@ std::string svg_writer::get_point_formatted(
         << create_property(prefix + "y" + postfix, p.y);
 
     return out.str();
-}
-
-std::string svg_writer::get_header_element(
-                rna_tree::iterator root)
-{
-    APP_DEBUG_FNAME;
-
-    ostringstream out;
-
-    letter = LETTER;
-
-    point scale = {0.54, 0.54};
-    letter.x /= scale.x;
-    letter.y /= scale.y;
-
-    shift = -bottom_left_corner(root) + point({50, 59});
-
-    DEBUG("sh %s, lt %s", to_cstr(shift), to_cstr(letter));
-
-    out
-        << "<svg"
-        << create_property("xmlns", "http://www.w3.org/2000/svg")
-        << create_property("xmlns:xlink", "http://www.w3.org/1999/xlink")
-        << create_property("width", letter.x)
-        << create_property("height", letter.y)
-        << create_property("viewBox", "0 0 1200px 1600px")
-        << create_style({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
-        << ">"
-        << endl;
-
-    ++indentation;
-
-    return out.str();
-}
-
-void svg_writer::init(
-                const std::string& filename,
-                rna_tree::iterator root)
-{
-    APP_DEBUG_FNAME;
-
-    document_writer::init(filename + ".svg");
-
-    print(get_header_element(root) + create_white_background());
 }
 
 template <typename value_type>

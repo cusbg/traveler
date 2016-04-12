@@ -25,6 +25,8 @@
 #include <fstream>
 #include "rna_tree.hpp"
 
+#define LETTER              point({612, 792})
+
 struct RGB;
 
 class document_writer

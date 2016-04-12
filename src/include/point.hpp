@@ -123,6 +123,7 @@ bool lies_on_line(point p1, point p2, point p3);
 
 bool lies_between(point p, point from, point to);
 
+point abs(point p);
 
 #endif /* !POINT_HPP */
 

@@ -294,5 +294,11 @@ bool lies_between(point p, point from, point to)
         double_equals(p.x / to.x, p.y / to.y);
 }
 
+point abs(point p)
+{
+    UNARY(p);
+
+    return {fabs(p.x), fabs(p.y)};
+}
 
 

@@ -5,6 +5,8 @@ FILES1=${ALL}
 FILES2=${ALL}
 #FILES1="artemia_salina"
 #FILES2="cicadas"
+FILES1=cicadas
+FILES2=echinococcus_granulosus
 
 EXECUTABLE="build/traveler"
 DIR=precomputed

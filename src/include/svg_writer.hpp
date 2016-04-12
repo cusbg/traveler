@@ -31,6 +31,7 @@ private:
     struct property;
 
 public:
+    svg_writer();
     virtual streampos print(
                 const std::string& text);
     void init(
