@@ -47,6 +47,9 @@ build:
 run:
 	make --directory=${ROOTDIR} --file=Makefile $@
 
+debug:
+	make --directory=${ROOTDIR} --file=Makefile $@
+
 test:
 	make --directory=${ROOTDIR} --file=Makefile $@
 

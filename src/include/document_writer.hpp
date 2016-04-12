@@ -25,44 +25,7 @@
 #include <fstream>
 #include "rna_tree.hpp"
 
-
-class RGB
-{
-public: /* constants: */
-    static const RGB RED;
-    static const RGB GREEN;
-    static const RGB BLUE;
-    static const RGB BLACK;
-    static const RGB GRAY;
-
-private:
-    RGB(
-                double _red,
-                double _green,
-                double _blue);
-
-public:
-    bool operator==(
-                const RGB& other) const;
-    inline double get_red() const
-    {
-        return red;
-    }
-    inline double get_green() const
-    {
-        return green;
-    }
-    inline double get_blue() const
-    {
-        return blue;
-    }
-
-private:
-    double red;
-    double green;
-    double blue;
-};
-
+struct RGB;
 
 class document_writer
 {
@@ -101,6 +64,8 @@ public:
     std::string get_rna_formatted(
                 rna_tree rna) const;
     std::string get_rna_subtree_formatted(
+                rna_tree::iterator root) const;
+    std::string get_rna_subtree_formatted_colored(
                 rna_tree::iterator root) const;
 
 public:
@@ -153,6 +118,49 @@ private:
     std::ofstream out;
 };
 
+
+struct RGB
+{
+public: /* constants: */
+    static const RGB RED;
+    static const RGB GREEN;
+    static const RGB BLUE;
+    static const RGB BLACK;
+    static const RGB GRAY;
+    static const RGB BROWN;
+
+private:
+    RGB(
+                double _red,
+                double _green,
+                double _blue);
+
+    static RGB for_255(
+                size_t _red,
+                size_t _green,
+                size_t _blue);
+
+public:
+    bool operator==(
+                const RGB& other) const;
+    inline double get_red() const
+    {
+        return red;
+    }
+    inline double get_green() const
+    {
+        return green;
+    }
+    inline double get_blue() const
+    {
+        return blue;
+    }
+
+private:
+    double red;
+    double green;
+    double blue;
+};
 
 #endif /* !UTILS_DOCUMENT_WRITER_HPP */
 

@@ -51,6 +51,14 @@ inline bool contains(
     return std::find(std::begin(c), std::end(c), v) != std::end(c);
 }
 
+template <typename T, typename value_type>
+inline bool contains(
+                const std::initializer_list<T>& c,
+                const value_type& v)
+{
+    return contains(std::vector<T>(c), v);
+}
+
 template <typename T>
 inline bool operator!=(
                 const T& t1,

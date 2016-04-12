@@ -52,9 +52,8 @@ using namespace std;
     assert(!(P).bad());
 
 
-
 point::point()
-    : point(BAD_POINT)
+    : point(bad_point())
 { }
 
 point::point(double _x, double _y)
@@ -141,9 +140,10 @@ bool point::bad() const
         ::isnan(x) || ::isnan(y);
 }
 
-/* static */ point point::bad_point()
+/* static */ const point& point::bad_point()
 {
-    return BAD_POINT;
+    static point bad = BAD_POINT;
+    return bad;
 }
 
 point operator*(double value, point p)
@@ -293,5 +293,6 @@ bool lies_between(point p, point from, point to)
         p.x / to.x >= 0 &&
         double_equals(p.x / to.x, p.y / to.y);
 }
+
 
 

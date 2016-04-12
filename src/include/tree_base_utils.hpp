@@ -174,6 +174,19 @@ void tree_base<label_type>::set_postorder_ids()
     assert(size() - 1 == ::id(begin()));
 }
 
+template <typename label_type>
+bool tree_base<label_type>::is_ordered_postorder() const
+{
+    APP_DEBUG_FNAME;
+
+    size_t i = 0;
+    for (post_order_iterator it = begin_post(); it != end_post(); ++it, ++i)
+        if (i != ::id(it))
+            return false;
+
+    return true;
+}
+
 //
 // global functions:
 //

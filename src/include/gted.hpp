@@ -29,6 +29,7 @@
 
 class mapping;
 
+// TODO: prepisat na templatovanu verziu, nepouzivat rna_tree, ale radsej tree_base<T>
 class gted
 {
 public:

@@ -48,6 +48,7 @@ public:
         deleted,
         inserted,
         reinserted,
+        rotated,
         pair_changed,
     };
 

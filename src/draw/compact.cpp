@@ -24,6 +24,19 @@
 #include "compact_utils.hpp"
 
 
+// TODO: remove
+#include "ps_writer.hpp"
+#define UPDATE(root) \
+
+/*
+    { \
+        ps_writer writer; \
+        writer.init("build/files/doc", rna_tree::parent(root)); \
+        writer.print(writer.get_rna_subtree_formatted_colored(root)); \
+        WAIT; \
+    }
+*/
+
 using namespace std;
 
 #define MULTIBRANCH_MINIMUM_SPLIT   10
@@ -167,6 +180,7 @@ void compact::init()
     APP_DEBUG_FNAME;
 
     //LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+    assert(rna.is_ordered_postorder());
 
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     {
@@ -319,17 +333,6 @@ void compact::init_multibranch(
 #define LEAF_POINTS 1
 #define PAIRED_POINTS 5 /* we use only # 1 and 3; # 0,2,4 will be free space */
 
-    auto create_circle =
-        [](iterator iter)
-        {
-            circle c;
-            c.p1 = iter->at(0).p;
-            c.p2 = iter->at(1).p;
-            c.direction = rna_tree::parent(iter)->at(0).p;
-            c.centre = centre(c.p1, c.p2);
-            c.compute_sgn();
-            return c;
-        };
     auto get_number_of_places_for_bases =
         [](sibling_iterator root)
         {
@@ -344,40 +347,59 @@ void compact::init_multibranch(
             return n;
         };
     auto rotate_subtree =
-        [this](sibling_iterator ch, circle c, point newpos)
+        [this](sibling_iterator root, point centre, point p1, point p2)
         {
-            c.p1 = ch->centre();
-            c.p2 = newpos;
-            rotate_branch(ch, c, c.segment_angle());
+            if (init_branch_recursive(root, centre).bad())
+            {
+                rna_tree::for_each_in_subtree(root,
+                        [](iterator iter)
+                        {
+                            rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
+                        });
+
+                root->set_points_exact(p1, 0);
+                root->set_points_exact(p2, 1);
+                return;
+            }
+
+            UPDATE(root);
+
+            point rp1 = root->at(0).p;
+            point rp2 = root->at(1).p;
+
+            root->set_points_exact(p1, 0);
+            root->set_points_exact(p2, 1);
+
+            double beta = angle(rp1 - rp2) - angle(p1 - p2);
+
+            int i = 0;  // TODO: remove
+            for (pre_post_order_iterator it = ++pre_post_order_iterator(root, true); id(it) < id(root); ++it)
+            {
+                ++i;
+                point from = it->at(it.label_index()).p;
+                if (from.bad())
+                    continue;
+
+                double alpha = angle(from - rp1);
+                double radius = distance(from, rp1);
+
+                point to = rotate(p1, alpha - beta, radius);
+
+                DEBUG("from %s to %s", to_cstr(from), to_cstr(to));
+                it->at(it.label_index()).p = to;
+            }
+
+            DEBUG("i=%i", i);
+            UPDATE(root);
         };
-    auto rotate_out_of_circle =
-        [this](iterator it, point p1, point p2, point direction)
-        {
-            assert(it->paired());
 
-            circle c;
-            c.p1 = p1;
-            c.p2 = p2;
-            c.centre = centre(p1, p2);
-            c.direction = direction;
-            c.compute_sgn();
-
-            double alpha = angle(direction, it->centre(), get_onlyone_branch(it)->centre());
-            alpha = alpha - angle(direction, it->centre(), move_point(direction, it->centre(), 10000));
-
-            rotate_branch(it, c, alpha);
-
-            it->at(0).p = p1;
-            it->at(1).p = p2;
-            int i = 0;
-            for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch)
-                it->remake_ids.push_back(i++);
-        };
-
-    int bases = get_number_of_places_for_bases(it);
-    circle c = create_circle(it);
-    c.init(bases);
-    auto points = c.split(bases);
+    circle c;
+    c.p1 = it->at(0).p;
+    c.p2 = it->at(1).p;
+    c.direction = rna_tree::parent(it)->at(0).p;
+    c.centre = centre(c.p1, c.p2);
+    c.compute_sgn();
+    auto points = c.init(get_number_of_places_for_bases(it));
 
     int i = 0;
     for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch)
@@ -390,24 +412,21 @@ void compact::init_multibranch(
         }
         else
         {
-            if (ch->inited_points())
-            {
-                // we will use only points # 1 and 3;
-                // # 0, 2, 4 will be free space
-
-                set_distance(ch, c.centre, c.radius());
-                rotate_subtree(ch, c, points[i + 2]);
-                rotate_out_of_circle(ch, points[i + 1], points[i + 2], c.centre);
-            }
-            else
-            {
-                ch->set_points_exact(points[i + 1], 0);
-                ch->set_points_exact(points[i + 3], 1);
-            }
-
+            rotate_subtree(ch, c.centre, points[i + 1], points[i + 3]);
             i += PAIRED_POINTS;
         }
     }
+    auto set_label_status =
+        [](iterator iter)
+        {
+#define lbl(type) rna_pair_label::type
+            if (!contains({lbl(edited), lbl(deleted), lbl(inserted), lbl(reinserted)}, iter->status))
+            {
+                iter->status = lbl(rotated);
+            }
+#undef lbl
+        };
+    rna_tree::for_each_in_subtree(it, set_label_status);
 }
 
 void compact::make_branch_even(

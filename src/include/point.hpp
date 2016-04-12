@@ -57,10 +57,9 @@ struct point
 
 
     bool bad() const;
-    static point bad_point();
+    static const point& bad_point();
 
     friend std::ostream& operator<<(std::ostream& out, point p);
-
 };
 
 

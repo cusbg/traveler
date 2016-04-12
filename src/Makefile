@@ -26,7 +26,7 @@ run: build cleanLog cp mkdir
 debug: build cp mkdir
 	sh -x run.sh debug
 
-build: mk_dirs make_modules ${BUILDDIR}/Makefile compile
+build: mkdir make_modules ${BUILDDIR}/Makefile compile
 
 CORES                   = $(shell nproc)
 compile:
@@ -61,7 +61,7 @@ cp:
 	cp -R ../InFiles ./precomputed
 
 mkdir:
-	@mkdir -p ${BUILDDIR}/files
+	@mkdir -p ${BUILDDIR}/files ${LOGDIR}
 
 ${BUILDDIR}/Makefile:
 	@echo -e \
@@ -76,9 +76,6 @@ ${BUILDDIR}/Makefile:
 				\\n\\trm -rf \*.o ${TARGET} \
 					>>$@
 
-
-mk_dirs:
-	@mkdir -p $(LOGDIR)
 
 #OTHER GLOBAL targets
 clean: cleanMK cleanCompiled cleanLog

@@ -327,7 +327,7 @@ iter tree_base<label_type>::parent(
 {
     static_assert(!std::is_same<iter,
             tree_base<label_type>::pre_post_order_iterator>::value,
-            "call parent(pre_post_order_iterator)");
+            "call parent(pre_post_order_iterator) is forbidden");
 
     assert(it.node->parent != nullptr);
     return iter(it.node->parent);

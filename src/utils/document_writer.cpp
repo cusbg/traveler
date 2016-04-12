@@ -27,14 +27,16 @@ using namespace std;
 #define COLOR_INSERT        RGB::RED
 #define COLOR_REINSERT      RGB::BLUE
 #define COLOR_EDIT          RGB::GREEN
+#define COLOR_ROTATE        RGB::BROWN
 #define COLOR_DEFAULT       RGB::BLACK
 
 // initialize RGB constants:
-const RGB RGB::RED = RGB(1, 0, 0);
-const RGB RGB::GREEN = RGB(0, 1, 0);
-const RGB RGB::BLUE = RGB(0, 0, 1);
-const RGB RGB::BLACK = RGB(0, 0, 0);
+const RGB RGB::RED = RGB(1., 0., 0.);
+const RGB RGB::GREEN = RGB(0., 1., 0.);
+const RGB RGB::BLUE = RGB(0., 0., 1.);
+const RGB RGB::BLACK = RGB(0., 0., 0.);
 const RGB RGB::GRAY = RGB(0.8, 0.8, 0.8);
+const RGB RGB::BROWN = RGB::for_255(210, 105, 30);
 
 RGB::RGB(
                 double _red,
@@ -44,6 +46,14 @@ RGB::RGB(
     red = _red;
     green = _green;
     blue = _blue;
+}
+
+/* static */ RGB RGB::for_255(
+                size_t _red,
+                size_t _green,
+                size_t _blue)
+{
+    return RGB(_red / 255., _green / 255., _blue / 255.);
 }
 
 bool RGB::operator==(
@@ -113,6 +123,7 @@ const RGB& document_writer::get_default_color(
         switchcase(edited, EDIT);
         switchcase(inserted, INSERT);
         switchcase(reinserted, REINSERT);
+        switchcase(rotated, ROTATE);
         switchcase(touched, DEFAULT);
         switchcase(untouched, DEFAULT);
         default:
@@ -143,17 +154,59 @@ void document_writer::validate_stream() const
 std::string document_writer::get_rna_subtree_formatted(
                 rna_tree::iterator root) const
 {
-    typedef rna_tree::pre_post_order_iterator pre_post_order_iterator;
+    ostringstream out;
+
+    auto print =
+        [&out, this](rna_tree::pre_post_order_iterator it)
+        {
+            out << get_label_formatted(it);
+        };
+
+    rna_tree::for_each_in_subtree(root, print);
+
+    return out.str();
+}
+
+std::string document_writer::get_rna_subtree_formatted_colored(
+                rna_tree::iterator root) const
+{
+    APP_DEBUG_FNAME;
 
     ostringstream out;
-    pre_post_order_iterator beg(root, true);
-    pre_post_order_iterator end(root, false);
 
-    for (rna_tree::pre_post_order_iterator it = beg; it != end; ++it)
+    struct
     {
-        out
-            << get_label_formatted(it);
+        size_t from, to;
+    } ids;
+
+    for (rna_tree::iterator it = rna_tree::first_child(root);;)
+    {
+        if (rna_tree::is_leaf(it))
+        {
+            ids.from = id(it);
+            break;
+        }
+        else 
+            it = rna_tree::first_child(it);
     }
+    ids.to = id(root);
+
+    rna_tree::print_subtree(root);
+    auto print =
+        [&out, this, ids](rna_tree::pre_post_order_iterator it)
+        {
+            if (!it->inited_points())
+                return;
+
+            rna_label lbl = it->at(it.label_index());
+            if (ids.from <= id(it) && id(it) <= ids.to)
+                out << get_label_formatted(lbl, RGB::RED);
+            else
+                out << get_label_formatted(lbl, RGB::BLACK);
+        };
+
+    rna_tree::for_each_in_subtree(rna_tree::parent(root), print);
+
     return out.str();
 }
 

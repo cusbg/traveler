@@ -155,7 +155,7 @@ void ps_writer::init(
 {
     APP_DEBUG_FNAME;
 
-    document_writer::init(filename);
+    document_writer::init(filename + ".ps");
 
     print(get_default_prologue(root));
 }

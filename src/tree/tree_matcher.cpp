@@ -62,6 +62,7 @@ rna_tree& matcher::run(
     assert_err(t2.correct_pairing(), "uncorrect tree pairing");
 
     update_ends_in_rna(t1);
+    t1.set_postorder_ids();
 
     return t1;
 }

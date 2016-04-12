@@ -111,19 +111,38 @@ std::ostream& operator<<(
                 std::ostream& out,
                 rna_pair_label lbl)
 {
-    if (lbl.status == rna_pair_label::inserted)
-        out << "__ins`";
-    if (lbl.status == rna_pair_label::deleted)
-        out << "__del`";
-    if (lbl.status == rna_pair_label::reinserted)
-        out << "__reins`";
+    auto status_string =
+        [](rna_pair_label::status_type type)
+        {
+            string t;
+            switch (type)
+            {
+#define switchcase(type, text) \
+                case rna_pair_label::type: \
+                    t = text; \
+                    break;
+
+                switchcase(inserted, "ins")
+                switchcase(deleted, "del")
+                switchcase(reinserted, "reins")
+                switchcase(rotated, "rot")
+                default:
+                    break;
+#undef switchcase
+            }
+            if (!t.empty())
+                t = "__" + t + "`";
+            return t;
+        };
+
+    string status = status_string(lbl.status);
+
+    out << status;
 
     for (const auto& val : lbl.labels)
         out << val.label;
 
-    if (lbl.status == rna_pair_label::inserted ||
-            lbl.status == rna_pair_label::deleted ||
-            lbl.status == rna_pair_label::reinserted)
+    if (!status.empty())
         out << "`";
 
     return out;
