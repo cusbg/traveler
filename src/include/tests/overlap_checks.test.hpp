@@ -1,5 +1,5 @@
 /*
- * File: rted.test.hpp
+ * File: overlap_checks.test.hpp
  *
  * Copyright (C) 2016 Richard Eliáš <richard@ba30.eu>
  *
@@ -19,29 +19,27 @@
  * USA.
  */
 
-#ifndef RTED_TEST_HPP
-#define RTED_TEST_HPP
+#ifndef OVERLAP_CHECKS_TEST_HPP
+#define OVERLAP_CHECKS_TEST_HPP
 
 #include "test.test.hpp"
-#include "rted.hpp"
 
-class rted_test : public test
+struct point;
+
+class overlap_checks_test : public test
 {
 public:
-    rted_test();
-    virtual ~rted_test() = default;
+    overlap_checks_test();
+    virtual ~overlap_checks_test() = default;
     virtual void run();
 
 private:
-    template<typename funct>
-    void test_rted(
-                const std::string& b1,
-                const std::string& l1,
-                const std::string& b2,
-                const std::string& l2,
-                funct test_funct);
+    void test_intersection(
+                point p1,
+                point p2,
+                bool intersects);
 };
 
 
-#endif /* !RTED_TEST_HPP */
+#endif /* !OVERLAP_CHECKS_TEST_HPP */
 

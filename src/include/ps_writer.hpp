@@ -34,7 +34,7 @@ class ps_writer : public document_writer
 public:
     virtual streampos print(
                 const std::string& text);
-    void init(
+    virtual void init(
                 const std::string& filename,
                 rna_tree::iterator root);
 

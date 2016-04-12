@@ -24,6 +24,10 @@
 #include "point.test.hpp"
 #include "rna_tree.test.hpp"
 #include "compact_circle.test.hpp"
+#include "gted.test.hpp"
+#include "rted.test.hpp"
+#include "overlap_checks.test.hpp"
+
 
 using namespace std;
 
@@ -36,6 +40,9 @@ void run_test()
         new test_point(),
         new rna_tree_test(),
         new compact_circle_test(),
+        new gted_test(),
+        new rted_test(),
+        new overlap_checks_test(),
     };
 
     for (test* t : vec)
@@ -55,7 +62,8 @@ test::test(
 
 test::~test()
 {
-    logger.set_priority(logger::INFO);
+    logger.set_priority(logger::DEBUG);
+
     if (failed_tests.empty())
     {
         INFO("TESTS %s: OK", test_name.c_str());
@@ -63,7 +71,11 @@ test::~test()
     else
     {
         auto stream = logger.error_stream();
-        stream << "TESTS: FAILED:\n";
+        stream
+            << "TESTS "
+            << test_name
+            << ": FAILED:\n";
+
         for (auto val : failed_tests)
             stream << val << "\n";
     }
@@ -119,6 +131,7 @@ void test::set(
 
 void test::test_ok()
 {
+    APP_DEBUG_FNAME;
     DEBUG("TEST %s OK", test_name.c_str());
 }
 

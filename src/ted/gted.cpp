@@ -50,8 +50,6 @@ void gted::run(
 {
     APP_DEBUG_FNAME;
 
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
     INFO("BEG: GTED(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
 
     STR = _str;
@@ -292,8 +290,6 @@ gted::forest_distance_table_type gted::compute_distance_LR(
 mapping gted::get_mapping()
 {
     APP_DEBUG_FNAME;
-
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
     INFO("BEG: GTED_MAPPING(%s, %s)",
             to_cstr(t1.name()), to_cstr(t2.name()));

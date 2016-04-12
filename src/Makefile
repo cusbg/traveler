@@ -76,6 +76,9 @@ ${BUILDDIR}/Makefile:
 				\\n\\trm -rf \*.o ${TARGET} \
 					>>$@
 
+sort:
+	sort ${LOGDIR}/overlaps.log -n -k 3 > ${LOGDIR}/overlaps.sorted.log
+
 
 #OTHER GLOBAL targets
 clean: cleanMK cleanCompiled cleanLog

@@ -39,6 +39,8 @@ protected:
     document_writer() = default;
 
 public:
+    static std::vector<std::unique_ptr<document_writer>> get_writers();
+
     /**
      * print `text` to document
      */
@@ -76,6 +78,9 @@ public:
      */
     void init(
                 const std::string& filename);
+    virtual void init(
+                const std::string& filename,
+                rna_tree::iterator root) = 0;
 
     /**
      * fill document from actual position to end of file with `ch`-chars
@@ -163,6 +168,7 @@ private:
     double green;
     double blue;
 };
+
 
 #endif /* !UTILS_DOCUMENT_WRITER_HPP */
 

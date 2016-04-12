@@ -37,7 +37,7 @@ inline std::string to_string(
     // funkcia sa pouziva aj pri operator<<(bool/char[]/..)
     // takze treba napisat vsade operator<< a to_string() bude fungovat ok
     std::stringstream str;
-    str << t;
+    str << std::boolalpha << t;
     return str.str();
 }
 

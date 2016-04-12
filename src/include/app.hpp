@@ -55,14 +55,6 @@ private:
                 arguments args);
 
     /**
-     * save rna to document
-     */
-    void save(
-                rna_tree& rna,
-                document_writer& writer,
-                bool overlaps);
-
-    /**
      * save rna to document,
      * take prolog from `templated_ps` document
      */

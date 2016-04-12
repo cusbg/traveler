@@ -63,6 +63,9 @@ private:
     overlaps run(
                 const edges& e);
 
+#ifdef TESTS
+public:
+#endif
     /**
      * find point in which edges are intersecting each other
      * if no point exist, return point::bad_point

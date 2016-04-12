@@ -91,10 +91,6 @@ std::string svg_writer::get_header_element(
     point tr = top_right_corner(root);
     point size = abs(bl) + abs(tr) + point({100, 100});
 
-    DEBUG("shift %s, lt %s, size %s", to_cstr(shift), to_cstr(letter), to_cstr(size));
-
-    WAIT;
-
     out
         << "<svg"
         << create_property("xmlns", "http://www.w3.org/2000/svg")
@@ -168,7 +164,7 @@ svg_writer::style svg_writer::get_svg_color_style(
     out
         << get_point_formatted(centre, "c", "")
         << create_property("r", radius)
-        << create_property("style", create_style({get_svg_color_style(RGB::BLACK), {"fill", "none"}}));
+        << create_style({get_svg_color_style(RGB::BLACK), {"fill", "none"}});
 
     return create_element("circle", out.str(), "");
 }

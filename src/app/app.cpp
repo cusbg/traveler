@@ -168,39 +168,26 @@ void app::run(
 void app::save(
                 const std::string& filename,
                 rna_tree& rna,
-                bool overlaps)
-{
-    APP_DEBUG_FNAME;
-
-    ps_writer ps;
-    svg_writer svg;
-
-    ps.init(filename, rna.begin());
-    svg.init(filename, rna.begin());
-    INFO("save(%s)", to_cstr(filename));
-
-    save(rna, ps, overlaps);
-    save(rna, svg, overlaps);
-}
-
-void app::save(
-                rna_tree& rna,
-                document_writer& writer,
                 bool overlap)
 {
     APP_DEBUG_FNAME;
 
+    auto writers = document_writer::get_writers();
+
     overlap_checks::overlaps overlaps;
-    
-    //if (overlap)
-        //overlaps = overlap_checks().run(rna);
+    if (overlap)
+        overlaps = overlap_checks().run(rna);
+
+    for (auto& writer : writers)
+    {
+        writer->init(filename, rna.begin());
+        writer->print(writer->get_rna_formatted(rna));
+
+        for (const auto& p : overlaps)
+            writer->print(writer->get_circle_formatted(p.centre, p.radius));
+    }
 
     log_overlaps(rna.name(), overlaps.size());
-
-    writer.print(writer.get_rna_formatted(rna));
-
-    for (const auto& p : overlaps)
-        writer.print(writer.get_circle_formatted(p.centre, p.radius));
 }
 
 void app::log_overlaps(

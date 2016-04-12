@@ -81,7 +81,8 @@ private:
             { \
                 bool result = (expected) == (value); \
                 test_assert_true(result); \
-                test_ok(); \
+                if (result) \
+                    test_ok(); \
             } \
             catch (const my_exception& e) \
             { \

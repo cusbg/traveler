@@ -20,6 +20,8 @@
  */
 
 #include "document_writer.hpp"
+#include "svg_writer.hpp"
+#include "ps_writer.hpp"
 
 using namespace std;
 
@@ -66,6 +68,14 @@ bool RGB::operator==(
 
 
 
+/* static */ std::vector<std::unique_ptr<document_writer>> document_writer::get_writers()
+{
+    decltype(get_writers()) vec;
+    vec.emplace_back(new svg_writer());
+    vec.emplace_back(new ps_writer());
+
+    return vec;
+}
 
 std::string document_writer::get_edge_formatted(
                 point from,

@@ -24,11 +24,17 @@
 
 #include "test.test.hpp"
 
+class rna_tree;
+
 class gted_test : public test
 {
 public:
+    gted_test();
     virtual ~gted_test() = default;
     virtual void run();
+
+private:
+    void test_gted(rna_tree rna1, rna_tree rna2, size_t distance);
 };
 
 
