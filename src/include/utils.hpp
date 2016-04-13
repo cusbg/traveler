@@ -28,6 +28,15 @@
 
 class mapping;
 
+struct fasta
+{
+    std::string id;
+    std::string brackets;
+    std::string labels;
+
+    friend std::ostream& operator<<(std::ostream& out, fasta f);
+};
+
 
 // TABLE-SAVING FUNCTIONS:
     
@@ -79,13 +88,9 @@ void write_file(
                 const std::string& filename,
                 const std::string& text);
 
+fasta read_fasta_file(
+                const std::string& filename);
 
-
-point top_right_corner(
-                rna_tree::iterator root);
-
-point bottom_left_corner(
-                rna_tree::iterator root);
 
 #endif /* !READER_HPP */
 

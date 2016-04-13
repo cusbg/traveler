@@ -22,7 +22,6 @@
 #include <iomanip>
 
 #include "ps_writer.hpp"
-#include "utils.hpp"
 
 #define PS_COLUMNS_WIDTH    15
 #define PS_END_STRING       "showpage\n"
@@ -50,8 +49,8 @@ std::string ps_writer::get_default_prologue(
     ostringstream str;
     point tr, bl, letter, scale;
 
-    tr = top_right_corner(root);
-    bl = bottom_left_corner(root);
+    tr = rna_tree::top_right_corner(root);
+    bl = rna_tree::bottom_left_corner(root);
 
     letter = LETTER;
     double dist = distance(tr, bl);

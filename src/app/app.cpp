@@ -65,7 +65,6 @@ struct app::arguments
         bool overlap_checks = false;
         string mapping;
         string file;
-        string file_templated;
     } document;
 
 public:
@@ -214,31 +213,25 @@ void app::log_overlaps(
 
 
 rna_tree app::create_matched(
-                const std::string& seqfile,
-                const std::string& foldfile,
-                const std::string& name)
+                const std::string& fastafile)
 {
     APP_DEBUG_FNAME;
 
-    string brackets, labels;
-
-    brackets = read_file(foldfile);
-    labels = read_file(seqfile);
-
-    return rna_tree(brackets, labels, name);
+    fasta f = read_fasta_file(fastafile);
+    return rna_tree(f.brackets, f.labels, f.id);
 }
 
 rna_tree app::create_templated(
-                const std::string& docfile,
-                const std::string& doctype,
-                const std::string& foldfile,
-                const std::string& name)
+                const std::string& templatefile,
+                const std::string& templatetype,
+                const std::string& fastafile)
 {
     APP_DEBUG_FNAME;
 
-    string brackets = read_file(foldfile);
-    extractor& doc = extractor::get_extractor(docfile, doctype);
-    return rna_tree(brackets, doc.labels, doc.points, name);
+    fasta f = read_fasta_file(fastafile);
+
+    extractor& doc = extractor::get_extractor(templatefile, templatetype);
+    return rna_tree(f.brackets, doc.labels, doc.points, f.id);
 }
 
 
@@ -341,7 +334,6 @@ void app::print(
     APP_DEBUG_FNAME;
 
     size_t i;
-    bool mt, tt;
     string arg;
     arguments a;
 
@@ -353,8 +345,14 @@ void app::print(
             else
                 return args.back();
         };
-
-    mt = tt = false;
+    auto is_argument =
+        [&arg](const std::vector<std::string>& arguments)
+        {
+            for (const string& a : arguments)
+                if (a == arg)
+                    return true;
+            return false;
+        };
 
     for (i = 1; i < args.size(); ++i)
     {
@@ -362,64 +360,41 @@ void app::print(
         if (arg.empty())
             continue;
 
-        if (arg == "-h" || arg == "--help")
+        if (is_argument({"-h", "--help"}))
         {
             DEBUG("arg help");
             app::usage(args.at(0));
             exit(0);
         }
-        if (arg == "-mt" || arg == "--match-tree")
+        else if (is_argument({"-mt", "--match-tree"}))
         {
             DEBUG("arg match-tree");
-            string seq, fold, name;
-
-            seq = args.at(i + 1);
-            fold = args.at(i + 2);
-            i += 2;
-            if (nextarg() == "--name")
-            {
-                name = args.at(i + 2);
-                i+= 2;
-            }
-            a.matched = app::create_matched(seq, fold, name);
-            mt = true;
-            continue;
+            string fastafile = args.at(i + 1);
+            a.matched = app::create_matched(fastafile);
         }
-        if (arg == "-tt" || arg == "--template-tree")
+        else if (is_argument({"-tt", "--template-tree"}))
         {
             DEBUG("arg template-tree");
-            string doc, doctype, fold, name;
+            string templatefile, fastafile;
+            string templatetype = "ps";
             if (nextarg() == "--type")
             {
-                doctype = args.at(i + 2);
+                templatetype = args.at(i + 2);
                 i += 2;
             }
-            else
-            {
-                doctype = "ps";
-            }
-            doc = args.at(i + 1);
-            fold = args.at(i + 2);
+            templatefile = args.at(i + 1);
+            fastafile = args.at(i + 2);
+            a.templated = app::create_templated(templatefile, templatetype, fastafile);
             i += 2;
-            if (nextarg() == "--name")
-            {
-                name = args.at(i + 2);
-                i+= 2;
-            }
-            a.templated = app::create_templated(doc, doctype, fold, name);
-            a.document.file_templated = doc;
-            tt = true;
-            continue;
         }
-        if (arg == "-a" || arg == "--all")
+        else if (is_argument({"-a", "--all"}))
         {
             DEBUG("arg all");
             a.all.run = true;
             a.all.file = args.at(i + 1);
             ++i;
-            continue;
         }
-        if (arg == "-r" || arg == "--rted")
+        else if (is_argument({"-r", "--rted"}))
         {
             DEBUG("arg rted");
             a.rted.run = true;
@@ -428,9 +403,8 @@ void app::print(
                 a.rted.strategies = args.at(i + 2);
                 i += 2;
             }
-            continue;
         }
-        if (arg == "-g" || arg == "--gted")
+        else if (is_argument({"-g", "--gted"}))
         {
             DEBUG("arg gted");
             a.gted.run = true;
@@ -461,9 +435,8 @@ void app::print(
                 else
                     arg = false;
             }
-            continue;
         }
-        if (arg == "--image")
+        else if (is_argument({"-i", "--image"}))
         {
             DEBUG("arg image");
             a.document.run = true;
@@ -484,21 +457,21 @@ void app::print(
             }
             a.document.file = args.at(i + 1);
             ++i;
-            continue;
         }
-        if (arg == "-d" || arg == "--debug")
+        else if (is_argument({"-d", "--debug"}))
         {
             logger.set_priority(logger::DEBUG);
-            DEBUG("enable debug mode");
-            continue;
+            DEBUG("enabled debug mode");
         }
-
-        WARN("wrong parameter no.%lu: '%s'", i, to_cstr(arg));
-        usage(args.at(0));
-        exit(1);
+        else
+        {
+            ERR("wrong parameter no.%lu: '%s'", i, to_cstr(arg));
+            usage(args.at(0));
+            exit(1);
+        }
     }
 
-    if (!mt || !tt)
+    if (a.templated == rna_tree() || a.matched == rna_tree())
     {
         ERR("trees are missing");
         usage(args.at(0));

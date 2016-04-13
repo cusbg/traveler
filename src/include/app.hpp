@@ -68,9 +68,7 @@ private:
      * reads both seq & fold file and construct rna tree
      */
     static rna_tree create_matched(
-                const std::string& seqfile,
-                const std::string& foldfile,
-                const std::string& name);
+                const std::string& fastafile);
 
     /**
      * reads ps & fold file and construct rna tree
@@ -79,8 +77,7 @@ private:
     static rna_tree create_templated(
                 const std::string& templatefile,
                 const std::string& templatetype,
-                const std::string& foldfile,
-                const std::string& name);
+                const std::string& fastafile);
 
     void log_overlaps(
                 const std::string& name,

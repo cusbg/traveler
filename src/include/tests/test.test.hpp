@@ -66,6 +66,7 @@ private:
             } \
             catch (const my_exception& e) \
             { \
+                DEBUG("Catched unexpected exception"); \
                 add_failed_test(e); \
             } \
         }
@@ -86,6 +87,7 @@ private:
             } \
             catch (const my_exception& e) \
             { \
+                DEBUG("Catched unexpected exception"); \
                 add_failed_test(e); \
             } \
         }
@@ -99,10 +101,12 @@ private:
                     LOGGER_PRIORITY_ON_FUNCTION(EMERG); \
                     operation; \
                 } \
+                DEBUG("Expected test to fail"); \
                 add_failed_test(); \
             } \
             catch (...) \
             { \
+                DEBUG("Catched expected exception"); \
                 test_ok(); \
             } \
         }

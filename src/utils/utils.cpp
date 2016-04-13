@@ -20,13 +20,23 @@
  */
 
 #include <fstream>
-#include <cfloat>
 
 #include "utils.hpp"
 #include "mapping.hpp"
 #include "ps_extractor.hpp"
 
 using namespace std;
+
+template<typename container_type, typename value_container_type>
+bool contains_one_of(
+                const container_type& container,
+                const value_container_type& values)
+{
+    for (const auto& val : values)
+        if (contains(container, val))
+            return true;
+    return false;
+}
 
 
 /* global */ std::string read_file(
@@ -59,6 +69,50 @@ using namespace std;
             "write_file(%s) failed", to_cstr(filename));
 }
 
+/* global */ fasta read_fasta_file(
+                const std::string& filename)
+{
+    assert_err(exist_file(filename),
+            "read_file(%s) failed, file does not exist", to_cstr(filename));
+
+    ifstream in(filename);
+    ostringstream labels, brackets;
+    string id, line;
+
+    while(true)
+    {
+        char ch;
+        in >> ch;
+        assert_err(!in.fail(), "starting '>' character missing");
+        if (ch == '>')
+        {
+            getline(in, id);
+            id = id.substr(0, id.find_first_of(' '));
+            break;
+        }
+    }
+
+    while(true)
+    {
+        getline(in, line);
+        if (in.fail())
+            break;
+        if (contains(line, '>'))
+            break;
+
+        if (contains_one_of(line, "(.)"))
+            brackets << line;
+        else
+            labels << line;
+    }
+    fasta f;
+    f.id = id;
+    f.brackets = brackets.str();
+    f.labels = labels.str();
+
+    DEBUG("FASTA: %s", to_cstr(f));
+    return f;
+}
 
 
 
@@ -254,114 +308,27 @@ mapping load_mapping_table(
 
 
 
-point top_right_corner(
-                rna_tree::iterator root)
+
+std::ostream& operator<<(
+                std::ostream& out,
+                fasta f)
 {
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+    DEBUG("fasta: id=%s; labels=%s; brackets=%s", to_cstr(f.id), to_cstr(f.labels), to_cstr(f.brackets));
 
-    // x, y should be maximal in subtree
-    point p = { -DBL_MAX, -DBL_MAX };
+    out
+        << "FASTA:"
+        << endl
+        << ">"
+        << f.id
+        << endl
+        << f.labels
+        << endl
+        << f.brackets;
 
-    auto f = [&p] (rna_tree::pre_post_order_iterator it) {
-        if (rna_tree::is_root(it) || !it->inited_points())
-            return;
-        point o = it->at(it.label_index()).p;
-        if (o.x > p.x)
-            p.x = o.x;
-        if (o.y > p.y)
-            p.y = o.y;
-    };
-
-    rna_tree::for_each_in_subtree(root, f);
-
-    assert(p.x != -DBL_MAX && p.y != -DBL_MAX);
-    DEBUG("top_right_corner = %s", to_cstr(p));
-
-    return p;
+    return out;
 }
 
-point bottom_left_corner(
-                rna_tree::iterator root)
-{
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
-
-    // x, y should be minimal in subtree
-    point p = { DBL_MAX, DBL_MAX };
-
-    auto f = [&p] (rna_tree::pre_post_order_iterator it) {
-        if (rna_tree::is_root(it) || !it->inited_points())
-            return;
-        point o = it->at(it.label_index()).p;
-        if (o.x < p.x)
-            p.x = o.x;
-        if (o.y < p.y)
-            p.y = o.y;
-    };
-
-    rna_tree::for_each_in_subtree(root, f);
-
-    assert(p.x != DBL_MAX && p.y != DBL_MAX);
-    DEBUG("bottom_left_corner = %s", to_cstr(p));
-
-    return p;
-}
-
-
-
-
-#ifdef NODEF
-
-/**
- * convert rna_tree to java-implementation rted fromat
- */
-std::string convert_to_java_format(
-                rna_tree rna)
-{
-    APP_DEBUG_FNAME;
-
-    auto it = ++rna.begin();
-    stringstream stream;
-
-    std::function<void(rna_tree::sibling_iterator,
-            stringstream&)> print_recursive =
-        [&](rna_tree::sibling_iterator sib, stringstream& out)
-    {
-        out << "{" << " ";
-        out << label(sib);
-
-        if (!rna_tree::is_leaf(sib))
-            print_recursive(rna_tree::first_child(sib), out);
-
-        out << "}";
-
-        if (!rna_tree::is_last_child(sib))
-        {
-            ++sib;
-            print_recursive(sib, out);
-        }
-    };
-
-    stream << "{" << label(rna.begin());
-    print_recursive(it, stream);
-    stream << "}";
-
-    string s = stream.str();
-    int left, right;
-    left = right = 0;
-    for (auto val : s)
-    {
-        assert(left >= right);
-        if (val == '{')
-            ++left;
-        else if (val == '}')
-            ++right;
-    }
-    assert(left == right);
-    return stream.str();
-}
-
-#endif
-
+// TODO: remove
 rna_tree get_rna(const string& name)
 {
     DEBUG("get_rna(%s)", to_cstr(name));

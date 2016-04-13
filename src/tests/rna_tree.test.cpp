@@ -65,8 +65,6 @@ void rna_tree_test::run()
 
     assert(rna.get_labels() == LABELS);
     assert(rna.get_brackets() == BRACKETS);
-
-    INFO("RNA_TREE: tests OK");
 }
 
 

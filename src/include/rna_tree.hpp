@@ -81,6 +81,10 @@ public:
     static point base_pair_edge_point(
                 point from,
                 point to);
+    static point top_right_corner(
+                    rna_tree::iterator root);
+    static point bottom_left_corner(
+                    rna_tree::iterator root);
 
 private:
     std::string _name;

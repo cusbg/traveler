@@ -19,6 +19,7 @@
  * USA.
  */
 
+#include <cfloat>
 
 #include "rna_tree.hpp"
 
@@ -258,6 +259,63 @@ bool rna_tree::correct_pairing() const
 
     return true;
 }
+
+
+
+point rna_tree::top_right_corner(
+                rna_tree::iterator root)
+{
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+
+    // x, y should be maximal in subtree
+    point p = { -DBL_MAX, -DBL_MAX };
+
+    auto f = [&p] (rna_tree::pre_post_order_iterator it) {
+        if (rna_tree::is_root(it) || !it->inited_points())
+            return;
+        point o = it->at(it.label_index()).p;
+        if (o.x > p.x)
+            p.x = o.x;
+        if (o.y > p.y)
+            p.y = o.y;
+    };
+
+    rna_tree::for_each_in_subtree(root, f);
+
+    assert(p.x != -DBL_MAX && p.y != -DBL_MAX);
+    DEBUG("top_right_corner = %s", to_cstr(p));
+
+    return p;
+}
+
+point rna_tree::bottom_left_corner(
+                rna_tree::iterator root)
+{
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+
+    // x, y should be minimal in subtree
+    point p = { DBL_MAX, DBL_MAX };
+
+    auto f = [&p] (rna_tree::pre_post_order_iterator it) {
+        if (rna_tree::is_root(it) || !it->inited_points())
+            return;
+        point o = it->at(it.label_index()).p;
+        if (o.x < p.x)
+            p.x = o.x;
+        if (o.y < p.y)
+            p.y = o.y;
+    };
+
+    rna_tree::for_each_in_subtree(root, f);
+
+    assert(p.x != DBL_MAX && p.y != DBL_MAX);
+    DEBUG("bottom_left_corner = %s", to_cstr(p));
+
+    return p;
+}
+
+
+
 
 /* global */ size_t child_index(
                 rna_tree::sibling_iterator sib)

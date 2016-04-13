@@ -45,18 +45,18 @@ inline std::string to_string(
 
 template <typename container_type, typename value_type>
 inline bool contains(
-                const container_type& c,
-                const value_type& v)
+                const container_type& container,
+                const value_type& value)
 {
-    return std::find(std::begin(c), std::end(c), v) != std::end(c);
+    return std::find(std::begin(container), std::end(container), value) != std::end(container);
 }
 
 template <typename T, typename value_type>
 inline bool contains(
-                const std::initializer_list<T>& c,
-                const value_type& v)
+                const std::initializer_list<T>& container,
+                const value_type& value)
 {
-    return contains(std::vector<T>(c), v);
+    return contains(std::vector<T>(container), value);
 }
 
 template <typename T>

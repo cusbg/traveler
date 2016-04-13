@@ -27,7 +27,7 @@
 #include "gted.test.hpp"
 #include "rted.test.hpp"
 #include "overlap_checks.test.hpp"
-
+#include "utils.test.hpp"
 
 using namespace std;
 
@@ -43,6 +43,7 @@ void run_test()
         new gted_test(),
         new rted_test(),
         new overlap_checks_test(),
+        new utils_test(),
     };
 
     for (test* t : vec)
