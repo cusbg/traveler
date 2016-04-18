@@ -25,7 +25,7 @@
 #include "types.hpp"
 
 class rna_tree;
-class document_writer;
+class mapping;
 
 class app
 {
@@ -53,6 +53,21 @@ private:
      */
     void run(
                 arguments args);
+
+    mapping run_ted(
+                rna_tree& templated,
+                rna_tree& matched,
+                bool save,
+                const std::string& distances_file = "",
+                const std::string& mapping_file = "");
+
+    void run_drawing(
+                rna_tree& templated,
+                rna_tree& matched,
+                const mapping& mapping,
+                bool run,
+                bool run_overlaps,
+                const std::string& file);
 
     /**
      * save rna to document,

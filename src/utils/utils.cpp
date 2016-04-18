@@ -155,8 +155,7 @@ void save_strategy_table(
 {
     APP_DEBUG_FNAME;
 
-    save_table<strategy_table_type,
-                strategy, size_t>(filename, table);
+    save_table<strategy_table_type, strategy, size_t>(filename, table);
 }
 
 strategy_table_type load_strategy_table(
@@ -164,8 +163,7 @@ strategy_table_type load_strategy_table(
 {
     APP_DEBUG_FNAME;
 
-    return load_table<strategy_table_type,
-                strategy>(filename);
+    return load_table<strategy_table_type, strategy>(filename);
 }
 
 void save_tree_distance_table(
@@ -175,8 +173,7 @@ void save_tree_distance_table(
     APP_DEBUG_FNAME;
     typedef std::vector<std::vector<size_t>> tree_distance_table_type;
 
-    save_table<tree_distance_table_type,
-                size_t, size_t>(filename, table);
+    save_table<tree_distance_table_type>(filename, table);
 }
 
 std::vector<std::vector<size_t>> load_tree_distance_table(
@@ -185,8 +182,7 @@ std::vector<std::vector<size_t>> load_tree_distance_table(
     APP_DEBUG_FNAME;
     typedef std::vector<std::vector<size_t>> tree_distance_table_type;
 
-    return load_table<tree_distance_table_type,
-                size_t, size_t>(filename);
+    return load_table<tree_distance_table_type>(filename);
 }
 
 

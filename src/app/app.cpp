@@ -49,16 +49,9 @@ struct app::arguments
     struct
     {
         bool run = false;
-        string strategies;
-    } rted;
-    struct
-    {
-        bool run = false;
-        string strategies;
-        string ted_out;
-        string ted_in;
+        string distances;
         string mapping;
-    } gted;
+    } ted;
     struct
     {
         bool run = false;
@@ -66,7 +59,7 @@ struct app::arguments
         string mapping;
         string file;
         string file_templated;
-    } document;
+    } draw;
 
 public:
     static arguments parse(
@@ -96,73 +89,79 @@ void app::run(
     INFO("BEG: APP");
 
     print(args);
+    bool rted = args.all.run || args.ted.run;
+    bool draw = args.all.run || args.draw.run;
+    mapping map;
+    string img_out = args.all.file;
 
-    if (args.all.run)
+    run_ted(args.templated, args.matched, rted, args.ted.distances, args.ted.mapping);
+
+    if (args.draw.run)
     {
-        rted r(args.templated, args.matched);
-        gted g(args.templated, args.matched);
-
-        r.run();
-        g.run(r.get_strategies());
-
-        args.templated = matcher(args.templated, args.matched).run(g.get_mapping());
-        compact(args.templated).run();
-
-        save(args.all.file, args.templated, true);
+        assert(!args.draw.mapping.empty());
+        map = load_mapping_table(args.draw.mapping);
+        args.templated.set_name(args.matched.name() + "_mapped_to_" + args.templated.name());
+        img_out = args.draw.file;
     }
-    else
-    {
-        if (args.rted.run)
-        {
-            rted r(args.templated, args.matched);
-            r.run();
-            if (!args.rted.strategies.empty())
-            {
-                save_strategy_table(args.rted.strategies, r.get_strategies());
 
-                if (args.gted.strategies.empty())
-                    args.gted.strategies = args.rted.strategies;
-            }
-        }
-        if (args.gted.run)
-        {
-            gted g(args.templated, args.matched);
-
-            if (!args.gted.ted_in.empty())
-                g.set_tdist_table(load_tree_distance_table(args.gted.ted_in));
-            else
-                g.run(load_strategy_table(args.gted.strategies));
-
-            if (!args.gted.ted_out.empty())
-                save_tree_distance_table(args.gted.ted_out, g.get_tree_distances());
-
-            if (!args.gted.mapping.empty())
-            {
-                save_tree_mapping_table(args.gted.mapping, g.get_mapping());
-                if (args.document.mapping.empty())
-                    args.document.mapping = args.gted.mapping;
-            }
-        }
-        if (args.document.run)
-        {
-            assert(!args.document.mapping.empty());
-            assert(!args.document.file.empty());
-
-            mapping map = load_mapping_table(args.document.mapping);
-
-            args.templated.set_name(args.matched.name() + "_mapped_to_" + args.templated.name());
-
-            args.templated = matcher(args.templated, args.matched).run(map);
-            compact(args.templated).run();
-
-            save(args.document.file, args.templated, args.document.overlap_checks);
-        }
-    }
+    run_drawing(args.templated, args.matched, map, draw, args.draw.overlap_checks, img_out);
 
     INFO("END: APP");
 }
 
+mapping app::run_ted(
+                rna_tree& templated,
+                rna_tree& matched,
+                bool run,
+                const std::string& distances_file,
+                const std::string& mapping_file)
+{
+    APP_DEBUG_FNAME;
 
+    mapping mapping;
+
+    if (run)
+    {
+        rted r(templated, matched);
+        gted g(templated, matched);
+
+        r.run();
+        g.run(r.get_strategies());
+
+        mapping = g.get_mapping();
+
+        if (!distances_file.empty())
+            save_tree_distance_table(distances_file, g.get_tree_distances());
+        if (!mapping_file.empty())
+            save_tree_mapping_table(mapping_file, mapping);
+    }
+    else
+    {
+        DEBUG("skipping rted run, returning default mapping");
+    }
+
+    return mapping;
+}
+
+void app::run_drawing(
+                rna_tree& templated,
+                rna_tree& matched,
+                const mapping& mapping,
+                bool run,
+                bool run_overlaps,
+                const std::string& file)
+{
+    APP_DEBUG_FNAME;
+
+    if (!run)
+        return;
+    // TODO overlaps
+
+    templated = matcher(templated, matched).run(mapping);
+    compact(templated).run();
+
+    save(file, templated, run_overlaps);
+}
 
 
 void app::save(
@@ -265,12 +264,8 @@ void app::usage(
         << endl
         << "OPTIONS:" << endl
         << "\t[-a|--all <FILE>]" << endl
-        << "\t[-r|--rted [--strategies <FILE>]]" << endl
-        << "\t[-g|--gted [--strategies <FILE>]"
-            << " [--ted-out <FILE>]"
-            << " [--ted-in <FILE>]"
-            << " [--mapping <FILE>]]" << endl
-        << "\t[--image"
+        << "\t[-t|--ted <FILE-DISTANCES> <FILE-MAPPING>]" << endl
+        << "\t[--draw"
             << " [--mapping <FILE>]"
             << " [--overlaps] <FILE>]" << endl
         << "\t[-d|--debug]" << endl;
@@ -301,33 +296,23 @@ void app::print(
             << endl << '\t'
             << " file=" << args.all.file
             << endl
-        << "rted:"
+        << "ted:"
             << endl << '\t'
-            << " run=" << args.rted.run << ";"
+            << " run=" << args.ted.run << ";"
             << endl << '\t'
-            << " strategy-out-file=" << args.rted.strategies
+            << " ted-distances-file=" << args.ted.distances
+            << endl << '\t'
+            << " ted-mapping-file=" << args.ted.mapping
             << endl
-        << "gted:"
+        << "draw:"
             << endl << '\t'
-            << " run=" << args.gted.run << ";"
+            << " run=" << args.draw.run
             << endl << '\t'
-            << " strategy-in-file=" << args.gted.strategies
+            << " overlaps=" << args.draw.overlap_checks
             << endl << '\t'
-            << " tree-edit-distance-in-file=" << args.gted.ted_in
+            << " mapping-table-in-file=" << args.draw.mapping
             << endl << '\t'
-            << " tree-edit-distance-out-file=" << args.gted.ted_out
-            << endl << '\t'
-            << " mapping-table-out-file=" << args.gted.mapping
-            << endl
-        << "ps:"
-            << endl << '\t'
-            << " run=" << args.document.run
-            << endl << '\t'
-            << " overlaps=" << args.document.overlap_checks
-            << endl << '\t'
-            << " mapping-table-in-file=" << args.document.mapping
-            << endl << '\t'
-            << " document-out-file=" << args.document.file
+            << " draw-out-file=" << args.draw.file
             << endl
         << endl;
 
@@ -407,7 +392,7 @@ void app::print(
                 i+= 2;
             }
             a.templated = app::create_templated(doc, doctype, fold, name);
-            a.document.file_templated = doc;
+            a.draw.file_templated = doc;
             tt = true;
             continue;
         }
@@ -419,70 +404,35 @@ void app::print(
             ++i;
             continue;
         }
-        if (arg == "-r" || arg == "--rted")
+        if (arg == "-t" || arg == "--ted")
         {
-            DEBUG("arg rted");
-            a.rted.run = true;
-            if (nextarg() == "--strategies")
-            {
-                a.rted.strategies = args.at(i + 2);
-                i += 2;
-            }
+            DEBUG("arg ted");
+            a.ted.run = true;
+            a.ted.distances = args.at(i + 1);
+            a.ted.mapping = args.at(i + 2);
+            i += 2;
             continue;
         }
-        if (arg == "-g" || arg == "--gted")
+        if (arg == "--draw")
         {
-            DEBUG("arg gted");
-            a.gted.run = true;
-            bool arg = true;
-
-            while (arg)
-            {
-                if (nextarg() == "--strategies")
-                {
-                    a.gted.strategies = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--ted-out")
-                {
-                    a.gted.ted_out = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--ted-in")
-                {
-                    a.gted.ted_in = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--mapping")
-                {
-                    a.gted.mapping = args.at(i + 2);
-                    i += 2;
-                }
-                else
-                    arg = false;
-            }
-            continue;
-        }
-        if (arg == "--image")
-        {
-            DEBUG("arg image");
-            a.document.run = true;
+            DEBUG("arg draw");
+            a.draw.run = true;
             while (true)
             {
                 if (nextarg() == "--mapping")
                 {
-                    a.document.mapping = args.at(i + 2);
+                    a.draw.mapping = args.at(i + 2);
                     i += 2;
                 }
                 else if (nextarg() == "--overlaps")
                 {
-                    a.document.overlap_checks = true;
+                    a.draw.overlap_checks = true;
                     i += 1;
                 }
                 else
                     break;
             }
-            a.document.file = args.at(i + 1);
+            a.draw.file = args.at(i + 1);
             ++i;
             continue;
         }
