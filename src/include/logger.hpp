@@ -97,6 +97,7 @@ public:
 
 public:
     logger(
+                const std::string& filename,
                 priority priority);
     ~logger();
 

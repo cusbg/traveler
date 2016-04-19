@@ -4,7 +4,8 @@ ALL="african_frog artemia_salina blue_mussel cicadas echinococcus_granulosus fru
 FILES1=${ALL}
 FILES2=${ALL}
 FILES1="artemia_salina"
-FILES2="cicadas"
+FILES2="artemia_salina"
+#FILES2="cicadas"
 
 EXECUTABLE="build/traveler"
 DIR=precomputed
@@ -61,7 +62,7 @@ run_all() {
 run() {
     init_variables
 
-    run_ted
+    #run_ted
     run_draw
 
     #{

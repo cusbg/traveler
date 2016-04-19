@@ -105,6 +105,10 @@ void init()
     set_signal_handler();
     cout << boolalpha;
     srand(1);
+
+    DEBUG("*****************************************");
+    DEBUG("************ RUNNING PROGRAM ************");
+    DEBUG("*****************************************");
 }
 
 int main(int argc, char** argv)

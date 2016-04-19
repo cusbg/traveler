@@ -33,28 +33,25 @@ using namespace chrono;
 #define LOG_FILE "build/logs/program.log"
 
 /* global */
-class logger logger(logger::WARN);
+class logger logger(LOG_FILE, logger::WARN);
 
 
 
 logger::logger(
+                const std::string& filename,
                 priority priority)
 {
     p = priority;
     out.push_back(stdout);
-    FILE* f = fopen(LOG_FILE, "a");
+    FILE* f = fopen(filename.c_str(), "a");
 
     assert_err(f != nullptr && !ferror(f),
-            "cannot open file '%s' to log in", LOG_FILE);
+            "cannot open file '%s' to log in", to_cstr(filename));
 
     out.push_back(f);
 
     for (FILE *f : out)
         setvbuf(f, NULL, _IOFBF, 0);
-
-    debug("*****************************************");
-    debug("************ RUNNING PROGRAM ************");
-    debug("*****************************************");
 }
 
 logger::~logger()
@@ -120,12 +117,14 @@ string logger::message_header(
         << setfill('0') << setw(3)
         << millisecond
         << ' '
+        << setfill(' ') << setw(9) << left
         << cputacts
-        << " <"
-        << (int)getpid()
-        << ">\t["
-        << p
-        << "]\t";
+        << ' '
+        << setfill(' ') << setw(10) << left
+        << ("<" + to_string(getpid()) + ">")
+        << ' '
+        << setfill(' ') << setw(8) << left
+        << ("[" + to_string(p) + "]");
 
     return stream.str();
 }

@@ -192,14 +192,9 @@ void app::log_overlaps(
                 const std::string& name,
                 size_t size)
 {
-    ofstream out;
-    out.open("build/logs/overlaps.log", ios_base::app);
+    class logger overlaps("build/logs/overlaps.log", logger::DEBUG);
 
-    out
-        << name
-        << " : "
-        << size
-        << endl;
+    overlaps.debug("%s : %lu", to_cstr(name), size);
 
     if (size != 0)
     {
