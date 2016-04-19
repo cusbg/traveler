@@ -57,7 +57,8 @@ logger::logger(
 logger::~logger()
 {
     for (FILE* f : out)
-        fclose(f);
+        if (!contains({stdout, stderr}, f))
+            fclose(f);
 }
 
 void logger::log(

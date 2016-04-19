@@ -24,19 +24,6 @@
 #include "compact_utils.hpp"
 
 
-// TODO: remove
-#include "ps_writer.hpp"
-#define UPDATE(root) \
-
-/*
-    { \
-        ps_writer writer; \
-        writer.init("build/files/doc", rna_tree::parent(root)); \
-        writer.print(writer.get_rna_subtree_formatted_colored(root)); \
-        WAIT; \
-    }
-*/
-
 using namespace std;
 
 #define MULTIBRANCH_MINIMUM_SPLIT   10
@@ -49,6 +36,8 @@ compact::compact(
 void compact::run()
 {
     APP_DEBUG_FNAME;
+
+    LOGGER_PRIORITY_ON_FUNCTION_AT_LEAST(INFO);
 
     INFO("BEG: COMPACT");
 
@@ -179,7 +168,6 @@ void compact::init()
 {
     APP_DEBUG_FNAME;
 
-    //LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
     assert(rna.is_ordered_postorder());
 
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
@@ -362,8 +350,6 @@ void compact::init_multibranch(
                 return;
             }
 
-            UPDATE(root);
-
             point rp1 = root->at(0).p;
             point rp2 = root->at(1).p;
 
@@ -390,7 +376,6 @@ void compact::init_multibranch(
             }
 
             DEBUG("i=%i", i);
-            UPDATE(root);
         };
 
     circle c;

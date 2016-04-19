@@ -35,6 +35,8 @@ overlap_checks::overlaps overlap_checks::run(
 {
     APP_DEBUG_FNAME;
 
+    LOGGER_PRIORITY_ON_FUNCTION_AT_LEAST(INFO);
+
     INFO("BEG: OVERLAP_CHECKS(%s)", to_cstr(rna.name()));
 
     edges vec = get_edges(rna);
@@ -52,27 +54,23 @@ overlap_checks::edges overlap_checks::get_edges(
 
     edges vec;
     edge e;
-    rna_tree::pre_post_order_iterator it, end;
 
-    it = ++rna.begin_pre_post();
-    end = rna_tree::pre_post_order_iterator(rna.begin(), false);
+#define get_p() it->at(it.label_index()).p
+    rna_tree::pre_post_order_iterator it = ++rna.begin_pre_post();
+    e.p1 = get_p();
+    rna_tree::iterator par;
 
-    e.p1 = it->at(it.label_index()).p;
-    ++it;
-
-    while (true)
+    for (++it; it != rna.end_pre_post(); ++it)
     {
-        e.p1 = it->at(it.label_index()).p;
-        ++it;
-        if (it == end)
-            break;
         assert(it->inited_points());
-        e.p2 = it->at(it.label_index()).p;
 
+        e.p2 = get_p();
         vec.push_back(e);
+        e.p1 = e.p2;
     }
 
     return vec;
+#undef get_p
 }
 
 overlap_checks::overlaps overlap_checks::run(
@@ -103,7 +101,7 @@ overlap_checks::overlaps overlap_checks::run(
                     distance(p, e2.p2),
                 };
                 double radius = *std::max_element(distances.begin(), distances.end());
-                WARN("overlap occured");
+                DEBUG("overlap occured");
 
                 vec.push_back({p, radius});
             }
@@ -139,9 +137,6 @@ overlap_checks::overlaps overlap_checks::run(
 
     gamma = 180. - alpha - beta;
 
-    //DEBUG("alpha %f, beta %f, gamma %f",
-            //alpha, beta, gamma);
-
     assert(double_equals(180, alpha + beta + gamma));
 
     if (gamma < 0 || iszero(gamma))
@@ -154,8 +149,6 @@ overlap_checks::overlaps overlap_checks::run(
         p = move_point(e2.p1, e2.p2, a);
     else
         p = e2.p1;
-
-    //DEBUG("p=%s", to_cstr(p));
 
     if (lies_between(p, e1.p1, e1.p2) &&
             lies_between(p, e2.p1, e2.p2))

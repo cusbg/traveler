@@ -93,7 +93,7 @@ void app::run(
     mapping map;
     string img_out = args.all.file;
 
-    run_ted(args.templated, args.matched, rted, args.ted.distances, args.ted.mapping);
+    map = run_ted(args.templated, args.matched, rted, args.ted.distances, args.ted.mapping);
 
     if (args.draw.run)
     {
@@ -252,11 +252,11 @@ void app::usage(
         << endl
         << "OPTIONS:" << endl
         << "\t[-a|--all <FILE>]" << endl
-        << "\t[-t|--ted <FILE-DISTANCES> <FILE-MAPPING>]" << endl
-        << "\t[--draw"
-            << " [--mapping <FILE>]"
-            << " [--overlaps] <FILE>]" << endl
-        << "\t[-d|--debug]" << endl;
+        << "\t[-t|--ted <FILE_DISTANCES_OUT> <FILE_MAPPING_OUT>]" << endl
+        << "\t[-d|--draw"
+            << " [--mapping <FILE_MAPPING_IN>]"
+            << " [--overlaps]]" << endl
+        << "\t[--debug]" << endl;
 
     INFO("%s", to_cstr(str.str()));
 }
@@ -387,7 +387,6 @@ void app::print(
             a.ted.distances = args.at(i + 1);
             a.ted.mapping = args.at(i + 2);
             i += 2;
-            continue;
         }
         else if (is_argument({"-d", "--draw"}))
         {

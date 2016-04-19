@@ -3,8 +3,8 @@
 ALL="african_frog artemia_salina blue_mussel cicadas echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
 FILES1=${ALL}
 FILES2=${ALL}
-FILES1="artemia_salina"
-FILES2="artemia_salina"
+#FILES1="artemia_salina"
+#FILES2="artemia_salina"
 #FILES2="cicadas"
 
 EXECUTABLE="build/traveler"
@@ -46,8 +46,9 @@ run_draw() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --draw --mapping ${file}.map --overlaps build/files/${file1}-${file2} \
-        || fail_function
+	    -d --mapping ${file}.map
+	    #--draw --mapping ${file}.map --overlaps build/files/${file1}-${file2} \
+        #|| fail_function
 }
 
 run_all() {

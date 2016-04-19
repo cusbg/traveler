@@ -44,8 +44,11 @@ rna_tree& matcher::run(
     mark(t1, map.get_to_remove(), rna_pair_label::deleted);
     mark(t2, map.get_to_insert(), rna_pair_label::inserted);
 
-    assert((t1.size() - map.get_to_remove().size()) ==
-            (t2.size() - map.get_to_insert().size()));
+    assert_err((t1.size() - map.get_to_remove().size()) ==
+            (t2.size() - map.get_to_insert().size()),
+            "t1.size:%lu - to_remove.size:%lu != t2.size:%lu - to_insert.size:%lu",
+            t1.size(), map.get_to_remove().size(),
+            t2.size(), map.get_to_insert().size());
 
     erase();
 
