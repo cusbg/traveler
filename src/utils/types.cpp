@@ -26,6 +26,19 @@
 using namespace std;
 
 
+/* static */ logger_end_of_function_priority logger_end_of_function_priority::with_priority(
+                logger::priority new_priority)
+{
+    return logger_end_of_function_priority(new_priority);
+}
+
+/* static */ logger_end_of_function_priority logger_end_of_function_priority::with_at_least(
+                logger::priority minimal_priority)
+{
+    logger::priority p = (logger.get_priority() < minimal_priority) ? minimal_priority : logger.get_priority();
+
+    return logger_end_of_function_priority(p);
+}
 
 logger_end_of_function_priority::logger_end_of_function_priority(
                 logger::priority new_priority)

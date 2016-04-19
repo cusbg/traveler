@@ -43,6 +43,8 @@ void rted::run()
 {
     APP_DEBUG_FNAME;
 
+    LOGGER_PRIORITY_ON_FUNCTION_AT_LEAST(INFO);
+
     post_order_iterator it1, it2;
 
     init();

@@ -79,9 +79,15 @@ void wait_for_input();
 
 struct logger_end_of_function_priority
 {
-public:
+private:
     logger_end_of_function_priority(
                 logger::priority new_priority);
+public:
+    static logger_end_of_function_priority with_priority(
+                logger::priority new_priority);
+    static logger_end_of_function_priority with_at_least(
+                logger::priority minimal_priority);
+
     ~logger_end_of_function_priority();
 
 private:
@@ -100,7 +106,11 @@ private:
 
 
 #define LOGGER_PRIORITY_ON_FUNCTION(PRIORITY) \
-    logger_end_of_function_priority __logger_priority(logger::PRIORITY)
+    logger_end_of_function_priority __logger_priority(logger_end_of_function_priority::with_priority(logger::PRIORITY))
+
+#define LOGGER_PRIORITY_ON_FUNCTION_AT_LEAST(PRIORITY) \
+    logger_end_of_function_priority __logger_priority(logger_end_of_function_priority::with_at_least(logger::PRIORITY))
+
 
 #define APP_DEBUG_FNAME \
     print_class_BEG_END_name __function_name(__PRETTY_FUNCTION__)

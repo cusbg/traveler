@@ -87,7 +87,10 @@ bool contains_one_of(
         if (ch == '>')
         {
             getline(in, id);
-            id = id.substr(0, id.find_first_of(' '));
+            size_t index = id.find_first_of(' ');
+            if (index == string::npos)
+                index = id.length();
+            id = id.substr(0, index);
             break;
         }
     }
@@ -110,7 +113,7 @@ bool contains_one_of(
     f.brackets = brackets.str();
     f.labels = labels.str();
 
-    DEBUG("FASTA: %s", to_cstr(f));
+    DEBUG("%s", to_cstr(f));
     return f;
 }
 
@@ -309,8 +312,6 @@ std::ostream& operator<<(
                 std::ostream& out,
                 fasta f)
 {
-    DEBUG("fasta: id=%s; labels=%s; brackets=%s", to_cstr(f.id), to_cstr(f.labels), to_cstr(f.brackets));
-
     out
         << "FASTA:"
         << endl

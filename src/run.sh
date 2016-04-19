@@ -5,8 +5,6 @@ FILES1=${ALL}
 FILES2=${ALL}
 FILES1="artemia_salina"
 FILES2="cicadas"
-#FILES1=cicadas
-#FILES2=echinococcus_granulosus
 
 EXECUTABLE="build/traveler"
 DIR=precomputed
@@ -31,44 +29,23 @@ fail_function() {
 
 init_variables() {
     file="${DIR}/${file1}-${file2}"
-    tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fold --name ${file1}"
-    mt="--match-tree ${DIR}/${file2}.seq ${DIR}/${file2}.fold --name ${file2}"
+    tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fasta"
+    mt="--match-tree ${DIR}/${file2}.fasta"
 }
 
-run_rted() {
-    init_variables
-
+run_ted() {
     ${EXECUTABLE} \
         ${tt} ${mt} \
-        --rted --strategies ${file}.rted \
+        --ted ${file}.dist ${file}.map \
         || fail_function
 }
 
-run_gted_full() {
-    init_variables
-
-    ${EXECUTABLE} \
-        ${tt} ${mt} \
-        --gted --strategies ${file}.rted --ted-out ${file}.ted --mapping ${file}.map \
-        || fail_function
-
-}
-
-run_gted_mapping() {
-    init_variables
-
-    ${EXECUTABLE} \
-        ${tt} ${mt} \
-        --gted --ted-in ${file}.ted --mapping ${file}.map \
-        || fail_function
-}
-
-run_ps() {
+run_draw() {
     init_variables
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --image --mapping ${file}.map --overlaps build/files/${file1}-${file2} \
+	    --draw --mapping ${file}.map --overlaps build/files/${file1}-${file2} \
         || fail_function
 }
 
@@ -77,18 +54,15 @@ run_all() {
 
     ${EXECUTABLE} \
         ${tt} ${mt} \
-        --rted --strategies ${file}.rted \
-        --gted --ted-out ${file}.ted --mapping ${file}.map \
-        --image ${file} \
+        --draw ${file} \
         || fail_function
 }
 
 run() {
     init_variables
 
-    #run_rted
-    #run_gted_full
-    run_ps
+    run_ted
+    run_draw
 
     #{
         #date

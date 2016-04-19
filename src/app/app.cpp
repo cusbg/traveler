@@ -58,12 +58,7 @@ struct app::arguments
         bool overlap_checks = false;
         string mapping;
         string file;
-<<<<<<< HEAD
-    } document;
-=======
-        string file_templated;
     } draw;
->>>>>>> 7dc138140b1f08da04b380af6177843c544c40f3
 
 public:
     static arguments parse(
@@ -127,9 +122,9 @@ mapping app::run_ted(
     if (run)
     {
         rted r(templated, matched);
-        gted g(templated, matched);
-
         r.run();
+
+        gted g(templated, matched);
         g.run(r.get_strategies());
 
         mapping = g.get_mapping();
@@ -283,9 +278,13 @@ void app::print(
         << "ARGUMENTS:"
             << endl
         << "templated: "
+            << args.templated.name()
+            << ":"
             << args.templated.print_tree(false)
             << endl
         << "matched: "
+            << args.matched.name()
+            << ":"
             << args.matched.print_tree(false)
             << endl
         << "all:"
@@ -361,6 +360,8 @@ void app::print(
             DEBUG("arg match-tree");
             string fastafile = args.at(i + 1);
             a.matched = app::create_matched(fastafile);
+            ++i;
+            continue;
         }
         else if (is_argument({"-tt", "--template-tree"}))
         {
@@ -376,18 +377,6 @@ void app::print(
             fastafile = args.at(i + 2);
             a.templated = app::create_templated(templatefile, templatetype, fastafile);
             i += 2;
-<<<<<<< HEAD
-=======
-            if (nextarg() == "--name")
-            {
-                name = args.at(i + 2);
-                i+= 2;
-            }
-            a.templated = app::create_templated(doc, doctype, fold, name);
-            a.draw.file_templated = doc;
-            tt = true;
-            continue;
->>>>>>> 7dc138140b1f08da04b380af6177843c544c40f3
         }
         else if (is_argument({"-a", "--all"}))
         {
@@ -396,52 +385,7 @@ void app::print(
             a.all.file = args.at(i + 1);
             ++i;
         }
-<<<<<<< HEAD
-        else if (is_argument({"-r", "--rted"}))
-        {
-            DEBUG("arg rted");
-            a.rted.run = true;
-            if (nextarg() == "--strategies")
-            {
-                a.rted.strategies = args.at(i + 2);
-                i += 2;
-            }
-        }
-        else if (is_argument({"-g", "--gted"}))
-        {
-            DEBUG("arg gted");
-            a.gted.run = true;
-            bool arg = true;
-
-            while (arg)
-            {
-                if (nextarg() == "--strategies")
-                {
-                    a.gted.strategies = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--ted-out")
-                {
-                    a.gted.ted_out = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--ted-in")
-                {
-                    a.gted.ted_in = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--mapping")
-                {
-                    a.gted.mapping = args.at(i + 2);
-                    i += 2;
-                }
-                else
-                    arg = false;
-            }
-        }
-        else if (is_argument({"-i", "--image"}))
-=======
-        if (arg == "-t" || arg == "--ted")
+        else if (is_argument({"-t", "--ted"}))
         {
             DEBUG("arg ted");
             a.ted.run = true;
@@ -450,8 +394,7 @@ void app::print(
             i += 2;
             continue;
         }
-        if (arg == "--draw")
->>>>>>> 7dc138140b1f08da04b380af6177843c544c40f3
+        else if (is_argument({"-d", "--draw"}))
         {
             DEBUG("arg draw");
             a.draw.run = true;
@@ -473,7 +416,7 @@ void app::print(
             a.draw.file = args.at(i + 1);
             ++i;
         }
-        else if (is_argument({"-d", "--debug"}))
+        else if (is_argument({"--debug"}))
         {
             logger.set_priority(logger::DEBUG);
             DEBUG("enabled debug mode");
