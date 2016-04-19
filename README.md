@@ -64,7 +64,9 @@ To compile project, run `make build` in src/ directory.
 	$ ./build/traveler \
 		--match-tree $INDIR/mouse.fasta \
 		--template-tree $INDIR/human.ps $INDIR/human.fasta \
-		--draw --mapping $OUTDIR/mouse_to_human.map --overlaps $OUTDIR/mouse_to_human
+		--draw --overlaps --mapping $OUTDIR/mouse_to_human.map $OUTDIR/mouse_to_human
+
+    $ # generate .svg and .ps files
     $ # checks also if output molecule has overlaps and draws them in output image
 
 
