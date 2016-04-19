@@ -36,6 +36,8 @@ void ps_writer::init(
 {
     APP_DEBUG_FNAME;
 
+    assert_err(!filename.empty(), "Filename should not be empty");
+
     document_writer::init(filename + ".ps");
 
     print(get_default_prologue(root));

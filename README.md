@@ -18,12 +18,13 @@ To compile project, run `make build` in src/ directory.
         FASTAFile is in format like in example below
 		PSFile contains post-script file*
 
-		* the only supported .ps format is from database (http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
+		* the only supported .ps format is from database
+            (http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
 
 	OPTIONS:
 		[-a|--all <FILE_OUT>]
         [-t|--ted <FILE_DISTANCES_OUT> <FILE_MAPPING_OUT>]
-        [-d|--draw --mapping <FILE_MAPPING_IN> [--overlaps]]
+        [-d|--draw --mapping <FILE_MAPPING_IN> [--overlaps] <FILE_OUT>]
         [--debug]
 
 
@@ -57,13 +58,13 @@ To compile project, run `make build` in src/ directory.
 		--template-tree $INDIR/human.ps $INDIR/human.fasta \
 		--ted $OUTDIR/mouse_to_human.ted $OUTDIR/mouse_to_human.map
 
-### Example3 - prints .svg/.ps image using precomputed mapping from Example2
+### Example3 - prints image using precomputed mapping from previous example
 	$ INDIR="../InFiles/"
 	$ OUTDIR="/tmp/"
 	$ ./build/traveler \
 		--match-tree $INDIR/mouse.fasta \
 		--template-tree $INDIR/human.ps $INDIR/human.fasta \
-		--draw --mapping $OUTDIR/mouse_to_human.map --overlaps
+		--draw --mapping $OUTDIR/mouse_to_human.map --overlaps $OUTDIR/mouse_to_human
     $ # checks also if output molecule has overlaps and draws them in output image
 
 

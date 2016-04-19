@@ -112,6 +112,8 @@ void svg_writer::init(
 {
     APP_DEBUG_FNAME;
 
+    assert_err(!filename.empty(), "Filename should not be empty");
+
     document_writer::init(filename + ".svg");
 
     print(get_header_element(root) + create_white_background());
