@@ -46,9 +46,8 @@ run_draw() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    -d --mapping ${file}.map
-	    #--draw --mapping ${file}.map --overlaps build/files/${file1}-${file2} \
-        #|| fail_function
+	    --draw --mapping ${file}.map --overlaps \
+	|| fail_function
 }
 
 run_all() {
