@@ -1,4 +1,4 @@
-# PROJECT
+# TRAVeLer - Template RnA VisuaLization
 
 
 ## Prerequisites:
