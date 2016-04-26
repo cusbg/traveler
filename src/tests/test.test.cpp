@@ -31,9 +31,9 @@
 
 using namespace std;
 
-void run_test()
+/* static */ void test::run_tests()
 {
-    logger.set_priority(logger::ERROR);
+    LOGGER_PRIORITY_ON_FUNCTION(ERROR);
     APP_DEBUG_FNAME;
 
     std::vector<test*> vec = {
@@ -63,8 +63,7 @@ test::test(
 
 test::~test()
 {
-    logger.set_priority(logger::DEBUG);
-
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
     if (failed_tests.empty())
     {
         INFO("TESTS %s: OK", test_name.c_str());
@@ -80,60 +79,18 @@ test::~test()
         for (auto val : failed_tests)
             stream << val << "\n";
     }
-    logger.set_priority(logger::ERROR);
 }
 
-void test::add_failed_test()
+void test::add_failed(const std::string& msg)
 {
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
-
-    logger.emerg("TEST %s on line %li of %s failed: %s",
-            test_name.c_str(), line_number, file.c_str(), condition.c_str());
-
-    failed_tests.push_back(file + ":" + to_string(line_number) + " - " + condition);
-}
-
-void test::add_failed_test(
-                const my_exception& e)
-{
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
-
-    logger.emerg("TEST %s on line %li of %s failed: %s",
-            test_name.c_str(), line_number, file.c_str(), condition.c_str());
-
-    failed_tests.push_back(file + ":" + to_string(line_number) + " - " + condition + ": Exception: " + e.what());
-}
-
-void test::test_assert_true(
-                bool condition)
-{
-    if (!condition)
-        add_failed_test();
-}
-
-void test::set(
-                int _line_number,
-                const std::string& _file,
-                const std::string& _condition)
-{
-    line_number = _line_number;
-    condition = _condition;
-    file = _file;
-
-    DEBUG("TEST line #%li: %s", line_number, condition.c_str());
-}
-
-void test::set(
-                const std::string& expected,
-                const std::string& value)
-{
-    condition = condition + ", " + expected + " == " + value;
+    //logger.emerg("fail msg: %s", msg.c_str());
+    failed_tests.push_back(msg);
 }
 
 void test::test_ok()
 {
     APP_DEBUG_FNAME;
-    DEBUG("TEST %s OK", test_name.c_str());
+    DEBUG("TEST #%i in %s OK", test_number, test_name.c_str());
 }
 
 

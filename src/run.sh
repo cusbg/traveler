@@ -62,8 +62,8 @@ run_all() {
 run() {
     init_variables
 
-    #run_ted
-    run_draw
+    run_ted
+    #run_draw
 
     #{
         #date

@@ -37,6 +37,15 @@ struct fasta
     friend std::ostream& operator<<(std::ostream& out, fasta f);
 };
 
+class io_exception : public my_exception
+{
+public:
+    io_exception(const std::string& msg)
+        : my_exception(msg)
+    { }
+    virtual ~io_exception() noexcept = default;
+};
+
 
 // TABLE-SAVING FUNCTIONS:
     

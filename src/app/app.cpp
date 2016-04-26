@@ -154,7 +154,6 @@ void app::run_drawing(
 
     if (!run)
         return;
-    // TODO overlaps
 
     templated = matcher(templated, matched).run(mapping);
     compact(templated).run();
@@ -212,7 +211,14 @@ rna_tree app::create_matched(
     APP_DEBUG_FNAME;
 
     fasta f = read_fasta_file(fastafile);
-    return rna_tree(f.brackets, f.labels, f.id);
+    try
+    {
+        return rna_tree(f.brackets, f.labels, f.id);
+    }
+    catch (const exception& e)
+    {
+        throw invalid_argument("creating matched rna " + f.id + " failed:" + e.what());
+    }
 }
 
 rna_tree app::create_templated(
@@ -225,7 +231,14 @@ rna_tree app::create_templated(
     fasta f = read_fasta_file(fastafile);
 
     extractor& doc = extractor::get_extractor(templatefile, templatetype);
-    return rna_tree(f.brackets, doc.labels, doc.points, f.id);
+    try
+    {
+        return rna_tree(f.brackets, doc.labels, doc.points, f.id);
+    }
+    catch (const exception& e)
+    {
+        throw invalid_argument("creating templated rna " + f.id + " failed:" + e.what());
+    }
 }
 
 
@@ -234,9 +247,8 @@ rna_tree app::create_templated(
 void app::usage(
                 const string& appname)
 {
-    stringstream str;
-
-    str
+    char endl = '\n';
+    logger.info_stream()
         << endl
         << endl
         << "usage():"
@@ -246,8 +258,8 @@ void app::usage(
             << endl
         << appname
             << " [OPTIONS]"
-            << " <-mt|--match-tree> SEQ FOLD"
-            << " <-tt|--template-tree> [--type TYPE] DOCUMENT FOLD"
+            << " <-mt|--match-tree> FASTA_FILE"
+            << " <-tt|--template-tree> [--type TYPE] DOCUMENT FASTA_FILE"
             << endl
         << endl
         << "OPTIONS:" << endl
@@ -257,8 +269,6 @@ void app::usage(
             << " [--mapping <FILE_MAPPING_IN>]"
             << " [--overlaps]]" << endl
         << "\t[--debug]" << endl;
-
-    INFO("%s", to_cstr(str.str()));
 }
 
 void app::print(
@@ -266,9 +276,8 @@ void app::print(
 {
     APP_DEBUG_FNAME;
 
-    stringstream str;
-
-    str
+    char endl = '\n';
+    logger.info_stream()
         << boolalpha
         << "ARGUMENTS:"
             << endl
@@ -307,8 +316,6 @@ void app::print(
             << " draw-out-file=" << args.draw.file
             << endl
         << endl;
-
-    INFO("%s", to_cstr(str.str()));
 }
 
 
@@ -417,18 +424,21 @@ void app::print(
         }
         else
         {
-            ERR("wrong parameter no.%lu: '%s'", i, to_cstr(arg));
-            usage(args.at(0));
-            exit(1);
+            ostringstream out;
+            out
+                << "wrong parameter no."
+                << i
+                << ": '"
+                << arg
+                << "'; try running "
+                << args[0]
+                << " -h for more arguments details";
+            throw invalid_argument(out.str());
         }
     }
 
     if (a.templated == rna_tree() || a.matched == rna_tree())
-    {
-        ERR("trees are missing");
-        usage(args.at(0));
-        abort();
-    }
+        throw invalid_argument("Trees are missing, try running " + args[0] + " -h for more arguments details");
 
     return a;
 }

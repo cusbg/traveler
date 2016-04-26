@@ -30,6 +30,7 @@
 #include "types.hpp"
 #include "test.test.hpp"
 
+#include "point.hpp"
 using namespace std;
 
 
@@ -101,7 +102,6 @@ static void set_signal_handler()
 
 void init()
 {
-    logger.set_priority(logger::DEBUG);
     set_signal_handler();
     cout << boolalpha;
     srand(1);
@@ -114,7 +114,7 @@ void init()
 int main(int argc, char** argv)
 {
 #ifdef TESTS
-    run_test();
+    test::run_tests();
     return 0;
 #endif
 
@@ -127,7 +127,8 @@ int main(int argc, char** argv)
     }
     catch (const exception& e)
     {
-        ERR("Exception %s caught", e.what());
+        ERR("Exception caught:");
+        ERR("%s", e.what());
         return 1;
     }
 

@@ -42,8 +42,8 @@ bool contains_one_of(
 /* global */ std::string read_file(
                 const std::string& filename)
 {
-    assert_err(exist_file(filename),
-            "read_file(%s) failed, file does not exist", to_cstr(filename));
+    if (!exist_file(filename))
+        throw io_exception(msprintf("read_file(%s) failed, file does not exist", filename));
 
     ifstream in(filename);
     stringstream s;
@@ -65,15 +65,15 @@ bool contains_one_of(
     out << what;
     out.flush();
 
-    assert_err(out.good(),
-            "write_file(%s) failed", to_cstr(filename));
+    if (!exist_file(filename))
+        throw io_exception(msprintf("write_file(%s) failed", filename));
 }
 
 /* global */ fasta read_fasta_file(
                 const std::string& filename)
 {
-    assert_err(exist_file(filename),
-            "read_file(%s) failed, file does not exist", to_cstr(filename));
+    if (!exist_file(filename))
+        throw io_exception(msprintf("read_file(%s) failed, file does not exist", filename));
 
     ifstream in(filename);
     ostringstream labels, brackets;
@@ -83,16 +83,15 @@ bool contains_one_of(
     {
         char ch;
         in >> ch;
-        assert_err(!in.fail(), "starting '>' character missing");
-        if (ch == '>')
-        {
-            getline(in, id);
-            size_t index = id.find_first_of(' ');
-            if (index == string::npos)
-                index = id.length();
-            id = id.substr(0, index);
-            break;
-        }
+        if (in.fail() || ch != '>')
+            throw invalid_argument(msprintf("starting character '>' is missing"));
+
+        getline(in, id);
+        size_t index = id.find_first_of(' ');
+        if (index == string::npos)
+            index = id.length();
+        id = id.substr(0, index);
+        break;
     }
 
     while(true)
@@ -120,20 +119,14 @@ bool contains_one_of(
 
 
 
-
-
-
-
-
-
 template <typename table_type, typename table_value_type = size_t, typename file_value_type = size_t>
 table_type load_table(
                 const std::string& filename)
 {
     APP_DEBUG_FNAME;
 
-    assert_err(exist_file(filename),
-            "load_table(%s) failed, file does not exist", to_cstr(filename));
+    if (!exist_file(filename))
+        throw io_exception(msprintf("load_table(%s) failed, file does not exist", filename));
 
     std::ifstream in(filename);
     size_t m, n;
@@ -199,8 +192,8 @@ void save_table(
         out << endl;
     }
 
-    assert_err(!out.fail(),
-            "save_table(%s) failed", to_cstr(filename));
+    if (out.fail())
+        throw io_exception(msprintf("save_table(%s) failed", filename));
 }
 
 
@@ -267,8 +260,8 @@ void save_tree_mapping_table(
             << endl;
     }
 
-    assert_err(!out.fail(),
-            "save_table(%s) failed", to_cstr(filename));
+    if (out.fail())
+        throw io_exception(msprintf("save_table(%s) failed", filename));
 }
 
 mapping load_mapping_table(
@@ -276,8 +269,8 @@ mapping load_mapping_table(
 {
     APP_DEBUG_FNAME;
 
-    assert_err(exist_file(filename),
-            "load_file(%s) failed, file does not exist", to_cstr(filename));
+    if (!exist_file(filename))
+        throw io_exception(msprintf("load_file(%s) failed, file does not exist", filename));
 
     string s;
     mapping map;

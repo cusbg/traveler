@@ -27,48 +27,45 @@
 class test
 {
 public:
+    static void run_tests();
+
+public:
     virtual ~test();
     test(const std::string& test_name);
     virtual void run() = 0;
 
-protected:
-    void test_assert_true(bool condition);
-
-protected:
-    void add_failed_test();
-    void add_failed_test(const my_exception& e);
-
-    void set(int line_number, const std::string& file, const std::string& condition);
-    void set(const std::string& expected, const std::string& value);
+    void add_failed(const std::string& msg);
     void test_ok();
-
 
 protected:
     std::vector<std::string> failed_tests;
-
-private:
-    int line_number;
-    std::string condition;
     std::string test_name;
-    std::string file;
+    int test_number = 0;
 };
 
-#define set_args(str) set(__LINE__, __FILE__, str)
+
+#define format_failed(condition) \
+    msprintf("TEST %s:%s on line %li of %s failed: %s", test_name.c_str(), test_number, __LINE__, __FILE__, #condition)
+
+#define print_test_number() \
+    DEBUG("test #%s", test_number); \
+    ++test_number;
 
 #define assert_true(condition) \
         { \
-            set_args(#condition); \
             try \
             { \
-                bool out = (condition); \
-                test_assert_true(out); \
-                test_ok(); \
+                if (!(condition)) \
+                    add_failed(format_failed(condition)); \
+                else \
+                    test_ok(); \
             } \
-            catch (const my_exception& e) \
+            catch (const exception& e) \
             { \
                 DEBUG("Catched unexpected exception"); \
-                add_failed_test(e); \
+                add_failed(format_failed(condition) + "Exception: " + e.what()); \
             } \
+            print_test_number(); \
         }
 
 #define assert_false(condition) \
@@ -76,43 +73,40 @@ private:
 
 #define assert_equals(value, expected) \
         { \
-            set_args(#expected " == " #value); \
-            set(to_string(expected), to_string(value)); \
             try  \
             { \
-                bool result = (expected) == (value); \
-                test_assert_true(result); \
-                if (result) \
+                if ((expected) != (value)) \
+                    add_failed(msprintf("%s (=%s) != %s (=%s)", #expected, (expected), #value, (value))); \
+                else \
                     test_ok(); \
             } \
             catch (const my_exception& e) \
             { \
                 DEBUG("Catched unexpected exception"); \
-                add_failed_test(e); \
+                add_failed(msprintf("%s (=%s) != %s (=%s)", #expected, (expected), #value, (value)) + "Exception: " + e.what()); \
             } \
+            print_test_number(); \
         }
 
 #define assert_fail(operation) \
         { \
-            set_args(#operation); \
             try  \
             { \
+                DEBUG("Running operation %s", #operation); \
                 { \
                     LOGGER_PRIORITY_ON_FUNCTION(EMERG); \
                     operation; \
                 } \
-                DEBUG("Expected test to fail"); \
-                add_failed_test(); \
+                add_failed(format_failed((operation) " should fail" )); \
             } \
             catch (...) \
             { \
                 DEBUG("Catched expected exception"); \
                 test_ok(); \
             } \
+            print_test_number(); \
         }
 
-
-void run_test();
 
 #endif /* !TEST_HPP */
 

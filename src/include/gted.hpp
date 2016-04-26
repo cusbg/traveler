@@ -41,6 +41,15 @@ public:
                                                         rev_post_order_iterator;
     typedef std::vector<std::vector<size_t>>            tree_distance_table_type;
     typedef std::vector<std::vector<size_t>>            forest_distance_table_type;
+    struct costs
+    {
+        static size_t del(iterator it);
+        static size_t ins(iterator it);
+        static size_t upd(iterator it1, iterator it2);
+
+    private:
+        static size_t get_cost(iterator it, size_t value);
+    };
 
 public:
     gted(

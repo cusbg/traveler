@@ -66,8 +66,6 @@ void utils_test::test_io()
 
 void utils_test::test_read_fasta_file()
 {
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
-
     write_file(TEST_FILE, create_fasta_text());
 
     fasta expected = create_fasta();

@@ -33,7 +33,7 @@ using namespace chrono;
 #define LOG_FILE "build/logs/program.log"
 
 /* global */
-class logger logger(LOG_FILE, logger::WARN);
+class logger logger(LOG_FILE, logger::INFO);
 
 
 
@@ -63,25 +63,16 @@ logger::~logger()
 
 void logger::log(
                 priority p,
-                const char* msg,
-                va_list va)
+                const std::string& text)
 {
     if (!can_log(p))
         return;
 
     for (FILE* f : out)
     {
-        va_list copy;
-        va_copy(copy, va);
-
-        fprintf(f, "%s", message_header(p).c_str());
-        vfprintf(f, msg, copy);
-        fprintf(f, "\n");
+        fprintf(f, "%s%s\n", message_header(p).c_str(), text.c_str());
         fflush(f);
-
-        va_end(copy);
     }
-
     check_errors();
 }
 
@@ -168,7 +159,8 @@ void logger::logger_stream::flush()
 {
     if (!l.can_log(p))
         return;
-    l.log(p, "%s", stream.str().c_str());
+    l.log(p, stream.str());
+    stream.str("");
 }
 
 

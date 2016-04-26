@@ -77,7 +77,7 @@ ${BUILDDIR}/Makefile:
 					>>$@
 
 sort:
-	sort ${LOGDIR}/overlaps.log -n -k 3 > ${LOGDIR}/overlaps.sorted.log
+	sort ${LOGDIR}/overlaps.sorted.log -n -k 3 > ${LOGDIR}/overlaps.sorted.log2
 
 
 #OTHER GLOBAL targets

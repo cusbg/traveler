@@ -47,24 +47,24 @@ void rna_tree_test::run()
     rna_tree rna(BRACKETS, LABELS);
     iterator it;
 
-    assert(rna.get_labels() == LABELS);
-    assert(rna.get_brackets() == BRACKETS);
+    assert_equals(rna.get_labels(), LABELS);
+    assert_equals(rna.get_brackets(), BRACKETS);
 
     it = plusplus(rna.begin(), INDEX);
 
-    assert(rna.get_labels(it) == "2");
-    assert(rna.get_brackets(it) == ".");
+    assert_equals(rna.get_labels(it), "2");
+    assert_equals(rna.get_brackets(it), ".");
 
     rna.erase(it);
 
-    assert(rna.get_labels() == LABELS_DEL);
-    assert(rna.get_brackets() == BRACKETS_DEL);
+    assert_equals(rna.get_labels(), LABELS_DEL);
+    assert_equals(rna.get_brackets(), BRACKETS_DEL);
 
     it = plusplus(rna.begin(), INDEX);
     rna.insert(it, rna_pair_label("2"), 0);
 
-    assert(rna.get_labels() == LABELS);
-    assert(rna.get_brackets() == BRACKETS);
+    assert_equals(rna.get_labels(), LABELS);
+    assert_equals(rna.get_brackets(), BRACKETS);
 }
 
 

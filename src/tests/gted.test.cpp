@@ -36,10 +36,12 @@
 
 using namespace std;
 
-static std::string to_string(
-                const mapping& m)
+static ostream& operator<<(
+                ostream& out,
+                const mapping& map)
 {
-    return "Mapping<>";
+    out << "Mapping<>";
+    return out;
 }
 
 static bool operator==(

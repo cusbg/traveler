@@ -26,21 +26,70 @@
 #include <vector>
 #include <sstream>
 
+#include <stdexcept>
+
+template<typename Stream, typename T, typename... Args>
+Stream&& mprintf(const char* format, Stream&& stream, const T value, Args... args);
+
+template<typename Stream>
+Stream&& mprintf(const char* format, Stream&& stream);
+
+template<typename... Args>
+std::string msprintf(const char* format, Args... args)
+{
+    return mprintf(format, std::ostringstream(), args...).str();
+}
+
+template<typename Stream, typename T, typename... Args>
+Stream&& mprintf(const char* format, Stream&& stream, const T value, Args... args)
+{
+    while (*format != '\0')
+    {
+        if (*format == '%')
+        {
+            if (*(format + 1) == '%')
+                ++format;
+            else
+            {
+                stream << value;
+                format += 2;
+                return mprintf(format, std::move(stream), args...);
+            }
+        }
+        stream << *format++;
+    }
+    throw std::runtime_error(mprintf("invalid number of arguments", std::ostringstream()).str());
+}
+
+template<typename Stream>
+Stream&& mprintf(const char* format, Stream&& stream)
+{
+    while (*format != '\0')
+    {
+        if (*format == '%')
+        {
+            if (*(format + 1) == '%')
+                ++format;
+            else
+                throw std::runtime_error(mprintf("invalid format string: missing arguments, format string '%s'",
+                        std::ostringstream(),
+                        format).str());
+        }
+        stream << *format++;
+    }
+    return std::move(stream);
+}
+
+
+
 
 class logger
 {
-#define LOGGER_PRIORITY_FUNCTION_BODY(_priority) \
-    { \
-        va_list va; \
-        va_start(va, msg); \
-        log(_priority, msg, va); \
-        va_end(va); \
-    }
-
 #define LOGGER_PRIORITY_FUNCTION(_fname, _priority) \
-    inline void _fname(const char* msg, ...) \
+    template<typename ...Args> \
+    inline void _fname(const char* msg, Args... args) \
     { \
-        LOGGER_PRIORITY_FUNCTION_BODY(logger::_priority) \
+        mprintf(msg, get_stream(_priority), args...); \
     }
 
 #define LOGGER_ENABLED_PRIORITY_FUNCTION(_fname, _priority) \
@@ -86,9 +135,9 @@ public:
 
         void flush();
 
-        template <typename T>
+        template<typename T>
         logger_stream& operator<<(
-                    const T value);
+                    const T& value);
     private:
         logger& l;
         priority p;
@@ -116,18 +165,9 @@ protected:
     std::string message_header(
                 priority p) const;
 
-    inline void log(
-                priority p,
-                const char* msg,
-                ...)
-    {
-        LOGGER_PRIORITY_FUNCTION_BODY(p);
-    }
-
     void log(
                 priority p,
-                const char* msg,
-                va_list va);
+                const std::string& text);
 
     inline logger_stream get_stream(
                 priority p)
@@ -174,14 +214,13 @@ extern class logger logger;
 
 
 
-template <typename T>
+template<typename T>
 logger::logger_stream& logger::logger_stream::operator<<(
-                    const T value)
+                    const T& value)
 {
     stream << value;
     return *this;
 }
-
 
 std::ostream& operator<<(
                     std::ostream& out,

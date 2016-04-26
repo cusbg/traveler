@@ -66,7 +66,6 @@ compact::circle create_invalid_circle()
 
 void compact_circle_test::run()
 {
-    //LOGGER_PRIORITY_ON_FUNCTION(INFO);
     APP_DEBUG_FNAME;
 
     test_operations_success();

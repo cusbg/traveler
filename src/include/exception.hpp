@@ -83,7 +83,7 @@ public:
         if (!(boolean)) \
         { \
             ERR(__VA_ARGS__); \
-            assert(boolean); \
+            throw assert_exception(#boolean, __LINE__, __FILE__, __PRETTY_FUNCTION__); \
         } \
     }
 
