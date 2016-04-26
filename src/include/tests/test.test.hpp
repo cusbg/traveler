@@ -80,7 +80,7 @@ protected:
                 else \
                     test_ok(); \
             } \
-            catch (const my_exception& e) \
+            catch (const exception& e) \
             { \
                 DEBUG("Catched unexpected exception"); \
                 add_failed(msprintf("%s (=%s) != %s (=%s)", #expected, (expected), #value, (value)) + "Exception: " + e.what()); \
