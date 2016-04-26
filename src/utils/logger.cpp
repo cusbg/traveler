@@ -79,18 +79,18 @@ void logger::log(
 string logger::message_header(
                 priority p) const
 {
-    auto now = chrono::system_clock::now().time_since_epoch();
-
     size_t hour, minute, second, millisecond, cputacts;
-    timespec cputime;
+    timespec cputime, clocks;
     std::ostringstream stream;
 
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cputime);
+    clock_gettime(CLOCK_REALTIME, &clocks);
+    tm c = *localtime(&clocks.tv_sec);
 
-    hour = ((size_t)chrono::duration_cast<chrono::hours>(now).count()) % 24 + 1;
-    minute = ((size_t)duration_cast<minutes>(now).count()) % 60;
-    second = ((size_t)duration_cast<seconds>(now).count()) % 60;
-    millisecond = ((size_t)duration_cast<milliseconds>(now).count()) % 1000;
+    hour = c.tm_hour;
+    minute = c.tm_min;
+    second = c.tm_sec;
+    millisecond = clocks.tv_sec / 1000000;
     cputacts = cputime.tv_sec * 1000000LL + cputime.tv_nsec / 1000;
 
     // PATTERN:
