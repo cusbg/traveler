@@ -19,7 +19,6 @@
  * USA.
  */
 
-#include <chrono>
 #include <iomanip>
 #include <unistd.h>
 
@@ -28,7 +27,6 @@
 
 
 using namespace std;
-using namespace chrono;
 
 #define LOG_FILE "build/logs/program.log"
 
