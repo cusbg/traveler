@@ -26,9 +26,6 @@
 
 using namespace std;
 
-#define GTED_COST_MODIFY    0
-#define GTED_COST_DELETE    1
-
 #define BAD                 0xBADF00D
 
 #define get_table(str, tblname) \
@@ -227,9 +224,9 @@ gted::forest_distance_table_type gted::compute_distance_LR(
 
     set_fdist(empty, empty, 0);
     for (it1 = beg1; it1 != end1; ++it1)
-        set_fdist(it1, empty, get_fdist(prev(1), empty) + GTED_COST_DELETE);
+        set_fdist(it1, empty, get_fdist(prev(1), empty) + costs::del(it1));
     for (it2 = beg2; it2 != end2; ++it2)
-        set_fdist(empty, it2, get_fdist(empty, prev(2)) + GTED_COST_DELETE);
+        set_fdist(empty, it2, get_fdist(empty, prev(2)) + costs::ins(it2));
 
     DEBUG("END init");
     DEBUG("BEG main cycle");
@@ -244,12 +241,12 @@ gted::forest_distance_table_type gted::compute_distance_LR(
             bool b = get_begin_leaf(t1, it1) == beg1 &&
                     get_begin_leaf(t2, it2) == beg2;
             
-            vec[0] = get_fdist(prev(1), it2) + GTED_COST_DELETE; // delete `it1`
-            vec[1] = get_fdist(it1, prev(2)) + GTED_COST_DELETE; // delete `it2`
+            vec[0] = get_fdist(prev(1), it2) + costs::del(it1); // delete `it1`
+            vec[1] = get_fdist(it1, prev(2)) + costs::del(it2); // delete `it2`
 
             // modify iff both it-s are subtree roots
             if (b)
-                vec[2] = get_fdist(prev(1), prev(2)) + GTED_COST_MODIFY; // modify `it1` ~> `it2`
+                vec[2] = get_fdist(prev(1), prev(2)) + costs::upd(it1, it2); // modify `it1` ~> `it2`
             else
             {
                 // previous subtree visited root == --leaf
@@ -373,7 +370,7 @@ mapping gted::get_mapping()
             DEBUG("its: %s - %s", clabel(it1), clabel(it2));
 
             if (tree_type::is_valid(it1) &&
-                    get_fdist(prev(1), it2) + GTED_COST_DELETE ==
+                    get_fdist(prev(1), it2) + costs::del(it1) ==
                     get_fdist(it1, it2))
             {
                 DEBUG("delete %s:%lu", clabel(it1), id(it1));
@@ -383,7 +380,7 @@ mapping gted::get_mapping()
                 it1 = prev(1);
             }
             else if (tree_type::is_valid(it2) &&
-                    get_fdist(it1, prev(2)) + GTED_COST_DELETE ==
+                    get_fdist(it1, prev(2)) + costs::ins(it2) ==
                     get_fdist(it1, it2))
             {
                 DEBUG("insert %s:%lu", clabel(it2), id(it2));
@@ -578,4 +575,35 @@ gted::tree_distance_table_type& gted::get_tree_distances()
 }
 
 
+// costs
+#define GTED_COST_MODIFY    0
+#define GTED_COST_DELETE    1
+#define GTED_COST_INSERT    1
+#define GTED_COST_ROOT      10000
+
+/* static */ size_t gted::costs::del(
+                iterator it)
+{
+    return get_cost(it, GTED_COST_DELETE);
+}
+
+/* static */ size_t gted::costs::ins(
+                iterator it)
+{
+    return get_cost(it, GTED_COST_INSERT);
+}
+
+/* static */ size_t gted::costs::upd(
+                iterator it1,
+                iterator it2)
+{
+    return (rna_tree::is_root(it1) != rna_tree::is_root(it2)) ? GTED_COST_ROOT : GTED_COST_MODIFY;
+}
+
+/* static */ size_t gted::costs::get_cost(
+                iterator it,
+                size_t value)
+{
+    return rna_tree::is_root(it) ? GTED_COST_ROOT : value;
+}
 
