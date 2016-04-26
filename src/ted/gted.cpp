@@ -59,7 +59,7 @@ void gted::run(
 
     compute_distance_recursive(t1.begin(), t2.begin());
 
-    INFO("tdist[%s][%s] = %lu",
+    INFO("tdist[%s][%s] = %u",
             clabel(t1.begin()), clabel(t2.begin()),
             tdist[id(t1.begin())][id(t2.begin())]);
 
@@ -192,7 +192,7 @@ gted::forest_distance_table_type gted::compute_distance_LR(
 
     APP_DEBUG_FNAME;
 
-    DEBUG("root1 %s:%lu, root2 %s:%lu",
+    DEBUG("root1 %s:%u, root2 %s:%u",
             clabel(root1), id(root1),
             clabel(root2), id(root2));
     t1.print_subtree(root1);
@@ -373,7 +373,7 @@ mapping gted::get_mapping()
                     get_fdist(prev(1), it2) + costs::del(it1) ==
                     get_fdist(it1, it2))
             {
-                DEBUG("delete %s:%lu", clabel(it1), id(it1));
+                DEBUG("delete %s:%u", clabel(it1), id(it1));
 
                 map.map.push_back({id(it1) + 1, 0});
 
@@ -383,7 +383,7 @@ mapping gted::get_mapping()
                     get_fdist(it1, prev(2)) + costs::ins(it2) ==
                     get_fdist(it1, it2))
             {
-                DEBUG("insert %s:%lu", clabel(it2), id(it2));
+                DEBUG("insert %s:%u", clabel(it2), id(it2));
 
                 map.map.push_back({0, id(it2) + 1});
 
@@ -394,7 +394,7 @@ mapping gted::get_mapping()
                 if (get_begin_leaf(t1, it1) == beg1 &&
                         get_begin_leaf(t2, it2) == beg2)
                 {
-                    DEBUG("match %s:%lu -> %s:%lu",
+                    DEBUG("match %s:%u -> %s:%u",
                             clabel(it1), id(it1),
                             clabel(it2), id(it2));
 
@@ -460,7 +460,7 @@ mapping gted::get_mapping()
 
     assert(i1 < tdist.size() && i2 < tdist[i1].size());
 
-    DEBUG("\tget TDist[%s:%lu][%s:%lu] -> %lu",
+    DEBUG("\tget TDist[%s:%u][%s:%u] -> %u",
             clabel(it1), i1,
             clabel(it2), i2,
             tdist[i1][i2]);
@@ -492,7 +492,7 @@ mapping gted::get_mapping()
     assert(i1 < tdist.size() && i2 < tdist[i1].size());
     assert(value != BAD);
 
-    DEBUG("set TDist[%s:%lu][%s:%lu] = %lu",
+    DEBUG("set TDist[%s:%u][%s:%u] = %u",
             clabel(it1), i1,
             clabel(it2), i2,
             value);
@@ -515,7 +515,7 @@ mapping gted::get_mapping()
     assert((int)i1 >= 0 && (int)i2 >= 0);
     assert(i1 < fdist.size() && i2 < fdist[i1].size());
 
-    DEBUG("\tget FDist[%s:%lu:%lu][%s:%lu:%lu] -> %lu",
+    DEBUG("\tget FDist[%s:%u:%u][%s:%u:%u] -> %u",
             clabel(it1), valid(it1) ? id(it1) : 0, i1,
             clabel(it2), valid(it2) ? id(it2) : 0, i2,
             fdist[i1][i2]);
@@ -542,7 +542,7 @@ mapping gted::get_mapping()
     assert((int)i1 >= 0 && (int)i2 >= 0);
     assert(i1 < fdist.size() && i2 < fdist[i1].size());
 
-    DEBUG("set FDist[%s:%lu:%lu][%s:%lu:%lu] = %lu",
+    DEBUG("set FDist[%s:%u:%u][%s:%u:%u] = %u",
             clabel(it1), valid(it1) ? id(it1) : 0, i1,
             clabel(it2), valid(it2) ? id(it2) : 0, i2,
             value);

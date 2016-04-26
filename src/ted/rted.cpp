@@ -21,7 +21,7 @@
 
 #include "rted.hpp"
 
-#define RTED_BAD        0xBADF00D
+#define RTED_BAD        -0xBADF00D
 #define isbad(value)    ((value) == RTED_BAD)
 
 // TODO: mozno prepisat podobne ako gted - vytvorit iny rted_tree,
@@ -54,7 +54,7 @@ void rted::run()
     {
         for (it2 = t2.begin_post(); it2 != t2.end_post(); ++it2)
         {
-            DEBUG("%s:%lu <-> %s:%lu",
+            DEBUG("%s:%u <-> %s:%u",
                     clabel(it1), id(it1),
                     clabel(it2), id(it2));
 
@@ -177,13 +177,13 @@ void rted::compute_full_decomposition(
     ALeft[it_id]    = left;
     ARight[it_id]   = right;
 
-    DEBUG("A\t[%s]\t == %lu",
+    DEBUG("A\t[%s]\t == %u",
             clabel(it),
             A[it_id]);
-    DEBUG("ALeft\t[%s]\t == %lu",
+    DEBUG("ALeft\t[%s]\t == %u",
             clabel(it),
             ALeft[it_id]);
-    DEBUG("ARight\t[%s]\t == %lu",
+    DEBUG("ARight\t[%s]\t == %u",
             clabel(it),
             ARight[it_id]);
 }
@@ -220,9 +220,9 @@ void rted::compute_relevant_subforrests(
     FLeft[it_id]    = left;
     FRight[it_id]   = right;
 
-    DEBUG("FLeft\t[%s]\t == %lu",
+    DEBUG("FLeft\t[%s]\t == %u",
             clabel(it), FLeft[it_id]);
-    DEBUG("FRight\t[%s]\t == %lu",
+    DEBUG("FRight\t[%s]\t == %u",
             clabel(it), FRight[it_id]);
 }
 
@@ -238,7 +238,7 @@ void rted::compute_subtree_size(
 
     Size[it_id] = s;
 
-    DEBUG("Size\t[%s]\t == %lu",
+    DEBUG("Size\t[%s]\t == %u",
             clabel(it),
             Size[it_id]);
 }
@@ -415,7 +415,7 @@ size_t rted::update_STR_table(
     size_t c_min = *c_min_it;
     size_t index = distance(vec.begin(), c_min_it);
 
-    DEBUG("c_min %lu, index %lu", c_min, index);
+    DEBUG("c_min %u, index %u", c_min, index);
     STR[it1_id][it2_id] = strategy(index);
 
     DEBUG("STR\t[%s][%s]\t == %s",
@@ -482,15 +482,15 @@ void rted::update_T1_LRH_v_tables(
     T1_Hv[parent1_id][it2_id] += val;
 
 
-    DEBUG("T1_Lv\t[%s][%s]\t = %lu \t (update)",
+    DEBUG("T1_Lv\t[%s][%s]\t = %u \t (update)",
             clabel(tree_type::parent(it1)),
             clabel(it2),
             T1_Lv[parent1_id][it2_id]);
-    DEBUG("T1_Rv\t[%s][%s]\t = %lu \t (update)",
+    DEBUG("T1_Rv\t[%s][%s]\t = %u \t (update)",
             clabel(tree_type::parent(it1)),
             clabel(it2),
             T1_Rv[parent1_id][it2_id]);
-    DEBUG("T1_Hv\t[%s][%s]\t = %lu \t (update)",
+    DEBUG("T1_Hv\t[%s][%s]\t = %u \t (update)",
             clabel(tree_type::parent(it1)),
             clabel(it2),
             T1_Hv[parent1_id][it2_id]);
@@ -549,13 +549,13 @@ void rted::update_T2_LRH_w_tables(
         T2_Hw[parent2_id] += c_min;
 
 
-    DEBUG("T2_Lw\t[%s]\t = %lu \t (update)",
+    DEBUG("T2_Lw\t[%s]\t = %u \t (update)",
             clabel(tree_type::parent(it2)),
             T2_Lw[parent2_id]);
-    DEBUG("T2_Rw\t[%s]\t = %lu \t (update)",
+    DEBUG("T2_Rw\t[%s]\t = %u \t (update)",
             clabel(tree_type::parent(it2)),
             T2_Rw[parent2_id]);
-    DEBUG("T2_Hw\t[%s]\t = %lu \t (update)",
+    DEBUG("T2_Hw\t[%s]\t = %u \t (update)",
             clabel(tree_type::parent(it2)),
             T2_Hw[parent2_id]);
 }

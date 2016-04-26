@@ -88,7 +88,7 @@ string logger::message_header(
     hour = c.tm_hour;
     minute = c.tm_min;
     second = c.tm_sec;
-    millisecond = clocks.tv_sec / 1000000;
+    millisecond = clocks.tv_nsec / 1000000LL;
     cputacts = cputime.tv_sec * 1000000LL + cputime.tv_nsec / 1000;
 
     // PATTERN:
