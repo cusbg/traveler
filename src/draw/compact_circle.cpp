@@ -74,7 +74,7 @@ double compact::circle::segment_angle() const
 
 double compact::circle::segment_length() const
 {
-    return 2. * PI * radius() * segment_angle() / 360.;
+    return 2. * M_PI * radius() * segment_angle() / 360.;
 }
 
 bool compact::circle::lies_in_segment(

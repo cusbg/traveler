@@ -21,7 +21,7 @@
 
 #include "rted.hpp"
 
-#define RTED_BAD        -0xBADF00D
+#define RTED_BAD        size_t(-0xBADF00D)
 #define isbad(value)    ((value) == RTED_BAD)
 
 // TODO: mozno prepisat podobne ako gted - vytvorit iny rted_tree,

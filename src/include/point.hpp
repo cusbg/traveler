@@ -25,7 +25,9 @@
 #include <sstream>
 #include <cmath>
 
-#define PI              M_PI
+#ifndef M_PI
+#define M_PI		3.14159265358979323846
+#endif
 
 
 struct point
@@ -82,13 +84,13 @@ inline bool double_equals(
 inline double radians_to_degrees(
                 double val)
 {
-    return val * 180. / PI;
+    return val * 180. / M_PI;
 }
 
 inline double degrees_to_radians(
                 double val)
 {
-    return val * PI / 180.;
+    return val * M_PI / 180.;
 }
 
 inline bool iszero(

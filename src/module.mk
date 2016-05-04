@@ -17,7 +17,6 @@ RUNSH                   = sh -x ${ROOTDIR}/make.sh
 MODULEVAR               = $(shell echo ${MODULE} | tr 'a-z' 'A-Z')
 
 make: $(addprefix ${BUILDDIR}/,${MAKEFILES})
-	echo $(addprefix ${BUILDDIR}/,${MAKEFILES})
 	@echo -e \
 		\\ninclude ${MAKEFILES} \
 		\\n \

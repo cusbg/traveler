@@ -1,11 +1,14 @@
 # TRAVeLer - Template RnA VisuaLization
 
+## Requirements:
+- gcc with support of c++11
 
-## Prerequisites:
-	No prerequisites are needed
+## Download:
+Use `git clone https://github.com/rikiel/bc traveler` to download project
 
 ## Compiling:
-To compile project, run `make build` in src/ directory.
+    cd traveler/src
+    make
 
 ## Usage:
     traveler [-h|--help]
@@ -23,8 +26,12 @@ To compile project, run `make build` in src/ directory.
 
 	OPTIONS:
 		[-a|--all <FILE_OUT>]
+            # compute TED and draw images to FILE_OUT
         [-t|--ted <FILE_DISTANCES_OUT> <FILE_MAPPING_OUT>]
+            # run only TED, save distance table and mapping to files FILE_DISTANCES_OUT and FILE_MAPPING_OUT
         [-d|--draw --mapping <FILE_MAPPING_IN> [--overlaps] <FILE_OUT>]
+            # use mapping in FILE_MAPPING_IN and draw images to FILE_OUT
+            # if optional argument --overlaps is present, compute overlaps in image and highlight them
         [--debug]
 
 

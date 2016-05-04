@@ -20,13 +20,13 @@ LFLAGS                  = ${DEBUG} ${RELEASE} -std=c++11 -lrt
 SHELL                   = /bin/bash -o pipefail
 
 
+build: mkdir make_modules ${BUILDDIR}/Makefile compile
+
 run: build cleanLog cp mkdir
 	sh -x run.sh
 
 debug: build cp mkdir
 	sh -x run.sh debug
-
-build: mkdir make_modules ${BUILDDIR}/Makefile compile
 
 CORES                   = $(shell nproc)
 compile:
