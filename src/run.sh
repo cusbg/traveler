@@ -12,6 +12,9 @@ DIR="precomputed"
 DIR_IMG="build/files"
 ONCE=false
 
+COLORED="--colored"
+OVERLAPS=""
+
 mv ${EXECUTABLE} ${EXECUTABLE}2
 EXECUTABLE="${EXECUTABLE}2"
 
@@ -47,7 +50,7 @@ run_draw() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --draw --mapping ${file}.map ${DIR_IMG}/${file1}-${file2} \
+	    --draw ${COLORED} ${OVERLAPS}--mapping ${file}.map ${DIR_IMG}/${file1}-${file2} \
 	|| fail_function
 }
 
@@ -63,8 +66,8 @@ run_all() {
 run() {
     init_variables
 
-    run_ted
-    #run_draw
+    #run_ted
+    run_draw
 
     #{
         #date

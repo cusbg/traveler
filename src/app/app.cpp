@@ -250,12 +250,13 @@ rna_tree app::create_templated(
 void app::usage(
                 const string& appname)
 {
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
     char endl = '\n';
 
     logger.info_stream()
-        << endl
-        << endl
         << "usage():"
+        << endl
         << endl
         << appname
             << " [-h|--help]"
@@ -444,7 +445,7 @@ void app::print(
                 << arg
                 << "'; try running "
                 << args[0]
-                << " -h for more arguments details";
+                << " --help for more arguments details";
             throw invalid_argument(out.str());
         }
     }
