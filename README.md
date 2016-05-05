@@ -29,9 +29,10 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
             # compute TED and draw images to FILE_OUT
         [-t|--ted <FILE_DISTANCES_OUT> <FILE_MAPPING_OUT>]
             # run only TED, save distance table and mapping to files FILE_DISTANCES_OUT and FILE_MAPPING_OUT
-        [-d|--draw --mapping <FILE_MAPPING_IN> [--overlaps] <FILE_OUT>]
+        [-d|--draw --mapping <FILE_MAPPING_IN> [--overlaps] [--colored] <FILE_OUT>]
             # use mapping in FILE_MAPPING_IN and draw images to FILE_OUT
             # if optional argument --overlaps is present, compute overlaps in image and highlight them
+	    # if optional argument --colored is present, bases are differentiated (inserted/edited/rotated branch/..)
         [--debug]
 
 

@@ -102,13 +102,15 @@ static void set_signal_handler()
 
 void init()
 {
+    LOGGER_PRIORITY_ON_FUNCTION(INFO);
+
     set_signal_handler();
     cout << boolalpha;
     srand(1);
 
-    DEBUG("*****************************************");
-    DEBUG("************ RUNNING PROGRAM ************");
-    DEBUG("*****************************************");
+    INFO("*****************************************");
+    INFO("************ RUNNING PROGRAM ************");
+    INFO("*****************************************");
 }
 
 int main(int argc, char** argv)

@@ -56,6 +56,7 @@ struct app::arguments
     {
         bool run = false;
         bool overlap_checks = false;
+        bool colors = false;
         string mapping;
         string file;
     } draw;
@@ -103,7 +104,7 @@ void app::run(
         img_out = args.draw.file;
     }
 
-    run_drawing(args.templated, args.matched, map, draw, args.draw.overlap_checks, img_out);
+    run_drawing(args.templated, args.matched, map, draw, args.draw.overlap_checks, args.draw.colors, img_out);
 
     INFO("END: APP");
 }
@@ -148,6 +149,7 @@ void app::run_drawing(
                 const mapping& mapping,
                 bool run,
                 bool run_overlaps,
+                bool colored,
                 const std::string& file)
 {
     APP_DEBUG_FNAME;
@@ -158,18 +160,19 @@ void app::run_drawing(
     templated = matcher(templated, matched).run(mapping);
     compact(templated).run();
 
-    save(file, templated, run_overlaps);
+    save(file, templated, run_overlaps, colored);
 }
 
 
 void app::save(
                 const std::string& filename,
                 rna_tree& rna,
-                bool overlap)
+                bool overlap,
+                bool colored)
 {
     APP_DEBUG_FNAME;
 
-    auto writers = document_writer::get_writers();
+    auto writers = document_writer::get_writers(colored);
 
     overlap_checks::overlaps overlaps;
     if (overlap)
@@ -193,11 +196,11 @@ void app::log_overlaps(
 {
     class logger overlaps("build/logs/overlaps.log", logger::DEBUG);
 
-    overlaps.debug("%s : %lu", to_cstr(name), size);
+    overlaps.debug("%s : %u", to_cstr(name), size);
 
     if (size != 0)
     {
-        WARN("overlaps occurs in %s, count=%lu",
+        WARN("overlaps occurs in %s, count=%u",
                 to_cstr(name), size);
     }
 }
@@ -248,6 +251,7 @@ void app::usage(
                 const string& appname)
 {
     char endl = '\n';
+
     logger.info_stream()
         << endl
         << endl
@@ -267,6 +271,7 @@ void app::usage(
         << "\t[-t|--ted <FILE_DISTANCES_OUT> <FILE_MAPPING_OUT>]" << endl
         << "\t[-d|--draw"
             << " [--mapping <FILE_MAPPING_IN>]"
+            << " [--colored]"
             << " [--overlaps]]" << endl
         << "\t[--debug]" << endl;
 }
@@ -310,6 +315,8 @@ void app::print(
             << " run=" << args.draw.run
             << endl << '\t'
             << " overlaps=" << args.draw.overlap_checks
+            << endl << '\t'
+            << " colored=" << args.draw.colors
             << endl << '\t'
             << " mapping-table-in-file=" << args.draw.mapping
             << endl << '\t'
@@ -409,6 +416,11 @@ void app::print(
                 else if (nextarg() == "--overlaps")
                 {
                     a.draw.overlap_checks = true;
+                    i += 1;
+                }
+                else if (nextarg() == "--colored")
+                {
+                    a.draw.colors = true;
                     i += 1;
                 }
                 else

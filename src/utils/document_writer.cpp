@@ -68,11 +68,15 @@ bool RGB::operator==(
 
 
 
-/* static */ std::vector<std::unique_ptr<document_writer>> document_writer::get_writers()
+/* static */ std::vector<std::unique_ptr<document_writer>> document_writer::get_writers(
+                bool use_colors)
 {
-    decltype(get_writers()) vec;
+    std::vector<std::unique_ptr<document_writer>> vec;
     vec.emplace_back(new svg_writer());
     vec.emplace_back(new ps_writer());
+
+    for (const auto& writer : vec)
+        writer->use_colors(use_colors);
 
     return vec;
 }
@@ -123,6 +127,9 @@ std::string document_writer::get_label_formatted(
 const RGB& document_writer::get_default_color(
                 rna_pair_label::status_type status) const
 {
+    if (!colored)
+        return RGB::BLACK;
+
     switch (status)
     {
 #define switchcase(status, rgb) \
@@ -291,6 +298,12 @@ size_t document_writer::fill(
     }
     seek(pos);
     return n;
+}
+
+void document_writer::use_colors(
+                bool _colored)
+{
+    colored = _colored;
 }
 
 

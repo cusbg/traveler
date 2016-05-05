@@ -312,7 +312,6 @@ mapping gted::get_mapping()
         };
     auto compute_distance_local =
         [this](const iterator_type& root1, const iterator_type& root2) {
-            LOGGER_PRIORITY_ON_FUNCTION(INFO);
             tree_distance_table_type oldtdist = tdist;
 
             auto fdist = compute_distance(root1, root2);

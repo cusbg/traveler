@@ -35,8 +35,6 @@ void ps_extractor::init(
     assert_err(exist_file(filename),
             "ps_document(%s): file does not exist", to_cstr(filename));
 
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
     string line, str;
     ifstream in(filename);
     point p;

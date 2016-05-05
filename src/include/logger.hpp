@@ -148,6 +148,10 @@ public:
     logger(
                 const std::string& filename,
                 priority priority);
+    logger(
+                const std::string& filename,
+                priority priority,
+                std::vector<FILE*> streams);
     ~logger();
 
 public:
@@ -218,6 +222,9 @@ template<typename T>
 logger::logger_stream& logger::logger_stream::operator<<(
                     const T& value)
 {
+    if (!l.can_log(p))
+        return *this;
+
     stream << value;
     return *this;
 }

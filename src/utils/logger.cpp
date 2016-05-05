@@ -31,16 +31,22 @@ using namespace std;
 #define LOG_FILE "build/logs/program.log"
 
 /* global */
-class logger logger(LOG_FILE, logger::INFO);
-
+class logger logger(LOG_FILE, logger::ERROR, {stdout});
 
 
 logger::logger(
                 const std::string& filename,
                 priority priority)
+    : logger(filename, priority, {})
+{ }
+
+logger::logger(
+                const std::string& filename,
+                priority priority,
+                std::vector<FILE*> streams)
 {
     p = priority;
-    out.push_back(stdout);
+    out = streams;
     FILE* f = fopen(filename.c_str(), "a");
 
     assert_err(f != nullptr && !ferror(f),

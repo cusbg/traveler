@@ -240,8 +240,6 @@ void rna_pair_label::set_label_strings(
     //  edited          - ak labels su rozne
     //
 
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
     APP_DEBUG_FNAME;
 
     if (status != untouched)

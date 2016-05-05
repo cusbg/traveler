@@ -3,12 +3,13 @@
 ALL="african_frog artemia_salina blue_mussel cicadas echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
 FILES1=${ALL}
 FILES2=${ALL}
-#FILES1="artemia_salina"
+FILES1="artemia_salina"
+FILES2="cicadas"
 #FILES2="artemia_salina"
-#FILES2="cicadas"
 
 EXECUTABLE="build/traveler"
-DIR=precomputed
+DIR="precomputed"
+DIR_IMG="build/files"
 ONCE=false
 
 mv ${EXECUTABLE} ${EXECUTABLE}2
@@ -46,7 +47,7 @@ run_draw() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --draw --mapping ${file}.map --overlaps ${file} \
+	    --draw --mapping ${file}.map ${DIR_IMG}/${file1}-${file2} \
 	|| fail_function
 }
 
@@ -62,8 +63,8 @@ run_all() {
 run() {
     init_variables
 
-    #run_ted
-    run_draw
+    run_ted
+    #run_draw
 
     #{
         #date

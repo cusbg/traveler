@@ -265,8 +265,6 @@ bool rna_tree::correct_pairing() const
 point rna_tree::top_right_corner(
                 rna_tree::iterator root)
 {
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
-
     // x, y should be maximal in subtree
     point p = { -DBL_MAX, -DBL_MAX };
 
@@ -291,8 +289,6 @@ point rna_tree::top_right_corner(
 point rna_tree::bottom_left_corner(
                 rna_tree::iterator root)
 {
-    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
-
     // x, y should be minimal in subtree
     point p = { DBL_MAX, DBL_MAX };
 

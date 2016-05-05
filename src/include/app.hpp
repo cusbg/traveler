@@ -67,6 +67,7 @@ private:
                 const mapping& mapping,
                 bool run,
                 bool run_overlaps,
+                bool colored,
                 const std::string& file);
 
     /**
@@ -76,7 +77,8 @@ private:
     void save(
                 const std::string& filename,
                 rna_tree& rna,
-                bool overlaps);
+                bool overlaps,
+                bool colored);
 
 private:
     /**

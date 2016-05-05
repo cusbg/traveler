@@ -39,13 +39,17 @@ protected:
     document_writer() = default;
 
 public:
-    static std::vector<std::unique_ptr<document_writer>> get_writers();
+    static std::vector<std::unique_ptr<document_writer>> get_writers(
+                bool use_colors);
 
     /**
      * print `text` to document
      */
     virtual streampos print(
                 const std::string& text) = 0;
+
+    void use_colors(
+                bool colored);
 
 public: // formatters
     virtual std::string get_circle_formatted(
@@ -123,6 +127,7 @@ private:
 
 private:
     std::ofstream out;
+    bool colored = false;
 };
 
 
