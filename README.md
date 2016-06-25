@@ -25,13 +25,16 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
             (http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
 
 	OPTIONS:
-	[-a|--all <FILE_OUT>]
+	[-a|--all [--overlaps] [--colored] <FILE_OUT>]
             # compute TED and draw images to FILE_OUT
+            # if optional argument --overlaps is present, compute overlaps in image and highlight them
+            # for detailed use of --colored argument, see COLOR CODING section
         [-t|--ted <FILE_DISTANCES_OUT> <FILE_MAPPING_OUT>]
             # run only TED, save distance table and mapping to files FILE_DISTANCES_OUT and FILE_MAPPING_OUT
         [-d|--draw --mapping <FILE_MAPPING_IN> [--overlaps] [--colored] <FILE_OUT>]
             # use mapping in FILE_MAPPING_IN and draw images to FILE_OUT
             # if optional argument --overlaps is present, compute overlaps in image and highlight them
+            # for detailed use of --colored argument, see COLOR CODING section
 	    # if optional argument --colored is present -- see COLOR CODING section
         [--debug]
 

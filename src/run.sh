@@ -13,7 +13,7 @@ DIR_IMG="build/files"
 ONCE=false
 
 COLORED="--colored"
-OVERLAPS=""
+OVERLAPS="--overlaps"
 
 mv ${EXECUTABLE} ${EXECUTABLE}2
 EXECUTABLE="${EXECUTABLE}2"
@@ -33,7 +33,8 @@ fail_function() {
 }
 
 init_variables() {
-    file="${DIR}/${file1}-${file2}"
+    file_in="${DIR}/${file1}-${file2}"
+    file_out="${DIR_IMG}/${file1}-${file2}"
     tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fasta"
     mt="--match-tree ${DIR}/${file2}.fasta"
 }
@@ -41,7 +42,7 @@ init_variables() {
 run_ted() {
     ${EXECUTABLE} \
         ${tt} ${mt} \
-        --ted ${file}.dist ${file}.map \
+        --ted ${file_in}.dist ${file_in}.map \
         || fail_function
 }
 
@@ -50,7 +51,7 @@ run_draw() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --draw ${COLORED} ${OVERLAPS}--mapping ${file}.map ${DIR_IMG}/${file1}-${file2} \
+	    --draw ${COLORED} ${OVERLAPS} --mapping ${file_in}.map ${file_out} \
 	|| fail_function
 }
 
@@ -59,7 +60,8 @@ run_all() {
 
     ${EXECUTABLE} \
         ${tt} ${mt} \
-        --draw ${file} \
+        --all ${COLORED} ${OVERLAPS} ${file_out} \
+        --debug \
         || fail_function
 }
 
@@ -67,7 +69,8 @@ run() {
     init_variables
 
     #run_ted
-    run_draw
+    #run_draw
+    run_all
 
     #{
         #date

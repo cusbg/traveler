@@ -44,6 +44,8 @@ struct app::arguments
     struct
     {
         bool run = false;
+        bool colors = false;
+        bool overlap_checks = false;
         string file;
     } all;
     struct
@@ -91,6 +93,8 @@ void app::run(
     print(args);
     bool rted = args.all.run || args.ted.run;
     bool draw = args.all.run || args.draw.run;
+    bool overlaps = args.all.overlap_checks || args.draw.overlap_checks;
+    bool colored = args.all.colors || args.draw.colors;
     mapping map;
     string img_out = args.all.file;
 
@@ -104,7 +108,7 @@ void app::run(
         img_out = args.draw.file;
     }
 
-    run_drawing(args.templated, args.matched, map, draw, args.draw.overlap_checks, args.draw.colors, img_out);
+    run_drawing(args.templated, args.matched, map, draw, overlaps, colored, img_out);
 
     INFO("END: APP");
 }
@@ -268,7 +272,7 @@ void app::usage(
             << endl
         << endl
         << "OPTIONS:" << endl
-        << "\t[-a|--all <FILE>]" << endl
+        << "\t[-a|--all [--colored] [--overlaps] <FILE>]" << endl
         << "\t[-t|--ted <FILE_DISTANCES_OUT> <FILE_MAPPING_OUT>]" << endl
         << "\t[-d|--draw"
             << " [--mapping <FILE_MAPPING_IN>]"
@@ -392,6 +396,21 @@ void app::print(
         {
             DEBUG("arg all");
             a.all.run = true;
+            while (true)
+            {
+                if (nextarg() == "--colored")
+                {
+                    a.all.colors = true;
+                    i += 1;
+                }
+                else if (nextarg() == "--overlaps")
+                {
+                    a.all.overlap_checks = true;
+                    i += 1;
+                }
+                else
+                    break;
+            }
             a.all.file = args.at(i + 1);
             ++i;
         }
