@@ -154,4 +154,15 @@ void ps_extractor::init(
     }
 }
 
+regex create_regex(const std::string& pattern)
+{
+    try
+    {
+        return regex(pattern);
+    }
+    catch (const std::regex_error e)
+    {
+        throw runtime_error("regex_error: You need newer compiler. Actual does not support necessary regex patterns, use gcc version >= 4.9.2");
+    }
+}
 
