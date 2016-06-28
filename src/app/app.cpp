@@ -51,7 +51,6 @@ struct app::arguments
     struct
     {
         bool run = false;
-        string distances;
         string mapping;
     } ted;
     struct
@@ -98,7 +97,7 @@ void app::run(
     mapping map;
     string img_out = args.all.file;
 
-    map = run_ted(args.templated, args.matched, rted, args.ted.distances, args.ted.mapping);
+    map = run_ted(args.templated, args.matched, rted, args.ted.mapping);
 
     if (args.draw.run)
     {
@@ -117,7 +116,6 @@ mapping app::run_ted(
                 rna_tree& templated,
                 rna_tree& matched,
                 bool run,
-                const std::string& distances_file,
                 const std::string& mapping_file)
 {
     APP_DEBUG_FNAME;
@@ -134,8 +132,6 @@ mapping app::run_ted(
 
         mapping = g.get_mapping();
 
-        if (!distances_file.empty())
-            save_tree_distance_table(distances_file, g.get_tree_distances());
         if (!mapping_file.empty())
             save_tree_mapping_table(mapping_file, mapping);
     }
@@ -272,12 +268,12 @@ void app::usage(
             << endl
         << endl
         << "OPTIONS:" << endl
-        << "\t[-a|--all [--colored] [--overlaps] <FILE>]" << endl
-        << "\t[-t|--ted <FILE_DISTANCES_OUT> <FILE_MAPPING_OUT>]" << endl
+        << "\t[-a|--all [--colored] [--overlaps] <FILE_OUT>]" << endl
+        << "\t[-t|--ted <FILE_MAPPING_OUT>]" << endl
         << "\t[-d|--draw"
-            << " [--mapping <FILE_MAPPING_IN>]"
             << " [--colored]"
-            << " [--overlaps]]" << endl
+            << " [--overlaps]]"
+            << " <FILE_MAPPING_IN> <FILE_OUT>" << endl
         << "\t[--debug]" << endl;
 }
 
@@ -310,8 +306,6 @@ void app::print(
         << "ted:"
             << endl << '\t'
             << " run=" << args.ted.run << ";"
-            << endl << '\t'
-            << " ted-distances-file=" << args.ted.distances
             << endl << '\t'
             << " ted-mapping-file=" << args.ted.mapping
             << endl
@@ -418,9 +412,8 @@ void app::print(
         {
             DEBUG("arg ted");
             a.ted.run = true;
-            a.ted.distances = args.at(i + 1);
-            a.ted.mapping = args.at(i + 2);
-            i += 2;
+            a.ted.mapping = args.at(i + 1);
+            i += 1;
         }
         else if (is_argument({"-d", "--draw"}))
         {
@@ -428,12 +421,7 @@ void app::print(
             a.draw.run = true;
             while (true)
             {
-                if (nextarg() == "--mapping")
-                {
-                    a.draw.mapping = args.at(i + 2);
-                    i += 2;
-                }
-                else if (nextarg() == "--overlaps")
+                if (nextarg() == "--overlaps")
                 {
                     a.draw.overlap_checks = true;
                     i += 1;
@@ -446,8 +434,9 @@ void app::print(
                 else
                     break;
             }
-            a.draw.file = args.at(i + 1);
-            ++i;
+            a.draw.mapping = args.at(i + 1);
+            a.draw.file = args.at(i + 2);
+            i += 2;
         }
         else if (is_argument({"--debug"}))
         {

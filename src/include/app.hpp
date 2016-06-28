@@ -58,8 +58,7 @@ private:
                 rna_tree& templated,
                 rna_tree& matched,
                 bool save,
-                const std::string& distances_file = "",
-                const std::string& mapping_file = "");
+                const std::string& mapping_file);
 
     void run_drawing(
                 rna_tree& templated,

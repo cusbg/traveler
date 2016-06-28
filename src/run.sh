@@ -3,8 +3,8 @@
 ALL="african_frog artemia_salina blue_mussel cicadas echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
 FILES1=${ALL}
 FILES2=${ALL}
-FILES1="artemia_salina"
-FILES2="cicadas"
+FILES1="mouse"
+FILES2="human"
 #FILES2="artemia_salina"
 
 EXECUTABLE="build/traveler"
@@ -42,7 +42,7 @@ init_variables() {
 run_ted() {
     ${EXECUTABLE} \
         ${tt} ${mt} \
-        --ted ${file_in}.dist ${file_in}.map \
+        --ted ${file_out}.map \
         || fail_function
 }
 
@@ -51,7 +51,7 @@ run_draw() {
 
     ${EXECUTABLE} \
 	    ${tt} ${mt} \
-	    --draw ${COLORED} ${OVERLAPS} --mapping ${file_in}.map ${file_out} \
+	    --draw ${COLORED} ${OVERLAPS} ${file_out}.map ${file_out} \
 	|| fail_function
 }
 
@@ -68,9 +68,9 @@ run_all() {
 run() {
     init_variables
 
-    #run_ted
-    #run_draw
-    run_all
+    run_ted
+    run_draw
+    #run_all
 
     #{
         #date
