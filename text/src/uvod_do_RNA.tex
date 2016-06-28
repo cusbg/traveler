@@ -1,59 +1,62 @@
-
 \renewcommand{\SS}{\mathbb{S}}
 \newcommand{\Par}[2]{\mbox{$( #1, #2 )$}}
 \usetikzlibrary{positioning, shapes, trees, graphs} % RNA trees
 \newcommand{\scale}{0.6}
 
 \chapter{Uvod do študia štruktúry RNA}
-
 Na začiatku práce stručne zoznámime čitateľa s pojmamy, ktoré s RNA a jej štruktúrou súvisia.
+
 
 \section{Co je RNA}
 
 % TODO pridat nejaky vseobecny uvod, napriklad, ze RNA hraje velku ulohu pri prepise genetickej informacie a pod. potom veta ze je jednovlaknova a ze to vlakno sa sklada z molekul z 3 zloziek - cukor, fosfat a dusikata baza. Potom ze my dalej budeme na vsetko ostatne kaslat a stavebnou jednotkou bude pre nas prave baza A C G U.
-Ribonukleonová kyselina, RNA, je nukleonova kyselina zlozena z nukleotidov adenin (A), uracyl (U),
-cytozin (C) a guanin (G).
+ 
+ Ribonukleónová kyselina je nukleonová kyselina tvorená jedným vláknom kovalentne naviazaných ribonukleotidov, 
+ ktoré sú základnými stavebnými jendotkami nukleonových kyselín. Je biochemicky odlišná od DNA kôli prítomnosti 
+ hydroxilovej skupiny pripojenej ku každej molekule pentózy v reťazci.
+ v DNA a RNA sa vyskytuje niekoľko variant nukleotidov (báz). U RNA sú to
+adeín (A), guanín (G), cytozín (C), uracyl (U),
+pri DNA sa namiesto uracylu vyskytuje tymin (T).
+Medzi jednotlivými bázami sa môžu vyskytovať vodíkové väzby. Nukleotidy majú
+vzájomnú preferenciu, čo znamená, že bázy vznikajú najčastejšie medzi A-U a C-G
+u RNA a podobne A-T a C-G u DNA.
 
-RNA patri medzi jednovlaknove molekuly. V snahe minimalizovat volnu energiu molekuly sa paruje sama na seba.
-Vtomto hraju rolu pritazlive sily - vodikove vazby. Nukleotidy maju vzajomnu preferenciu, co znamena,
-ze vazby vznikaju najcastejsie medzi bazami A - U a C - G.
-
-Strukturu nukleovych kyselin mozeme chapat podla stupna zjednodusenia
+Štrukturu nukleových kyselín môžeme chápat podľa stupňa zjednodušenia
 \begin{itemize}
-  \item Primarna struktura - je urcena poradim jednotlivych nukleotidov
-    do polynukleotidoveho retazca
-  \item Sekundarna struktura - je dana parovanim medzi bazami molekuly
-  \item Terciarna struktura - priestorove usporiadanie molekuly
+  \item Primárna štruktúra - je určená poradím jednotlivých nukleotidov
+    do polynukleotidového reťazca
+  \item Sekundárna štruktúra - je daná parovaním medzi bázami molekuly
+  \item Terciárna štruktúra - priestorové usporiadanie molekuly
 \end{itemize}
-DNA je dvojvlaknova molekula u ktorej spojenie medzi vlaknami sa realizuje na principe
+DNA je dvojvláknova molekula, u ktorej spojenie medzi vlaknami sa realizuje na princípe
 komplementarity.
-Naopak, RNA je iba jednovlaknova molekula a v snahe minimalizovat volnu energiu molekuly
-sa paruje sama na seba. V tomto hraju rolu pritazlive sily medzi bazami.
+Naopak, RNA je iba jednovláknova molekula a v snahe minimalizovať voľnu energiu molekuly,
+sa paruje sama na seba. V tomto hrajú rolu pritazlive sily medzi bázami.
 
-V praci budeme strukturou mysliet prave sekundarnu strukturu RNA, ak nebude povedane inak.
+V praci budeme štruktúrou myslieť práve sekundárnu štruktuúru RNA, ak nebude povedané inak.
 
-Az donedavna sa myslelo, ze funkcia RNA je obmedzena na prenos genetickej informacie z DNA
-v jadre bunky do ribozomu. Napriklad pri tvorbe bielkovin (mRNA), alebo transporter aminokyselin
+Až donedávna sa myslelo, že funkcia RNA je obmedzená na prenos genetickej informácie z DNA
+v jadre bunky do ribozomu. Napríklad pri tvorbe bielkovín (mRNA), alebo transporter aminokyselin
 v ribozome bunky (tRNA).
 % TODO: citacie k druhom RNA
-Avsak existuje mnoho dalsich, od relativne
-malych molekul tvorenych desiatkami baz, ktore pomahaju pri expresii genov
-(miRNA, siRNA, tmRNA a dalsie), az po velke, tvorene tisickami nukleotidov (rRNA).
+Avšak existuje mnoho ďalších, od relatívne
+malých molekúl tvorenyých desiatkami báz, ktoré pomáhajú pri expresii genov
+(miRNA, siRNA, tmRNA a dalsie), až po veľké, tvorené tisíckami nukleotidov (rRNA).
 
 \section{Sekundarna struktura rRNA + konzervovanost}
 
-Ako hlavny objekt zaujmu sme si spomedzi vsetkych druhov RNA vybrali prave ribozomalnu,
-najma kvoli jej velkosti a tomu, ze existujucim nastrojom prave velkost robi najvacsie problemy
-pri vizualizacii.
+Ako hlavný objekt záujmu sme si spomedzi všetkych druhov RNA vybrali práve ribozomálnu,
+najmä kvôli jej veľkosti a tomu, že existujúcim nástrojom práve veľkosť robí najväčšie problémy
+pri vizualizácii.
 
-\begin{definice}[Primarna struktura RNA]
+\begin{definice}[Primárna štruktra RNA]
   \label{def:RNA_primarna_struktura}
   Nech $\Sigma$ je abeceda $\{A, C, G, U\}$. Potom slovo $W \in \Sigma^n$ nad touto abecedou
   je sekvencia nukleotidov (baz) RNA.
 \end{definice}
 
-Jednotlive nukleotidy sekvencie RNA budeme, ak bude jasne o co ide, oznacovat priamo poradovym
-cislom, teda $i$ bude oznacovat nukleotid $W_{i}$, resp. $W[i]$.
+Jednotlivé nukleotidy sekvencie RNA budeme, ak bude zretelné o čo sa jedná, označovat priamo poradovým 
+číslom, teda $i$ bude označovať nukleotid $W_{i}$, resp. $W[i]$.
 
 \begin{definice}[Sekundarna struktura RNA]
   \label{def:RNA_sekundarna_struktura}
@@ -70,9 +73,9 @@ cislom, teda $i$ bude oznacovat nukleotid $W_{i}$, resp. $W[i]$.
 
 %TODO: obrazok prim/sek/terc struktury RNA
 
-Prva podmienka zabezpecuje, ze nukleotid je najviac v jednom bazickom pare, druha a tretia
-hovoria o usporiadani parov, bud su na sebe nezavisle alebo na seba nadvazuju.
-Posledna podmienka zakazuje existenciu pseudouzlov (pseudoknots). Pseudouzol patri medzi najcastejsie typy priestoroveho usporiadania RNA. vytvara  niekolko interakcii vramci jednej molekuly a smycky typu loops  ktore vznikaju medzi roznimy molekulami.
+Prvá podmienka zabezpečuje, že nukleotid je najviac v jednom bazickom páre, druhá a tretia
+hovoria o usporiadani párov, buď sú na sebe nezávisle alebo na seba nadväzujú.
+Posledna podmienka zakazuje existenciu pseudouzlov (pseudoknots). Pseudouzol patrí medzi najčastejšie typy priestorového usporiadania RNA. Vytvára  niekolko interakcii vrámci jednej molekuly a smyčky typu loops,  ktore vznikajú medzi rôznimy molekulami.
 
 %TODO: pseudoknot obrazok
 %TODO: 2 obrazky RNA napriec fylogenetickym stromom
@@ -87,15 +90,15 @@ Posledna podmienka zakazuje existenciu pseudouzlov (pseudoknots). Pseudouzol pat
 
 \subsection{Motivy}
 
-Motivom v RNA mame na mysli casti molekuly, ktore vytvaraju urcite struktury.
+Motivom v RNA máme na mysli časti molekuly, ktoré vytvárajú určité štruktúry.
 Na obrazku \ref{obr:RNA_motifs} vidime motivy, ktore sa mozu v RNA vyskytovat.
 
-Stem (stonka) je cast molekuly kde sa na seba paruju dva suvisle casti RNA vlakna.
-Interior loop spaja dva stemy a medzi nimi na oboch stranach obsahuje nesparovane
-bazy. Podobna je bulge (vypuklina), ale nesparovane nukleotidy ma iba z jednej strany.
-Hairpin je medzi castami vlakna ktore sa paruju sami na seba.
-Multibranch loop je podobna ako interior loop, ale spaja dokopy viac stemov.
-V dalsom rozpravani nam bude stacit rozdelenie na stem a loop.
+Stem (stonka) je časť molekuly kde sa na seba paruju dva súvisle časti RNA vlákna.
+Interior loop spája dva stemy a medzi nimi na oboch stranách obsahuje nespárované
+bázy. Podobna je bulge (vypuklina), ale nespárované nukleotidy ma iba z jednej strany.
+Hairpin je medzi časťami vlákna, ktoré sa parujú sami na seba.
+Multibranch loop je podobná ako interior loop, ale spája dokopy viac stemov.
+V ďalšom rozprávani ámam bude stačiť rozdelenie na stem a loop.
 
 %TODO: ako nazyvat strukturne motivy v RNA: anglicky, alebo hladat vhodny preklad
 
@@ -108,8 +111,8 @@ V dalsom rozpravani nam bude stacit rozdelenie na stem a loop.
 
 \section{Reprezentacia sekundarnej struktury}
 
-Definicia \ref{def:RNA_sekundarna_struktura} nam ponuka reprezentovat sekundarnu strukturu
-ako usporiadany strom.
+Definicia \ref{def:RNA_sekundarna_struktura} nám ponúka reprezentovať sekundárnu štrukturu
+ako usporiadaný strom.
 
 \begin{figure}[H]
 \centering
@@ -120,23 +123,23 @@ ako usporiadany strom.
 \end{figure}
 
 \begin{definice}\label{def:strom}
-  Usporiadany zakoreneny strom je orientovany graf, v ktorom plati, ze hrany su orientovane
-  vzdy v smere z predka na potomka. Okrem korena ma kazdy vrchol svojho predka.
+  Usporiadaný zakorenený strom je orientovaný graf, v ktorom platí, že hrany sú orientované
+  vždy v smere z predka na potomka. Okrem koreňa má každý vrchol svojho predka.
   Naviac tu existuje usporiadanie medzi potomkami.
   \\
-  Usporiadany les je usporiadana mnozina stromov.
-  %TODO: obrazok usporiadania stromov
+  Usporiadany les je usporiadaná množina stromov.
+  %TODO: obrázok usporiadania stromov
 \end{definice}
 
-Bez ujmy na obecnosti budeme o RNA hovorit ako o strome, aj ked sa moze stat, ze
-struktura nebude celistva (teda nieje to strom, ale les). V tom pripade ale
-iba pripojime korenovy vrchol, ktoreho potomkovia budu dane stromy.
+Bez ujmy na obecnosti budeme o RNA hovoritť ako o strome, aj keď sa môže stať, že
+štruktúra nebude celistvá (teda nieje to strom, ale les). V tom prípade ale
+iba pripojíme koreňový vrchol, ktorého potomkovia budú dané stromy.
 
-Kazdy vrchol stromu moze reprezentovat napriklad motiv v strukture RNA, nukleotid, alebo bazovy par
-Priklady mozno vidiet na obrazku \ref{obr:RNA_vrcholy}.
+Každý vrchol stromu môže reprezentovať napríklad motiv v štruktúre RNA, nukleotid, alebo bázovy pár
+Príklady možno vidiet na obrázku \ref{obr:RNA_vrcholy}.
 
-V nasej praci vrchol stromu reprezentuje bazovy par (vnutorny vrchol) a nesparovanu bazu (list stromu).
-Strukturu do ktorej patri si totiz vieme lahko zistit z potomkov vrcholu.
+V našej práci vrchol stromu reprezentuje bázovy pár (vnútorný vrchol) a nespárovanúábazu (list stromu).
+Štruktúru, do ktorej patrí si totiž vieme ľahko zistiť z potomkov vrcholu.
 
 %rna, from 5' to 3':
 % AUGCAAACUGGCACCCUCAU
@@ -301,9 +304,6 @@ Strukturu do ktorej patri si totiz vieme lahko zistit z potomkov vrcholu.
 \section{RNA stromy}
 
 %TODO grafove/stromove pojmy
-
-
-
 
 
 

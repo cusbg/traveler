@@ -1,82 +1,80 @@
-
 \newcommand{\degree}{\ensuremath{^{\circ}}}
 
 \chapter{Kreslenie molekuly}
 
-Po tom co ziskame a aplikujeme mapovanie medzi sablonovou a cielovou molekulou RNA,
-ziskame cielovu molekulu s ciastocnou vizualizaciou, ktorej zvysok treba dopocitat.
+Po tom čo získame a aplikujeme mapovanie medzi šablonovou a cieľovou molekulou RNA,
+ziskame cieľovú molekulu s čiastočnou vizualizáciou, ktorej zvyšok treba dopočitať.
 
-Po operaciach delete ostavaju v molekule prazdne diery, naopak po insertoch potrebujeme
-vypocitat, kam umiestnime bazovy par, resp. samotnu bazu, pripadne este potrebujeme pre
-nu urobit miesto. Update vrcholu v strome nerobi ziadne strukturne zmeny, zmeni sa iba
-nazov bazy na danom mieste.
+Po operáciach delete ostávajú v molekule prázdne diery, naopak po insertoch potrebujeme
+vypočítať, kam umiestnime bázový pár, resp. samotnú bázu, prípadne ešte potrebujeme pre
+ňu urobiť miesto. Update vrcholu v strome nerobí žiadne štruktúrne zmeny, zmení sa iba
+názov bázy na danom mieste.
 
-Sekundarna struktura RNA obsahuje mnozstvo motivov popisanych na obrazku \ref{obr:RNA_motifs}.
-Vo vseobecnosti ale sa kazdy z tychto motivov sklada zo stemu a loopu.
+Sekundárna štruktúra RNA obsahuje množstvo motivov popisaných na obrázku \ref{obr:RNA_motifs}.
+Vo všeobecnosti ale sa každý z týchto motivov skladá zo stemu a loopu.
 
-Stemom budeme dalej nazyvat cast RNA ktora zodpoveda vnutornemu vrcholu v strome. Loop
-budeme oznacovat listy v RNA strome (lese), nezalezi ci je to bulge, interior loop, hairpin
-alebo multibranch loop, ako aj ukazuje obrazok \ref{obr:RNA_motifs_stem_loop}.
+Stemom budeme ďalej nazývať časť RNA, ktorá zodpovedá vnútornému vrcholu v strome. Loop
+budeme označovať listy v RNA strome (lese), nezáleží či je to bulge, interior loop, hairpin
+alebo multibranch loop, ako aj ukazuje obrázok \ref{obr:RNA_motifs_stem_loop}.
 
-Stem zacina vzdy v najvyssom vrchole stromu (v smere ku korenu), ktory je zaroven vnutornym
-vrcholom a nema ziadnych surodencov, ktory by boli rovnako vnutornymi vrcholmi.
-To znamena, ze do multibranch loop vchadza 1 stem (ten tu konci) a vychadza z nej niekolko novych stemov.
-Naopak pre bulge a interior loop jeden stem vchadza do struktury ale pokracuje dalej.
+Stem začína vždy v najvyššom vrchole stromu (v smere ku koreňu), ktorý je zároveň vnútorným
+vrcholom a nemá žiadnych súrodencov, ktorý by boli rovnako vnútornými vrcholmi.
+To znamená, že do multibranch loop vchádza 1 stem (ten tu konci) a vychádza z nej niekoľko nových stemov.
+Naopak pre bulge a interior loop jeden stem vchádza do štruktúry ale pokračuje ďalej.
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=50mm, height=35mm]{../img/struktury_v_rna-stem_loop.png}
-%TODO klasicky obrazok RNA molekuly, v ktorej farbami odlisim stem a loop.
+%TODO klasicky obrázok RNA molekuly, v ktorej farbami odlišim stem a loop.
 \caption{Stem a loop v molekule}
 \label{obr:RNA_motifs_stem_loop}
 \end{figure}
 
-\section{Struktury RNA}
+\section{Štruktúry v RNA}
 
-V clanku od \citet{RNA_DRAW} autori popisuju pravidla vizualizacie sekundarnej struktury RNA.
+V článku od \citet{RNA_DRAW} autori popisujú pravidlá vizualizácie sekundárnej štruktúry RNA.
 
-Nakreslenie musi byt rovinne bez krizeni, bazy tvoriace rozne druhy loopov musia leziat na kruzniciach
-a bazy tvoriace stem maju lezat na priamke.
-Dalsim pravidlom je, ze vzdialenost medzi bazami ma byt konstantna, ci uz vzdialenost medzi bazami jedneho paru,
-alebo bazami sekvencie.
+Nakreslenie musí byť rovinné bez krížení, bázy tvoriace rôzne druhy loopov musia ležať na kružniciach
+a bázy tvoriace stem majú ležať na priamke.
+Ďalším pravidlom je, že vzdialenosť medzi bázami má byť konštantná, či už vzdialenosť medzi bázami jedného páru,
+alebo bázami sekvencie.
 
-Ako je ukazane na obrazku \ref{obr:RNA_full}, pravidla niesu niekedy respektovane. To ztazuje pouzitie obrazka
-ako sablony, kedze vo vyslednom obrazku chceme vsetky tieto pravidla respektovat.
+Ako je ukázane na obrázku \ref{obr:RNA_full}, pravidla niesu niekedy rešpektované. To zťažuje pouzitie obrazka
+ako šablony, kedže vo výslednom obrázku chceme všetky tieto pravidlá rešpektovať.
 
 \section{Algoritmus}
+Čiastočnej vizualizácie, ktorú dostávame z mapovania sa chceme dotýkať čo najmenej. To znamená,
+že všetky zásahy sa snažíme robiť iba v miestach, ktoré boli dotknuté vkladaním alebo mazaním báz.
 
-Ciastocnej vizualizacie ktoru dostavame z mapovania sa chceme dotykat co najmenej. To znamena,
-ze vsetky zasahy sa snazime robit iba v miestach, ktore boli dotknute vkladanim alebo mazanim baz.
-
-Jedine vynimky su normalizacia vzdialensoti medzi bazovymi parmi a vyrovnavanie stemov.
+Jediné výnimky sú normalizácia vzdialensti medzi bázovými pármi a vyrovnávanie stemov.
 
 \subsection{Normalizácia vzdialeností v bázových pároch a vyrovnavanie stemov}
 
-Ako bolo uvedene, stemom rozumieme nevetviacu sa cast stromu tvorenu iba bazovymi parmi.
+Ako bolo uvedené, stemom rozumieme nevetviacu sa časť stromu tvorenú iba bázovými pármi.
 
-Algoritmus normalizácie vzdialeností medzi vrcholmi bázových párov stojí iba v preiterovani celeho stromu
-a ak nejake parove vrcholy su od seba priliz vzdialene, priblizi ich k sebe.
+Algoritmus normalizácie vzdialeností medzi vrcholmi bázových párov stojí iba v preiterovaní celého stromu
+a ak nejaké párové vrcholy sú od seba príliž vzdialené, priblíži ich k sebe.
 
-Vyrovnavaci algoritmus prechadza vsetky stemy. Z ich zaciatkov vedie priamku na ktorej maju byt podla pravidla ulozene
-vsetky stemove vrcholy. Rotaciami a posunutiami podstromov vieme docielit to, aby vrcholy stemu na tejto priamke lezali.
+Vyrovnávací algoritmus prechádza všetky stemy. Z ich začiatkov vedie priamku, na ktorej majú byť podľa pravidla uložené
+všetky stemove vrcholy. Rotáciami a posunutiami podstromov vieme docieliť to, aby vrcholy stemu na tejto priamke ležali.
 
-% TODO obrazok vyrovnavania
+% TODO obrázok vyrovnávania
 
-\subsection{Operacie na stromoch}
+\subsection{Operácie na stromoch}
 
-Citatela zoznamime s 2 operaciami, ktore budeme vykonavat na molekule. Tie budeme pouzivat nezavisle
-na tom, ci vrcholy do stromu vkladame alebo mazeme.
+Čitateľa zoznámime s 2 operáciami, ktoré budeme vykonávať na molekule. Tie budeme používať nezávisle
+na tom, či vrcholy do stromu vkladáme alebo mažeme.
 
 \begin{algorithm}
-  \caption{Rozlozenie baz na kruznicu}
-  \label{alg:operacia_circle_reinsert}
+  \caption{Rozloženie báz na kružnicu}
+  \label{alg:operácia_circle_reinsert}
   \begin{algorithmic}[1]
     \Procedure {rozlozBazy}{Begin, End, Bases}
-      \State $n \gets$ velkost zoznamu baz $Bases$
-      \State $\Gamma \gets$ dostatocne velka kruznica pre $n$ bodov prechadzajuca bodmi $Begin$ a $End$
-      \State $\Pi \gets$ rozdel kruhovy obluk kruznice $\Gamma$ od $Begin$ po $End$ na $n$ bodov
+      \State $n \gets$ veľkosť zoznamu báz $Bases$
+      \State $\Gamma \gets$ dostatočne veľká kružnica pre $n$ bodov prechádzajúca bodmi $Begin$ a $End$
+      \State $\Pi \gets$ rozdel kruhový obluk kružnice $\Gamma$ od $Begin$ po $End$ na $n$ bodov
       \ForAll{$i$ in 1 .. $n$}
-        \State nastav poziciu bazy $Bases[i]$ na bod $\Pi[i]$
+        \State nastav pozíciu bázy $Bases[i]$ na bod $\Pi[i]$
       \EndFor
     \EndProcedure
   \end{algorithmic}
@@ -88,62 +86,59 @@ na tom, ci vrcholy do stromu vkladame alebo mazeme.
   \begin{algorithmic}[1]
     \Procedure {posunPodstrom}{Root, Vector}
       \ForAll {vrchol $V$ v podstrome vrcholu $Root$}
-        \If {vrchol $V$ uz ma urcenu poziciu, t.j. nieje prave vlozeny}
-          \State pripocitaj k pozicii bazy $V$ vektor $Vector$
+        \If {vrchol $V$ už má určenu pozíciu, t.j. nieje práve vložený}
+          \State pripočítaj k pozicií bázy $V$ vektor $Vector$
         \EndIf
       \EndFor
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
 
-Ako sme pisali uz skor, vsetky loop struktury maju byt ulozene na kruzniciach. K tomu nam pomoze funkcia
-\ref{alg:operacia_circle_reinsert}. Ta dostava na vstupe zoznam baz $Bases$ a dva body v rovine, $Begin$ a $End$.
-Tymito bodmi potrebujeme viest kruznicu, ktora bude dostatocne velka, teda aby na nu vsetky bazy zo zoznamu vosli.
-Velkostou kruznice v tomto pripade myslime dlzku kruhoveho obluku medzi vrcholmi $Begin$ a $End$.
+Ako sme písali už skôr, všetky loop štruktúry majú byť uložené na kružniciach. K tomu nám pomôže funkcia
+\ref{alg:operacia_circle_reinsert}. Tá dostáva na vstupe zoznam báz $Bases$ a dva body v rovine, $Begin$ a $End$.
+Týmito bodmi potrebujeme viesť kružnicu, ktorá bude dostatočne veľká, teda aby na ňu všetky bázy zo zoznamu vošli.
+Veľkosťou kružnice v tomto prípade myslíme dĺžku kruhového obluku medzi vrcholmi $Begin$ a $End$.
 
-V nasom programe pouzivame iteracny algoritmus, ktory ju pomaly zvacsuje alebo zmensuje.
-Nakoniec bud najde kruznicu ktorej velkost je optimalna, alebo ani na maximalny pocet krokov taku kruznicu nenajde
-a tak vrati tu z posledneho kroku.
-% TODO obrazok iterovania zvacsovania kruznice
+V našom programe používame iteračný algoritmus, ktorý ju pomaly zväčšuje alebo zmenšuje.
+Nakoniec buď nájde kružnicu, ktorej veľkosť je optimálna, alebo ani na maximálny počet krokov takú kružnicu nenájde
+a tak vráti tu z posledného kroku.
+% TODO obrázok iterovania zväčšoania kružnice
 
-Operacia v ramci algoritmu \ref{alg:operacia_tree_shift} nam pomoze urobit miesto na novo vlozene bazove pary,
-alebo naopak ak sme nieco zmazali, tak dokaze cely podstrom pritiahnut spat.
+Operácia v rámci algoritmu \ref{alg:operacia_tree_shift} nám pomôže urobiť miesto na novo vložené bázové páry,
+alebo naopak ak sme niečo zmazali, tak dokáže celý podstrom pritiahnuť späť.
 
-\subsection{Vkladanie noveho vrcholu do stromu}
+\subsection{Vkladanie nového vrcholu do stromu}
 
-Pri vkladani noveho vrcholu do stromu mozu nastat nasledovne moznosti.
+Pri vkladaní nového vrcholu do stromu môžu nastať nasledovné možnosti.
 
-Ak vkladame list do hairpinu, je to jednoduche, potrebujeme iba pouzit proceduru z algoritmu \ref{alg:operacia_circle_reinsert}
-s parametrami $Begin = $ pozicia prvej bazy z bazoveho paru, $End = $ pozicia druhej bazy z paru
-a $Bases = $ zoznam vsetkych potomkov.
+Ak vkladáme list do hairpinu, je to jednodúche, potrebujeme iba použiť procedúru z algoritmu \ref{alg:operacia_circle_reinsert}
+s parametrami $Begin = $ požicia prvej bázy z bázového páru, $End = $ požičia druhej bázy z páru
+a $Bases = $ zoznam všetkých potomkov.
 
-Trochu zlozitejsie je to pri vkladani listu do stemu. V tomto pripade bud uz stem obsahoval nejaky loop, alebo vznika nova.
-Najprv potrebujeme upravit vzdialenost medzi vrcholmi stemu, teda posunut cely podstrom aby nam dane bazy vosli.
-To vyriesime algoritmom \ref{alg:operacia_tree_shift}. Nasledne najdeme kruznicu a bazy na nu naukladame.
+Trochu zložitejšie je to pri vkladaní listu do stemu. V tomto prípade buď už stem obsahoval nejaký loop, alebo vzniká nová.
+Najprv potrebujeme upraviť vzdialenosť medzi vrcholmi stemu, teda posunuť celý podstrom aby nám dané bázy vošli.
+To vyriešime algoritmom \ref{alg:operacia_tree_shift}. Následne nájdeme kružnicu a bázy na ňu naukladáme.
 
-Vkladanie bazoveho paru do stemu je jednoduche. Najprv posunieme cely podstrom a urobime tak miesto pre novu dvojicu
-baz, a potom ich ulozime na poziciu kde by mala patrit. Moze sa stat, ze vlozenim vrcholu do stemu zdedime niekolko
-listov z predka. V tomto pripade iba pouzijeme operaciu vlozenia vrcholu a updatu loopov pred aj za vlozenym vrcholom.
+Vkladanie bázového páru do stemu je jednoduché. Najprv posunieme celý podstrom a urobíme tak miesto pre novú dvojicu
+báz, a potom ich uložíme na pozíciu kde by mala patriť. Môže sa stať, že vložením vrcholu do stemu zdedíme niekoľko
+listov z predka. V tomto prípade iba použijeme operáciu vloženia vrcholu a updatu loopov pred aj za vloženým vrcholom.
 
-\subsection{Modifikacia multibrach loop}
+\subsection{Modifikácia multibrach loop}
 
-Modifikacia multibranch loop je zlozitejsia ako vsetky predchadzajuce pripady. Obrazky su vacsinou rucne upravene tak,
-aby bol co najkompaktnejsi a kvoli tomu sa casto nerespektuju pravidla o kruznicovom tvare struktury.
-Kvoli tomu sa snazime do tejto struktury nezasahovat, ak sa to da.
+Modifikácia multibranch loop je zložitejšia ako všetky predchádzajúce prípady. Obrázky sú väčšinou ručné upravené tak,
+aby bol čo najkompaktnejší a kvôli tomu sa často nerešpektujú pravidlá o kružnicovom tvare štruktúry.
+Kvôli tomu sa snažíme do tejto štruktúry nezasahovať, ak sa to dá.
 
-Prekresleniu celej struktury sa mozeme vyhnut napriklad pri zmene poctu listov medzi jednotlivymi vetvami.
-Ak je zmena dostatocne mala, mozeme vrcholy roztiahnut, alebo naopak priblizit k sebe.
+Prekresleniu celej štruktúry sa môžeme vyhnúť napríklad pri zmene počtu listov medzi jednotlivými vetvami.
+Ak je zmena dostatočne malá, môžeme vrcholy roztiahnuť, alebo naopak priblížiť k sebe.
 
-Ak sa jedna o pridanie/odobratie celej vetvy stromu, modifikacii sa nevyhneme. V tom pripade potrebujeme
-rozdistribuovat vsetky vrcholy patriace do loop na kruznicu. Je to podobny proces ako sa pouziva iba pre samotne loopy,
-ale potrebujeme posuvat cele podstromy a zrotovat ich spravnym smerom.
+Ak sa jedná o pridanie/odobratie celej vetvy stromu, modifikácií sa nevyhneme. V tom prípade potrebujeme
+rozdistribuovať všetky vrcholy patriace do loop na kružnicu. Je to podobný proces ako sa používa iba pre samotné loopy,
+ale potrebujeme posúvať celé podstromy a zrotovať ich správnym smerom.
 
 \subsection{Mazanie vrcholu zo stromu}
 
-Mazanie povazujeme za inverznu operaciu voci vkladaniu do stromu. Vzhladom k tomu, pouzivame rovnake operacie
-rozdistribuovania vrcholov v loope, alebo posuvanie podstromu, ktore sa deje v tomto pripade opacnym smerom
+Mazanie považujeme za inverznú operáciu voči vkladaniu do stromu. Vzhľadom k tomu, používame rovnaké operácie
+rozdistribuovania vrcholov v loope, alebo posúvanie podstromu, ktoré sa deje v tomto prípade opačným smerom
 k predkovi.
-
-
-
 

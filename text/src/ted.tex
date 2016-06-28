@@ -20,17 +20,17 @@
 
 \chapter{Tree-edit-distance algoritmus}
 
-Jadro aplikacie lezi v pouziti tree-edit-distance (TED) algoritmu,
-vdaka ktoremu dostaneme mapovanie medzi 2 RNA stromami. Mapovanie nam ukaze
-spolocne casti oboch RNA stromov. TED algoritmus je obdoba Levenstheinoveho
-string-edit-distance algoritmu. Problem u retazcov je specialnym pripadom
-TED-u, kedy stromy zdegenerovali na cesty (spojovy zoznam).
+Jadro aplikacie leží v použití tree-edit-distance (TED) algoritmu,
+vďaka ktorému dostaneme mapovanie medzi 2 RNA stromami. Mapovanie nám ukáže
+spoločné časti oboch RNA stromov. TED algoritmus je obdoba Levenstheinoveho
+string-edit-distance algoritmu. Problém u reťazcov je špecialným prípadom
+TED-u, kedy stromy zdegenerovali na cesty (spojový zoznam).
 
-\section{Hlavna myslienka TED-u}
+\section{Hlavná myšlienka TED-u}
 
-Zaklad TED algoritmu je v rekurzivnom vzorci \ref{eq:ted} z \citet{DMRW} a \citet{RTED}. Vzdialenost medzi
-lesmi F a G, $\delta(F, G)$ je definovana ako minimalny pocet editacnych operacii,
-ktore z F urobia G. Pouzivame standardne editacne operacie - delete, insert, update.
+Základ TED algoritmu je v rekurzivnom vzorci \ref{eq:ted} z \citet{DMRW} a \citet{RTED}. Vzdialenosť medzi
+lesmi $F$ a $G$, $\delta(F, G)$ je definovana ako minimálny počet editačných operácií,
+ktoré z F urobia G. Používame štandardne editačné operácie - delete, insert, update.
 
 \begin{figure}[H]
 \centering
@@ -39,33 +39,33 @@ ktore z F urobia G. Pouzivame standardne editacne operacie - delete, insert, upd
 \label{obr:TED_operations}
 \end{figure}
 
-Delete, zmazanie vrcholu, znamena pripojit k predkovi vsetkych jeho potomkov so
-zachovanim poradia medzi nimi. Insert, vlozenie vrcholu, je opacna operacia k
-delete, co znamena, ze vkladame vrchol medzi rodica nejakych jeho, po sebe
-nasledujucich potomkov. Update iba zmeni hodnotu vo vrchole stromu.
+Delete, zmazanie vrcholu, znamená pripojiť k predkovi všetkých jeho potomkov so
+zachovanim poradia medzi nimi. Insert, vložnie vrcholu, je opačná operácia k
+delete, čo znamená, že vkladáme vrchol medzi rodiča a nejakých jeho, po sebe
+nasledujúcich potomkov. Update iba zmeni hodnotu vo vrchole stromu.
 
-\section{Znacenie}
+\section{Značenie}
 
-V tejto kapitole sa budeme riadit znacenim \citet{RTED}. Teda, pouzivame definiciu
-stromu a lesa z \ref{def:strom}. Ak $F$ je les (strom), $N_F$ oznacuje mnozinu jeho vrcholov a $E_F$
-mnozinu jeho hran. Plati dalej ze $E_F \subseteq N_F \times N_F$. $\emptyset$ oznacuje
-prazdny strom, resp. prazdny les. Podles lesa $F$ je graf $\tilde{F}$ s vrcholmi
+V tejto kapitole sa budeme riadiť značením \citet{RTED}. Teda, používame definiciu
+stromu a lesa z \ref{def:strom}. Ak $F$ je les (strom), $N_F$ označuje množinu jeho vrcholov a $E_F$
+množinu jeho hrán. Platí ďalej že $E_F \subseteq N_F \times N_F$. $\emptyset$ označuje
+prázdny strom, resp. prázdny les. Podles lesa $F$ je graf $\tilde{F}$ s vrcholmi
 $N_{\tilde{F}} \subseteq N_F$ a hranami $E_{\tilde{F}} \subseteq E_F \cap N_{\tilde{F}} \times N_{\tilde{F}}$.
-Obdobne to plati aj pre podstrom stromu $T$.
-$F_{v}$ oznacuje podstrom $F$ zakoreneny vo $v$, t.j. v strome ostavaju iba potomkovia $v$.
-$F - v$ budeme znacit les, ktory dostaneme zmazanim vrcholu $v$ z $F$, spolu so vsetkymi hranami
-zasahujucimi do $v$. Podobne $F - F_{v}$ budeme znacit les, ktory dostaneme zmazanim podstromu
+Obdobne to platí aj pre podstrom stromu $T$.
+$F_{v}$ označuje podstrom $F$ zakorenený vo $v$, t.j. v strome ostávajú iba potomkovia $v$.
+$F - v$ budeme značiť les, ktorý dostaneme zmazaním vrcholu $v$ z $F$, spolu so všetkými hranami
+zasahujúcimi do $v$. Podobne $F - F_{v}$ budeme značiť les, ktorý dostaneme zmazaním podstromu
 $F_{v}$ z $F$.
 
-\begin{definice}[Editacna vzdialenost]
-	Nech F a G su dva lesy. Editacna vzdialenost, tree-edit-distance - $\delta(F, G)$,
-	medzi F a G je rovna minimalnej cene, za ktoru les F transformujeme na G.
+\begin{definice}[Editačná vzdialenosť]
+	Nech F a G sú dva lesy. Editačna vzdialenosť, tree-edit-distance - $\delta(F, G)$,
+	medzi F a G je rovná minimálnej cene, za ktorú les F transformujeme na G.
 \end{definice}
 
-Vo vzorci \ref{eq:ted} pocitame editacnu vzdialenost $\delta(F, G)$,
-\Cdel, \Cins a \Cupd su ceny zmazania, vlozenia a editacie vrcholu v strome
-a $r_{F}$ a $r_{G}$ su korene, bud obidva najpravejsie alebo najlavejsie (tzn. vyberieme
-najpravejsi/najlavejsi strom lesa a jeho koren).
+Vo vzorci \ref{eq:ted} počítame editačnú vzdialenosť $\delta(F, G)$,
+\Cdel, \Cins a \Cupd sú ceny zmazania, vloženia a editácie vrcholu v strome
+a $r_{F}$ a $r_{G}$ sú korene, buď obidva najpravejšie alebo najľavejšie (tzn. vyberieme
+najpravejší/najľavejší strom lesa a jeho koreň).
 
 \begin{figure}[H]
   \begin{subequations}
@@ -90,51 +90,51 @@ najpravejsi/najlavejsi strom lesa a jeho koren).
       \end{cases}
   \end{align*}
   \end{subequations}
-  \caption{Rekurzivny vzorec pre vypocet tree-edit-distance}
+  \caption{Rekurzívny vzorec pre výpočet tree-edit-distance}
   \label{eq:ted}
 \end{figure}
 
 
-\section{Algoritmy dynamickeho programovania}
+\section{Algoritmy dynamického programovania}
 
-\citet{TAI} predstavil algoritmus s priestorovou a casovou zlozitostou \O{$m^3 \cdot n^3$},
-\citet{ZHANGSHASHA} algoritmus nasledne vylepsili pozorovanim toho, ze nepotrebujeme
-vzdialenosti medzi vsetkymi parmi podlesov. Algoritmus mal casovu zlozitost \O{$m^2 \cdot n^2$}
-a priestorovu \O{$m \cdot n$}. \citet{KLEIN} dosiahol casovu zlozitost \O{$m^2 \cdot n \cdot \log{n}$},
-avsak jeho riesenie potrebovalo rovnako vela pamete.
-\citet{DALUCQ} ukazali, ze minimalny cas na beh algoritmu je \O{$m \cdot n \cdot \log{m} \cdot \log{n}$}.
-\citet{DMRW} predviedli worst-case optimalny algoritmus pre tree-edit-distance.
-Jeho casova a priestorova zlozitost je \O{$m^2 \cdot n \cdot (1 + \log{\frac{n}{m}})$} a
-\O{$m \cdot n$}. \citet{RTED} ukazali spojitost medzi efektivnostou predchadzajucich algoritmov
-a tvarom stromov. Zovseobecnili predchadzajuce pristupy a vytvorili algoritmus beziaci
-vo worst-case case \O{$m^3$} a priestore \O{$m \cdot n$}. Ich algoritmus je teda efektivny pre vsetky
-tvary stromov a nikdy nespadne do worst-case, ak existuje lepsi smer vypoctu. 
+\citet{TAI} predstavil algoritmus s priestorovou a časovou zložitosťou \O{$m^3 \cdot n^3$},
+\citet{ZHANGSHASHA} algoritmus následne vylepšili pozorovaním toho, že nepotrebujeme
+vzdialenosti medzi všetkými pármi podlesov. Algoritmus mal časovú zložitosť \O{$m^2 \cdot n^2$}
+a priestorovú \O{$m \cdot n$}. \citet{KLEIN} dosiahol časovú zložitosť \O{$m^2 \cdot n \cdot \log{n}$},
+avšak jeho riešenie potrebovalo rovnako veľa pamäte.
+\citet{DALUCQ} ukázali, že minimálny čas na beh algoritmu je \O{$m \cdot n \cdot \log{m} \cdot \log{n}$}.
+\citet{DMRW} predviedli worst-case optimálny algoritmus pre tree-edit-distance.
+Jeho časová a priestorová zložitosť je \O{$m^2 \cdot n \cdot (1 + \log{\frac{n}{m}})$} a
+\O{$m \cdot n$}. \citet{RTED} ukázali spojitosť medzi efektivnosťou predchádzajúcich algoritmov
+a tvarom stromov. Zovšeobecnili predchádzajúce prístupy a vytvorili algoritmus bežiaci
+vo worst-case čase \O{$m^3$} a priestore \O{$m \cdot n$}. Ich algoritmus je teda efektívny pre všetky
+tvary stromov a nikdy nespadne do worst-case, ak existuje lepší smer výpočtu. 
 
 
 
 \subsection{RTED}
 
-Dalej sa v nasej praci budeme venovat vyhradne algoritmu RTED od tvorcov \citet{RTED}.
-Ich algoritmus rozdelime na 2 casti, rovnako pomenovany RTED a GTED.
+Ďalej sa v našej práci budeme venovať výhradne algoritmu RTED od tvorcov \citet{RTED}.
+Ich algoritmus rozdelíme na 2 časti, rovnako pomenovaný RTED a GTED.
 
-RTED (Robust Tree Edit Distance) algoritmus bude pre nas algoritmus na vypocet
-optimalnej dekompozicnej strategie (viz definicia \ref{def:strategy})
-a GTED (General Tree Edit Distance) algoritmus samotny vypocet rekurzie \ref{eq:ted}
-s aplikovanim danej strategie.
+RTED (Robust Tree Edit Distance) algoritmus bude pre nás algoritmus na výpočet
+optimálnej dekompozičnej stratégie (viz definicia \ref{def:strategy})
+a GTED (General Tree Edit Distance) algoritmus samotný výpočet rekurzie \ref{eq:ted}
+s aplikovaním danej stratégie.
 
-\begin{definice}[Dekompozicna strategia]\label{def:strategy}
-	Nech $F$ a $G$ su lesy. Dekompozicina strategia v rekurzii \ref{eq:ted} priradi
-  kazdej dvojici podstromov $F_{v}$ a $G_{w}$ lesov $F$ a $G$ jednu cestu $\gamma_{T}$
-  z korena do listu, kde $T \in \{F, G\}$.
-	LRH dekompozicna strategia vybera vzdy najlavejsi/najpravejsi/najtazsi
-	(left/right/heavy) vrchol na ceste z korena do listu. Najtazsi vrchol je taky
-	v ktoreho podstrome je najviac vrcholov. 
+\begin{definice}[Dekompozičná stratégia]\label{def:strategy}
+	Nech $F$ a $G$ sú lesy. Dekompozičná stratégia v rekurzií \ref{eq:ted} priradí
+  každej dvojici podstromov $F_{v}$ a $G_{w}$ lesov $F$ a $G$ jednu cestu $\gamma_{T}$
+  z koreňa do listu, kde $T \in \{F, G\}$.
+	LRH dekompozičná stratégia vyberá vždy najľavejší/najpravejší/najťažší
+	(left/right/heavy) vrchol na ceste z koreňa do listu. Najťažší vrchol je taký,
+	v ktorého podstrome je najviac vrcholov. 
 \end{definice}
 
 \subsubsection{GTED: General Tree Edit Distance algoritmu}
 
-Zacneme principom fungovania GTED algoritmu. Detaily pre LRH strategie su
-v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy strategiu.
+Začneme princípom fungovania GTED algoritmu. Detaily pre LRH stratégie sú
+v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy stratégiu.
 
 \begin{algorithm}
   \caption{General Tree Edit Distance for LRH strategies}
@@ -241,24 +241,24 @@ v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy strategiu.
 
 
 \begin{pozn}
-  Funkcia $Get Ordered Subforests()$ v algoritme \ref{alg:spf} vracia lesy zoradene
-  v opacnom poradi, ako ich pridavame v definicii \ref{def:relevant_subforests}.
+  Funkcia $Get Ordered Subforests()$ v algoritme \ref{alg:spf} vracia lesy zoradené
+  v opačnom poradí, ako ich pridávame v definícii \ref{def:relevant_subforests}.
 \end{pozn}
 
 Algoritmus \ref{alg:gted} funguje v troch krokoch.
 
-Najprv podla strategie dekomponuje jeden zo stromov podla cesty $\gamma$,
-bez ujmy na obecnosti, nech je to $F$ a rekurzivne spocita editacnu vzdialenost
-medzi vsetkymi podstromami ktore susedia s dekompozicnou cestou a stromom $G$.
+Najprv podľa stratégie dekomponuje jeden zo stromov podľa cesty $\gamma$,
+bez ujmy na obecnosti, nech je to $F$ a rekurzívne spočíta editačnú vzdialenosť
+medzi všetkými podstromami, ktoré susedia s dekompozicnou cestou a stromom $G$.
 
-Nasledne pre vsetky relevant-subtrees (viz definice \ref{def:relevant_subforests})
-podstromy $G'$ stromu $G$ vyrata vzdialenosti medzi $F_{v}$ a $G'$ pomocou single-path funkcie.
-Ta dopocita vzdialenosti medzi vrcholmi $v \in \gamma_{F}$ a stromami $G'$.
+Následne pre všetky relevant-subtrees (viz definice \ref{def:relevant_subforests})
+podstromy $G'$ stromu $G$ vyráta vzdialenosti medzi $F_{v}$ a $G'$ pomocou single-path funkcie.
+Tá dopočíta vzdialenosti medzi vrcholmi $v \in \gamma_{F}$ a stromami $G'$.
 
 \begin{definice}
   \label{def:relevant_subforests}
-	Relevant subtrees stromu $F$ pre root-leaf cestu $\gamma$ su definovane ako $F - \gamma$.
-	Relevant subforests stromu $F$ pre nejaku root-leaf cestu $\gamma$ su definovane rekurzivne ako
+	Relevant subtrees stromu $F$ pre root-leaf cestu $\gamma$ sú definované ako $F - \gamma$.
+	Relevant subforests stromu $F$ pre nejakú root-leaf cestu $\gamma$ sú definované rekurzívne ako
 	\begin{align*}
     \mathcal{F}(\emptyset, \gamma) &= \emptyset
 		\\
@@ -266,73 +266,73 @@ Ta dopocita vzdialenosti medzi vrcholmi $v \in \gamma_{F}$ a stromami $G'$.
 		\begin{cases}
       \mathcal{F}(F - r_{R}(F), \gamma), \quad{} &\text{ak $r_{L}(F) \in \gamma$}
 			\\
-      \mathcal{F}(F - r_{L}(F), \gamma), &\text{v ostatnych pripadoch}
+      \mathcal{F}(F - r_{L}(F), \gamma), &\text{v ostatných pripadoch}
 		\end{cases}
 	\end{align*}
 \end{definice}
 
 \begin{lemma}
-  Ak compute-distance funkcia dopocita editacnu vzdialenost medzi vrcholmi na ceste $\gamma$
-  a vsetkymi podstromami druheho stromu, potom GTED vrati maticu vzdialenosti
-  medzi vsetkymi dvojicami podstromov $F_{v}$ a $G_{w}$, pre $v \in F; w \in G$.
+  Ak compute-distance funkcia dopočíta editačnú vzdialenosť medzi vrcholmi na ceste $\gamma$
+  a všetkými podstromami druhého stromu, potom GTED vráti maticu vzdialenosti
+  medzi všetkými dvojicami podstromov $F_{v}$ a $G_{w}$, pre $v \in F; w \in G$.
 \end{lemma}
 
 \begin{dukaz}
-  Nech $\gamma \in F$. Po vyratani editacnej vzdialenosti medzi stromami
-  $F - \gamma$ a $G$ nam staci dopocitat uz len vrcholy na ceste,
+  Nech $\gamma \in F$. Po vyrátani editačnej vzdialenosti medzi stromami
+  $F - \gamma$ a $G$ nám stačí dopočítať už len vrcholy na ceste,
   teda vzdialenosti medzi stromami $F_{v}$ a $G$ pre $v \in \gamma_{F}$.
 \end{dukaz}
 
-Vdaka doslednemu usporiadaniu lesov si v kazdom kroku pripravime potrebne
-data pre dalsi krok algoritmu \ref{alg:spf}.
+Vďaka doslednému usporiadaniu lesov si v každom kroku pripravíme potrebne
+data pre ďalší krok algoritmu \ref{alg:spf}.
 
-Najprv si este ale vysvetlime hodnoty pouzivane v algoritme \ref{alg:spf} v podmienkach
-na riadkoch \ref{alg:spf:iftrees} a \ref{alg:spf:ifforests}. Prve dva su v oboch rovnake.
-Pocitame hodnotu zmazania vrcholu z $F$, resp. vlozenia vrcholu do $F$.
+Najprv si ešte ale vysvetlíme hodnoty používané v algoritme \ref{alg:spf} v podmienkách
+na riadkoch \ref{alg:spf:iftrees} a \ref{alg:spf:ifforests}. Prvé dva sú v oboch rovnaké.
+Počítame hodnotu zmazania vrcholu z $F$, resp. vloženia vrcholu do $F$.
 
-Tretia hodnota sa lisi podla toho, ci su lesy zaroven aj stromami. Ak su, tak na danom mieste
+Tretia hodnota sa líši podľa toho, či sú lesy zároveň aj stromami. Ak sú, tak na danom mieste
 je cena namapovania podstromov $F_{v} - v$ na $F_{w} - w$ a updatu vrcholu $v$ na $w$.
 Inac, ked aspon jeden z lesov nieje stromom, tak cenu medzi $F_{Last_{F}}$ a $G_{Last_{G}}$
-mame vyratanu z predchadzajucich krokoch, alebo z inej vetvy rekurzie.
+mame vyrátanú z predchádzajúcich krokoch, alebo z inej vetvy rekurzie.
 
-Potom nastavime hodnotu vzdialenosti medzi lesmi na minimum a v pripade ze su to obidva stromy,
-tak nastavime aj ich vzdialenost.
+Potom nastavíme hodnotu vzdialenosti medzi lesmi na minimum a v prípade že sú to obidva stromy,
+tak nastavíme aj ich vzdialenosť.
 
-Najprv este ukazeme, ze SPF pouziva vzdy inicializovane hodnoty, a kazdu hodnotu nastavuje prave raz.
-
-\begin{pozn}
-  Nikdy nepouzivam 2x rovnaku cestu $\gamma$ v strome. To vyplyva z toho, ze po dekompozicii
-  stromu podla $\gamma$, cesta v ostatnych stromoch neexistuje.
-\end{pozn}
+Najprv ešte ukážeme, že SPF používa vždy inicializované hodnoty a každú hodnotu nastavuje práve raz.
 
 \begin{pozn}
-  Single-path funkcia kazdu hodnotu $ForestDistance$, rovnako ako $TreeDistance$ nastavuje
-  prave raz.
+  Nikdy nepoužívam 2x rovnakú cestu $\gamma$ v strome. To vyplýva z toho, že po dekompozícií
+  stromu podľa $\gamma$, cesta v ostatných stromoch neexistuje.
+1\end{pozn}
+
+\begin{pozn}
+  Single-path funkcia každú hodnotu $ForestDistance$, rovnako ako $TreeDistance$ nastavuje
+  práve raz.
 \end{pozn}
 
 \begin{dukaz}
-  Ziadnu cestu nepouzivam opakovane. Hodnotu v $TreeDistance$ nastavujem iba v momente,
-  ked su obidva lesy stromami (teda ich korene lezia na cestach $\gamma_{F}$ a $\gamma_{G}$)
-  a to sa udeje prave raz.
-  Lesy vzdy iba zvacsujem, takze nikdy sa nedostanem do mensieho aby som mohol mu znovu nastavit
+  Žiadnu cestu nepoužívam opakovane. Hodnotu v $TreeDistance$ nastavujem iba v momente,
+  keď sú obidva lesy stromami (teda ich korene ležia na cestách $\gamma_{F}$ a $\gamma_{G}$)
+  a to sa udeje práve raz.
+  Lesy vždy iba zväčšujem, takze nikdy sa nedostanem do menšieho aby som mohol mu znovu nastaviť
   hodnotu. To iste plati aj pre $ForestDistance$.
 \end{dukaz}
 
 \begin{lemma}
-  Nikdy nepouzivame neinicializovane hodnoty $TreeDistance$ a $ForestDistance$.
+  Nikdy nepoužívame neinicializované hodnoty $TreeDistance$ a $ForestDistance$.
 \end{lemma}
 
 \begin{dukaz}
-  Hodnota $ForestDistance$ pre pouzitie s prazdnym lesom je inicializovana, a pri kazdej iteracii
-  algoritmu citam iba z hodnot z predchadzajucich iteracii, napr
+  Hodnota $ForestDistance$ pre použitie s prázdnym lesom je inicializovaná, a pri každej iteracií
+  algoritmu čítam iba z hodnôt z predchadzajúcich iteracií, napr.
   $ForestDistance[F - Last_{F}][G - Last_{G}]$, alebo $ForestDistance[F - F_{Last_{F}}][G - G_{Last_{G}}]$.
-  V prvom pripade mazem iba jeden vrchol, v druhom cely jeho podstrom.
+  V prvom prípade mažem iba jeden vrchol, v druhom celý jeho podstrom.
 
-  Hodnoty $TreeDistance$ pouzivame iba v pripade, ze aspon jeden z lesov $F'$ alebo $G'$ nieje stromom.
-  To znamena, ze ak posledne pridany vrchol $Last_{F}$ je mimo cesty $\gamma_{F}$, tak sme vzdialenost
-  od $Last_{G}$ vyratali rekurzivne po dekompozicii $F$ uz skor.
-  Naopak ak $Last_{F}$ lezi na ceste, potom $Last_{G}$ je mimo cesty, a editacnu vzdialenost
-  sme vyratali pri pocitani relevant-subtrees.
+  Hodnoty $TreeDistance$ používame iba v prípade, že aspoň jeden z lesov $F'$ alebo $G'$ nieje stromom.
+  To znamená, že ak posledne pridaný vrchol $Last_{F}$ je mimo cesty $\gamma_{F}$, tak sme vzdialenosť
+  od $Last_{G}$ vyrátali rekurzívne po dekompozicií $F$ už skôr.
+  Naopak ak $Last_{F}$ leži na ceste, potom $Last_{G}$ je mimo cesty, a editačnú vzdialenosť
+  sme vyrátali pri počítani relevant-subtrees.
 \end{dukaz}
 
 \begin{dusl}
@@ -340,25 +340,25 @@ Najprv este ukazeme, ze SPF pouziva vzdy inicializovane hodnoty, a kazdu hodnotu
 \end{dusl}
 
 \begin{dukaz}
-  V predchadzajucich castiach sme dokazali, ze v kazdom kroku pouzivame iba korektne hodnoty a
-  vsetky casti algoritmu pocitaju spravne, takze algoritmus GTED je v poriadku.
+  V predchádzajúcich častiach sme dokázali, že v každom kroku používame iba korektné hodnoty a
+  všetky časti algoritmu počítajú správne, takže algoritmus GTED je v poriadku.
 \end{dukaz}
 
 %TODO priklad
 
 \subsubsection{RTED: Robust Tree Edit Distance algoritmus}
 
-RTED budeme vnimat ako algoritmus na vypocitanie optimalnej strategie - teda algoritmus,
-ktory nam poradi ako najlepsie dekomponovat obidva stromy.
+RTED budeme vnímať ako algoritmus na výpočítanie optimálnej stratégie - teda algoritmus,
+ktorý nám poradí ako najlepšie dekomponovať obidva stromy.
 
-Funguje tak, ze si predpocita kolko podproblemov budeme musiet vyriesit, ak pouzijeme strategiu
+Funguje tak, že si predpočíta koľko podproblémov budeme musieť vyriešiť, ak použijeme stratégiu
 $left$, $right$, alebo $heavy$.
 
 \begin{definice}
-	Celkova dekompozicia lesa (full decomposition) $F$, $\mathcal{A}(F)$ je mnozina
-	vsetkych podlesov F, ktore dostaneme rekurzivnym odstranenim najlavejsieho
-	alebo najpravejsieho korenoveho vrcholu - $r_{R}(F)$ a $r_{L}(F)$ - z $F$
-	a nasledne aj vsetkych jeho podlesov.
+	Celková dekompozícia lesa (full decomposition) $F$, $\mathcal{A}(F)$ je množina
+	všetkych podlesov F, ktoré dostaneme rekurzívnym odstranením najľavejšieho
+	alebo najpravejšieho koreňového vrcholu - $r_{R}(F)$ a $r_{L}(F)$ - z $F$
+	a následne aj všetkých jeho podlesov.
 	\begin{align*}
 		\mathcal{A}(\emptyset) &= \emptyset
 		\\
@@ -369,14 +369,14 @@ $left$, $right$, alebo $heavy$.
 \begin{figure}[H]
 \centering
 \includegraphics[width=85mm, height=100mm]{../img/LRH_decomposition.png}
-%TODO vlastne obrazky
-\caption{Celkova dekompozicia pomocou LRH strategii}
+%TODO vlastné obrázky
+\caption{Celková dekompozícia pomocou LRH strategii}
 \label{obr:LRH_decomposition}
 \end{figure}
 
 \begin{lemma}
-  Pocet podproblemov (relevant-subproblems) pocitanych single-path funkciou pre dvojicu
-  stromov $F$ a $G$ je rovna
+  Počet podproblémov (relevant-subproblems) počítaných single-path funkciou pre dvojicu
+  stromov $F$ a $G$ je rovná
   \begin{align*}
     \# = 
     \begin{cases}
@@ -390,13 +390,13 @@ $left$, $right$, alebo $heavy$.
 \end{lemma}
 
 \begin{dukaz}
-  \citet{DMRW} dokazali, ze vzorec pre tazke cesty je v poriadku. Rovnako tak,
-  \citet{ZHANGSHASHA} to dokazali pre lave cesty. Jednoduchou upravou vieme upravit
-  ich vzorec na pouzitie pravych ciest.
+  \citet{DMRW} dokázali, že vzorec pre ťažké cesty je v poriadku. Rovnako tak,
+  \citet{ZHANGSHASHA} to dokázali pre ľavé cesty. Jednoduchou úpravou vieme upraviť
+  ich vzorec na použitie pravých ciest.
 \end{dukaz}
 
 \begin{definice}
-  Minimalny pocet podproblemov ktore potrebujeme vyratat pri pouziti GTEDu je
+  Minimálny počet podproblémov, ktoré potrebujeme vyrátať pri použití GTEDu je
   \begin{align*}
     cena(F, G) =
     \begin{cases}
@@ -416,17 +416,17 @@ $left$, $right$, alebo $heavy$.
 \end{definice}
 
 \begin{dukaz}
-  je uvedeny v \citet{RTED}
+  je uvedený v \citet{RTED}
 \end{dukaz}
 
-Namiesto \O{$n^3$} rekurzie potrebujeme algoritmus, ktory optimalnu strategiu vyrata
-s nizsimi casovymi narokmi ako potrebuje optimalny beh $GTED$u.
+Namiesto \O{$n^3$} rekurzie potrebujeme algoritmus, ktorý optimálnu stratégiu vyráta
+s nižšími časovými nárokmi ako potrebuje optimálny beh $GTED$u.
 
 Popiseme teda algoritmus \ref{alg:rted} - RTED, od tvorcov \citet{RTED}.
-Beziaci v case \O{$n^2$}.
+Bežiaci v čase \O{$n^2$}.
 
 \begin{algorithm}
-  \caption{Optimalna strategia}
+  \caption{Optimálna stratégia}
   \label{alg:rted}
   \begin{algorithmic}[1]
     \Procedure {rted}{$F, G$}
@@ -503,27 +503,27 @@ Beziaci v case \O{$n^2$}.
   \end{algorithmic}
 \end{algorithm}
 
-Prechadza vrcholmi v postorder, aby sa znizila pametova narocnost algoritmu a nemuseli ukladat hodnoty
-medzi dvojicami relevant-subforest. Namiesto toho inkrementujeme hodnotu v rodicovskom vrchole pri
-kazdej navsteve jeho potomka.
+Prechádza vrcholmi v postorder, aby sa znížila pamäťová náročnosť algoritmu a nemuseli ukladať hodnoty
+medzi dvojicami relevant-subforest. Namiesto toho inkrementujeme hodnotu v rodičovskom vrchole pri
+každej návšteve jeho potomka.
 
 \begin{lemma}
-  Algoritmus \ref{alg:rted} vyrata optimalnu LRH strategiu pre dvojicu podstromov $F$ a $G$ a
-  casova narocnost algoritmu je \O{$n^2$}.
+  Algoritmus \ref{alg:rted} vyráta optimalnú LRH stratégiu pre dvojicu podstromov $F$ a $G$ a
+  časová náročnosť algoritmu je \O{$n^2$}.
 \end{lemma}
 
 \begin{dukaz}
-  Toto tvrdenie dokazali \citet{RTED}.
+  Toto tvrdenie dokázali \citet{RTED}.
 \end{dukaz}
 
 
 \section{Mapovanie medzi stromami}
 
-Tabulka vzdialenosti z $GTED$u medzi stromami $F$ a $G$ nam nebude stacit.
-Potrebujeme vediet ako strom $F$ namapovat na $G$.
+Tabuľka vzdialenosti z $GTED$u medzi stromami $F$ a $G$ nám nebude stačiť.
+Potrebujeme vedieť ako strom $F$ namapovať na $G$.
 
 \begin{algorithm}
-  \caption{Pocitanie mapovania}
+  \caption{Počitanie mapovania}
   \label{alg:ted:mapping}
   \begin{algorithmic}[1]
     \Procedure {Mapping}{$F, G, TreeDistance$}
@@ -560,17 +560,18 @@ Potrebujeme vediet ako strom $F$ namapovat na $G$.
       \State \Return vrchol $r_{L}(Forest)$ alebo $r_{R}(Forest)$ alebo
         $\emptyset$ z $Forest$
         \Indent
-          \State rovnako ako v definicii \ref{def:relevant_subforests}
+          \State rovnako ako v definícií \ref{def:relevant_subforests}
         \EndIndent
       \label{alg:ted:mapping:update}
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
 
-Princip je v backtrackovani matice $ForestDistance$, teda zistujeme, aku operaciu sme v ktorom
-bode pouzili, podobne ako v zistovani operacii pri editacnej vzdialenosti retazcov.
-Musime ale pouzivat $ForestDistance$ maticu, nie $TreeDistance$, kedze v nej
-sa odzrkadluje detailnejsia struktura stromov. Maticu $TreeDistance$ pouzivame iba na
-pocitanie single-path funkcie.
+Princíp je v backtrackovani matice $ForestDistance$, teda zisťujeme, akú operáciu, sme v ktorom
+bode použili, podobne ako v zisťovaní operácií pri editačnej vzdialenosti reťazcov.
+Musíme ale používať $ForestDistance$ maticu, nie $TreeDistance$, keďže v nej
+sa odzrkadluje detailnejšia štruktúra stromov. Maticu $TreeDistance$ používame iba na
+počítanie single-path funkcie.
+
 
 
