@@ -27,6 +27,9 @@
 
 using namespace std;
 
+regex create_regex(
+                const std::string& pattern);
+
 
 void ps_extractor::init(
                 const std::string& filename)
@@ -39,7 +42,7 @@ void ps_extractor::init(
     ifstream in(filename);
     point p;
     auto stream_pos = in.tellg();
-    regex regexp_base_line(
+    regex regexp_base_line = create_regex(
             "^\\([A-Z]\\)\\s+"                                 //(%BASE%)
             "-?[0-9]+(\\.[0-9]+)?\\s+-?[0-9]+(\\.[0-9]+)?\\s+"  //+-%DOUBLE% +-%DOUBLE%
             "lwstring\\s*$"                                     // %LWSTRING%
@@ -59,7 +62,7 @@ void ps_extractor::init(
     };
     vector<regex> ignore_regexps;
     for (string val : endings)
-        ignore_regexps.push_back(regex(val + "\\s*$"));
+        ignore_regexps.push_back(create_regex(val + "\\s*$"));
 
     auto ignore_line = [&ignore_regexps](const std::string& line)
     {
