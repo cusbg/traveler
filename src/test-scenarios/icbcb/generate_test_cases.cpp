@@ -1,7 +1,7 @@
 /*
- * File: tests.cpp
+ * File: generate_test_cases.cpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard@ba30.eu>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,40 +19,58 @@
  * USA.
  */
 
-#ifdef NODEF
-
-#include "tests.hpp"
+#include "generate_test_cases.hpp"
 #include "rna_tree.hpp"
 #include "utils.hpp"
 #include "app.hpp"
 #include "compact.hpp"
-#include "utils_ps_writer.hpp"
+#include "document_writer.hpp"
+#include "extractor.hpp"
 
 
-#define print(string)   psout.print((string), true)
 #define parent(iter)    rna_tree::parent(iter)
 
 
-static ps_writer psout;
+static std::vector<std::unique_ptr<document_writer>> writers;
 static rna_pair_label lbl_leaf("I");
 static rna_pair_label lbl_pair = lbl_leaf + lbl_leaf;
 
 using namespace std;
 
+void f()
+{
+    LOGGER_PRIORITY_ON_FUNCTION(DEBUG);
+    generate_test_cases test;
+    test.run();
+    exit(0);
+}
+
+static rna_tree get_rna(const std::string& filename)
+{
+    extractor& ex = extractor::get_extractor(filename + ".ps", "ps");
+    string brackets = read_fasta_file(filename + ".fasta").brackets;
+
+    rna_tree rna(brackets, ex.labels, ex.points);
+
+    rna.print_tree();
+
+    return rna;
+}
+
 #ifdef NODEF
 
-void test::save_seq_fold_subtree(iterator it, string name)
+void generate_test_cases::save_seq_fold_subtree(iterator it, string name)
 {
     APP_DEBUG_FNAME;
 
-#define OUTDIR_PART     (string("build/files/run-part/"))
+#define OUTDIR_PART     (string("build/files/"))
     name = OUTDIR_PART + name;
 
     write_file(name + ".seq", rna_tree::get_labels(it));
     write_file(name + ".fold", rna_tree::get_brackets(it));
 }
 
-void test::generate()
+void generate_test_cases::generate()
 {
     APP_DEBUG_FNAME;
 
@@ -78,12 +96,11 @@ void test::generate()
 
 #endif
 
-void test::save_seq_fold(rna_tree rna, std::string name)
+void generate_test_cases::save_seq_fold(rna_tree rna, std::string name)
 {
     APP_DEBUG_FNAME;
 
-    write_file(name + ".seq", rna.get_labels());
-    write_file(name + ".fold", rna.get_brackets());
+    write_file(name + ".fasta", ">" + rna.name() + "\n" + rna.get_labels() + "\n" + rna.get_brackets());
 }
 
 
@@ -91,18 +108,15 @@ void test::save_seq_fold(rna_tree rna, std::string name)
 
 
 
-std::vector<std::string> test::create_app_arguments(const std::string& file_in, const std::string& file_out)
+std::vector<std::string> generate_test_cases::create_app_arguments(const std::string& file_in, const std::string& file_out)
 {
     vector<string> vec = {
         "program_name",
         "-tt",
             file_in + ".ps",
-            file_in + ".fold",
-            "--name", file_in + "_templ",
+            file_in + ".fasta",
         "-mt",
-            file_out + ".seq",
-            file_out + ".fold",
-            "--name", file_out + "_match",
+            file_out + ".fasta",
         //"-r",
             //"--strategies", file_out + ".matched.rted",
         //"-g",
@@ -112,34 +126,39 @@ std::vector<std::string> test::create_app_arguments(const std::string& file_in, 
             //"--mapping", file_out + ".matched.map",
             //file_out + ".matched.ps",
         "-a",
-            file_out + ".ps",
+            "--colored",
+            file_out ,
     };
 
     return vec;
 }
 
-void test::save_to_psout(const std::string& filename, iterator it)
+void generate_test_cases::save_to_psout(const std::string& filename, iterator it)
 {
     APP_DEBUG_FNAME;
 
-    psout.init_default(filename, it);
+    writers = document_writer::get_writers(true);
 
-    print(psout.sprint_subtree(it));
-    print(ending_3_5_strings(it));
+    for (const auto& writer : writers)
+    {
+        writer->init(filename, it);
+        writer->print(writer->get_rna_subtree_formatted(it));
+    }
 }
 
 
-void test::run()
+void generate_test_cases::run()
 {
     APP_DEBUG_FNAME;
 
-    run_hairpin();
+    //run_hairpin();
     //run_interior();
     run_multibranch();
+    run_multibranch_loop();
 }
 
 
-void test::insert_hairpin(
+void generate_test_cases::insert_hairpin(
                 rna_tree& rna,
                 sibling_iterator ch,
                 size_t n)
@@ -153,12 +172,12 @@ void test::insert_hairpin(
         ch = rna.insert(ch, lbl_pair, 1);
 }
 
-void test::run_delete(size_t n, rna_tree& rna, sibling_iterator sib)
+void generate_test_cases::run_delete(size_t n, rna_tree& rna, sibling_iterator sib)
 {
     while (n-- != 0)
         sib = rna.erase(sib);
 }
-void test::run_delete_leafs(size_t n, rna_tree& rna, sibling_iterator sib)
+void generate_test_cases::run_delete_leafs(size_t n, rna_tree& rna, sibling_iterator sib)
 {
     while (n-- != 0)
     {
@@ -166,19 +185,19 @@ void test::run_delete_leafs(size_t n, rna_tree& rna, sibling_iterator sib)
         sib = rna.erase(sib);
     }
 }
-void test::run_insert_leafs(size_t n, rna_tree& rna, sibling_iterator sib)
+void generate_test_cases::run_insert_leafs(size_t n, rna_tree& rna, sibling_iterator sib)
 {
     while (n-- != 0)
         sib = rna.insert(sib, lbl_leaf, 0);
 }
-void test::run_insert(size_t n, rna_tree& rna, sibling_iterator sib)
+void generate_test_cases::run_insert(size_t n, rna_tree& rna, sibling_iterator sib)
 {
     while (n-- != 0)
         sib = rna.insert(sib, lbl_pair, 1);
 }
 
 
-void test::run_app(std::string filetempl, std::string fileother)
+void generate_test_cases::run_app(std::string filetempl, std::string fileother)
 {
     APP_DEBUG_FNAME;
 
@@ -191,7 +210,7 @@ void test::run_app(std::string filetempl, std::string fileother)
     //save_to_psout(fileother + ".ps", ++rna.begin());
 }
 
-void test::run_hairpin()
+void generate_test_cases::run_hairpin()
 {
     APP_DEBUG_FNAME;
 
@@ -234,7 +253,7 @@ void test::run_hairpin()
 #undef FILEINDEX
 }
 
-void test::run_multibranch()
+void generate_test_cases::run_multibranch()
 {
     APP_DEBUG_FNAME;
 
@@ -306,16 +325,74 @@ void test::run_multibranch()
     inserts();
 }
 
+void generate_test_cases::run_multibranch_loop()
+{
+    APP_DEBUG_FNAME;
 
+#define FILEINDEX 2
 
+    auto deletes = [this]()
+    {
+        string filein = FILEIN(FILEINDEX);
+        string fileout = FILEOUT(FILEINDEX) + ".del2";
 
-#endif
+        rna_tree rna = get_rna(filein);
+        sibling_iterator ch = plusplus(rna.begin(), 8);
 
+        for (int i = 0; i < 16; ++i)
+        {
+            while (rna_tree::is_leaf(ch))
+                ++ch;
+            ch = rna.erase(ch);
+        }
 
+        while (!ch->paired())
+            ++ch;
 
+        for (int i = 0; i < 2; ++i)
+            ch = rna.erase(ch);
 
+        rna.print_tree();
+        save_seq_fold(rna, fileout);
+        run_app(filein, fileout);
+    };
+    auto deletes_inserts = [this]()
+    {
+        string filein = FILEOUT(FILEINDEX) + ".del2";
+        string fileout = FILEOUT(FILEINDEX) + ".del-ins2";
 
+        rna_tree rna = get_rna(filein);
+        sibling_iterator ch = plusplus(rna.begin(), 8);
 
+        ch = rna.insert(ch, lbl_pair, 9);
+        for (int i = 0; i < 2; ++i)
+            ch = rna.insert(ch, lbl_pair, 1);
+
+        ch = plusplus(rna_tree::iterator(ch.begin()), 2);
+        ch = plusplus(ch, 2);
+        ch = rna.insert(ch, lbl_pair, 5);
+
+        for (int i = 0; i < 7; ++i)
+            rna.insert(ch, lbl_pair, 1);
+
+        ch = plusplus(ch.begin(), 1);
+        ch = rna.insert(ch, lbl_pair, 4);
+        for (int i = 0; i < 4; ++i)
+            rna.insert(ch, lbl_pair, 1);
+
+        ch = plusplus(rna_tree::iterator(ch), 10);
+
+        ch = rna.insert(ch, lbl_pair, 4);
+        ch = rna.insert(ch, lbl_pair, 1);
+
+        //rna.print_tree();
+        save_seq_fold(rna, fileout);
+        run_app(filein, fileout);
+    };
+
+    deletes();
+    deletes_inserts();
+}
 
 
 

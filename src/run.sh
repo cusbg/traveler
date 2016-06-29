@@ -3,8 +3,8 @@
 ALL="african_frog artemia_salina blue_mussel cicadas echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
 FILES1=${ALL}
 FILES2=${ALL}
-FILES1="mouse"
-FILES2="human"
+FILES1="blue_mussel"
+FILES2="artemia_salina"
 #FILES2="artemia_salina"
 
 EXECUTABLE="build/traveler"
@@ -13,7 +13,7 @@ DIR_IMG="build/files"
 ONCE=false
 
 COLORED="--colored"
-#OVERLAPS="--overlaps"
+OVERLAPS="--overlaps"
 
 #mv ${EXECUTABLE} ${EXECUTABLE}2
 #EXECUTABLE="${EXECUTABLE}2"
@@ -23,7 +23,6 @@ then
     EXECUTABLE="gdb --args ${EXECUTABLE}"
     ONCE=true
 fi
-
 
 fail_function() {
     {
@@ -52,7 +51,7 @@ run_draw() {
 
     ${EXECUTABLE} \
         ${tt} ${mt} ${debug} \
-	    --draw ${COLORED} ${OVERLAPS} ${file_out}.map ${file_out} \
+	    --draw ${COLORED} ${OVERLAPS} ${file_in}.map ${file_out} \
 	|| fail_function
 }
 

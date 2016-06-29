@@ -241,6 +241,9 @@ std::string document_writer::get_rna_background_formatted(
         point p1 = prev->at(prev.label_index()).p;
         point p2 = begin->at(begin.label_index()).p;
 
+        if (p1.bad() || p2.bad())
+            continue;
+
         point tmp = rna_tree::base_pair_edge_point(p1, p2);
         p2 = rna_tree::base_pair_edge_point(p2, p1);
         p1 = tmp;

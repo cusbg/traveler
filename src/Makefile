@@ -58,7 +58,7 @@ force_rebuild_main:
 	@rm -rf ${BUILDDIR}/main* ${BUILDDIR}/${TARGET}
 
 cp:
-	cp -R ../InFiles ./precomputed
+	cp -R ../InFiles/* ./precomputed
 
 mkdir:
 	@mkdir -p ${BUILDDIR}/files ${LOGDIR}

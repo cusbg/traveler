@@ -1,5 +1,5 @@
 /*
- * File: tests.hpp
+ * File: generate_test_cases.hpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
  *
@@ -19,16 +19,12 @@
  * USA.
  */
 
-#ifdef NODEF
-
 #ifndef TESTS_HPP
 #define TESTS_HPP
 
 #include "rna_tree.hpp"
 
-class rna_tree;
-
-class test
+class generate_test_cases
 {
 private:
     typedef rna_tree::iterator iterator;
@@ -43,6 +39,8 @@ private:
     void run_hairpin();
     void run_interior();
     void run_multibranch();
+
+    void run_multibranch_loop();
     void run_fullbranch();
 
     void run_delete(size_t n, rna_tree& rna, sibling_iterator sib);
@@ -68,8 +66,8 @@ public:
     void generate();
 };
 
-#define INDIR           (string("precomputed/"))
-#define OUTDIR_OP       (string("build/files/run-op/"))
+#define INDIR           (string("precomputed/test/"))
+#define OUTDIR_OP       (string("build/files/"))
 
 #define FILES   (std::vector<string>({"1.hairpin", "2.interior", "3.multibranch", "4.fullbranch"}))
 
@@ -78,4 +76,3 @@ public:
 
 
 #endif /* !TESTS_HPP */
-#endif

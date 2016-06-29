@@ -43,6 +43,9 @@ static regex create_regex(const std::string& pattern)
 void ps_extractor::init(
                 const std::string& filename)
 {
+    labels = "";
+    points = vector<point>();
+
     APP_DEBUG_FNAME;
     assert_err(exist_file(filename),
             "ps_document(%s): file does not exist", to_cstr(filename));
@@ -164,5 +167,7 @@ void ps_extractor::init(
         epilog += line + "\n";
         DEBUG("epilog '%s'", line.c_str());
     }
+
+    DEBUG("%s", labels.c_str());
 }
 
