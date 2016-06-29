@@ -98,7 +98,7 @@ std::string document_writer::get_edge_formatted(
         from = tmp;
     }
 
-    return get_line_formatted(from, to);
+    return get_line_formatted(from, to, RGB::BLACK);
 }
 
 std::string document_writer::get_label_formatted(
@@ -227,10 +227,35 @@ std::string document_writer::get_rna_subtree_formatted_colored(
     return out.str();
 }
 
+std::string document_writer::get_rna_background_formatted(
+                rna_tree::pre_post_order_iterator begin,
+                rna_tree::pre_post_order_iterator end) const
+{
+    rna_tree::pre_post_order_iterator prev;
+    ostringstream out;
+
+    while (++rna_tree::pre_post_order_iterator(begin) != end)
+    {
+        prev = begin++;
+
+        point p1 = prev->at(prev.label_index()).p;
+        point p2 = begin->at(begin.label_index()).p;
+
+        point tmp = rna_tree::base_pair_edge_point(p1, p2);
+        p2 = rna_tree::base_pair_edge_point(p2, p1);
+        p1 = tmp;
+
+        out << get_line_formatted(p1, p2, RGB::GRAY);
+    }
+
+    return out.str();
+}
+
 std::string document_writer::get_rna_formatted(
                 rna_tree rna) const
 {
-    return get_rna_subtree_formatted(rna.begin());
+    return get_rna_subtree_formatted(rna.begin())
+        + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
 }
 
 void document_writer::init(

@@ -198,7 +198,8 @@ svg_writer::style svg_writer::get_svg_color_style(
 
 /* virtual */ std::string svg_writer::get_line_formatted(
                 point from,
-                point to) const
+                point to,
+                const RGB& color) const
 {
     ostringstream out;
 
@@ -206,7 +207,7 @@ svg_writer::style svg_writer::get_svg_color_style(
         << get_point_formatted(from, "", "1")
         << " "
         << get_point_formatted(to, "", "2")
-        << create_style({get_svg_color_style(RGB::BLACK), {"stroke-width", "2"}});
+        << create_style({get_svg_color_style(color), {"stroke-width", "2"}});
 
     return create_element("line", out.str());
 }

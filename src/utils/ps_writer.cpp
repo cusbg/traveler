@@ -127,12 +127,18 @@ std::string ps_writer::get_default_prologue() const
 
 /* virtual */ std::string ps_writer::get_line_formatted(
                 point from,
-                point to) const
+                point to,
+                const RGB& color) const
 {
     ostringstream out;
 
     if (from.bad() || to.bad())
         return "";
+
+    string color_beg, color_end;
+
+    if (color != RGB::BLACK)
+        out << get_color_formatted(color);
 
     for (double coordinates : {from.x, from.y, to.x, to.y})
     {
@@ -144,6 +150,9 @@ std::string ps_writer::get_default_prologue() const
     out
         << " lwline"
         << endl;
+
+    if (color != RGB::BLACK)
+        out << get_color_formatted(RGB::BLACK);
 
     return out.str();
 }

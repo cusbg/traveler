@@ -52,7 +52,8 @@ public:
 protected:
     virtual std::string get_line_formatted(
                 point from,
-                point to) const;
+                point to,
+                const RGB& color) const;
 
 private:
     std::string get_color_formatted(

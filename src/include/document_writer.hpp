@@ -69,6 +69,9 @@ public: // formatters
                 const RGB& color) const = 0;
 
 public:
+    std::string get_rna_background_formatted(
+                rna_tree::pre_post_order_iterator begin,
+                rna_tree::pre_post_order_iterator end) const;
     std::string get_rna_formatted(
                 rna_tree rna) const;
     std::string get_rna_subtree_formatted(
@@ -113,7 +116,8 @@ public:
 protected:
     virtual std::string get_line_formatted(
                 point from,
-                point to) const = 0;
+                point to,
+                const RGB& color) const = 0;
     void print_to_stream(
                 const std::string& text);
     void seek_from_current_pos(
