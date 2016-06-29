@@ -24,9 +24,8 @@ Naopak pre bulge a interior loop jeden stem vchádza do štruktúry ale pokraču
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=50mm, height=35mm]{../img/struktury_v_rna-stem_loop.png}
-%TODO klasicky obrázok RNA molekuly, v ktorej farbami odlišim stem a loop.
-\caption{Stem a loop v molekule}
+\fbox{\includegraphics[trim=0.3cm 24.7cm 17cm 2cm]{../img/stem_loop-colored}}
+\caption{Rozlisenie stemov a loopov v molekule: cierne su stemy, farebne odlisene su bazy patriace do jednej loopy}
 \label{obr:RNA_motifs_stem_loop}
 \end{figure}
 
@@ -101,8 +100,22 @@ Veľkosťou kružnice v tomto prípade myslíme dĺžku kruhového obluku medzi 
 
 V našom programe používame iteračný algoritmus, ktorý ju pomaly zväčšuje alebo zmenšuje.
 Nakoniec buď nájde kružnicu, ktorej veľkosť je optimálna, alebo ani na maximálny počet krokov takú kružnicu nenájde
-a tak vráti tu z posledného kroku.
-% TODO obrázok iterovania zväčšoania kružnice
+a tak vráti tu z posledného kroku. Na obrázku \ref{obr:insert_circle_hairpin} vidíme celý algoritmus zväčšovania kružnice.
+
+\begin{figure}
+  \begin{subfigure}{0.3\textwidth}
+    \fbox{\includegraphics[trim=1cm 24.5cm 17cm 2.5cm]{../img/alg-insert/circle-small}}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \fbox{\includegraphics[trim=1cm 24.5cm 17cm 2.5cm]{../img/alg-insert/circle-big}}
+  \end{subfigure}
+  \begin{subfigure}{0.3\textwidth}
+    \fbox{\includegraphics[trim=1cm 24.5cm 17cm 2.5cm]{../img/alg-insert/circle-big-end}}
+  \end{subfigure}
+
+  \caption{Priklad zvacsovania kruznice a insertu do hairpinu}
+  \label{obr:insert_circle_hairpin}
+\end{figure}
 
 Operácia v rámci algoritmu \ref{alg:operacia_tree_shift} nám pomôže urobiť miesto na novo vložené bázové páry,
 alebo naopak ak sme niečo zmazali, tak dokáže celý podstrom pritiahnuť späť.
