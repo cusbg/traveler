@@ -40,7 +40,7 @@ OPTIONS:
 
 TREES:
   <-mt|--match-tree> FILE_FASTA
-  <-tt|--template-tree> FILE_PS FILE_FASTA
+  <-tt|--template-tree> [--type DOCUMENT_TYPE] DOCUMENT FILE_FASTA
 \end{code}
 
 Strucnu napovedu k programu dostaneme standardnym \paramI{h} alebo \param{help} argumentom.
@@ -76,6 +76,10 @@ presunut dalsich 10 ktore uz v loop boli.
 Hnedou farbou oznacujeme cele podstromy multibranch loopy, ktoru sme museli prekreslit.
 V tychto pripadoch vznikaju casto velke prekryvy a tymto ich odlisujeme od ostatnych, necakanych.
 
+Prepínač \param{match-tree} nám určuje RNA molekulu ktorú ideme vizualizovať, \param{template-tree}
+šablónu. Strom vizualizovanej molekuly sa načítava iba z fasta súboru, kdežto pri šablónovej molekule
+potrebujeme aj jej obrázok. Viac informácii ohľadom parametra \param{type} nájdete v kapitole \nameref{kap:rozsirenie}.
+
 \subsection{Format fasta suboru}
 
 Ako format suborov kodujucich stromy pouzivame trochu upraveny fasta format.
@@ -92,6 +96,11 @@ vizualizovanu molekulu aj sekvenciu. Je to dane tym, ze sekvenciu si vieme vybra
 Teraz uvedieme priklad vstupu pre malu podjednotku ribozomalnej RNA mysi, konkretne priklad
 fasta suboru \ref{obr:mouse_fasta}, podporovaneho formatu post script suboru \ref{obr:mouse_ps_text}
 a nasledne aj obrazok vizualizacie v post script subore \ref{obr:mouse_ps}.
+
+\begin{pozn}
+  Podporujeme iba jeden format PostScript súborov - ten používa databáza CRW publikovaná \citet{CRW}.
+  Ďalšie rozšírenia podpory inych formatov rozoberáme v kapitole \nameref{kap:rozsirenie}.
+\end{pozn}
 
 \begin{figure}[H]
 \begin{code}[fontsize=\scriptsize, frame=none, samepage=true]
@@ -171,7 +180,7 @@ CCGUAGGUGAACCUGCGGAAGGAUCAUUA
 \label{obr:mouse_ps_text}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}
   \makebox[\textwidth]{\includegraphics[width=\textwidth]{../img/mouse}}
   \caption{Priklad vstupneho obrazka}
   \label{obr:mouse_ps}
@@ -276,5 +285,32 @@ showpage
 \label{obr:svg_out}
 \end{figure}
 
+
+\section{Rozšírenie podpory iných vstupných obrázkov}
+\label{kap:rozsirenie}
+
+Ako sme už uviedli, momentálne podporujeme iba jediny vstupny format vstupných obrázkov.
+Je ním PostScript formát používaný databázou CRW od autorov \citet{CRW}.
+
+\begin{definice}
+  Extractor bude nejaky objekt ktory vie zo suboru urciteho typu vynat potrebne
+  polozky reprezentujuce RNA sekvenciu a poziciu baz na obrazku.
+\end{definice}
+
+Pri tvorbe aplikácie sme už mysleli na budúcnosť a načítavanie súboru robíme v jednom lahko
+rozsiritelnom module. Ten sa na zaklade typu v parametre \param{template-tree} rozhoduje
+aky extractor pouzit. Predvoleny a jediny implementovany je PostScript extractor fungujuci
+nad subormi z CRW databazy.
+
+Na implementovanie extractora potrebujeme implementovat existujuce rozhranie $extractor$,
+co znamena implementovat metodu $init$ s parametrom nazvu suboru.
+
+Jej uloha je zo suboru ziskat sekvenciu RNA a pozicie baz.
+
+Poslednou ulohou je pridat dvojicu $(názov\_exctractora, extractor)$ do tabulky implementovanych
+v metode $create\_exctractors()$.
+
+Naslednym volanim \param{template-tree} \param{type} $nazov\_extractora$ zacneme
+pouzivat nas novo implementovany extractor.
 
 

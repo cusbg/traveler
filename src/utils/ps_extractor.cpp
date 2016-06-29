@@ -27,8 +27,17 @@
 
 using namespace std;
 
-regex create_regex(
-                const std::string& pattern);
+static regex create_regex(const std::string& pattern)
+{
+    try
+    {
+        return regex(pattern);
+    }
+    catch (const std::regex_error& e)
+    {
+        throw runtime_error("regex_error: You need newer compiler. Actual does not support necessary regex patterns, use gcc version >= 4.9.2");
+    }
+}
 
 
 void ps_extractor::init(
@@ -154,18 +163,6 @@ void ps_extractor::init(
             break;
         epilog += line + "\n";
         DEBUG("epilog '%s'", line.c_str());
-    }
-}
-
-regex create_regex(const std::string& pattern)
-{
-    try
-    {
-        return regex(pattern);
-    }
-    catch (const std::regex_error e)
-    {
-        throw runtime_error("regex_error: You need newer compiler. Actual does not support necessary regex patterns, use gcc version >= 4.9.2");
     }
 }
 
