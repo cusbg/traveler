@@ -55,6 +55,7 @@ ako ukazeme neskor problemy nastavaju.
   \label{obr:delete_insert_multibranch_loop}
 \end{figure}
 
+
 Ako dalsie, testovali sme schopnost nasho algoritmu vizualizovat znamu podjednotku 16S ribozomalnej RNA
 na zivocisnej risi. CRW databaza obsahuje 16 organizmov so znamou sekundarnou strukturou.
 
@@ -124,6 +125,47 @@ jedneho konkretneho zastupcu $echinococcus\_granulosus$ a vzdialenost je $805,63
 
 V tejto kapitole uvedieme vygenerovane obrazky niektorych molekul a na nich ukazeme caste problemy,
 ktore pri vizualizacii nastavali.
+
+\subsubsection{Otacanie vetvy kvoli existujucej hrane}
+
+Jednym prikladom za vsetky je molekula zivocicha $Tripedalia cystophora$ - meduzy.
+Po tom, co sme dali molekulu nakreslit samu na seba vznikol problem, ze cela jedna
+vetva molekuly sa otocila na jednu stranu. Je to sposobene existenciou bazoveho paru,
+ktory je v povodnej molekule znazorneny dlhsou lomenou ciarou.
+
+Kedze nas program vsetky vzdialenosti normalizuje a nasledne uklada bazy stemu na jednu priamku,
+vznikaju obrazky podobne \ref{obr:chyba_otocenie_vetvy}.
+
+\begin{figure}
+  \includegraphics[width=0.45\textwidth]{../img/chyby/tripedalia_cystophora}
+  \includegraphics[width=0.45\textwidth]{../img/chyby/tripedalia_cystophora-tripedalia_cystophora}
+  \caption{Chyba pri otoceni vetvy}
+  \label{obr:chyba_otocenie_vetvy}
+\end{figure}
+
+\subsection{Rozlozenie baz na kruznicu}
+
+Niekedy sa prekresleniu celej loop nevyhneme. Ak napriklad vkladame velmi velke mnozstvo baz na jedno
+miesto, dochadza k problemom nacrtnutym na obrazku \ref{obr:chyba_rozlozenie_loopy}.
+
+Na tomto konkretnom priklade je nakresleny stem, vo vnutri ktoreho je velka loop. Kvoli tomu,
+ze chceme dodrziavat pravidla o kruznicovom tvare loopy, najdeme kruznicu dostatocne velku.
+V tomto pripade az priliz velku.
+
+Poznamka - vo vrchnej vetve ja taktiez znazornena kruznica, ale na rozdiel od spodnej obsahuje iba 2 vrcholy.
+
+\begin{figure}
+%trim=left bottom right top
+  \fbox{\includegraphics[clip, trim=0 10cm 3cm 2cm,width=0.9\textwidth]{../img/chyby/african_frog-echinococcus_granulosus}}
+  \caption{Chyba pri rozkladani baz na kruznicu}
+  \label{obr:chyba_rozlozenie_loopy}
+\end{figure}
+
+
+
+
+
+
 
 
 
