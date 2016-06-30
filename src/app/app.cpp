@@ -187,6 +187,18 @@ void app::save(
             writer->print(writer->get_circle_formatted(p.centre, p.radius));
     }
 
+    for (auto it = rna.begin(); it != rna.end(); ++it)
+    {
+        if (it->status == rna_pair_label::rotated)
+        {
+            class logger rotated("build/logs/rotated.log", logger::DEBUG);
+
+            rotated.debug("%s", rna.name());
+            break;
+        }
+    }
+
+
     log_overlaps(rna.name(), overlaps.size());
 }
 
@@ -196,7 +208,7 @@ void app::log_overlaps(
 {
     class logger overlaps("build/logs/overlaps.log", logger::DEBUG);
 
-    overlaps.debug("%s : %u", to_cstr(name), size);
+    overlaps.debug("%s %u", to_cstr(name), size);
 
     if (size != 0)
     {

@@ -23,15 +23,15 @@ ako ukazeme neskor problemy nastavaju.
 \begin{figure}[H]
   \begin{subfigure}{0.3\textwidth}
 %trim=left bottom right top
-    \fbox{\includegraphics[clip, trim=1cm 21cm 14cm 2.5cm, width=0.85\textwidth]{../img/alg-insert/2/multibranch-beg}}
+    \includegraphics[clip, trim=1cm 21cm 14cm 2.5cm, width=0.85\textwidth]{../img/alg-insert/2/multibranch-beg}
   \end{subfigure}
   \begin{subfigure}{0.3\textwidth}
 %trim=left bottom right top
-    \fbox{\includegraphics[clip, trim=1cm 21cm 14cm 2.5cm, width=0.85\textwidth]{../img/alg-insert/2/multibranch-del}}
+    \includegraphics[clip, trim=1cm 21cm 14cm 2.5cm, width=0.85\textwidth]{../img/alg-insert/2/multibranch-del}
   \end{subfigure}
   \begin{subfigure}{0.3\textwidth}
 %trim=left bottom right top
-    \fbox{\includegraphics[clip, trim=1cm 21cm 14cm 2.5cm, width=0.85\textwidth]{../img/alg-insert/2/multibranch-del-ins}}
+    \includegraphics[clip, trim=1cm 21cm 14cm 2.5cm, width=0.85\textwidth]{../img/alg-insert/2/multibranch-del-ins}
   \end{subfigure}
   \caption{Inverzne operacie: rekonstrukcia stemu}
   \label{obr:delete_insert_multibranch}
@@ -41,19 +41,90 @@ ako ukazeme neskor problemy nastavaju.
 \begin{figure}[H]
   \begin{subfigure}{0.3\textwidth}
 %trim=left bottom right top
-    \fbox{\includegraphics[clip, trim=0 0 0 3cm, width=0.85\textwidth]{../img/alg-insert/3/multibranch-beg}}
+    \includegraphics[clip, trim=1cm 21cm 14cm 2.5cm, width=0.85\textwidth]{../img/alg-insert/3/multibranch-beg}
   \end{subfigure}
   \begin{subfigure}{0.3\textwidth}
 %trim=left bottom right top
-    \fbox{\includegraphics[clip, trim=0 0 0 3cm, width=0.85\textwidth]{../img/alg-insert/3/multibranch-del}}
+    \includegraphics[clip, trim=0 0 0 15cm, width=0.85\textwidth]{../img/alg-insert/3/multibranch-del}
   \end{subfigure}
   \begin{subfigure}{0.3\textwidth}
 %trim=left bottom right top
-    \fbox{\includegraphics[clip, trim=0 0 0 3cm, width=0.85\textwidth]{../img/alg-insert/3/multibranch-del-ins}}
+    \includegraphics[clip, trim=0 0 0 2cm, width=0.85\textwidth]{../img/alg-insert/3/multibranch-del-ins}
   \end{subfigure}
   \caption{Inverzne operacie: rekonstrukcia multibranch loop}
   \label{obr:delete_insert_multibranch_loop}
 \end{figure}
+
+Ako dalsie, testovali sme schopnost nasho algoritmu vizualizovat znamu podjednotku 16S ribozomalnej RNA
+na zivocisnej risi. CRW databaza obsahuje 16 organizmov so znamou sekundarnou strukturou.
+
+Ribozomalna RNA bola vybrata lebo je v centre zaujmu mnohych vyskumov a taktiez kvoli jej velkosti
+a zlozitosti.
+
+Nas vizualizacny test sme spustili na vsetky pary RNA, z ktorych sme ziskali 256 vizualizacii.
+
+%Na zaciatku potrebujeme uviest, ze z celkoveho poctu 256 vizualizacii dopadlo 21 neuspechom pre rozne dovody.
+%Tym hlavnym je 
+
+Na obrazku \ref{obr:statistika_prekryvy} vidime pocty molekul s danym poctom prekryvov. 
+Je ale niekolko typov molekul u ktorych sme nejake prekryvy cakali - napriklad, ak sme v nej
+potrebovali prekreslit multibranch loop. Takuto zavislost nam vyjadruju dalsie dva grafy,
+prvy - \ref{obr:statistika_prekryvy_s_rotaciami} nam ukazuje, ze ak program musel rotovat
+a prekreslovat multibranch loopy, nedarilo sa mu najlepsie. Naopak, ak z prveho grafu
+odoberieme molekuly, ktore museli pouzit rotacie - graf \ref{obr:statistika_prekryvy_bez_rotacii},
+vidime, ze algoritmus sablonovej vizualizacie si viedol celkom dobre, prekryvy vznikali iba ojedinele.
+
+
+\begin{figure}
+  \includegraphics[width=1\textwidth]{../img/statistika/prekryvy-pocetmolekul}
+  \caption{Počet prekryvov v testovaných molekulách}
+  \label{obr:statistika_prekryvy}
+\end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=1\textwidth]{../img/statistika/prekryvy-pocetmolekul-s-rotaciami}
+  \caption{Počet prekryvov: molekuly ktore potrebovali prekreslit multibranch loop}
+  \label{obr:statistika_prekryvy_bez_rotacii}
+\end{figure}
+
+
+\begin{figure}
+  \includegraphics[width=1\textwidth]{../img/statistika/prekryvy-pocetmolekul-bez-rotacii}
+  \caption{Počet prekryvov: molekuly bez prekreslovania multibranch loop}
+  \label{obr:statistika_prekryvy_s_rotaciami}
+\end{figure}
+
+\begin{table}[b]
+  \centering
+  \begin{tabular}{l@{\hspace{1.5cm}}D{.}{,}{3.2}D{.}{,}{1.2}D{.}{,}{2.3}}
+    \toprule
+                                  & \mc{\textbf{Počet}}								& \mc{\textbf{Smerodajná}}		& \\
+    \mc{\textbf{Vzdialenosť}}	    & \mc{\textbf{prekryvov}}	          & \mc{\textbf{odchýlka}}	    & \\
+                                  & \mc{\textbf{(priemer)}}           &                            	& \\
+    \midrule
+    1.														&	5.13															&	1.64												& \\
+    5.														&	13.38															&	9.57												&	\\
+    10.														&	14.13															&	12.47												&	\\
+    15.														&	15.25															&	0.66												&	\\
+    \bottomrule
+  \end{tabular}
+\caption{Počty prekryvov v závislosti od tree-edit-distance vzdialenosti}
+\label{tab:statistika_prekryvy}
+\end{table}
+
+Z tabulky \ref{tab:statistika_prekryvy} je vidiet, ze pocet prekryvov zavisi od poctu operacii vkladania
+a mazania ktore v molekule musime urobit. Statistika pracuje s prvou, piatou, desiatou a patnastou najblizsou
+molekulou z pohladu $tree-edit-distance$.
+
+Zaujimavostou je, ze ako najvzdialenejsiu molekulu (v poradi patnastu) si vsetci vybrali molekulu od
+jedneho konkretneho zastupcu $echinococcus\_granulosus$ a vzdialenost je $805,63$ s odchylkou $12,92$.
+
+\subsection{Celkove vysledky}
+
+V tejto kapitole uvedieme vygenerovane obrazky niektorych molekul a na nich ukazeme caste problemy,
+ktore pri vizualizacii nastavali.
+
 
 
 

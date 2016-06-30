@@ -23,6 +23,7 @@
 #include "compact_circle.hpp"
 #include "compact_utils.hpp"
 
+#include "document_writer.hpp"
 
 using namespace std;
 
@@ -32,6 +33,22 @@ compact::compact(
                 rna_tree& _rna)
     : rna(_rna)
 { }
+
+void print(rna_tree::iterator root)
+{
+    auto writers = document_writer::get_writers(true);
+    for (const auto& writer : writers)
+    {
+        writer->init("build/files/0", root);
+        writer->print(writer->get_rna_subtree_formatted(root));
+    } 
+}
+
+void print(rna_tree rna)
+{
+    print(rna.begin());
+}
+
 
 void compact::run()
 {
@@ -567,11 +584,17 @@ void compact::set_distance_multibranch_loop(
 
     for (size_t i = 0; i < in.vec.size(); ++i)
     {
+    try {
         if (in.vec[i].vec.size() > MULTIBRANCH_MINIMUM_SPLIT)
         {
             split(in.vec[i]);
             in.vec[i].remake = false;
         }
+    } catch (...)
+    {
+        // TODO opravit bug
+        continue;
+    }
     }
 }
 

@@ -3,8 +3,8 @@
 ALL="african_frog artemia_salina blue_mussel cicadas echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
 FILES1=${ALL}
 FILES2=${ALL}
-FILES1="blue_mussel"
-FILES2="artemia_salina"
+FILES1="human"
+FILES2="sea_scallop"
 #FILES2="artemia_salina"
 
 EXECUTABLE="build/traveler"
@@ -12,8 +12,8 @@ DIR="precomputed"
 DIR_IMG="build/files"
 ONCE=false
 
-COLORED="--colored"
-OVERLAPS="--overlaps"
+#COLORED="--colored"
+#OVERLAPS="--overlaps"
 
 #mv ${EXECUTABLE} ${EXECUTABLE}2
 #EXECUTABLE="${EXECUTABLE}2"
