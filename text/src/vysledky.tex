@@ -121,12 +121,12 @@ molekulou z pohladu $tree-edit-distance$.
 Zaujimavostou je, ze ako najvzdialenejsiu molekulu (v poradi patnastu) si vsetci vybrali molekulu od
 jedneho konkretneho zastupcu $echinococcus\_granulosus$ a vzdialenost je $805,63$ s odchylkou $12,92$.
 
-\subsection{Celkove vysledky}
+\section{Celkove vysledky}
 
 V tejto kapitole uvedieme vygenerovane obrazky niektorych molekul a na nich ukazeme caste problemy,
 ktore pri vizualizacii nastavali.
 
-\subsubsection{Otacanie vetvy kvoli existujucej hrane}
+\subsection{Otacanie vetvy kvoli existujucej hrane}
 
 Jednym prikladom za vsetky je molekula zivocicha $Tripedalia cystophora$ - meduzy.
 Po tom, co sme dali molekulu nakreslit samu na seba vznikol problem, ze cela jedna
@@ -154,14 +154,40 @@ V tomto pripade az priliz velku.
 
 Poznamka - vo vrchnej vetve ja taktiez znazornena kruznica, ale na rozdiel od spodnej obsahuje iba 2 vrcholy.
 
-\begin{figure}
+\begin{figure}[H]
 %trim=left bottom right top
-  \fbox{\includegraphics[clip, trim=0 10cm 3cm 2cm,width=0.9\textwidth]{../img/chyby/african_frog-echinococcus_granulosus}}
+  \includegraphics[clip, trim=0 10cm 3cm 2cm,width=0.8\textwidth]{../img/chyby/african_frog-echinococcus_granulosus}
   \caption{Chyba pri rozkladani baz na kruznicu}
   \label{obr:chyba_rozlozenie_loopy}
 \end{figure}
 
+\subsection{Otacanie vetvy kvoli prekreslovaniu multibranch loopy}
 
+Ako uz aj graf na obrazku \ref{obr:statistika_prekryvy_bez_rotacii} ukazal,
+prekreslovanie multibranch loopy a rotacie vsetkych vetiev sposobuje masivne prekryvy.
+
+Pripajame jeden priklad na obrazku \ref{obr:chyba_rotacia_multibranch}. Miesto vlavo dolu, kde zacinaju
+bazy sa sfarbovat na hnedo, je multibranch loop, ktoru sme potrebovali z dovodu vlozenej novej vetvy
+(oznacena cerveno) prekreslit.
+
+Vysledok je taky, ze vsetky vetvy sme ulozili na kruznicu a pootacali do vhodneho smeru a tym vzniklo
+vela prekryvov.
+
+Na obrazku je vidiet este jednu vec, oznacene krizenia vo vyslednom obrazku vlavo hore.
+V kapitole o upravach multibranch loop sme spominali, ze prekresleniu celej loopy sa snazime
+vyhnut ak to ide. Predpokladame, ze ak je baz vela a zmeny male, bazy trochu poposuvame aby sa
+novy vrchol zmestil medzi ne, alebo prave naopak ich roztiahneme, aby sme vyplnili medzeru po starom.
+Kvoli tomu vyzera tato struktura tak pomiesane a kvoli tomu na tomto mieste vznikaju dalsie prekryvy.
+
+\begin{figure}
+  %\includegraphics[width=0.45\textwidth]{../img/chyby/sea_scallop}
+  \includegraphics[width=0.45\textwidth]{../img/chyby/cicadas}
+%trim=left bottom right top
+  %\centering
+  \includegraphics[clip, trim=0.5cm 7cm 4cm 2cm,width=0.45\textwidth]{../img/chyby/cicadas-sea_scallop}
+  \caption{Chyba pri otacani kvoli prekreslovaniu multibranch loopy}
+  \label{obr:chyba_rotacia_multibranch}
+\end{figure}
 
 
 

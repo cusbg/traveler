@@ -9,7 +9,6 @@ run: build
 
 # LaTeX je potreba spustit nekolikrat, aby spravne spocital odkazy
 ${TARGET}.pdf: ${TARGET}.tex *.tex *.bib
-	@mkdir -p ${BUILDDIR}
 	${SHELL} run.sh ${TARGET} ${BUILDDIR}
 
 
