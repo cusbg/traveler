@@ -1,23 +1,23 @@
 
-\chapter{Vysledky prace}
+\chapter{Výsledky práce}
 
-V tejto kapitole zhrnieme vysledky ktore nasa praca dosiahla.
+V tejto kapitole zhrnieme výsledky, ktoré naša práca dosiahla.
 
-Uz v predchadzajucich kappitolach sme sa stretli s niekolkymi prikladmi, napriklad ako si
-program poradil s vkladanim do hairpinu - obrazok \ref{obr:insert_circle_hairpin}.
+Už v predchádzajúcich kapitolách sme sa stretli s niekoľkými príkladmi, napríklad ako si
+program poradil s vkladaíim do hairpinu - obrázok \ref{obr:insert_circle_hairpin}.
 
-Na dalsom (obrazok \ref{obr:delete_insert_multibranch}) simulujeme mazanie s naslednym vkladanim,
-teda 2 k sebe inverzne operacie. Po zmazaní bazovych parov na hornej vetve molekuly, sa nam vsetky
-neparove bazy zliali a vytvorili jednu loop. Nasledne po opatovnom vlozeni bazovych parov (pre lepsie
-zviditelnenie sme ich oznacili "I"), vznikla struktura velmi podobna predchadzajucej.
+Na ďalšom (obrázok \ref{obr:delete_insert_multibranch}) simulujeme mazanie s následným vkladaním,
+teda 2 k sebe inverzne operácie. Po zmazaní bázových párov na hornej vetve molekuly, sa nám všetky
+nepárové bázy zliali a vytvorili jednu loop. Následne po opätovnom vložení bázovych parov (pre lepsie
+zviditelnenie sme ich označili "I"), vzniklá štruktúra veľmi podobná predchádzajúcej.
 
-Obrazok ma za ciel ukazat, ze vieme znovu nakreslit povodnu strukturu iba s malymi zmenamy v pozicii
-nukleotidov (vysledne loopy su trochu plytsie ako povodne).
+Obrázok má za cieľ ukázať, že vieme znovu nakresliť pôvodnu štruktúru iba s malými zmenamy v pozícií
+nukleotidov (výsledne loopy sú trochu plytšie ako pôvodne).
 
-Rovnako obrazok \ref{obr:delete_insert_multibranch_loop} rekonstruuje vetvenie sa stromu. Ako je vidiet,
-v tomto obrazku je uz viac rozdielov, vychylenie je celkom badatelne.
+Rovnako obrázok \ref{obr:delete_insert_multibranch_loop} rekonštruuje vetvenie sa stromu. Ako je vidieť,
+v tomto obrázku je už viac rozdielov, vychylenie je celkom badatelné.
 
-Na takto malych castiach bez velkych vetveni nam ani taketo zmeny nevadia. Pri velkych molekulach
+Na takto malých častiach bez velkých vetvení nam ani taketo zmeny nevadia. Pri velkych molekulach
 ako ukazeme neskor problemy nastavaju.
 
 \begin{figure}[H]
@@ -33,7 +33,7 @@ ako ukazeme neskor problemy nastavaju.
 %trim=left bottom right top
     \includegraphics[clip, trim=1cm 21cm 14cm 2.5cm, width=0.85\textwidth]{../img/alg-insert/2/multibranch-del-ins}
   \end{subfigure}
-  \caption{Inverzne operacie: rekonstrukcia stemu}
+  \caption{Inverzne operacie: rekonštrukcia stemu}
   \label{obr:delete_insert_multibranch}
 \end{figure}
 
@@ -51,29 +51,29 @@ ako ukazeme neskor problemy nastavaju.
 %trim=left bottom right top
     \includegraphics[clip, trim=0 0 0 2cm, width=0.85\textwidth]{../img/alg-insert/3/multibranch-del-ins}
   \end{subfigure}
-  \caption{Inverzne operacie: rekonstrukcia multibranch loop}
+  \caption{Inverzné operácie: rekonštrukcia multibranch loop}
   \label{obr:delete_insert_multibranch_loop}
 \end{figure}
 
 
-Ako dalsie, testovali sme schopnost nasho algoritmu vizualizovat znamu podjednotku 16S ribozomalnej RNA
-na zivocisnej risi. CRW databaza obsahuje 16 organizmov so znamou sekundarnou strukturou.
+Ako ďalšie, testovali sme schopnosť nášho algoritmu vizualizovať známu podjednotku 16S ribozomálnej RNA
+na živočisnej ríši. CRW databáza obsahuje 16 organizmov so známou sekundárnou štruktúrou.
 
-Ribozomalna RNA bola vybrata lebo je v centre zaujmu mnohych vyskumov a taktiez kvoli jej velkosti
-a zlozitosti.
+Ribozomálna RNA bola vybrata lebo je v centre záujmu mnohých výskumov a taktiež kvôli jej veľkosti
+a zložitosti.
 
-Nas vizualizacny test sme spustili na vsetky pary RNA, z ktorych sme ziskali 256 vizualizacii.
+Náš vizualizačný test sme spustili na všetky páry RNA, z ktorých sme získali 256 vizualizácií.
 
-%Na zaciatku potrebujeme uviest, ze z celkoveho poctu 256 vizualizacii dopadlo 21 neuspechom pre rozne dovody.
-%Tym hlavnym je 
+%Na začiatku potrebujeme uviesť, že z celkového pocčtu 256 vizualizácií dopadlo 21 neúspechom pre rôzne dôvody.
+%Tým hlavným je 
 
-Na obrazku \ref{obr:statistika_prekryvy} vidime pocty molekul s danym poctom prekryvov. 
-Je ale niekolko typov molekul u ktorych sme nejake prekryvy cakali - napriklad, ak sme v nej
-potrebovali prekreslit multibranch loop. Takuto zavislost nam vyjadruju dalsie dva grafy,
-prvy - \ref{obr:statistika_prekryvy_s_rotaciami} nam ukazuje, ze ak program musel rotovat
-a prekreslovat multibranch loopy, nedarilo sa mu najlepsie. Naopak, ak z prveho grafu
-odoberieme molekuly, ktore museli pouzit rotacie - graf \ref{obr:statistika_prekryvy_bez_rotacii},
-vidime, ze algoritmus sablonovej vizualizacie si viedol celkom dobre, prekryvy vznikali iba ojedinele.
+Na obrázku \ref{obr:statistika_prekryvy} vidíme počty molekúl s daným počtom prekryvov. 
+Je ale niekoľko typov molekul, u ktorých sme nejaké prekryvy čakali - napríklad, ak sme v nej
+potrebovali prekresliť multibranch loop. Takúto závislosť nám vyjadrujú ďalšie dva grafy,
+prvý - \ref{obr:statistika_prekryvy_s_rotaciami} nám ukazuje, že ak program musel rotovať
+a prekreslovať multibranch loopy, nedarilo sa mu najlepšie. Naopak, ak z prvého grafu
+odoberieme molekuly, ktoré museli použiť rotácie - graf \ref{obr:statistika_prekryvy_bez_rotacii},
+vidíme, že algoritmus šablonovej vizualizácie si viedol celkom dobré, prekryvy vznikali iba ojedinele.
 
 
 \begin{figure}
@@ -85,8 +85,8 @@ vidime, ze algoritmus sablonovej vizualizacie si viedol celkom dobre, prekryvy v
 
 \begin{figure}
   \includegraphics[width=1\textwidth]{../img/statistika/prekryvy-pocetmolekul-s-rotaciami}
-  \caption{Počet prekryvov: molekuly ktore potrebovali prekreslit multibranch loop}
-  \label{obr:statistika_prekryvy_bez_rotacii}
+  \caption{Počet prekryvov: molekuly, ktoré potrebovali prekreslit multibranch loop}
+  \label{obr:statistika_prekryvy_bez_rotácii}
 \end{figure}
 
 
@@ -100,84 +100,84 @@ vidime, ze algoritmus sablonovej vizualizacie si viedol celkom dobre, prekryvy v
   \centering
   \begin{tabular}{l@{\hspace{1.5cm}}D{.}{,}{3.2}D{.}{,}{1.2}D{.}{,}{2.3}}
     \toprule
-                                  & \mc{\textbf{Počet}}								& \mc{\textbf{Smerodajná}}		& \\
-    \mc{\textbf{Vzdialenosť}}	    & \mc{\textbf{prekryvov}}	          & \mc{\textbf{odchýlka}}	    & \\
-                                  & \mc{\textbf{(priemer)}}           &                            	& \\
+                                  & \mc{\textbf{Počet}}               & \mc{\textbf{Smerodajná}}    & \\
+    \mc{\textbf{Vzdialenosť}}     & \mc{\textbf{prekryvov}}           & \mc{\textbf{odchýlka}}      & \\
+                                  & \mc{\textbf{(priemer)}}           &                             & \\
     \midrule
-    1.														&	5.13															&	1.64												& \\
-    5.														&	13.38															&	9.57												&	\\
-    10.														&	14.13															&	12.47												&	\\
-    15.														&	15.25															&	0.66												&	\\
+    1.                            & 5.13                              & 1.64                        & \\
+    5.                            & 13.38                             & 9.57                        & \\
+    10.                           & 14.13                             & 12.47                       & \\
+    15.                           & 15.25                             & 0.66                        & \\
     \bottomrule
   \end{tabular}
 \caption{Počty prekryvov v závislosti od tree-edit-distance vzdialenosti}
 \label{tab:statistika_prekryvy}
 \end{table}
 
-Z tabulky \ref{tab:statistika_prekryvy} je vidiet, ze pocet prekryvov zavisi od poctu operacii vkladania
-a mazania ktore v molekule musime urobit. Statistika pracuje s prvou, piatou, desiatou a patnastou najblizsou
-molekulou z pohladu $tree-edit-distance$.
+Z tabuľky \ref{tab:statistika_prekryvy} je vidieť, že počet prekryvov závisí od počtu operacií vkladania
+a mazania ktoré v molekule musíme urobiť. Štatistika pracuje s prvou, piatou, desiatou a pätnástou najbližšou
+molekulou z pohľadu $tree-edit-distance$.
 
-Zaujimavostou je, ze ako najvzdialenejsiu molekulu (v poradi patnastu) si vsetci vybrali molekulu od
-jedneho konkretneho zastupcu $echinococcus\_granulosus$ a vzdialenost je $805,63$ s odchylkou $12,92$.
+Zaujímavosťou je, že ako najvzdialenejšiu molekulu (v poradí pätnástu) si všetci vybrali molekulu od
+jedného konkrétneho zástupcu $echinococcus\_granulosus$ a vzdialenosť je $805,63$ s odchylkou $12,92$.
 
-\section{Celkove vysledky}
+\section{Celkové výsledky}
 
-V tejto kapitole uvedieme vygenerovane obrazky niektorych molekul a na nich ukazeme caste problemy,
-ktore pri vizualizacii nastavali.
+V tejto kapitole uvedieme vygenerované obrázky niektorých molekúl a na nich ukážeme časté problémy,
+ktoré pri vizualizácii nastavali.
 
-\subsection{Otacanie vetvy kvoli existujucej hrane}
+\subsection{Otáčanie vetvy kvôli existujúcej hrane}
 
-Jednym prikladom za vsetky je molekula zivocicha $Tripedalia cystophora$ - meduzy.
-Po tom, co sme dali molekulu nakreslit samu na seba vznikol problem, ze cela jedna
-vetva molekuly sa otocila na jednu stranu. Je to sposobene existenciou bazoveho paru,
-ktory je v povodnej molekule znazorneny dlhsou lomenou ciarou.
+Jedným príkladom za všetky je molekula žívočícha $Tripedalia cystophora$ - meduzy.
+Po tom, čo sme dali molekulu nakresliť samu na seba vznikol problém, že celá jedna
+vetva molekuly sa otočila na jednu stranu. Je to spôsobene existenciou bázového páru,
+ktorý je v pôvodnej molekule znázornený dlhšou lomenou čiarou.
 
-Kedze nas program vsetky vzdialenosti normalizuje a nasledne uklada bazy stemu na jednu priamku,
-vznikaju obrazky podobne \ref{obr:chyba_otocenie_vetvy}.
+Keďže nás program všetky vzdialenosti normalizuje a následne ukladá bázy stemu na jednu priamku,
+vznikajú obrázky podobné \ref{obr:chyba_otočenie_vetvy}.
 
 \begin{figure}
   \includegraphics[width=0.45\textwidth]{../img/chyby/tripedalia_cystophora}
   \includegraphics[width=0.45\textwidth]{../img/chyby/tripedalia_cystophora-tripedalia_cystophora}
-  \caption{Chyba pri otoceni vetvy}
-  \label{obr:chyba_otocenie_vetvy}
+  \caption{Chyba pri otočení vetvy}
+  \label{obr:chyba_otočenie_vetvy}
 \end{figure}
 
-\subsection{Rozlozenie baz na kruznicu}
+\subsection{Rozloženie báz na kružnicu}
 
-Niekedy sa prekresleniu celej loop nevyhneme. Ak napriklad vkladame velmi velke mnozstvo baz na jedno
-miesto, dochadza k problemom nacrtnutym na obrazku \ref{obr:chyba_rozlozenie_loopy}.
+Niekedy sa prekresleniu celej loop nevyhneme. Ak napríklad vkladáme veľmi veľké množstvo báz na jedno
+miesto, dochádza k problémom načrtnutým na obrázku \ref{obr:chyba_rozloženie_loopy}.
 
-Na tomto konkretnom priklade je nakresleny stem, vo vnutri ktoreho je velka loop. Kvoli tomu,
-ze chceme dodrziavat pravidla o kruznicovom tvare loopy, najdeme kruznicu dostatocne velku.
-V tomto pripade az priliz velku.
+Na tomto konkretnom príklade je nakreslený stem, vo vnútri ktorého je veľka loop. Kvoli tomu,
+že chceme dodržiavať pravidlá o kružnicovom tvare loopy, nájdeme kružnicu dostatočne veľkú.
+V tomto prípade až príliž veľkú.
 
-Poznamka - vo vrchnej vetve ja taktiez znazornena kruznica, ale na rozdiel od spodnej obsahuje iba 2 vrcholy.
+Poznámka - vo vrchnej vetve ja taktiež znázornená kružnica, ale na rozdiel od spodnej obsahuje iba 2 vrcholy.
 
 \begin{figure}[H]
 %trim=left bottom right top
   \includegraphics[clip, trim=0 10cm 3cm 2cm,width=0.8\textwidth]{../img/chyby/african_frog-echinococcus_granulosus}
-  \caption{Chyba pri rozkladani baz na kruznicu}
-  \label{obr:chyba_rozlozenie_loopy}
+  \caption{Chyba pri rozkladaní báz na kružnicu}
+  \label{obr:chyba_rozloženie_loopy}
 \end{figure}
 
-\subsection{Otacanie vetvy kvoli prekreslovaniu multibranch loopy}
+\subsection{Otáčanie vetvy kvôli prekreslovaniu multibranch loopy}
 
-Ako uz aj graf na obrazku \ref{obr:statistika_prekryvy_bez_rotacii} ukazal,
-prekreslovanie multibranch loopy a rotacie vsetkych vetiev sposobuje masivne prekryvy.
+Ako už aj graf na obrázku \ref{obr:štatistika_prekryvy_bez_rotacií} ukázal,
+prekreslovanie multibranch loopy a rotácie všetkych vetiev spôsobuje masívne prekryvy.
 
-Pripajame jeden priklad na obrazku \ref{obr:chyba_rotacia_multibranch}. Miesto vlavo dolu, kde zacinaju
-bazy sa sfarbovat na hnedo, je multibranch loop, ktoru sme potrebovali z dovodu vlozenej novej vetvy
-(oznacena cerveno) prekreslit.
+Pripájame jeden priklad na obrázku \ref{obr:chyba_rotácia_multibranch}. Miesto vľavo dolu, kde začínajú
+bázy sa sfarbovať na hnedo, je multibranch loop, ktorú sme potrebovali z dôvodu vloženej novej vetvy
+(označená červeno) prekresliť.
 
-Vysledok je taky, ze vsetky vetvy sme ulozili na kruznicu a pootacali do vhodneho smeru a tym vzniklo
-vela prekryvov.
+Výsledok je taký, že všetky vetvy sme uložili na kružnicu a pootáčali do vhodného smeru a tým vzniklo
+veľa prekryvov.
 
-Na obrazku je vidiet este jednu vec, oznacene krizenia vo vyslednom obrazku vlavo hore.
-V kapitole o upravach multibranch loop sme spominali, ze prekresleniu celej loopy sa snazime
-vyhnut ak to ide. Predpokladame, ze ak je baz vela a zmeny male, bazy trochu poposuvame aby sa
-novy vrchol zmestil medzi ne, alebo prave naopak ich roztiahneme, aby sme vyplnili medzeru po starom.
-Kvoli tomu vyzera tato struktura tak pomiesane a kvoli tomu na tomto mieste vznikaju dalsie prekryvy.
+Na obrázku je vidieť ešte jednu vec, označené kríženia vo výslednom obrázku vľavo hore.
+V kapitole o úpravach multibranch loop sme spomínali, že prekresleniu celej loopy sa snažíme
+vyhnúť ak to ide. Predpokladáme, že ak je báz veľa a zmeny malé, bázy trochu poposúvame aby sa
+nový vrchol zmestil medzi ne, alebo práve naopak ich roztiahneme, aby sme vyplnili medzeru po starom.
+Kvôli tomu vyzerá táto štruktúra tak pomiešane a kvôli tomu na tomto mieste vznikajú ďalšie prekryvy.
 
 \begin{figure}
   %\includegraphics[width=0.45\textwidth]{../img/chyby/sea_scallop}
@@ -185,8 +185,8 @@ Kvoli tomu vyzera tato struktura tak pomiesane a kvoli tomu na tomto mieste vzni
 %trim=left bottom right top
   %\centering
   \includegraphics[clip, trim=0.5cm 7cm 4cm 2cm,width=0.45\textwidth]{../img/chyby/cicadas-sea_scallop}
-  \caption{Chyba pri otacani kvoli prekreslovaniu multibranch loopy}
-  \label{obr:chyba_rotacia_multibranch}
+  \caption{Chyba pri otáčani kvôli prekreslovaniu multibranch loopy}
+  \label{obr:chyba_rotácia_multibranch}
 \end{figure}
 
 

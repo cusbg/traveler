@@ -1,32 +1,33 @@
+
 \newcommand{\paramI}[1]{\text{-}\ensuremath{#1}}
 \newcommand{\param}[1]{\text{\--\--}\ensuremath{#1}}
 
-\chapter{TRAVeLer - Template RnA VisuaLization}
+\chapter{TRAVeLer - Template RnA Visualization}
 
-Traveler je konzolova aplikacia programovana v C++ a je urceny pre operacne systemy UNIX-oveho typu.
-Vyvyjany a testovany bol na Linux-e a FreeBSD. Podpora ostatnych systemov nieje zarucena.
+Traveler je konzolová aplikacia programovaná v C++ a je určený pre operačné systemý UNIX-ového typu.
+Vyvýjaný a testovaný bol na Linux-e a FreeBSD. Podpora ostatných systémov nieje zaručená.
 
-\section{Instalacia}
+\section{Inštalácia}
 
-Pozadovane programove vybavenie je:
+Požadované programové vybavenie je:
 \begin{itemize}
-  \item gcc verzie aspon 4.9.2
+  \item gcc verzie aspoň 4.9.2
 \end{itemize}
 
-Pri testovani boli zaznamenane problemy s regularnymi vyrazmi, ktore nam pomahaju pri nacitavani
-vstupnych suborov. Problem bol pri verzii gcc 4.7.2, ktora plne nepodporovala potrebne vyrazy.
+Pri testovaní boli zaznamenané problémy s regulárnymi výrazmi, ktoré nám pomáhajú pri načítavaní
+vstupných súborov. Problém bol pri verzií gcc 4.7.2, ktorá plne nepodporovala potrebné výrazy.
 
-Traveler prelozime zo zdrojovych kodov postupnostou prikazov z korenoveho adresara:
+Traveler prelozžíme zo zdrojových kódov postupnosťou príkazov z koreňového adresára:
 \begin{itemize}
   \item cd src/
   \item make build
     \\
-    Nasledne spustitelny subor je $src/build/traveler$.
+    Následne spustiteľný súbor je $src/build/traveler$.
 \end{itemize}
 
 \section{Argumenty programu}
 
-Ak predpokladame, ze program lezi na $PATH$, spustame ho nasledovne:
+Ak predpokladáme, že program leží na $PATH$, spúšťame ho nasledovne:
 
 \begin{code}[frame=none]
 traveler [-h|--help]
@@ -43,63 +44,63 @@ TREES:
   <-tt|--template-tree> [--type DOCUMENT_TYPE] DOCUMENT FILE_FASTA
 \end{code}
 
-Strucnu napovedu k programu dostaneme standardnym \paramI{h} alebo \param{help} argumentom.
+Stručnú nápovedu k programu dostaneme štandardným \paramI{h} alebo \param{help} argumentom.
 
-Prepinacmi \param{ted} a \param{draw} vieme oddelit fazu pocitania vzdialenosti pomocou TEDu a nasledneho kreslenia.
+Prepínačmi \param{ted} a \param{draw} vieme oddeliť fázu počítania vzdialenosti pomocou TEDu a nasledného kreslenia.
 
-Prepinac \param{overlaps} po nakresleni obrazku v nom vyznaci vsetky miesta prekryvov, ak nejake vznikli.
-Zaroven ich pocet vypise do samostatneho suboru. Nasledne rychlejsie dokazeme identifikovat molekuly, ktore
-potrebuju zvysenu pozornost.
+Prepínač \param{overlaps} po nakreslení obrázku v ňom vyznačí všetky miesta prekryvov, ak nejaké vznikli.
+Zároveň ich počet vypíše do samostatného súboru. Následne rýchlejšie dokážeme identifikovať molekuly, ktoré
+potrebujú zvýšenú pozornosť.
 
-Prepinac \param{colored} aktivuje farebne zvyraznovanie zmien v strukture stromu oproti sablone.
-Pouzivame nasledovne kodovanie farbami:
+Prepínač \param{colored} aktivuje farebné zvýrazňovanie zmien v štruktúre stromu oproti šablone.
+Používame nasledovné kódovanie farbami:
 
 \begin{tabular}{@{$\bullet$ }ll}
-  $Cervena$ & vlozene bazy
+  $Cervena$ & vložené bázy
   \\
-  $Zelena$  & editovane bazy
+  $Zelena$  & editované bázy
   \\
-  $Modra$   & bazy ktore sme potrebovali presunut
+  $Modra$   & bázy ktoré sme potrebovali presunúť
   \\
-  $Hneda$   & podstromy prekreslenych multibranch loop
+  $Hneda$   & podstromy prekreslených multibranch loop
 \end{tabular}
 \\
 
-Farbami zvyraznujeme zmeny v strome, to znamena, ze ak sa bazovy par zmeni v jednej baze,
-cely bude oznaceny ako editovany.
+Farbami zvýrazňujeme zmeny v strome, to znamená, že ak sa bázový pár zmení v jednej báze,
+cely bude označený ako editovaný.
 
-Modrou oznacujeme casti, ktore sme z nejakeho dovodu potrebovali presunut a prekreslit. Typickym prikladom
-je prekreslenie loopy po vlozeny/zmazani nejakej bazy. Vtedy sme vlozili napriklad 1 bazu ale potrebovali
-presunut dalsich 10 ktore uz v loop boli.
-% TODO priklad
+Modrou označujeme časti, ktoré sme z nejakého dôvodu potrebovali presunúť a prekresliť. Typickým príkladom
+je prekreslenie loopy po vložení/zmazaní nejakej bázy. Vtedy sme vložili napríklad 1 bázu ale potrebovali
+presunúť ďalších 10 ktoré už v loop boli.
+% TODO príklad
 
-Hnedou farbou oznacujeme cele podstromy multibranch loopy, ktoru sme museli prekreslit.
-V tychto pripadoch vznikaju casto velke prekryvy a tymto ich odlisujeme od ostatnych, necakanych.
+Hnedou farbou označujeme celé podstromy multibranch loopy, ktorú sme museli prekresliť.
+V týchto prípadoch vznikajú často veľké prekryvy a týmto ich odlišujeme od ostatných, nečakanýh.
 
 Prepínač \param{match-tree} nám určuje RNA molekulu ktorú ideme vizualizovať, \param{template-tree}
 šablónu. Strom vizualizovanej molekuly sa načítava iba z fasta súboru, kdežto pri šablónovej molekule
-potrebujeme aj jej obrázok. Viac informácii ohľadom parametra \param{type} nájdete v kapitole \nameref{kap:rozsirenie}.
+potrebujeme aj jej obrázok. Viac informácii ohľadom parametra \param{type} nájdete v kapitole \nameref{kap:rozšírenie}.
 
-\subsection{Format fasta suboru}
+\subsection{Formát fasta súboru}
 
-Ako format suborov kodujucich stromy pouzivame trochu upraveny fasta format.
+Ako formát súborov kodujúcich stromy používame trochu upravený fasta formát.
 
-Subor na prvom riadku obsahuje nazov molekuly hned za znakom $>$ az po prvu medzeru.
-Na dalsich riadkoch obsahuje znaky sekvencie RNA a znaky kodujuce sekundarnu strukturu.
+Súbor na prvom riadku obsahuje názov molekuly hned za znakom $>$ az po prvú medzeru.
+Na ďalších riadkoch obsahuje znaky sekvencie RNA a znaky kódujúce sekundárnu štruktúru.
 Je zvykom, ze riadky su siroke najviac 80 znakov.
 
-Fasta subor pre sablonovu molekulu RNA potrebuje iba nazov a zatvorkovanie, pre
-vizualizovanu molekulu aj sekvenciu. Je to dane tym, ze sekvenciu si vieme vybrat z obrazka sablony.
+Fasta súbor pre šablonovú molekulu RNA potrebuje iba názov a zatvorkovanie, pre
+vizualizovanú molekulu aj sekvenciu. Je to dané tým, že sekvenciu si vieme vybrať z obrázka šablony.
 
-\section{Priklad vstupu}
+\section{Príklad vstupu}
 
-Teraz uvedieme priklad vstupu pre malu podjednotku ribozomalnej RNA mysi, konkretne priklad
-fasta suboru \ref{obr:mouse_fasta}, podporovaneho formatu post script suboru \ref{obr:mouse_ps_text}
-a nasledne aj obrazok vizualizacie v post script subore \ref{obr:mouse_ps}.
+Teraz uvedieme príklad vstupu pre malú podjednotku ribozomálnej RNA myši, konkrétne príklad
+fasta súboru \ref{obr:mouse_fasta}, podporovaného formátu post script súboru \ref{obr:mouse_ps_text}
+a následne aj obrázok vizualizácie v post script súbore \ref{obr:mouse_ps}.
 
 \begin{pozn}
-  Podporujeme iba jeden format PostScript súborov - ten používa databáza CRW publikovaná \citet{CRW}.
-  Ďalšie rozšírenia podpory inych formatov rozoberáme v kapitole \nameref{kap:rozsirenie}.
+  Podporujeme iba jeden formát PostScript súborov - ten používa databáza CRW publikovaná \citet{CRW}.
+  Ďalšie rozšírenia podpory iných formátov rozoberáme v kapitole \nameref{kap:rozšírenie}.
 \end{pozn}
 
 \begin{figure}[H]
@@ -154,7 +155,7 @@ CCGUAGGUGAACCUGCGGAAGGAUCAUUA
 (((.....))))))))))))...)))))))))))))))..))))))))))))).)))))))))..).))..))....(((
 (((((((....))))))))))........
 \end{code}
-\caption{Priklad fasta suboru}
+\caption{Príklad fasta súboru}
 \label{obr:mouse_fasta}
 \end{figure}
 
@@ -176,45 +177,45 @@ CCGUAGGUGAACCUGCGGAAGGAUCAUUA
 (G) 318.99 -244.68 lwstring
   ...
 \end{code}
-\caption{Priklad podporovaneho formatu post script suboru}
+\caption{Príklad podporovaného formátu post script súboru}
 \label{obr:mouse_ps_text}
 \end{figure}
 
 \begin{figure}
   \makebox[\textwidth]{\includegraphics[width=\textwidth]{../img/mouse}}
-  \caption{Priklad vstupneho obrazka}
+  \caption{Príklad vstupného obrázka}
   \label{obr:mouse_ps}
 \end{figure}
 
-\section{Vystupne subory}
+\section{Výstupne súbory}
 
-Program generuje 2 druhy vystupov. Prvym je ulozenie tabulky mapovania TED algoritmu a druhym su obrazky
-vo formate SVG a PS. \\
+Program generuje 2 druhy vystupov. Prvým je uloženie tabuľky mapovania TED algoritmu a druhým sú obrázky
+vo formáte SVG a PS. \\
 
-Oznacme $T1$ strom sablony a $T2$ vizualizovany strom.
+Označme $T1$ strom šablony a $T2$ vizualizovaný strom.
 
-Format mapovacieho suboru je nasledovny: \\
-Prvy riadok obsahuje $DISTANCE: n$, kde $n$ je
-editacna vzdialenost medzi $T1$ a $T2$.
+Formát mapovacieho súboru je nasledovný: \\
+Prvý riadok obsahuje $DISTANCE: n$, kde $n$ je
+editačná vzdialenosť medzi $T1$ a $T2$.
 
-Ostatne riadky su vo formate $i$ $j$, kde $i, j \ge 0$. Inymi slovami:
+Ostatné riadky sú vo formáte $i$ $j$, kde $i, j \ge 0$. Inymi slovami:
 \begin{itemize}
-  \item 1 2 - prvy vrchol z $T1$ potrebujeme namapovat na druhy vrchol z $T2$
-  \item 0 2 - do vysledneho stromu vkladame druhy vrchol z $T2$
-  \item 1 0 - zo stromu $T1$ mazeme prvy vrchol
+  \item 1 2 - prvý vrchol z $T1$ potrebujeme namapovať na druhý vrchol z $T2$
+  \item 0 2 - do vysledného stromu vkladáme druhý vrchol z $T2$
+  \item 1 0 - zo stromu $T1$ mazeme prvý vrchol
 \end{itemize}
 
-PostScript subor je zlozeny z hlavicky v ktorej su definicie kresliacich funkcii za
-ktorymi su riadky kreslenia molekuly. Priklad je na obrazku \ref{obr:ps_out}.
+PostScript súbor je zložený z hlavičky, v ktorej sú definície kresliacich funkcií za
+ktorými sú riadky kreslenia molekuly. Príklad je na obrázku \ref{obr:ps_out}.
 
-Najprv definujeme operacie kreslenia v hlavicke suboru - $lwline$, $lwstring$ a $lwarc$ - kreslenie ciar,
-textu a kruznic. Za ktorymi nasleduje samotne kreslenie molekuly. \\
+Najprv definujeme operácie kreslenia v hlavičke súboru - $lwline$, $lwstring$ a $lwarc$ - kreslenie čiar,
+textu a kružníc. Za ktorými nasleduje samotné kreslenie molekuly. \\
 
-Podobne funguje kreslenie v SVG subore ktoreho priklad je na obrazku \ref{obr:svg_out}.
-Elementy $<text>$ vypisuju na danu poziciu text, $<line>$
-naopak kreslia ciary a $<circle>$ zase kruznice.
+Podobne funguje kreslenie v SVG súbore, ktorého príklad je na obrázku \ref{obr:svg_out}.
+Elementy $<text>$ vypisujú na danú pozíciu text, $<line>$
+naopak kreslia čiary a $<circle>$ zase kružnice.
 
-% TODO pouzivat cele priklady malej existujucej molekuly
+% TODO použivať celé príklady malej existujúcej molekuly
 \begin{figure}
 \begin{code}[fontsize=\scriptsize, frame=none, samepage=true]
 %!
@@ -281,7 +282,7 @@ showpage
   ...
 </svg>
 \end{code}
-\caption{Format vystupneho SVG suboru}
+\caption{Formát vystupného SVG súboru}
 \label{obr:svg_out}
 \end{figure}
 
@@ -289,28 +290,28 @@ showpage
 \section{Rozšírenie podpory iných vstupných obrázkov}
 \label{kap:rozsirenie}
 
-Ako sme už uviedli, momentálne podporujeme iba jediny vstupny format vstupných obrázkov.
+Ako sme už uviedli, momentálne podporujeme iba jediný vstupný formát vstupných obrázkov.
 Je ním PostScript formát používaný databázou CRW od autorov \citet{CRW}.
 
 \begin{definice}
-  Extractor bude nejaky objekt ktory vie zo suboru urciteho typu vynat potrebne
-  polozky reprezentujuce RNA sekvenciu a poziciu baz na obrazku.
+  Extractor bude nejaký objekt, ktorý vie zo súboru určitého typu vynať potrebné
+  položky reprezentujúce RNA sekvenciu a pozíciu báz na obrázku.
 \end{definice}
 
-Pri tvorbe aplikácie sme už mysleli na budúcnosť a načítavanie súboru robíme v jednom lahko
-rozsiritelnom module. Ten sa na zaklade typu v parametre \param{template-tree} rozhoduje
-aky extractor pouzit. Predvoleny a jediny implementovany je PostScript extractor fungujuci
-nad subormi z CRW databazy.
+Pri tvorbe aplikácie sme už mysleli na budúcnosť a načítavanie súboru robíme v jednom ľahko
+rozširiteľnom module. Ten sa na základe typu v parametre \param{template-tree} rozhoduje
+aký extractor použiť. Predvolený a jediný implementovaný je PostScript extractor fungujúci
+nad súbormi z CRW databázy.
 
-Na implementovanie extractora potrebujeme implementovat existujuce rozhranie $extractor$,
-co znamena implementovat metodu $init$ s parametrom nazvu suboru.
+Na implementovanie extractora potrebujeme implementovať existujúce rozhranie $extractor$,
+čo znamená implementovať metódu $init$ s parametrom názvu súboru.
 
-Jej uloha je zo suboru ziskat sekvenciu RNA a pozicie baz.
+Jej úloha je zo súboru získať sekvenciu RNA a pozície báz.
 
-Poslednou ulohou je pridat dvojicu $(názov\_exctractora, extractor)$ do tabulky implementovanych
-v metode $create\_exctractors()$.
+Poslednou úlohou je pridať dvojicu $(názov\_exctractora, extractor)$ do tabuľky implementovaných
+v metóde $create\_exctractors()$.
 
-Naslednym volanim \param{template-tree} \param{type} $nazov\_extractora$ zacneme
-pouzivat nas novo implementovany extractor.
+Následným volánim \param{template-tree} \param{type} $názov\_extractora$ začneme
+používať nás novo implementovaný extractor.
 
 
