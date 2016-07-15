@@ -1,11 +1,75 @@
+
 \chapter*{Úvod}
 \addcontentsline{toc}{chapter}{Úvod}
 
-Následuje několik ukázkových kapitol, které doporučují, jak by se
-měla bakalářská práce sázet. Primárně popisují použití \TeX{}ové
-šablony, ale obecné rady poslouží dobře i~uživatelům jiných
-systémů.
+Donedávna sa myslelo, že úloha ribonukleovej kyseliny, RNA, je obmedzená
+iba na syntézu bielkovín ako nositeľka genetickej informácie (mRNA),
+alebo ako prenášač aminokyselín pri tvorbe bielkovín (tRNA).
+Avšak existuje mnoho ďalších druhov, od relatívne malých molekúl majúcich
+iba desiatky nukleotidov, ktoré ovplyvňujú expresiu génov (miRNA, siRNA, tmRNA, snRNA a ďalšie),
+až po veľké molekuly s tisíckami nukleotidov, tvoriace ribozómy (rRNA).
 
+Spolu s objavmi ďalších a ďalších funkcií RNA molekúl rastie záujem o nástroje dovoľujúce
+študovať štruktúru týchto molekúl.
+Primárna štruktúra je určená poradím nukleotidov v reťazci RNA. Priestorovým usporiadaním
+získame terciárnu štruktúru. Poslednou a v tejto práci pre nás najdôležitejšou
+bude sekundárna štruktúra. Tú reprezentuje zoznam nukleotidov ktoré sú spojené väzbou.
+Spárované nukleotidy sú blízko seba v priestore a tak nám sekundárna relatívne
+dobre aproximuje terciárnu štruktúru. Predpovedanie terciárnej štruktúry nieje veľmi
+spoľahlivé ani pre kratšie molekuly. Naopak, pre menšie molekuly a ich  sekundárnu
+štruktúru existujú spoľahlivejšie metódy, ktorých prehľad a porovnanie nájdeme napríklad
+v článku od autorov \citet{SEC_STR_PREDICT_TOOLS}.
+Príbuzné štruktúry nám vedia poslúžiť k predpovedaniu konzervovaných častí, dokonca
+aj veľkých rRNA molekúl, ako píšu autori \citet{SEC_STR_PREDICTION}.
 
+Vizualizácia sekundárnej štruktúry RNA sa dá previesť na kreslenie grafu, keďže
+sekundárna štruktúra môže byť reprezentovaná grafom, ktorého vrcholy tvoria
+nukleotidy a hrany reprezentujú páry medzi nukleotidmi.
+Kreslenie grafov je značne preskúmanou témou, keďže nachádza uplatnenie vo veľa
+doménach, ako napríklad analýza sociálnych sietí \citenum{SOCIAL_NETWORK_ANALYSIS}
+alebo vo všeobecnej analýze dát \citenum{GRAPH_DRAWING}.
+
+Cieľom vizualizácie sekundárnej RNA štruktúry je zachytit párovanie nukleotidov
+v molekule a ideálne všetky ďalšie motívy, ktoré sa v štruktúre vyskytujú,
+ako napríklad hairpin, bulge, interior a multibranch loop.
+Existujúce nástroje na vizualizáciu zväčša volia medzi tromi tipmi reprezentácie
+štruktúry \citenum{JVIZ}: spojnicový graf, kruhový graf alebo štandardná štruktúra.
+Aj keď spojnicový a kruhový graf podporujú vizualizáciu párovania báz, motívy
+sa v nej dajú nájsť len veľmi ťažko, ak vôbec.
+Preto nám na hľadanie motívov v RNA ostala štandardná reprezentácia štruktúry RNA.
+Bolo vymyslených množstvo riešení takejto reprezentácie -
+RNAplot z balíka ViennaRNA \citenum{VIENNA_RNA}, VARNA \citenum{VARNA},
+RnaViz \citenum{RNA_VIZ}, jViz.RNA \citenum{JVIZ}, mfold \citenum{MFOLD},
+XRna \citenum{TODOcitacia}, PseudoViewer \citenum{PSEUDOVIEWER} alebo
+RNAView \citenum{RNAVIEW}.
+Avšak iba niektoré z týchto nástrojov a algoritmov sú použiteľné pre vizualizáciu
+veľkých štruktúr, ako napríklad rRNA podjednotka (RNAplot, RnaViz a RNAView).
+
+Vzhľadom k tomu, že je nekonečne mnoho možností ako rozložiť sekundárnu štruktúru,
+potrebujeme zistiť aké kritéria by malo nakreslenie RNA splňovať. Nanešťastie
+tieto kritéria niesú formalizované, avšak niektoré vlastnosti ako napríklad
+rovinnosť nakreslenia, kreslenie loopov (hairpin, bulge, interior a multi-branch)
+na kružnice a vrcholy stemu ležiace na jednej priamke sú spoločné pre väčšinu
+vizualizácii používaných vo vedeckej komunite \citenum{RNA_DRAW}.
+Preto všeobecný algoritmus kreslenia nebude vyhovovať veľkej časti používateľov.
+Dôvod preto môžeme ilustrovať na ribozomálnej RNA. Štruktúry týchto molekúl
+majú veľké konzervované časti, ktoré biológovia očakávajú na rovnakom mieste
+na obrázku, vďaka čomu sa vedia orientovať aj v relatívne veľkej molekule.
+To znamená, že ak chceme štruktúru vizualizovať, potrebujeme ukladať
+konzervované časti vždy na rovnaké miesto.
+
+Potreba vizualizácie, ktorá by zachovávala čo najviac spomínaných vlastností
+nás viedla k vytvoreniu nového vizualizačného algoritmu založeného na
+použiťí šablónovej molekuly. Algoritmus na vstupe vezme cieľovú štruktúru,
+ktorú chceme vizualizovať a inú, podobnú štruktúru u ktorej poznáme jej
+nakreslenie. Túto podobnú molekulu nazývame šablónou. Obe štruktúry sú
+prevedené do ich stromovej reprezentácie. Následne nájdeme najkratšiu postupnosť
+editačných operácií, ktoré prevedú strom molekuly šablónovej na vizualizovanú
+molekulu a rovnako menia aj nakreslenie šablóny na nakreslenie cieľovej molekuly.
+Vzhľadom k tomu, že editačné operácie ktoré menia nakreslenie odpovedajú
+minimálnej editačnej vzdialeností medzi stromami, spoločné časti sa nemenia.
+Táto metóda je teda schopná vizualizovať sekundárnu štruktúru RNA
+molekuly presne podľa zvyku biológov - podľa poskytnutého vzorového
+nakreslenia.
 
 
