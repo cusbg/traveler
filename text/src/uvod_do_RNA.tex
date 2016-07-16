@@ -7,50 +7,89 @@
 
 \chapter{Úvod do štúdia RNA štruktúry a grafov}
 
-Na začiatku práce stručne zoznámime čitateľa s pojmamy, ktoré s RNA a jej štruktúrou súvisia.
+V tejto časti práce zoznámime čitateľa s pojmami, ktoré s RNA a jej
+štruktúrou súvisia.
 
+\section{Čo je RNA}
 
-\section{Co je RNA}
+RNA, ribonukleová kyselina, je jednovláknová molekula, pozostávajúca
+zo sekvencie nukleotidov, jej základných stavebných častí.
+Tie sa ďalej skladajú z cukru (pentózy), dusíkatej bázy a zvyšku
+kyseliny fosforečnej. Poznáme štyry druhy báz,
+adenín, cytozín, guanín a uracyl, označovať ich budeme A, C, G, respektíve U.
+Okrem báz nás ďalšie zložky nebudú zaujímať a tak ďalej v texte stotožníme
+pojmy nukleotid a báza.
 
-% TODO pridat nejaky vseobecny uvod, napriklad, ze RNA hraje velku ulohu pri prepise genetickej informacie a pod. potom veta ze je jednovlaknova a ze to vlakno sa sklada z molekul z 3 zloziek - cukor, fosfat a dusikata baza. Potom ze my dalej budeme na vsetko ostatne kaslat a stavebnou jednotkou bude pre nas prave baza A C G U.
- 
- Ribonukleónová kyselina je nukleonová kyselina tvorená jedným vláknom kovalentne naviazaných ribonukleotidov, 
- ktoré sú základnými stavebnými jendotkami nukleonových kyselín. Je biochemicky odlišná od DNA kôli prítomnosti 
- hydroxilovej skupiny pripojenej ku každej molekule pentózy v reťazci.
- v DNA a RNA sa vyskytuje niekoľko variant nukleotidov (báz). U RNA sú to
-adeín (A), guanín (G), cytozín (C), uracyl (U),
-pri DNA sa namiesto uracylu vyskytuje tymin (T).
-Medzi jednotlivými bázami sa môžu vyskytovať vodíkové väzby. Nukleotidy majú
-vzájomnú preferenciu, čo znamená, že bázy vznikajú najčastejšie medzi A-U a C-G
-u RNA a podobne A-T a C-G u DNA.
-
-Štrukturu nukleových kyselín môžeme chápat podľa stupňa zjednodušenia
+Štruktúru RNA môžeme chápať podľa stupňa zjednodušenia
 \begin{itemize}
-  \item Primárna štruktúra - je určená poradím jednotlivých nukleotidov
-    do polynukleotidového reťazca
-  \item Sekundárna štruktúra - je daná parovaním medzi bázami molekuly
+  \item Primárna štruktúra - poradie nukleotidov v reťazci
+  \item Sekundárna štruktúra - párovanie medzi bázami
   \item Terciárna štruktúra - priestorové usporiadanie molekuly
 \end{itemize}
-DNA je dvojvláknova molekula, u ktorej spojenie medzi vlaknami sa realizuje na princípe
-komplementarity.
-Naopak, RNA je iba jednovláknova molekula a v snahe minimalizovať voľnu energiu molekuly,
-sa paruje sama na seba. V tomto hrajú rolu pritazlive sily medzi bázami.
 
-V praci budeme štruktúrou myslieť práve sekundárnu štruktuúru RNA, ak nebude povedané inak.
+RNA ako jednovláknová molekula sa v snahe minimalizovať voľnú energiu páruje sama na seba.
+V tomto hrajú úlohu vodíkové väzby medzi nukleotidmi. Tie majú vzájomnú preferenciu,
+čo znamená, že páry vznikajú najčastejšie medzi A-U a C-G, no ani iné
+kombinácie nie sú vylúčené. 
 
-Až donedávna sa myslelo, že funkcia RNA je obmedzená na prenos genetickej informácie z DNA
-v jadre bunky do ribozomu. Napríklad pri tvorbe bielkovín (mRNA), alebo transporter aminokyselin
-v ribozome bunky (tRNA).
-% TODO: citacie k druhom RNA
-Avšak existuje mnoho ďalších, od relatívne
-malých molekúl tvorenyých desiatkami báz, ktoré pomáhajú pri expresii genov
-(miRNA, siRNA, tmRNA a dalsie), až po veľké, tvorené tisíckami nukleotidov (rRNA).
+\section{Sekundárna štruktúra}
 
-\section{Sekundarna struktura rRNA + konzervovanost}
+Hlavným objektom nášho záujmu je sekundárna štruktúra RNA. V nasledujúcich
+definíciach si ju definujeme formálnejšie.
 
-Ako hlavný objekt záujmu sme si spomedzi všetkych druhov RNA vybrali práve ribozomálnu,
-najmä kvôli jej veľkosti a tomu, že existujúcim nástrojom práve veľkosť robí najväčšie problémy
-pri vizualizácii.
+\begin{definice}
+  \label{def:RNA_primarna_struktura}
+  Primárna štruktúra RNA je určená poradím nukleotidov v polynukleotidovom reťazci.
+  \\
+  Sekundárnou štruktúrou označíme množinu $\SS$ párov báz \Par{i}{j} takých,
+  že pre dva páry \Par{i}{j} a \Par{k}{l} $\in \SS$ (bez straty na všeobecnosti $i \leq k$)
+  platí jedno z nasledujúcich:
+  \begin{itemize}
+    \item $i = k \iff j = l$
+    \item $i < j < k < l$, čiže pár \Par{i}{j} predchádza pár \Par{k}{l}
+    \item $i < k < l < j$, čiže pár \Par{i}{j} obsahuje pár \Par{k}{l}
+  \end{itemize}
+\end{definice}
+
+\section{Hlavný objekt záujmu - rRNA}
+
+Ako hlavný objekt záujmu sme si spomedzi všetkych druhov RNA vybrali práve ribozomálnu, rRNA.
+Jej funkcia je hlavne v translácií génov, pri ktorej sa genetická informácia prekladá
+z poradia nukleotidov v mRNA do poradia aminokyselín v bielkovine.
+
+\begin{figure}
+  \includegraphics[width=1\textwidth]{../img/human_crw}
+  \caption{Vizualizácia sekundárnej štruktúry RNA človeka z CRW databázy \citenum{CRW}}
+  \label{obr:RNA_human_crw}
+\end{figure}
+
+\begin{figure}
+%trim=left bottom right top
+  \includegraphics[trim=0 0 2cm 0, width=1\textwidth]{../img/human_mfold}
+  \caption{Malá podjednotka vygenerovaná programom Mfold \citenum{MFOLD}}
+  \label{obr:RNA_human_mfold}
+\end{figure}
+
+\begin{figure}
+%trim=left bottom right top
+  \centering
+  \includegraphics[clip, trim=2.5cm 10cm 3cm 10cm, angle=90, width=1\textwidth]{../img/human_RNAfold}
+  \caption{Malá podjednotka vygenerovaná programom RNAfold \citenum{VIENNA_RNA}}
+  \label{obr:RNA_human_rnafold}
+\end{figure}
+
+Ribozomálnu RNA sme zvolili kvôli jej konzervovanosti naprieč evolučným spektrom. Ďalším
+dôvodom bola jej veľkosť, ktorá robí existujúcim nástrojom najväčšie problémy
+pri vizualizácií. Na obrázku \ref{obr:RNA_human_crw} vidíme sekundárnu štruktúru 
+K03432 malej podjednotky ribozomálnej RNA človeka z CRW databázy.
+Tá znázorňuje predstavy biológov o tom, ako by malo nakreslenie danej molekuly vyzerať.
+Obrázky \ref{obr:RNA_human_mfold} a \ref{obr:RNA_human_rnafold} sú zase vygenerované
+vizualizácie pomocou programov Mfold a RNAfold.
+Dodržiavanie základných kritérií ako rovinnosť, loopy na kružniciach a stemy na priamkach
+sa viac, či menej programom darí, no celkový vzhľad obrázkov je úplne odlišný od požiadavok
+biológov, keďže sa motívy z obrázka z CRW databázy hľadajú veľmi ťažko.
+
+\section{Sekundárna štruktúra RNA + konzervovanosť}
 
 \begin{definice}[Primárna štruktra RNA]
   \label{def:RNA_primarna_struktura}
@@ -173,162 +212,8 @@ Príklady možno vidiet na obrázku \ref{obr:RNA_vrcholy}.
 V našej práci vrchol stromu reprezentuje bázovy pár (vnútorný vrchol) a nespárovanú bázu (list stromu).
 Štruktúru, do ktorej patrí si totiž vieme ľahko zistiť z potomkov vrcholu.
 
-%rna, from 5' to 3':
-% AUGCAAACUGGCACCCUCAU
-% (((((...))(...))..))
 
-\begin{center}
-  \begin{minipage}{.500\textwidth}
-    \begin{tikzpicture}[
-        on grid,
-        node distance = 0.7,
-        -latex,
-        scale = \scale,
-        every node/.style = {scale = \scale},
-        base/.style = {circle, draw},
-        ends/.style = {draw = none, fill = none}]
-
-      %ends, 5' a 3'
-      \node[ends] (5end) {5'};
-      \node[ends] (3end) [right = of 5end] {3'};
-
-      %stem
-      \node[base] (StemLeft1) [below = of 5end] {A};
-      \node[base] (StemRight1) [right = of StemLeft1] {U};
-      \node[base] (StemLeft2) [below = of StemLeft1] {U};
-      \node[base] (StemRight2) [right = of StemLeft2] {A};
-
-      %bulge
-      \node[base] (Bulge1) [below right = of StemRight2] {C};
-      \node[base] (Bulge2) [below = of Bulge1] {U};
-
-      %stem
-      \node[base] (StemRight3) [below left = of Bulge2] {C};
-      \node[base] (StemLeft3) [left = of StemRight3] {G};
-
-      %left-branch
-      \node[base] (LBranchLStem1) [below left = of StemLeft3] {C};
-      \node[base] (LBranchRStem1) [below right = of LBranchLStem1] {G};
-      \node[base] (LBranchLStem2) [below left = of LBranchLStem1] {A};
-      \node[base] (LBranchRStem2) [below left = of LBranchRStem1] {U};
-
-      %left-branch-hairpin
-      \node[base] (LBranchHairpin1) [below left = of LBranchLStem2] {A};
-      \node[base] (LBranchHairpin2) [below = of LBranchHairpin1] {A};
-      \node[base] (LBranchHairpin3) [below left = of LBranchRStem2] {C};
-
-      %right-branch
-      \node[base] (RBranchRStem1) [below right = of StemRight3] {C};
-      \node[base] (RBranchLStem1) [below left = of RBranchRStem1] {G};
-
-      %right-branch-hairpin
-      \node[base] (RBranchHairpin1) [below right = of RBranchLStem1] {C};
-      \node[base] (RBranchHairpin2) [right = of RBranchHairpin1] {A};
-      \node[base] (RBranchHairpin3) [below right = of RBranchRStem1] {C};
-
-      \begin{scope}[-]
-      %pair edges
-        \path[very thick]
-        (StemLeft1) edge (StemRight1)
-        (StemLeft2) edge (StemRight2)
-        (StemLeft3) edge (StemRight3)
-        (LBranchLStem1) edge (LBranchRStem1)
-        (LBranchLStem2) edge (LBranchRStem2)
-        (RBranchLStem1) edge (RBranchRStem1)
-        ;
-      %lines around molecule
-        \path[color = gray]
-        (StemLeft1) edge (StemLeft2)
-        (StemLeft2) edge (StemLeft3)
-        (StemLeft3) edge (LBranchLStem1)
-        (LBranchLStem1) edge (LBranchLStem2)
-        (LBranchLStem2) edge (LBranchHairpin1)
-        (LBranchHairpin1) edge (LBranchHairpin2)
-        (LBranchHairpin2) edge (LBranchHairpin3)
-        (LBranchHairpin3) edge (LBranchRStem2)
-        (LBranchRStem2) edge (LBranchRStem1)
-        (LBranchRStem1) edge (RBranchLStem1)
-        (RBranchLStem1) edge (RBranchHairpin1)
-        (RBranchHairpin1) edge (RBranchHairpin2)
-        (RBranchHairpin2) edge (RBranchHairpin3)
-        (RBranchHairpin3) edge (RBranchRStem1)
-        (RBranchRStem1) edge (StemRight3)
-        (StemRight3) edge (Bulge2)
-        (Bulge2) edge (Bulge1)
-        (Bulge1) edge (StemRight2)
-        (StemRight2) edge (StemRight1)
-        ;
-      \end{scope}
-
-      \begin{scope}
-        % edges to ends
-        \path[thick]
-        (5end) edge (StemLeft1)
-        (StemRight1) edge (3end)
-        ;
-      \end{scope}
-    \end{tikzpicture}
-  \end{minipage}
-  \begin{minipage}{.450\textwidth}
-    \begin{tikzpicture}[
-        baseline,
-        level distance = 1.5 cm,
-        scale = \scale,
-        every node/.style = {scale = \scale},
-        basepair/.style = {ellipse, draw, minimum height = 0.3 cm, minimum width = 0.7 cm},
-        unpaired/.style = {circle, draw, minimum width = 0.3 cm},
-        level 2/.style = {sibling distance = 3 cm},
-        level 3/.style = {sibling distance = 4 cm},
-        level 4/.style = {sibling distance = 1.5 cm}
-      ]
-      \node[basepair] {AU}
-      child {
-        node[basepair] {UA}
-        child {
-          node[basepair] {GC}
-          child {
-            node[basepair] {CG}
-            child {
-              node[basepair] {AU}
-              child {
-                node[unpaired] {A}
-              }
-              child {
-                node[unpaired] {A}
-              }
-              child {
-                node[unpaired] {C}
-              }
-            }
-          }
-          child {
-            node[basepair] {GC}
-            child {
-              node[unpaired] {C}
-            }
-            child {
-              node[unpaired] {A}
-            }
-            child {
-              node[unpaired] {C}
-            }
-          }
-        }
-        child {
-          node[unpaired] {U}
-        }
-        child {
-          node[unpaired] {C}
-        }
-      }
-      ;
-    \end{tikzpicture}
-      %\caption{Stromova reprezentacia RNA}
-      %\label{obr:RNA_tree}
-  \end{minipage}
-\end{center}
-
-
+\input{rna_to_tree}
 
 
 
