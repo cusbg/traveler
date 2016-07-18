@@ -34,8 +34,8 @@ kombinácie nie sú vylúčené.
 
 \section{Sekundárna štruktúra}
 
-Hlavným objektom nášho záujmu je sekundárna štruktúra RNA. V nasledujúcich
-definíciach si ju definujeme formálnejšie.
+Hlavným objektom nášho záujmu je sekundárna štruktúra RNA. V nasledujúcej
+časti si ju definujeme formálnejšie.
 
 \begin{definice}
   \label{def:RNA_primarna_struktura}
@@ -50,6 +50,57 @@ definíciach si ju definujeme formálnejšie.
     \item $i < k < l < j$, čiže pár \Par{i}{j} obsahuje pár \Par{k}{l}
   \end{itemize}
 \end{definice}
+
+Prvá podmienka zabezpečuje, že nukleotid je najviac v jednom bázickom páre,
+druhá a tretia hovoria o ich usporiadaní - buď na seba nadväzujú, alebo
+sú na sebe nezávisle.
+
+Všimnime si ďalej, že podmienky vylučujú bázové páry typu \Par{i}{j} a \Par{k}{l},
+kde $i < k < j < l$, teda páry sa nesmú prekrývať. Takéto páry nazývame
+pseudouzly (pseudoknot) a ich rozdelenie máme na obrázku \ref{obr:pseudoknot_types}.
+Pseudouzly sa často považujú za súčasť sekundárnej štruktúry, no v našej práci
+s nimi nepočítame. Takéto zjednodušenie nám umožní reprezentovať sekundárnu
+štruktúru RNA ako usporiadaný zakorenený strom (les). Definíciu grafových
+pojmov ako strom a les uvedieme neskôr.
+
+\begin{figure}
+%trim=left bottom right top
+  \includegraphics[clip, trim=0 12cm 0 11cm, width=0.9\textwidth]{../img/pseudoknot}
+  \caption{Typy pseudouzlov podľa \citenum{PSEUDOKNOT_TYPES}}
+  \label{obr:pseudoknot_types}
+\end{figure}
+
+\section{Motívy}
+
+Motivom v RNA máme na mysli časti molekuly, ktoré vytvárajú určité štruktúry.
+Na obrazku \ref{obr:RNA_motifs} vidime motivy, ktore sa mozu v RNA vyskytovat.
+
+Stem (stonka) je časť molekuly kde sa na seba paruju dva súvisle časti RNA vlákna.
+Interior loop spája dva stemy a medzi nimi na oboch stranách obsahuje nespárované
+bázy. Podobna je bulge (vypuklina), ale nespárované nukleotidy ma iba z jednej strany.
+Hairpin je medzi časťami vlákna, ktoré sa parujú sami na seba.
+Multibranch loop je podobná ako interior loop, ale spája dokopy viac stemov.
+V ďalšom rozprávani ámam bude stačiť rozdelenie na stem a loop.
+
+%TODO: ako nazyvat strukturne motivy v RNA: anglicky, alebo hladat vhodny preklad
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=70mm, height=70mm]{../img/struktury_v_rna.png}
+\caption{Strukturalne motivy v RNA}
+\label{obr:RNA_motifs}
+\end{figure}
+
+
+%TODO
+
+\begin{figure}[H]
+%TODO ostatne reprezentacie RNA
+\centering
+\includegraphics[width=140mm, height=120mm]{../img/RNA_circular_reprezentation.png}
+\caption{Circular Feynman - kruhova reprezentacia sekundarnej struktury}
+\label{obr:RNA_circular_representation}
+\end{figure}
 
 \section{Hlavný objekt záujmu - rRNA}
 
@@ -89,67 +140,6 @@ Dodržiavanie základných kritérií ako rovinnosť, loopy na kružniciach a st
 sa viac, či menej programom darí, no celkový vzhľad obrázkov je úplne odlišný od požiadavok
 biológov, keďže sa motívy z obrázka z CRW databázy hľadajú veľmi ťažko.
 
-\section{Sekundárna štruktúra RNA + konzervovanosť}
-
-\begin{definice}[Primárna štruktra RNA]
-  \label{def:RNA_primarna_struktura}
-  Nech $\Sigma$ je abeceda $\{A, C, G, U\}$. Potom slovo $W \in \Sigma^n$ nad touto abecedou
-  je sekvencia nukleotidov (baz) RNA.
-\end{definice}
-
-Jednotlivé nukleotidy sekvencie RNA budeme, ak bude zretelné o čo sa jedná, označovat priamo poradovým 
-číslom, teda $i$ bude označovať nukleotid $W_{i}$, resp. $W[i]$.
-
-\begin{definice}[Sekundarna struktura RNA]
-  \label{def:RNA_sekundarna_struktura}
-  Nech $W$ je sekvencia podla definicie \ref{def:RNA_primarna_struktura} dlzky n.
-  Sekundarnou strukturou oznacime mnozinu $\SS$ parov nukleotidov \Par{i}{j} takych, ze
-  pre dva pary \Par{i}{j} a \Par{k}{l} $\in \SS$ (bez ujmy na obecnosti $i \leq k$)
-  plati jedno z nasledujucich:
-  \begin{itemize}
-    \item $i = k \iff j = l$
-    \item $i < j < k < l$, cize par \Par{i}{j} predchadza par \Par{k}{l}
-    \item $i < k < l < j$, cize par \Par{i}{j} obsahuje par \Par{k}{l}
-  \end{itemize}
-\end{definice}
-
-%TODO: obrazok prim/sek/terc struktury RNA
-
-Prvá podmienka zabezpečuje, že nukleotid je najviac v jednom bazickom páre, druhá a tretia
-hovoria o usporiadani párov, buď sú na sebe nezávisle alebo na seba nadväzujú.
-Posledna podmienka zakazuje existenciu pseudouzlov (pseudoknots). Pseudouzol patrí medzi najčastejšie typy priestorového usporiadania RNA. Vytvára  niekolko interakcii vrámci jednej molekuly a smyčky typu loops,  ktore vznikajú medzi rôznimy molekulami.
-
-%TODO: pseudoknot obrazok
-%TODO: 2 obrazky RNA napriec fylogenetickym stromom
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=140mm, height=120mm]{../img/RNA_circular_reprezentation.png}
-\caption{Circular Feynman - kruhova reprezentacia sekundarnej struktury}
-\label{obr:RNA_circular_representation}
-\end{figure}
-
-
-\subsection{Motivy}
-
-Motivom v RNA máme na mysli časti molekuly, ktoré vytvárajú určité štruktúry.
-Na obrazku \ref{obr:RNA_motifs} vidime motivy, ktore sa mozu v RNA vyskytovat.
-
-Stem (stonka) je časť molekuly kde sa na seba paruju dva súvisle časti RNA vlákna.
-Interior loop spája dva stemy a medzi nimi na oboch stranách obsahuje nespárované
-bázy. Podobna je bulge (vypuklina), ale nespárované nukleotidy ma iba z jednej strany.
-Hairpin je medzi časťami vlákna, ktoré sa parujú sami na seba.
-Multibranch loop je podobná ako interior loop, ale spája dokopy viac stemov.
-V ďalšom rozprávani ámam bude stačiť rozdelenie na stem a loop.
-
-%TODO: ako nazyvat strukturne motivy v RNA: anglicky, alebo hladat vhodny preklad
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=70mm, height=70mm]{../img/struktury_v_rna.png}
-\caption{Strukturalne motivy v RNA}
-\label{obr:RNA_motifs}
-\end{figure}
 
 \section{Grafové pojmy}
 
