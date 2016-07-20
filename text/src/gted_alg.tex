@@ -1,0 +1,110 @@
+
+\begin{algorithm}
+  \caption{General Tree Edit Distance for LRH strategies}
+  \label{alg:gted}
+  \begin{algorithmic}[1]
+    \Procedure {gted}{$F, G, TreeDistance, Strategies$}
+      \State $\gamma \gets$ path in $Strategies[F, G]$
+      \If {$\gamma \in F$}
+        \ForAll {tree $F' \in F - \gamma$}
+          \State $TreeDistance \gets TreeDistance$
+          \Indent
+            \State $\cup \; \Call{gted}{F', G, TreeDistance, Strategies}$
+          \EndIndent
+        \EndFor
+        \State $TreeDistance \gets TreeDistance$
+        \Indent
+          \State $\cup \; \Call{ComputeDistance}{F, G, TreeDistance, \gamma}$
+        \EndIndent
+      \Else
+        \State $TreeDistance \gets TreeDistance$
+        \Indent
+          \State $\cup \; (\Call{gted}{G, F, TreeDistance^{T}, Strategies^{T}})^{T}$
+        \EndIndent
+      \EndIf
+      \State \Return{$TreeDistance$}
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{Single path function}
+  \label{alg:spf}
+  \begin{algorithmic}[1]
+    \Procedure {ComputeDistance}{$F, G, TreeDistance, \gamma$}
+      \If {$\gamma \in \gamma^{*}(F)$}
+        \ForAll {$G' \in \Call{RelevantSubtrees}{G}$}
+          \State $\Call{SinglePath}{F, G', TreeDistance, \gamma}$
+        \EndFor
+      \Else
+        \ForAll {$F' \in \Call{RelevantSubtrees}{F}$}
+          \State $\Call{SinglePath}{F', G, TreeDistance, \gamma}$
+        \EndFor
+      \EndIf
+    \EndProcedure
+    \\
+    \Procedure {SinglePath}{$F, G, TreeDistance, \gamma$}
+    \State $ForestDistance \gets$ array $(|F| + 1) \times (|G| + 1)$
+      \State $ForestDistance[\emptyset][\emptyset] := 0$
+      \For {$F'$ subforest in \Call{OrderedSubforests}{$F, \gamma$}}
+        \State $Last_{F} \gets$ last added node to $F'$
+        \State $ForestDistance[F'][\emptyset] := ForestDistance[F' - Last_{F}][\emptyset]$
+        \Indent
+          \State $+ \; C_{del}(Last_{F})$
+        \EndIndent
+      \EndFor
+      \For {$G'$ subforest in \Call{OrderedSubforests}{$G, \gamma$}}
+        \State $Last_{G} \gets$ last added node to $G'$
+        \State $ForestDistance[\emptyset][G'] := ForestDistance[\emptyset][G' - Last_{G}]$
+        \Indent
+          \State $+ \; C_{ins}(Last_{G})$
+        \EndIndent
+      \EndFor
+      \For {$F'$ subforest in \Call{OrderedSubforests}{$F, \gamma$}}
+        \For {$G'$ subforest in \Call{OrderedSubforests}{$G, \gamma$}}
+          \State $Last_{F} \gets$ last added node to $F'$
+          \State $Last_{G} \gets$ last added node to $G'$
+          \If {both $F'$ and $G'$ are trees}
+          \label{alg:spf:iftrees}
+            \State $C_{min} := min \, \{$
+            \Indent
+            \State $ForestDistance[F' - Last_{F}][G'] +$
+              \Indent
+                \State $C_{del}(Last_{F})$,
+              \EndIndent
+              \State $ForestDistance[F'][G' - Last_{G}] +$
+              \Indent
+                \State $C_{ins}(Last_{G})$,
+              \EndIndent
+              \State $ForestDistance[F' - Last_{F}][G' - Last_{G}] +$
+              \Indent
+                \State $C_{upd}(Last_{F}, Last_{G})$
+              \EndIndent
+            \EndIndent
+            \State $ForestDistance[F', G'] := C_{min}$
+            \State $TreeDistance[Last_{F}][Last_{G}] := C_{min}$
+          \Else
+          \label{alg:spf:ifforests}
+            \State $C_{min} := min \, \{$
+            \Indent
+              \State $ForestDistance[F' - Last_{F})][G'] +$
+              \Indent
+                \State $C_{del}(Last_{F})$,
+              \EndIndent
+              \State $ForestDistance[F'][G' - Last_{G}] +$
+              \Indent
+                \State $C_{ins}(Last_{G})$,
+              \EndIndent
+              \State $ForestDistance[F' - F_{Last_{F}}][G' - G_{Last_{G}}] +$
+              \Indent
+                \State $TreeDistance[F_{Last_{F}}][G_{Last_{G}}]\}$
+              \EndIndent
+            \EndIndent
+            \State $ForestDistance[F'][G'] := C_{min}$
+          \EndIf
+        \EndFor
+      \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+

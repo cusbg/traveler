@@ -1,0 +1,28 @@
+
+\begin{figure}
+  \begin{subequations}
+  \begin{align*}
+    \begin{split}
+    \delta(\emptyset, \emptyset) &=
+      0
+      \\
+    \delta(F, \emptyset) &=
+      \delta(F - r_{F}, \emptyset) + \Cdel(r_{F})
+      \\
+    \delta(\emptyset, G) &=
+      \delta(\emptyset, G - r_{G}) + \Cins(r_{G})
+    \end{split}
+    \\[1ex]
+    \delta(F, G) &=
+      \begin{cases}
+        \delta(F - r_{F}, G) + \Cdel(r_{F}) \\
+        \delta(F, G - r_{G}) + \Cins(r_{G}) \\
+        \delta(F - F_{r_{F}}, G - G_{r_{G}}) \\
+          \quad \quad + \delta(F_{r_{F}} - r_{F}, G_{r_{G}} - r_{G}) \\
+          \quad \quad + \Cupd(r_{F}, r_{G})
+      \end{cases}
+  \end{align*}
+  \end{subequations}
+  \caption{Rekurzívny vzorec pre výpočet tree-edit-distance od \citet{DMRW} a \citet{RTED}}
+  \label{eq:ted}
+\end{figure}
