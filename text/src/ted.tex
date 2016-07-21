@@ -8,6 +8,7 @@
 \newcommand{\AlgCase}{$\left\{\rule{0pt}{\baselineskip}\right.$\parbox{\textwidth}}
 
 \newcommand{\rtedCostSum}[3]{\sum_{{#1}' \in #1 - \gamma^{#2}(#1)}cena({#1}', #3)}
+\newcommand{\set}[1]{\ensuremath{\{#1\}}}
 
 
 %indentation in code:
@@ -215,7 +216,41 @@ tak si uložíme aj ich vzdialenosť.
   všetky časti algoritmu počítajú správne, takže algoritmus GTED je v poriadku.
 \end{dukaz}
 
-%TODO priklad
+Na záver tejto časti ukážeme na príklade, ako náš program TRAVeLer počíta vzdialenosť
+medzi dvomi stromami. Budeme používať, rovnako ako aj vo vyvinutej aplikácií,
+konštanty $c_{del} = c_{ins} = 1$, $c_{upd} = 0$. Sú nastavené tak
+kvôli tomu, že sa snažíme minimalizovať počet štrukturálnych zmien v strome, teda
+počet vkladaní a mazaní a zmena bázy nám vizualizáciu nemení.
+Obrázok \ref{obr:gted_priklad} nám znázorňuje tabuľku $ForestDistance$ z algoritmu
+\ref{alg:gted} po skončení výpočtu.
+
+Pozrime sa bližšie, ako algoritmus postupuje s výpočtom. Predpokladajme, že
+používame left stratégiu, ktorá nám určí cestu $\gamma = \{A, C\} \in G$.
+Hneď na začiatku algoritmus rozloží strom $G$ podľa tejto cesty a rekurzívne
+spracuje \set{B}\footnote{Množinou vrcholou budeme priamo označovať les/strom
+indukovaný týmito vrcholmi} $\in G$ (jeho podstrom) a vyráta vzdialenosť medzi ním a stromom $F$.
+
+Následne začne vykonávať $SinglePath$ funkciu \ref{alg:spf}, ktorej úloha je iba dorátať
+vzdialenosti medzi vrcholmi na ceste $\gamma$ a druhým stromom.
+Výpočet je uvedený v tabuľke na obrázku \ref{obr:gted_priklad}.
+Začne porovnávať dva lesy, \set{1} a \set{A}. Najmenšiu vzdialenosť (0) získame operáciou
+update(1, A), teda zmeníme hodnotu vo vrchole z 1 na A. Vzdialenosť si uložíme do $TreeDistance$
+tabuľky, keďže podmienka, aby boli obidva lesy aj stromami platí.
+Pokračujeme porovnávaním lesov \set{1} a \set{A, B}.
+Vzdialenosť medzi \set{1} a \set{B} máme už uloženú - vyplnili sme ju pri rekurzívnom
+porovnávaní stromov \set{B} a $F$.
+Máme tri možnosti:
+\begin{itemize}
+  \item zmažeme vrchol 1 a namapujeme \set{} na $G$
+  \item zmažeme vrchol B a namapujeme \set{1} na \set{A}
+  \item použijeme mapovanie, ktoré už máme v tabuľke \set{1} na \set{B} (z $TreeDistance$)
+    a namapujeme \set{} na \set{A} (z $ForestDistance$)
+\end{itemize}
+Hodnotu z tretej podmienky máme uloženú z predchádzajúcich krokov (tento prípad sme vyrátali
+pri rekurzívnom počítaní vzdialenosti medzi \set{B} a celého stromu $F$).
+Ďalej pokračujeme podobne, až kým dorátame všetky hodnoty.
+
+\input{gted_priklad}
 
 \subsubsection{RTED: Robust Tree Edit Distance algoritmus}
 

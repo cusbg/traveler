@@ -1,0 +1,79 @@
+
+\newcommand{\wi}{0.2\hsize}
+\newcommand{\wit}{0.5\hsize}
+\newcommand{\subtree}[1]{\begin{tikzpicture}[
+          on grid,
+          font=\tiny,
+          scale = \scale,
+          node distance = 0.6 cm,
+          sibling distance = 0.8 cm,
+          text width = 0.2cm,
+          level distance = 1.1 cm,
+          every node/.style = {scale = \scale, circle, draw, align=center},
+          tree/.style = {draw = none, fill = none}]#1\end{tikzpicture}}
+
+\newcolumntype{C}{>{\centering}m{2cm}}
+
+\begin{figure}
+    \begin{minipage}{\wi}
+      \begin{tikzpicture}[
+          on grid,
+          font=\large,
+          scale = \scale,
+          level distance = 1.5 cm,
+          every node/.style = {scale = \scale, circle, draw},
+          tree/.style = {draw = none, fill = none}]
+
+          \node[tree] (F) {F:};
+          \node[right = of F] {4}
+          child {
+            node {2}
+            child {
+              node {1}
+            }
+          }
+          child {
+            node {3}
+          }
+          ;
+      \end{tikzpicture}
+    \end{minipage}
+    \begin{minipage}{\wi}
+      \begin{tikzpicture}[
+          on grid,
+          font=\large,
+          scale = \scale,
+          level distance = 1.5 cm,
+          every node/.style = {scale = \scale, circle, draw},
+          tree/.style = {draw = none, fill = none}]
+
+          \node[tree] (G) {G:};
+          \node (3) [right = of G] {C}
+          child {
+            node {A}
+          }
+          child {
+            node {B}
+          }
+          ;
+      \end{tikzpicture}
+    \end{minipage}
+    \begin{minipage}{\wit}
+      \begin{tabular}{c|c|c|c}
+        \mc{$ForestDistance:$} & \mc{\subtree{\node{A};}} & \mc{\subtree{\node (A) {A}; \node[right = of A] {B};}} & \mc{\subtree{\node {C} child {node{A}} child {node{B}};}} \\
+        \toprule
+        \subtree{\node{1};}                                                 & 0 & 1 & 2 \\
+        \midrule
+        \subtree{\node{2} child {node{1}};}                                 & 1 & 2 & 1 \\
+        \midrule
+        \subtree{\node(2){2} child {node{1}}; \node[right = of 2]{3};}      & 2 & 1 & 2 \\
+        \midrule
+        \subtree{\node{4} child{node{2} child {node{1}}} child {node{3}};}  & 3 & 2 & 1 \\
+        \bottomrule
+      \end{tabular}
+    \end{minipage}
+  \caption{Príklad výpočtu GTED medzi stromami $F$ a $G$}
+  \label{obr:gted_priklad}
+\end{figure}
+
+
