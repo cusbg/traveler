@@ -195,7 +195,7 @@ V našej práci vrchol stromu reprezentuje bázový pár (vnútorný vrchol)
 alebo nespárovanú bázu (list stromu), ako je to zobrazené na obrázku \ref{obr:rna_to_tree}
 Štruktúru do ktorej patrí si totiž vieme ľahko zistiť z potomkov vrcholu.
 
-\input{rna_to_tree}
+\input{examples/rna_to_tree}
 
 \section{Grafové pojmy}
 \label{kap:grafy}
@@ -218,7 +218,7 @@ Prázdny strom/les budeme značiť $\emptyset$.
 \begin{definice}
   \label{def:stromove_pojmy}
   Nech \tree{F} je strom, $u$ a $v$ jeho dva rôzne vrcholy.
-  Hovoríme, že $u$ je predkom $v$ ($v$ je potomok $u$) ak $(u, v) \in E_{\tree{F}}$.
+  Hovoríme, že $u$ je predkom (rodičom) $v$ ($v$ je potomok $u$) ak $(u, v) \in E_{\tree{F}}$.
   Hovoríme, že $u$ je súrodencom $v$, ak sú to rôzne vrcholy a majú spoločného predka.
 \end{definice}
 
@@ -230,12 +230,74 @@ a hranami $E_{\tree{G}} \subseteq E_{\tree{F}} \cap (V_{\tree{G}} \times V_{\tre
 Obdobne to plati aj pre podstrom stromu.
 
 Nech $v$ je vrchol stromu \tree{F}. Potom \tree{F_{v}} budeme značiť podstrom \tree{F} zakorenený vo $v$,
-t.j. v strome ostávajú iba potomkovia $v$.
-\\
+t.j. v strome ostávajú potomkovia $v$, ich potomkovia, atď.
 \tree{F - v} budeme značiť les, ktorý vznikne zmazaním vrcholu $v$ z \tree{F} spolu so
 všetkými hranami obsahujúcimi $v$. Podobne \tree{F - \tree{F_{v}}} budeme značiť les, ktorý
 dostaneme zmazaním podstromu \tree{F_{v}} z \tree{F}.
 
+\begin{definice}[Root-leaf cesta]
+  Nech je $F$ strom. Cestou v $F$ nazveme jeho súvislý podgraf taký, že všetky jeho vrcholy
+  majú stupeň najviac 2.
 
+  Root-leaf cestou v $F$ budeme nazývať cestu začínajúcu v koreni stromu a \mbox{končiacu}
+  v nejakom jeho liste.
+\end{definice}
+
+V práci budeme využívať tri druhy ciest, budú to $left, right, heavy$ a označovať ich
+budeme $\gamma^L, \gamma^R, \gamma^H$. $Left$ bude v strome cesta idúca vždy do prvého (ľavého)
+potomka, $right$ do posledného (pravého) a $heavy$ zase cesta idúca do vrcholu s najväčším
+podstromom (najťažším)\footnote{ťažkých ciest môže existovať aj viac ako jedna}.
+
+Príklad $root$-$leaf$ cesty v strome je na obrázku \ref{obr:root_leaf_path}.
+
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[
+      on grid,
+      -latex,
+      font=\large,
+      scale = \scale,
+      level distance = 1.5 cm,
+      every node/.style = {scale = \scale, circle, draw, thin},
+      colored/.style = {color = red, thick},
+      black/.style = {color = black, thin}]
+
+      \node [colored]{}
+      child[colored] {
+        node {}
+        child[colored] {
+          node{}
+          child {
+            node{}
+            child[black] {
+              node{}
+            }
+            child[black] {
+              node{}
+            }
+            child {
+              node{}
+            }
+          }
+          child[black] {
+            node{}
+          }
+        }
+        child[black] {
+          node{}
+          child {
+            node{}
+          }
+        }
+      }
+      child[black] {
+        node{}
+      }
+      ;
+  \end{tikzpicture}
+  \caption{Príklad stromu. Je v ňom červene vyznačená $heavy$ cesta}
+  \label{obr:root_leaf_path}
+\end{figure}
 
 

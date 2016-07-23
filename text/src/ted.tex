@@ -65,7 +65,7 @@ Rekurzia \ref{eq:ted} počíta vzdialenosť medzi dvoma lesmi $F$ a $G$.
 a $r_{F}$ a $r_{G}$ sú korene $F$, respektíve $G$ a to buď obidva najpravejšie
 alebo najľavejšie (tzn. vyberieme najpravejší/najľavejší strom lesa a jeho koreň).
 
-\input{ted_rekurzia}
+\input{alg/ted_rekurzia}
 
 \section{\sloppy Vývoj algoritmu - rekurzia a dynamické programovanie}
 
@@ -109,6 +109,9 @@ To znamená, že dekompozičná stratégia nám pre dvojicu lesov povie,
 ktorý z nich a akou cestou chceme rozložiť (dekomponovať).
 V rekurzii to hovorí, či odoberám $r_{F}$, alebo $r_{G}$ vrchol.
 
+
+
+
 \subsubsection{GTED: General Tree Edit Distance algoritmus}
 
 Začneme princípom fungovania GTED algoritmu. Detaily pre LRH stratégie sú
@@ -132,7 +135,7 @@ v \citet{ZHANGSHASHA} pre left/right a v \citet{DMRW} pre heavy stratégiu.
 	\end{align*}
 \end{definice}
 
-\input{gted_alg}
+\input{alg/gted}
 
 \begin{pozn}
   Funkcia $OrderedSubforests$ v algoritme \ref{alg:spf} vracia zoradené podlesy daného lesa
@@ -148,7 +151,7 @@ Následne pre všetky relevant-subtrees stromy $G'$ stromu $G$ vyráta vzdialeno
 a $G'$, ktorá dopočíta vzdialeností medzi vrcholmi $v \in \gamma_{F}$ a stromami $G'$.
 
 \begin{lemma}
-  Ak compute-distance funkcia dopočíta editačnú vzdialenosť medzi vrcholmi na ceste $\gamma$
+  Ak $ComputeDistance$ funkcia dopočíta editačnú vzdialenosť medzi vrcholmi na ceste $\gamma$
   a všetkými podstromami druhého stromu, potom GTED vráti maticu vzdialenosti
   medzi všetkými dvojicami podstromov $F_{v}$ a $G_{w}$, pre $v \in F; w \in G$.
 \end{lemma}
@@ -230,6 +233,8 @@ Hneď na začiatku algoritmus rozloží strom $G$ podľa tejto cesty a rekurzív
 spracuje \set{B}\footnote{Množinou vrcholou budeme priamo označovať les/strom
 indukovaný týmito vrcholmi} $\in G$ (jeho podstrom) a vyráta vzdialenosť medzi ním a stromom $F$.
 
+\input{examples/gted}
+
 Následne začne vykonávať $SinglePath$ funkciu \ref{alg:spf}, ktorej úloha je iba dorátať
 vzdialenosti medzi vrcholmi na ceste $\gamma$ a druhým stromom.
 Výpočet je uvedený v tabuľke na obrázku \ref{obr:gted_priklad}.
@@ -248,11 +253,31 @@ Hodnotu z tretej podmienky máme uloženú z predchádzajúcich krokov (tento pr
 pri rekurzívnom počítaní vzdialenosti medzi \set{B} a celého stromu $F$).
 Ďalej pokračujeme podobne, až kým dorátame všetky hodnoty.
 
-\input{gted_priklad}
+
+
+\subsection{Mapovanie medzi stromami}
+
+Keď už máme vyrátanú $TreeDistance$ tabuľku, môžeme sa pustiť do mapovania medzi
+stromami. K mapovaniu potrebujeme vždy aj tabuľku $ForestDistance$, ktorá hovorí
+viac o štruktúre stromov/lesov.
+
+\input{alg/mapping}
+
+Princípom počítania mapovania je backtrackovanie matice $ForestDistance$, teda
+zisťujeme, akú operáciu sme v ktorom bode zvolili (update, delete, insert).
+
+Všimnime si, že algoritmus \ref{alg:ted_mapping} prechádza postupne
+relevantné podlesy (relevant subforest, viď definícia \ref{def:relevant_subforests})
+vďaka výberu vrcholov $v$ a $w$ a tie mapuje na seba.
+
+
+
+
+
 
 \subsubsection{RTED: Robust Tree Edit Distance algoritmus}
 
-RTED budeme vnímať ako algoritmus na výpočítanie optimálnej stratégie - teda algoritmus,
+RTED budeme vnímať ako algoritmus na počítanie optimálnej stratégie - teda algoritmus,
 ktorý nám poradí ako najlepšie dekomponovať obidva stromy.
 
 Funguje tak, že si predpočíta koľko podproblémov budeme musieť vyriešiť, ak použijeme stratégiu
@@ -262,7 +287,7 @@ $left$, $right$, alebo $heavy$.
 	Celková dekompozícia lesa (full decomposition) $F$, $\mathcal{A}(F)$ je množina
 	všetkych podlesov F, ktoré dostaneme rekurzívnym odstranením najľavejšieho
 	alebo najpravejšieho koreňového vrcholu - $r_{R}(F)$ a $r_{L}(F)$ - z $F$
-	a následne aj všetkých jeho podlesov.
+	a následne aj všetkých jeho podlesov:
 	\begin{align*}
 		\mathcal{A}(\emptyset) &= \emptyset
 		\\
@@ -270,39 +295,41 @@ $left$, $right$, alebo $heavy$.
 	\end{align*}
 \end{definice}
 
-\begin{figure}[H]
+Celková dekompozícia pomocou LRH stratégií je znázornena na obrázku \ref{obr:LRH_decomposition}.
+Vidíme, že najmenší počet relevant subforests má $heavy$ dekompozícia (10).
+
+\begin{figure}
 \centering
 \includegraphics[width=85mm, height=100mm]{../img/LRH_decomposition.png}
-%TODO vlastné obrázky
-\caption{Celková dekompozícia pomocou LRH strategii}
+\caption{Celková dekompozícia pomocou LRH strategií \citenum{RTED}}
 \label{obr:LRH_decomposition}
 \end{figure}
 
+Nasledujúca lemma, ktorú pre $heavy$ cesty dokázali \citet{DMRW}
+a pre $left$ cesty zase \citet{ZHANGSHASHA}
+\footnote{Pre $right$ cesty to platí obdobne, stačí nám zmeniť poradie medzi potomkami vrcholov}
+nám ukáže, že počet problémov ktoré potrebujeme vyrátať závisí od výberu dekompozičnej stratégie.
+
 \begin{lemma}
-  Počet podproblémov (relevant-subproblems) počítaných single-path funkciou pre dvojicu
+  Počet podproblémov (relevant subproblems) počítaných $SinglePath$ funkciou pre dvojicu
   stromov $F$ a $G$ je rovná
   \begin{align*}
     \# = 
     \begin{cases}
-      \abs{F} \times \abs{\FrelevantSubforests(G, \Gamma^{L}(G))} & \text{pre left-paths}
+      \abs{F} \times \abs{\FrelevantSubforests(G, \Gamma^{L}(G))} & \text{pre $left$ cesty}
       \\
-      \abs{F} \times \abs{\FrelevantSubforests(G, \Gamma^{R}(G))} & \text{pre right-paths}
+      \abs{F} \times \abs{\FrelevantSubforests(G, \Gamma^{R}(G))} & \text{pre $right$ cesty}
       \\
-      \abs{F} \times \abs{\AfullDecomposition(G)} & \text{pre heavy-paths}
+      \abs{F} \times \abs{\AfullDecomposition(G)} & \text{pre $heavy$ cesty}
     \end{cases}
   \end{align*}
 \end{lemma}
 
-\begin{dukaz}
-  \citet{DMRW} dokázali, že vzorec pre ťažké cesty je v poriadku. Rovnako tak,
-  \citet{ZHANGSHASHA} to dokázali pre ľavé cesty. Jednoduchou úpravou vieme upraviť
-  ich vzorec na použitie pravých ciest.
-\end{dukaz}
-
-\begin{definice}
-  Minimálny počet podproblémov, ktoré potrebujeme vyrátať pri použití GTEDu je
+\begin{lemma}
+  Minimálny počet podproblémov (cena počítania danou stratégiou),
+  ktoré potrebujeme vyrátať pri použití GTEDu je
   \begin{align*}
-    cena(F, G) =
+    cena(F, G) = min
     \begin{cases}
       \abs{F} \times \abs{\AfullDecomposition(G)} &+ \rtedCostSum{F}{H}{G}
       \\
@@ -317,35 +344,34 @@ $left$, $right$, alebo $heavy$.
       \abs{G} \times \abs{\FrelevantSubforests(F, \Gamma^{R}(F))} &+ \rtedCostSum{G}{R}{F}
     \end{cases}
   \end{align*}
-\end{definice}
+  pričom $\Gamma^{L}$ a $\Gamma^{R}$ sú funkcie vracajúce $left$ a $right$ cestu v lese.
+\end{lemma}
 
 \begin{dukaz}
-  je uvedený v \citet{RTED}
+  Je uvedený v \citenum{RTED}
 \end{dukaz}
 
-Namiesto \O{$n^3$} rekurzie potrebujeme algoritmus, ktorý optimálnu stratégiu vyráta
-s nižšími časovými nárokmi ako potrebuje optimálny beh $GTED$u.
-
-Popiseme teda algoritmus \ref{alg:rted} - RTED, od tvorcov \citet{RTED}.
-Bežiaci v čase \O{$n^2$}.
+Popíšeme algoritmus \ref{alg:rted} - RTED, od tvorcov \citet{RTED}.
+Vďaka jeho rýchlosti \O{$n^2$} si optimálnu stratégiu nájdeme a aj vypočítame
+$GTED$ v čase \O{$n^3$}.
 
 \begin{algorithm}
-  \caption{Optimálna stratégia}
+  \caption{Optimal strategy}
   \label{alg:rted}
   \begin{algorithmic}[1]
     \Procedure {rted}{$F, G$}
-      \State $L_{v}, R_{v}, H_{v} \gets$ polia velkosti $\abs{F} \times \abs{G}$
-      \State $L_{w}, R_{w}, H_{w} \gets$ polia velkosti $\abs{G}$
-      \ForAll {$v$ postorder v $F$}
-        \ForAll {$w$ postorder v $G$}
-          \If {$v$ je list}
+      \State $L_{v}, R_{v}, H_{v} \gets$ arrays $\abs{F} \times \abs{G}$
+      \State $L_{w}, R_{w}, H_{w} \gets$ arrays $\abs{G}$
+      \ForAll {$v$ postorder in $F$}
+        \ForAll {$w$ postorder in $G$}
+          \If {$v$ is leaf}
             \State $L_{v}[v, w] \gets R_{v}[v, w] \gets H_{v}[v, w] \gets 0$
           \EndIf
-          \If {$w$ je list}
+          \If {$w$ is leaf}
             \State $L_{w}[w] \gets R_{w}[w] \gets  H_{w}[w] \gets 0$
           \EndIf
 
-          \State $C := \{$
+          \State $C := \set{$
             \Indent
               \State $(\abs{F_{v}} \times \AfullDecomposition(G_{w}) +
                 H_{v}[v, w], \gamma^{H}(F)),$
@@ -363,19 +389,19 @@ Bežiaci v čase \O{$n^2$}.
               \State $(\abs{G_{w}} \times
                 \abs{\FrelevantSubforests(F_{v}, \Gamma^{R}(F))} +
                 R_{w}[w], \gamma^{R}(G))$
-              \State $\}$
+              \State $}$
             \EndIndent
 
-            \State $(c_{min}, \gamma_{min}) \gets (c, \gamma)$ take, ze
-              $(c, \gamma) \in C \wedge c = min\{c' | (c', \gamma) \in C\}$
+            \State Get $(c_{min}, \gamma_{min}) \in C$ such that
+              $c_{min} = min \set{c' | (c', \gamma') \in C}$
             \State $Strategies[v, w] := \gamma_{min}$
 
-            \If {$v$ nieje koren}
+            \If {$v$ is not root of tree}
             \State \Call{update}{$L_{v}$, v, w, $c_{min}$, $\gamma^{L}(parent(v)$}
               \State \Call{update}{$R_{v}$, v, w, $c_{min}$, $\gamma^{R}(parent(v)$}
               \State \Call{update}{$H_{v}$, v, w, $c_{min}$, $\gamma^{H}(parent(v)$}
             \EndIf
-            \If {$w$ nieje koren}
+            \If {$w$ is not root of tree}
               \State \Call{update}{$L_{w}$, w, $c_{min}$, $\gamma^{L}(parent(w)$}
               \State \Call{update}{$R_{w}$, w, $c_{min}$, $\gamma^{R}(parent(w)$}
               \State \Call{update}{$H_{w}$, w, $c_{min}$, $\gamma^{H}(parent(w)$}
@@ -390,26 +416,31 @@ Bežiaci v čase \O{$n^2$}.
     \Procedure {update}{$Table, v, w, c_{min}, \gamma$}
       \State $Table[parent(v), w] \pluseq
         \begin{cases}
-          Table[v, w] & \text{ak $v \in \gamma$}
+          Table[v, w] & \text{if $v \in \gamma$}
           \\
-          c_{min} & \text{v opacnom pripade}
+          c_{min} & \text{otherwise}
         \end{cases}$
     \EndProcedure
 
     \Procedure {update}{$Table, w, c_{min}, \gamma$}
-      \State $Table[parent(w)] \pluseq
+      \State $Table[parent(w)] \quad \pluseq
         \begin{cases}
-          Table[w] & \text{ak $v \in \gamma$}
+          Table[w] & \quad \text{if $v \in \gamma$}
           \\
-          c_{min} & \text{v opacnom pripade}
+          c_{min} & \quad \text{otherwise}
         \end{cases}$
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}
 
-Prechádza vrcholmi v postorder, aby sa znížila pamäťová náročnosť algoritmu a nemuseli ukladať hodnoty
-medzi dvojicami relevant-subforest. Namiesto toho inkrementujeme hodnotu v rodičovskom vrchole pri
-každej návšteve jeho potomka.
+Algoritmus prechádza vrcholmi stromov a spočíta si, aká je optimálna dekompozičná stratégia
+pre danú dvojicu podstromov, teda pri akej potrebujem vyrátať minimálny počet podproblémov.
+
+Stromom prechádza v postorder poradí, teda najprv navštívi potomkov zľava doprava, a až tak
+samotný vrchol.
+Toto poradie je zvolené kvôli tomu, aby sa znížila pamäťová náročnosť a nemuseli ukladať hodnoty
+medzi všetkými dvojicami podstromov. Namiesto toho inkrementujeme hodnotu v rodičovskom vrchole
+(procedúry $Update$) pri každej návšteve jeho potomka.
 
 \begin{lemma}
   Algoritmus \ref{alg:rted} vyráta optimalnú LRH stratégiu pre dvojicu podstromov $F$ a $G$ a
@@ -417,65 +448,6 @@ každej návšteve jeho potomka.
 \end{lemma}
 
 \begin{dukaz}
-  Toto tvrdenie dokázali \citet{RTED}.
+  Je uvedený v \citet{RTED}.
 \end{dukaz}
-
-
-\section{Mapovanie medzi stromami}
-
-Tabuľka vzdialenosti z $GTED$u medzi stromami $F$ a $G$ nám nebude stačiť.
-Potrebujeme vedieť ako strom $F$ namapovať na $G$.
-
-\begin{algorithm}
-  \caption{Počitanie mapovania}
-  \label{alg:ted:mapping}
-  \begin{algorithmic}[1]
-    \Procedure {Mapping}{$F, G, TreeDistance$}
-      \State $\sigma \gets$ lubovolna LRH strategia
-      \State $ForestDistance \gets \Call{Single Path}{F, G, TreeDistance, \sigma}$
-      \While {$F \neq \emptyset \wedge G \neq \emptyset$}
-        \State $v \gets \Call{Update}{F, \sigma}$
-        \State $w \gets \Call{Update}{G, \sigma}$
-        \If {$ForestDistance[F, G] = ForestDistance[F - v, G] + C_{del}$}
-          \State $Mapping \gets Mapping \cup (v \rightarrow 0)$
-          \State $F \gets F - v$
-        \ElsIf {$ForestDistance[F, G] = ForestDistance[F, G - w] + C_{ins}$}
-          \State $Mapping \gets Mapping \cup (0 \rightarrow w)$
-          \State $G \gets G - w$
-        \Else
-          \If {$F$ a $G$ su stromy}
-            \State $Mapping \gets Mapping \cup (v \rightarrow w)$
-            \State $F \gets F - v$
-            \State $G \gets G - w$
-          \Else
-            \State $Mapping \gets Mapping \cup$
-            \Indent
-              \State $\Call{Mapping}{F - F_{v}, G - G_{w}, TreeDistance}$
-            \EndIndent
-            \State $F \gets F - F_{v}$
-            \State $G \gets G - G_{w}$
-          \EndIf
-        \EndIf
-      \EndWhile
-    \EndProcedure
-  \item[]
-    \Procedure {Update}{$Forest, \sigma$}
-      \State $\gamma \gets$ cesta v lese $Forest$ podla strategie $\sigma$
-      \State \Return vrchol $r_{L}(Forest)$ alebo $r_{R}(Forest)$ alebo
-        $\emptyset$ z $Forest$
-        \Indent
-          \State rovnako ako v definícií \ref{def:relevant_subforests}
-        \EndIndent
-      \label{alg:ted:mapping:update}
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-Princíp je v backtrackovani matice $ForestDistance$, teda zisťujeme, akú operáciu, sme v ktorom
-bode použili, podobne ako v zisťovaní operácií pri editačnej vzdialenosti reťazcov.
-Musíme ale používať $ForestDistance$ maticu, nie $TreeDistance$, keďže v nej
-sa odzrkadluje detailnejšia štruktúra stromov. Maticu $TreeDistance$ používame iba na
-počítanie single-path funkcie.
-
-
 

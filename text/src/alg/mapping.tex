@@ -1,0 +1,45 @@
+
+
+\begin{algorithm}
+  \caption{Mapping between trees}
+  \label{alg:ted_mapping}
+  \begin{algorithmic}[1]
+    \Procedure {GetMapping}{$F, G, TreeDistance$}
+      \State $Mapping \gets \emptyset$
+      \State $\sigma \gets$ random LRH strategy
+      \State $\gamma \gets$ path according to strategy $\sigma$ (in $F$ or $G$)
+      \State $ForestDistance \gets \Call{SinglePath}{F, G, TreeDistance, \gamma}$
+      \While {$F \neq \emptyset \wedge G \neq \emptyset$}
+        \State $v \gets$ \Call{GetRelevantSubforestNode}{$F, \sigma}$
+        \State $w \gets$ \Call{GetRelevantSubforestNode}{$G, \sigma}$
+        \If {$ForestDistance[F, G] = ForestDistance[F - v, G] + c_{del}$}
+          \State $Mapping \gets Mapping \cup (v \rightarrow 0)$
+          \State $F \gets F - v$
+        \ElsIf {$ForestDistance[F, G] = ForestDistance[F, G - w] + c_{ins}$}
+          \State $Mapping \gets Mapping \cup (0 \rightarrow w)$
+          \State $G \gets G - w$
+        \Else
+          \If {$F$ and $G$ are both trees}
+            \State $Mapping \gets Mapping \cup (v \rightarrow w)$
+            \State $F \gets F - v$
+            \State $G \gets G - w$
+          \Else
+            \State $Mapping \gets Mapping \cup \Call{GetMapping}{F_{v}, G_{w}, TreeDistance}$
+            \State $F \gets F - F_{v}$
+            \State $G \gets G - G_{w}$
+          \EndIf
+        \EndIf
+      \EndWhile
+      \State \Return $Mapping$
+    \EndProcedure
+  \item[]
+    \Procedure {GetRelevantSubforestNode}{$Forest, \sigma$}
+      \State $\gamma \gets$ path in $Forest$ according to strategy $\sigma$
+      \If {$r_{L}(Forest) \in \gamma$}
+        \State \Return $r_{R}(Forest)$
+      \Else
+        \State \Return $r_{L}(Forest)$
+      \EndIf
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}

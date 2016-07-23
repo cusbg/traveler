@@ -44,6 +44,7 @@
           font=\large,
           scale = \scale,
           level distance = 1.5 cm,
+          invisible/.style={opacity=0},
           every node/.style = {scale = \scale, circle, draw},
           tree/.style = {draw = none, fill = none}]
 
@@ -51,6 +52,10 @@
           \node (3) [right = of G] {C}
           child {
             node {A}
+            % nieje viditelny; je pridavany iba kvoli tomu, aby obidva stromy boli rovnako vysoke
+            child[invisible] {
+              node {I}
+            }
           }
           child {
             node {B}

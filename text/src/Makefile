@@ -8,7 +8,7 @@ run: build
 	atril $(TARGET).pdf&
 
 # LaTeX je potreba spustit nekolikrat, aby spravne spocital odkazy
-${TARGET}.pdf: ${TARGET}.tex *.tex *.bib
+${TARGET}.pdf: ${TARGET}.tex *.tex *.bib */*.tex
 	${SHELL} run.sh ${TARGET} ${BUILDDIR}
 
 
