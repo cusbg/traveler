@@ -1,0 +1,48 @@
+%!
+/lwline {newpath moveto lineto stroke} def
+/lwstring {moveto show} def
+/lwarc {newpath gsave translate scale /rad exch def /ang1 exch def /ang2 exch def 0.0 0.0 rad ang1 ang2 arc stroke grestore} def
+/Helvetica findfont 8.00 scalefont setfont
+0.80 0.80 scale
+337.29 1647.24 translate
+(G)            -238       -721       lwstring       
+(G)            -243       -727       lwstring       
+(G)            -249       -732       lwstring     
+(G)            -255       -738       lwstring       
+(C)            -260       -744       lwstring       
+
+0 0 1 setrgbcolor
+(C)            -261       -752       lwstring       
+(C)            -266       -759       lwstring       
+(C)            -273       -763       lwstring       
+(C)            -281       -763.5       lwstring       
+(G)            -288       -761       lwstring       
+(C)            -293       -756       lwstring       
+
+1 0 0 setrgbcolor
+(I)            -295       -749       lwstring       
+(I)            -294       -741       lwstring       
+(I)            -290       -735       lwstring       
+(I)            -284       -731       lwstring       
+
+0 0 0 setrgbcolor
+(G)            -275       -729       lwstring       
+-260       -738       -269       -729        lwline
+(C)            -269       -724       lwstring       
+-255       -732       -263       -724        lwline
+(C)            -263       -718       lwstring       
+-249       -726       -257       -718        lwline
+(C)            -258       -712       lwstring       
+-243       -721       -252       -712        lwline
+(C)            -252       -707       lwstring       
+-238       -715       -246       -707        lwline
+(5') -229 -712 lwstring
+(3') -243 -698 lwstring
+-232       -715       -229       -712        lwline
+-246       -701       -243       -698        lwline
+
+
+0.1 setlinewidth
+360 0 18.5 1.0 1.0 -275 -744 lwarc
+showpage
+
