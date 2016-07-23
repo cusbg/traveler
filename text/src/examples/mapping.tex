@@ -1,39 +1,47 @@
 
-\renewcommand{\wi}{0.18\hsize}
+\renewcommand{\wi}{0.17\textwidth}
 
 \begin{figure}
-  \centering
-  \begin{minipage}{\wi}
-    \fbox{
-      \subtree{\node[colored]{4} child{node{2} child {node{1}}} child {node{3}};}
-      \subtree{\node[colored]{C} child {node{A}} child {node{B} child[invisible] {node{I}}};}
-    }
-  \end{minipage}
-  \begin{minipage}{\wi}
-    \fbox{
-      \subtree{\node{4}[invisible] child{node[normal]{2} child[normal] {node{1}}} child {node[normal, colored]{3}};}
-      \subtree{\node{C}[invisible] child {node[normal]{A}} child {node[normal, colored]{B} child[invisible] {node{I}}};}
-    }
-  \end{minipage}
-  \begin{minipage}{\wi}
-    \fbox{
-      \subtree{\node{4}[invisible] child{node{2} child {node{1}}} child {node[normal, colored]{3}};}
-      \subtree{\node{C}[invisible] child {node{A}} child {node[normal, colored]{B} child[invisible] {node{I}}};}
-    }
-  \end{minipage}
-  \begin{minipage}{\wi}
-    \fbox{
-      \subtree{\node{4}[invisible] child{node[cross, draw, circle, normal, colored]{2} child[normal] {node{1}}} child {node{3}};}
-      \subtree{\node{C}[invisible] child {node[normal, colored]{A}} child {node{B} child[invisible] {node{I}}};}
-    }
-  \end{minipage}
-  \begin{minipage}{\wi}
-    \fbox{
-      \subtree{\node{4}[invisible] child{node{2} child {node[normal, colored]{1}}} child {node{3}};}
-      \subtree{\node{C}[invisible] child {node[normal, colored]{A}} child {node{B} child[invisible] {node{I}}};}
-    }
-  \end{minipage}
-  \caption{Mapovanie medzi stromami}
+    \centering
+    \begin{minipage}{\wi}
+      \fbox{
+        \subtree{\node[colored]{4} child{node{2} child {node{1}}} child {node{3}};}
+        \subtree{\node[colored]{C} child {node{A}} child {node{B} child[invisible] {node{I}}};}
+      }
+    \end{minipage}
+    \begin{minipage}{\wi}
+      \fbox{
+        \subtree{\node{4}[invisible] child{node[normal]{2} child[normal] {node{1}}} child {node[normal, colored]{3}};}
+        \subtree{\node{C}[invisible] child {node[normal]{A}} child {node[normal, colored]{B} child[invisible] {node{I}}};}
+      }
+    \end{minipage}
+    \begin{minipage}{\wi}
+      \fbox{
+        \subtree{\node{4}[invisible] child{node{2} child {node{1}}} child {node[normal, colored]{3}};}
+        \subtree{\node{C}[invisible] child {node{A}} child {node[normal, colored]{B} child[invisible] {node{I}}};}
+      }
+    \end{minipage}
+    \begin{minipage}{\wi}
+      \fbox{
+        \subtree{\node{4}[invisible] child{node[cross, draw, circle, normal, colored]{2} child[normal] {node{1}}} child {node{3}};}
+        \subtree{\node{C}[invisible] child {node[normal, colored]{A}} child {node{B} child[invisible] {node{I}}};}
+      }
+    \end{minipage}
+    \begin{minipage}{\wi}
+      \fbox{
+        \subtree{\node{4}[invisible] child{node{2} child {node[normal, colored]{1}}} child {node{3}};}
+        \subtree{\node{C}[invisible] child {node[normal, colored]{A}} child {node{B} child[invisible] {node{I}}};}
+      }
+    \end{minipage}
+    \caption{Výpočet mapovania medzi stromami}
   \label{obr:mapping}
 \end{figure}
+
+%\begin{figure}
+  %\centering
+  %\begin{minipage}{\wi}
+    %\subtree{\node{C} child[invisible]{node{2} child {node[normal]{A}}} child {node{B}};}
+  %\end{minipage}
+  %\caption{Výsledný strom s mapovaním $4 \to C, 3 \to B, 2 \to \emptyset, 1 \to A$}
+%\end{figure}
 
