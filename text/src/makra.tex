@@ -91,3 +91,24 @@
 
 \renewcommand{\O}[1]{\sloppy\mbox{\ensuremath{\mathcal{O}}(#1)}}
 
+
+\newcommand{\subtree}[1]{\begin{tikzpicture}[
+          on grid,
+          font=\tiny,
+          scale = \scale,
+          node distance = 0.6 cm,
+          sibling distance = 0.8 cm,
+          text width = 0.2cm,
+          level distance = 1.1 cm,
+          colored/.style = {color = red},
+          normal/.style = {black = red, draw, opacity = 100},
+          invisible/.style={opacity = 0},
+          cross/.style={path picture={ 
+                \draw
+                (path picture bounding box.south east) -- (path picture bounding box.north west) (path picture bounding box.south west) -- (path picture bounding box.north east);
+            }},
+          every node/.style = {scale = \scale, circle, draw, align = center},
+          tree/.style = {draw = none, fill = none}]#1\end{tikzpicture}}
+
+
+

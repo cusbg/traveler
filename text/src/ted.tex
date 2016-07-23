@@ -252,25 +252,37 @@ Máme tri možnosti:
 Hodnotu z tretej podmienky máme uloženú z predchádzajúcich krokov (tento prípad sme vyrátali
 pri rekurzívnom počítaní vzdialenosti medzi \set{B} a celého stromu $F$).
 Ďalej pokračujeme podobne, až kým dorátame všetky hodnoty.
+Výsledná tabuľka je na obrázku \ref{obr:gted_tdist} a určuje ceny transformácie
+medzi stromami.
+
+\input{examples/gted_tdist}
+
 
 
 
 \subsection{Mapovanie medzi stromami}
 
 Keď už máme vyrátanú $TreeDistance$ tabuľku, môžeme sa pustiť do mapovania medzi
-stromami. K mapovaniu potrebujeme vždy aj tabuľku $ForestDistance$, ktorá hovorí
-viac o štruktúre stromov/lesov.
+stromami. Tabuľku používame iba vo funkcií $SinglePath$ a na samotné mapovanie
+používame $ForestDistance$, ktorá nám hovorí veľa o štruktúre stromov/lesov
+s ktorými pracujeme.
 
 \input{alg/mapping}
 
-Princípom počítania mapovania je backtrackovanie matice $ForestDistance$, teda
+Princípom počítania mapovania je spätné prechádzanie matice $ForestDistance$, teda
 zisťujeme, akú operáciu sme v ktorom bode zvolili (update, delete, insert).
 
-Všimnime si, že algoritmus \ref{alg:ted_mapping} prechádza postupne
-relevantné podlesy (relevant subforest, viď definícia \ref{def:relevant_subforests})
+Všimnime si, že algoritmus \ref{alg:mapping} prechádza postupne
+relevantné podlesy (relevant subforests z definície \ref{def:relevant_subforests})
 vďaka výberu vrcholov $v$ a $w$ a tie mapuje na seba.
 
+Na obrázku \ref{obr:mapping} pokračujeme v príklade a chystáme sa namapovať tieto
+dva stromy na seba. Červenou sú kreslené vrcholy $v$ a $w$ z algoritmu.
+Tretí obrázok predstavuje rekurzívne volanie z riadka \ref{alg:mapping:recursion}.
+Vo štvrtom sme vrchol 2 zmazali.
+Výsledné mapovanie je $4 \to C, 3 \to B, 2 \to \emptyset, 1 \to A$.
 
+\input{examples/mapping}
 
 
 

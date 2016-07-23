@@ -2,7 +2,7 @@
 
 \begin{algorithm}
   \caption{Mapping between trees}
-  \label{alg:ted_mapping}
+  \label{alg:mapping}
   \begin{algorithmic}[1]
     \Procedure {GetMapping}{$F, G, TreeDistance$}
       \State $Mapping \gets \emptyset$
@@ -25,6 +25,7 @@
             \State $G \gets G - w$
           \Else
             \State $Mapping \gets Mapping \cup \Call{GetMapping}{F_{v}, G_{w}, TreeDistance}$
+            \label{alg:mapping:recursion}
             \State $F \gets F - F_{v}$
             \State $G \gets G - G_{w}$
           \EndIf

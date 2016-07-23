@@ -3,7 +3,7 @@
   \caption{General Tree Edit Distance for LRH strategies}
   \label{alg:gted}
   \begin{algorithmic}[1]
-    \Procedure {gted}{$F, G, TreeDistance, Strategies$}
+    \Procedure {Gted}{$F, G, TreeDistance, Strategies$}
       \State $\gamma \gets$ path in $Strategies[F, G]$
       \If {$\gamma \in F$}
         \ForAll {tree $F' \in F - \gamma$}
@@ -33,16 +33,16 @@
   \begin{algorithmic}[1]
     \Procedure {ComputeDistance}{$F, G, TreeDistance, \gamma$}
       \If {$\gamma \in \gamma^{*}(F)$}
-        \ForAll {$G' \in \Call{RelevantSubtrees}{G}$}
-          \State $\Call{SinglePath}{F, G', TreeDistance, \gamma}$
+        \ForAll {$G' \in $\Call{RelevantSubtrees}{$G, \gamma$}}
+          \State \Call{SinglePath}{$F, G', TreeDistance, \gamma$}
         \EndFor
       \Else
-        \ForAll {$F' \in \Call{RelevantSubtrees}{F}$}
-          \State $\Call{SinglePath}{F', G, TreeDistance, \gamma}$
+        \ForAll {$F' \in$ \Call{RelevantSubtrees}{$F, \gamma$}}
+          \State \Call{SinglePath}{$F', G, TreeDistance, \gamma$}
         \EndFor
       \EndIf
     \EndProcedure
-    \\
+  \item[]
     \Procedure {SinglePath}{$F, G, TreeDistance, \gamma$}
     \State $ForestDistance \gets$ array $(|F| + 1) \times (|G| + 1)$
       \State $ForestDistance[\emptyset][\emptyset] := 0$
@@ -104,6 +104,7 @@
           \EndIf
         \EndFor
       \EndFor
+      \State \Return $ForestDistance$
     \EndProcedure
   \end{algorithmic}
 \end{algorithm}

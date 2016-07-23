@@ -250,54 +250,5 @@ podstromom (najťažším)\footnote{ťažkých ciest môže existovať aj viac a
 
 Príklad $root$-$leaf$ cesty v strome je na obrázku \ref{obr:root_leaf_path}.
 
-
-\begin{figure}[H]
-  \centering
-  \begin{tikzpicture}[
-      on grid,
-      -latex,
-      font=\large,
-      scale = \scale,
-      level distance = 1.5 cm,
-      every node/.style = {scale = \scale, circle, draw, thin},
-      colored/.style = {color = red, thick},
-      black/.style = {color = black, thin}]
-
-      \node [colored]{}
-      child[colored] {
-        node {}
-        child[colored] {
-          node{}
-          child {
-            node{}
-            child[black] {
-              node{}
-            }
-            child[black] {
-              node{}
-            }
-            child {
-              node{}
-            }
-          }
-          child[black] {
-            node{}
-          }
-        }
-        child[black] {
-          node{}
-          child {
-            node{}
-          }
-        }
-      }
-      child[black] {
-        node{}
-      }
-      ;
-  \end{tikzpicture}
-  \caption{Príklad stromu. Je v ňom červene vyznačená $heavy$ cesta}
-  \label{obr:root_leaf_path}
-\end{figure}
-
+\input{examples/root_leaf_path}
 
