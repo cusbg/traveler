@@ -1,0 +1,29 @@
+
+\begin{algorithm}
+  \caption{Rozloženie báz po kružnici}
+  \label{alg:operacia_circle_reinsert}
+  \begin{algorithmic}[1]
+    \Procedure {RozlozBazy}{$Begin, End, Bases$}
+      \State $n \gets$ $Bases.size()$
+      \State $\Gamma \gets$ kružnica pre $n$ bodov prechádzajúca bodmi $Begin$ a $End$
+      \State $\Pi \gets$ rozdel kruhový oblúk kružnice $\Gamma$ od $Begin$ po $End$ na $n$ bodov
+      \ForAll{$i$ in $1 \dots n$}
+        \State nastav pozíciu bázy $Bases[i]$ na $\Pi[i]$
+      \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}
+  \caption{Posunutie podstromu}
+  \label{alg:operacia_tree_shift}
+  \begin{algorithmic}[1]
+    \Procedure {PosunPodstrom}{$Root, Vector$}
+      \ForAll {vrchol $V$ v podstrome vrcholu $Root$}
+        \If {vrchol $V$ už má určenu pozíciu v obrázku - nieje práve vložený}
+          \State pripočítaj k pozicií bázy $V$ vektor $Vector$
+        \EndIf
+      \EndFor
+    \EndProcedure
+  \end{algorithmic}
+\end{algorithm}

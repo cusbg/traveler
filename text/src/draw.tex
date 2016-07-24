@@ -61,34 +61,7 @@ a posunutiami podstromov ich uložíme na miesto.
 Čitateľa zoznámime s 2 operáciami, ktoré budeme vykonávať na molekule. Tie využijeme
 ako pri vkladaní, tak aj pri mazaní vrcholov zo stromu.
 
-\begin{algorithm}
-  \caption{Rozloženie báz po kružnici}
-  \label{alg:operacia_circle_reinsert}
-  \begin{algorithmic}[1]
-    \Procedure {RozlozBazy}{$Begin, End, Bases$}
-      \State $n \gets$ $Bases.size()$
-      \State $\Gamma \gets$ kružnica pre $n$ bodov prechádzajúca bodmi $Begin$ a $End$
-      \State $\Pi \gets$ rozdel kruhový oblúk kružnice $\Gamma$ od $Begin$ po $End$ na $n$ bodov
-      \ForAll{$i$ in $1 \dots n$}
-        \State nastav pozíciu bázy $Bases[i]$ na $\Pi[i]$
-      \EndFor
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
-
-\begin{algorithm}
-  \caption{Posunutie podstromu}
-  \label{alg:operacia_tree_shift}
-  \begin{algorithmic}[1]
-    \Procedure {PosunPodstrom}{$Root, Vector$}
-      \ForAll {vrchol $V$ v podstrome vrcholu $Root$}
-        \If {vrchol $V$ už má určenu pozíciu v obrázku - nieje práve vložený}
-          \State pripočítaj k pozicií bázy $V$ vektor $Vector$
-        \EndIf
-      \EndFor
-    \EndProcedure
-  \end{algorithmic}
-\end{algorithm}
+\input{alg/draw}
 
 Ako sme písali už skôr, všetky loop štruktúry majú byť uložené na kružniciach.
 K tomu nám pomôže funkcia \ref{alg:operacia_circle_reinsert}.
@@ -127,7 +100,7 @@ Pôvodné vrcholy sú označené modrou, vložené sú zase červené I.
     \includegraphics[trim=1cm 24.5cm 17.5cm 2.5cm]{../img/alg/insert/1/circle-big-end}
   \end{subfigure}
 
-  \caption{Príklad zväčšovania kružnice a následne vloženie báz}
+  \caption{Príklad zväčšovania kružnice a následné vloženie báz}
   \label{obr:insert_circle_hairpin}
 \end{figure}
 
@@ -197,7 +170,7 @@ vetvy) na kružnicu. Je to podobný proces, ako používame iba pre samotné loo
 ale potrebujeme naviac vetvy zrotovať do správneho smeru.
 
 Obidva tieto prípady sú znázornené na obrázku \ref{obr:insert_multibranch}
-\footnote{Význam použitých farieb v obrázkoch popisuje tabuľka \ref{tab:traveler_colors}.
+\footnote{Význam použitých farieb v obrázkoch popisuje tabuľka \ref{tab:color_coding}.
   Zatiaľ nám stačí červená - to sú vkladané nukleotidy.},
 v obidvoch častiach vizualizujeme sekundárnu štruktúru rRNA človeka z obrázka \ref{obr:human_crw}.
 V prvej časti sme sa prekresľovaniu celej štruktúry vyhli a nukleotidy sme
@@ -205,28 +178,28 @@ priblížili k sebe. V druhej sme už vkladali celú vetvu stromu a tak sme muse
 celú štruktúru prekresliť. Spoločné podčasti sú označené číslami a šípka označuje
 smer, ktorým do podstromu vchádzame, v smere od 3' a 5' ktoré tvoria koreň stromu.
 
-\begin{figure}
+\begin{figure}[t!]
   \centering
   % bez prekreslenia
-  \begin{subfigure}{\wi}
+  \begin{subfigure}[t]{\wi}
     \caption{Pôvodná časť vizualizácie X04025 rRNA (žaba)}
 %trim=left bottom right top
     \includegraphics[clip, trim=1cm 21cm 12cm 1cm, width=1\textwidth]{../img/alg/insert/multibranch}
   \end{subfigure}
-  \begin{subfigure}{\wi}
+  \begin{subfigure}[t]{\wi}
     \caption{Miesto na nové bázy sme urobili poposúvaním pôvodných k sebe}
 %trim=left bottom right top
     \includegraphics[clip, trim=10.5cm 21cm 2.5cm 1cm, width=1\textwidth]{../img/alg/insert/multibranch}
   \end{subfigure}
 
   % s prekreslenim struktury
-  \begin{subfigure}{\wi}
+  \begin{subfigure}[t]{\wi}
     \caption{Pôvodná časť vizualizácie X01723 rRNA (kreveta)}
 %trim=left bottom right top
     \includegraphics[clip, trim=8cm 18cm 5cm 0, width=1\textwidth]{../img/alg/insert/multibranch-redraw}
   \end{subfigure}
-  \begin{subfigure}{\wi}
-    \caption{Kvôli vkladaniu celej vetvy sme potrebovali prekresliť celú štruktúru}
+  \begin{subfigure}[t]{\wi}
+    \caption{Kvôli vkladaniu novej vetvy sme potrebovali prekresliť celú štruktúru}
 %trim=left bottom right top
     \includegraphics[clip, trim=1cm 18cm 13cm 0, width=1\textwidth]{../img/alg/insert/multibranch-redraw}
   \end{subfigure}
