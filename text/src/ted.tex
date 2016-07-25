@@ -17,6 +17,8 @@
 \algtext*{EndIndent}
 
 
+
+
 \chapter{Mapovanie medzi RNA stromami}
 
 Ako sme spomínali v predchádzajúcich častiach, biológovia očakávajú, že
@@ -35,6 +37,10 @@ jeden reťazec na druhý.
 
 Problém u reťazcov je špeciálnym prípadom TEDu, kedy nám stromy zdegenerovali
 na cesty (spojový zoznam).
+
+
+
+
 
 \section{Tree-edit-distance algoritmus}
 
@@ -67,6 +73,10 @@ alebo najľavejšie (tzn. vyberieme najpravejší/najľavejší strom lesa a jeh
 
 \input{alg/ted_rekurzia}
 
+
+
+
+
 \section{\sloppy Vývoj algoritmu - rekurzia a dynamické programovanie}
 
 Algoritmus TED prešiel vývojom postupne od \citet{TAI}, ktorý predstavil algoritmus
@@ -83,6 +93,10 @@ a tvarom stromov. Zovšeobecnili predchádzajúce prístupy a vytvorili algoritm
 s worst-case časom \O{$m^3$} a priestorom \O{$m \cdot n$}.
 Ako dokázali, ich algoritmus je efektívny pre všetky tvary stromov a worst-case
 prípad u neho nastane iba vtedy, ak lepší smer výpočtu neexistuje.
+
+
+
+
 
 \subsection{RTED}
 

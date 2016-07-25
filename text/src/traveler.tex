@@ -277,11 +277,8 @@ PostScript súbor je zložený z hlavičky, v ktorej sú definície kresliacich 
 ktorými sú riadky kreslenia molekuly. Príklad je na obrázku \ref{obr:ps_out}.
 
 Najprv definujeme operácie kreslenia v hlavičke súboru - $lwline$,
-$lwstring$ a $lwarc$ - kreslenie čiar, textu a kružníc.
-Za nimi nasleduje výber písma (používame rovnaké ako v CRW databáze),
-škálovanie obrázka a posunutie obrázka (o koľko je posunutý bod (0, 0)).
-
-Za nimi už nasleduje samotné kreslenie molekuly.
+$lwstring$ a $lwarc$ - kreslenie čiar, textu a kružníc a ďalšie 
+parametre dokumentu, za ktorými nasleduje samotné kreslenie molekuly.
 
 \begin{figure}
 \begin{code}[fontsize=\scriptsize, frame=none, samepage=true]
@@ -313,7 +310,7 @@ Za nimi už nasleduje samotné kreslenie molekuly.
 (C)            -258.04        -712.9         lwstring       
 -243.728       -721.212       -252.212       -712.728        lwline
 (C)            -252.38        -707.24        lwstring       
--238.068       -715.552       -246.552       -707.068        lwline
+  ...
 (5')           -229.75        -712.89        lwstring
 (3')           -243.89        -698.75        lwstring
 -232.412       -715.552       -229.583       -712.723        lwline
@@ -381,7 +378,7 @@ Argumenty týchto elementov sú bližšie vysvetlené v SVG tutorále \citenum{S
 Ako sme už uviedli, momentálne podporujeme iba jediný vstupný formát obrázkov.
 Je ním PostScript formát používaný databázou CRW od autorov \citet{CRW}.
 
-Pri tvorbe aplikácie sme musleli na budúcnosť a tak načítavanie súboru
+Pri tvorbe aplikácie sme mysleli na budúcnosť a tak načítavanie súboru
 robíme v jednom, ľahko rozšíriteľnom module.
 Ak potrebujeme pracovať s inými vstupnými súbormi, naimplementujeme extractor
 (viď definícia) a parametrom \param{type} ho môžeme použiť.

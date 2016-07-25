@@ -7,18 +7,21 @@
 
 \chapter{Úvod do štúdia RNA štruktúry a grafov}
 
-V tejto časti práce zoznámime čitateľa s pojmami, ktoré s RNA a jej
+V~tejto časti práce zoznámime čitateľa s pojmami, ktoré s~RNA a~jej
 štruktúrou súvisia.
+
+
+
 
 \section{Čo je RNA}
 
 RNA, ribonukleová kyselina, je jednovláknová molekula, pozostávajúca
 zo sekvencie nukleotidov, jej základných stavebných častí.
-Tie sa ďalej skladajú z cukru (pentózy), dusíkatej bázy a zvyšku
+Tie sa ďalej skladajú z~cukru (pentózy), dusíkatej bázy a~zvyšku
 kyseliny fosforečnej. Poznáme štyry druhy báz,
-adenín, cytozín, guanín a uracyl, označovať ich budeme A, C, G, respektíve U.
-Okrem báz nás ďalšie zložky nebudú zaujímať a tak ďalej v texte stotožníme
-pojmy nukleotid a báza.
+adenín, cytozín, guanín a uracyl, označovať ich budeme A, C, G a U.
+Okrem báz nás ďalšie zložky nebudú zaujímať a~tak ďalej v texte stotožníme
+pojmy nukleotid a~báza.
 
 Štruktúru RNA môžeme chápať podľa stupňa zjednodušenia
 \begin{itemize}
@@ -28,22 +31,25 @@ pojmy nukleotid a báza.
 \end{itemize}
 
 RNA ako jednovláknová molekula sa v snahe minimalizovať voľnú energiu páruje sama na seba.
-V tomto hrajú úlohu vodíkové väzby medzi nukleotidmi. Tie majú vzájomnú preferenciu,
+V~tomto hrajú úlohu vodíkové väzby medzi nukleotidmi. Tie majú vzájomnú preferenciu,
 čo znamená, že páry vznikajú najčastejšie medzi A-U a C-G, no ani iné
 kombinácie nie sú vylúčené. 
 
+
+
+
 \section{Sekundárna štruktúra}
 
-Hlavným objektom nášho záujmu je sekundárna štruktúra RNA. V nasledujúcej
+Hlavným objektom nášho záujmu je sekundárna štruktúra RNA. V~nasledujúcej
 časti si ju definujeme formálnejšie.
 
 \begin{definice}
   \label{def:RNA_sekundarna_struktura}
-  Primárna štruktúra RNA je určená poradím nukleotidov v polynukleotidovom reťazci.
+  Primárna štruktúra RNA je určená poradím nukleotidov v~polynukleotidovom reťazci.
   \\
   Sekundárnou štruktúrou označíme množinu $\SS$ párov báz \Par{i}{j} takých,
   že pre dva páry \Par{i}{j} a \Par{k}{l} $\in \SS$ (bez straty všeobecnosti $i \leq k$)
-  platí jedno z nasledujúcich:
+  platí jedno z~nasledujúcich:
   \begin{itemize}
     \item $i = k \iff j = l$
     \item $i < j < k < l$, čiže pár \Par{i}{j} predchádza pár \Par{k}{l}
@@ -51,17 +57,21 @@ Hlavným objektom nášho záujmu je sekundárna štruktúra RNA. V nasledujúce
   \end{itemize}
 \end{definice}
 
-Prvá podmienka zabezpečuje, že nukleotid je najviac v jednom bázickom páre,
-druhá a tretia hovoria o ich usporiadaní - buď na seba nadväzujú, alebo
+Prvá podmienka zabezpečuje, že nukleotid je najviac v~jednom bázickom páre,
+druhá a~tretia hovoria o~ich usporiadaní - buď na seba nadväzujú, alebo
 sú na sebe nezávisle.
 
 Všimnime si ďalej, že podmienky vylučujú bázové páry typu \Par{i}{j} a \Par{k}{l},
-kde $i < k < j < l$, teda páry sa nesmú prekrývať. Takéto páry nazývame
-pseudouzly (pseudoknot) a ich rozdelenie máme na obrázku \ref{obr:pseudoknot_types}.
-Pseudouzly sa často považujú za súčasť sekundárnej štruktúry, no v našej práci
-s nimi nepočítame. Takéto zjednodušenie nám umožní reprezentovať sekundárnu
+kde \mbox{$i < k < j < l$}, teda páry sa nesmú prekrývať. Takéto páry nazývame
+pseudouzly (pseudoknot) a~ich rozdelenie máme na obrázku \ref{obr:pseudoknot_types}.
+Pseudouzly sa často považujú za súčasť sekundárnej štruktúry, no v~našej práci
+s~nimi nepočítame. Takéto zjednodušenie nám umožní reprezentovať sekundárnu
 štruktúru RNA ako usporiadaný zakorenený strom (les). Definíciu grafových
-pojmov ako strom a les uvedieme neskôr.
+pojmov ako strom a~les uvedieme neskôr.
+
+
+
+
 
 \subsection{Typy zobrazenia sekundárnej štruktúry}
 
@@ -70,14 +80,13 @@ Existujúce nástroje volia medzi tromi možnosťami vizualizácie sekundárnej
 alebo štandardná štruktúra (classical structure).
 
 Na nasledujúcich obrázkoch sme pomocou programu jViz.Rna \citenum{JVIZ}
-% TODO italics
-nakreslili molekulu K03432 malej podjednotky ribozomálnej RNA človeka
+nakreslili molekulu \textit{K03432} malej podjednotky ribozomálnej RNA človeka
 vo všetkých zobrazeniach.
-Ako vidíme, zo spojnicového \ref{obr:human_linked} a rovnako aj kruhového
+Ako vidíme, zo spojnicového \ref{obr:human_linked} a~rovnako aj kruhového
 grafu \ref{obr:human_circular} sa motívy vyčítať tak ľahko nedajú.
 Naopak zobrazenie štandardnej štruktúry na obrázku \ref{obr:human_crw}
 podľa predstáv biológov.
-Tí očakávajú, že v RNA molekulách rovnakého typu (napríklad malé podjednotky rRNA 23S)
+Tí očakávajú, že v~RNA molekulách rovnakého typu (napríklad malé podjednotky rRNA 23S)
 budú konzervované časti nakreslené na rovnakom mieste, čo im pomôže orientovať sa
 aj pri molekulách veľkých rozmerov.
 
@@ -101,21 +110,24 @@ aj pri molekulách veľkých rozmerov.
   \label{obr:human_crw}
 \end{figure}
 
+
+
+
 \subsection{Motívy}
 
-Niektoré časti molekuly vytvárajú isté motívy, z ktorých niektoré môžeme
+Niektoré časti molekuly vytvárajú isté motívy, z~ktorých niektoré môžeme
 vidieť na obrázku \ref{obr:RNA_motifs}.
-Motívom sú aj pseudouzly \ref{obr:pseudoknot_types}, ale v našej práci
-ich úplne ignorujeme.
+Motívom sú aj pseudouzly \ref{obr:pseudoknot_types}, ale v~tejto práci
+sa nimi nebudeme zaoberať.
 
 Stem (stonka) je časť molekuly, kde sa na seba párujú dva súvislé časti vlákna.
 Loopom budeme označovať miesta s nespárovanými bázami.
-Bulge (vypuklina) je miesto v steme, ktoré z jednej strany obsahuje loop.
+Bulge (vypuklina) je miesto v~steme, ktoré z~jednej strany obsahuje loop.
 Podobná je interior (vnútorná) loop, tá ale má loop po oboch stranách stemu.
-Hairpin je stem zakončený loopom a nakoniec multibranch (viac vetvová) loop
+Hairpin je stem zakončený loopom a~nakoniec multibranch (viac vetvová) loop
 je podobná ako interior loop, ale spája dokopy viac stemov.
-V ďalšom rozprávaní nám bude stačiť rozdelenie na stem (spárované bázy)
-a loop (nespárované bázy).
+V~ďalšom rozprávaní nám bude stačiť rozdelenie na stem (spárované bázy)
+a~loop (nespárované bázy).
 
 \begin{figure}
   \centering
@@ -132,11 +144,14 @@ a loop (nespárované bázy).
   \label{obr:pseudoknot_types}
 \end{figure}
 
+
+
+
 \section{Hlavný objekt záujmu - rRNA}
 
 Ako hlavný objekt záujmu sme si spomedzi všetkych druhov RNA vybrali práve ribozomálnu, rRNA.
-Jej funkcia je hlavne v translácií génov, pri ktorej sa genetická informácia prekladá
-z poradia nukleotidov v mRNA do poradia aminokyselín v bielkovine.
+Jej funkcia je hlavne v~translácií génov, pri ktorej sa genetická informácia prekladá
+z~poradia nukleotidov v~mRNA do poradia aminokyselín v~bielkovine.
 
 \begin{figure}[H]
   \centering
@@ -160,27 +175,31 @@ z poradia nukleotidov v mRNA do poradia aminokyselín v bielkovine.
   \label{obr:RNA_human_rnafold}
 \end{figure}
 
-Ribozomálnu RNA sme zvolili kvôli jej konzervovanosti naprieč evolučným spektrom. Ďalším
+Zvolili sme si ju taktiež kvôli jej konzervovanosti naprieč evolučným spektrom. Ďalším
 dôvodom bola jej veľkosť, ktorá robí existujúcim nástrojom najväčšie problémy
 pri vizualizácií. Na obrázku \ref{obr:human_crw} vidíme sekundárnu štruktúru 
-K03432 malej podjednotky ribozomálnej RNA človeka z CRW databázy.
-Tá znázorňuje predstavy biológov o tom, ako by malo nakreslenie danej molekuly vyzerať.
-Obrázky \ref{obr:human_jviz}, \ref{obr:RNA_human_mfold} a \ref{obr:RNA_human_rnafold}
-sú zase vygenerované vizualizácie pomocou programov jViz.Rna, Mfold a RNAfold.
-Dodržiavanie základných kritérií ako rovinnosť, loopy na kružniciach a stemy na priamkach
-sa viac, či menej programom darí, no celkový vzhľad obrázkov je úplne odlišný od požiadavok
-biológov, keďže sa motívy z obrázka z CRW databázy hľadajú veľmi ťažko.
+K03432 malej podjednotky ribozomálnej RNA človeka z~CRW databázy.
+Tá znázorňuje predstavy biológov o~tom, ako by malo nakreslenie danej molekuly vyzerať.
+Obrázky \ref{obr:human_jviz}, \ref{obr:RNA_human_mfold} a~\ref{obr:RNA_human_rnafold}
+sú zase vygenerované vizualizácie pomocou programov jViz.Rna, Mfold a~RNAfold.
+Dodržiavanie základných kritérií ako rovinnosť, loopy na kružniciach a~stemy na priamkach
+sa prevažne programom darí, no celkový vzhľad obrázkov je úplne odlišný od požiadavok
+biológov, keďže sa motívy z~obrázka z~CRW databázy hľadajú veľmi ťažko.
+
+
+
+
 
 \section{Stromová reprezentácia sekundárnej štruktúry}
 
-Vďaka ignorovaniu pseudouzlov v definícií \ref{def:RNA_sekundarna_struktura} sekundárnej
+Vďaka ignorovaniu pseudouzlov v~definícií \ref{def:RNA_sekundarna_struktura} sekundárnej
 štruktúry ju môžeme reprezentovať ako usporiadaný strom
-\footnote{Používame pojmy z nasledujúcej kapitoly \nameref{kap:grafy}}.
+\footnote{Používame pojmy z~nasledujúcej kapitoly \nameref{kap:grafy}}.
 
-Bez straty všeobecnosti budeme vždy hovoriť ako o strome, aj keď sa môže stať
-(a typicky aj stáva), že štruktúra nebude celistvá, teda nejde o strom, ale o les.
-V tom prápade ale môžeme pripojiť nový špeciálny koreňový vrchol, ktorého potomkovia
-(viz. definícia \ref{def:stromove_pojmy} budú dané stromy a ktorý nebudeme vizualizovať.
+Bez straty všeobecnosti budeme vždy hovoriť ako o~strome, aj keď sa môže stať
+(a~typicky aj stáva), že štruktúra nebude celistvá, teda nejde o~strom, ale o~les.
+V~tom prápade môžeme pripojiť nový špeciálny koreňový vrchol, ktorého potomkovia
+(viz. definícia \ref{def:stromove_pojmy}) budú dané stromy a~ktorý nebudeme vizualizovať.
 
 Na obrázku \ref{obr:RNA_stromova_reprezentacia} vidíme varianty reprezentácie vrcholov.
 Tie môžu zastupovať celé motívy, alebo iba nukleotid, respektíve celý bázový pár.
@@ -188,27 +207,30 @@ Tie môžu zastupovať celé motívy, alebo iba nukleotid, respektíve celý bá
 \begin{figure}
   \centering
   \includegraphics[width=130mm, height=70mm]{../img/stromova_reprezentacia_rna}
-  \caption{Varianty reprezentacie vrcholov podľa \citenum{RNA_DRAW}}
+  \caption{Varianty reprezentácie vrcholov podľa \citenum{RNA_DRAW}}
   \label{obr:RNA_stromova_reprezentacia}
 \end{figure}
 
-V našej práci vrchol stromu reprezentuje bázový pár (vnútorný vrchol)
+V~našej práci vrchol stromu reprezentuje bázový pár (vnútorný vrchol)
 alebo nespárovanú bázu (list stromu), ako je to zobrazené na obrázku \ref{obr:rna_to_tree}
-Štruktúru do ktorej patrí si totiž vieme ľahko zistiť z potomkov vrcholu.
+Štruktúru do ktorej patrí si totiž vieme ľahko zistiť z~potomkov vrcholu.
 
 \input{examples/rna_to_tree}
+
+
+
 
 \section{Grafové pojmy}
 \label{kap:grafy}
 
-V tejto časti zadefinujeme pojmy a značenie, ktoré budeme používať naprieč celou prácou.
-Z väčšej časti ho prevezmeme od \citet{RTED}.
+V~tejto časti zadefinujeme pojmy a~značenie, ktoré budeme v~tejto práci používať.
+Z~väčšej časti ho prevezmeme od \citet{RTED}.
 
 \begin{definice}\label{def:strom}
   Usporiadaný zakorenený strom je orientovaný graf bez cyklov,
-  jeho hrany sú orientované vždy v smere od koreňa, t.j. z predka k potomkovi.
+  jeho hrany sú orientované vždy v smere od koreňa, t.j. z~predka k~potomkovi.
 
-  Okrem koreňa má každý vrchol svojho predka a existuje usporiadanie medzi potomkami.
+  Okrem koreňa má každý vrchol svojho predka a~existuje usporiadanie medzi potomkami.
 
   Usporiadany les je usporiadaná množina stromov.
 \end{definice}
@@ -226,30 +248,30 @@ Prázdny strom/les budeme značiť $\emptyset$.
 Vnútornými vrcholmi budeme označovať vrcholy, ktoré majú nejakého potomka,
 tie bez potomkov nazveme listy.
 
-Podles lesa \tree{F} je les \tree{G} s vrcholmi $V_{\tree{G}} \subseteq V_{\tree{F}}$
-a hranami $E_{\tree{G}} \subseteq E_{\tree{F}} \cap (V_{\tree{G}} \times V_{\tree{G}})$.
+Podles lesa \tree{F} je les \tree{G} s~vrcholmi $V_{\tree{G}} \subseteq V_{\tree{F}}$
+a~hranami $E_{\tree{G}} \subseteq E_{\tree{F}} \cap (V_{\tree{G}} \times V_{\tree{G}})$.
 Obdobne to plati aj pre podstrom stromu.
 
 Nech $v$ je vrchol stromu \tree{F}. Potom \tree{F_{v}} budeme značiť podstrom \tree{F} zakorenený vo $v$,
-t.j. v strome ostávajú potomkovia $v$, ich potomkovia, atď.
+t.j. v~strome ostávajú potomkovia $v$, ich potomkovia, atď.
 \tree{F - v} budeme značiť les, ktorý vznikne zmazaním vrcholu $v$ z \tree{F} spolu so
 všetkými hranami obsahujúcimi $v$. Podobne \tree{F - \tree{F_{v}}} budeme značiť les, ktorý
-dostaneme zmazaním podstromu \tree{F_{v}} z \tree{F}.
+dostaneme zmazaním podstromu \tree{F_{v}} z~\tree{F}.
 
 \begin{definice}[Root-leaf cesta]
-  Nech je $F$ strom. Cestou v $F$ nazveme jeho súvislý podgraf taký, že všetky jeho vrcholy
+  Nech je $F$ strom. Cestou v~$F$ nazveme jeho súvislý podgraf taký, že všetky jeho vrcholy
   majú stupeň najviac 2.
 
-  Root-leaf cestou v $F$ budeme nazývať cestu začínajúcu v koreni stromu a \mbox{končiacu}
-  v nejakom jeho liste.
+  Root-leaf cestou v $F$ budeme nazývať cestu začínajúcu v koreni stromu \sloppy\mbox{a končiacu}
+  v~nejakom jeho liste.
 \end{definice}
 
-V práci budeme využívať tri druhy ciest, budú to $left, right, heavy$ a označovať ich
-budeme $\gamma^L, \gamma^R, \gamma^H$. $Left$ bude v strome cesta idúca vždy do prvého (ľavého)
-potomka, $right$ do posledného (pravého) a $heavy$ zase cesta idúca do vrcholu s najväčším
+V práci budeme využívať tri druhy ciest, budú to $left, right, heavy$ a~označovať ich
+budeme $\gamma^L, \gamma^R, \gamma^H$. $Left$ bude v~strome cesta idúca vždy do prvého (ľavého)
+potomka, $right$ do posledného (pravého) a~$heavy$ zase cesta idúca do vrcholu s~najväčším
 podstromom (najťažším)\footnote{ťažkých ciest môže existovať aj viac ako jedna}.
 
-Príklad $root$-$leaf$ cesty v strome je na obrázku \ref{obr:root_leaf_path}.
+Príklad $root$-$leaf$ cesty v~strome je na obrázku \ref{obr:root_leaf_path}.
 
 \input{examples/root_leaf_path}
 
