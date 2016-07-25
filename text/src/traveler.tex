@@ -4,9 +4,9 @@
 
 \chapter{TRAVeLer - Template RnA Visualization}
 
-V rámci bakalárskej práce sme vyvinuli konzolovú aplikáciu TRAVeLer.
-Program bol písaný v C++ a je určený pre operačné systémy UNIX-ového typu.
-Vyvíjaný a testovaný bol na Linux-e a FreeBSD.
+V~rámci bakalárskej práce sme vyvinuli konzolovú aplikáciu TRAVeLer.
+Program bol vyvíjaný v~C++ a~je určený pre operačné systémy UNIX-ového typu.
+Vyvíjaný a~testovaný bol na Linux-e a~FreeBSD.
 Podpora ostatných systémov nieje zaručená.
 
 
@@ -15,10 +15,10 @@ Podpora ostatných systémov nieje zaručená.
 
 \section{Inštalácia}
 
-Jedinou prerekvizitou k používaniu našej aplikácie je kompilátor C++
+Jedinou prerekvizitou k~používaniu našej aplikácie je kompilátor C++
 $gcc$ verzie aspoň 4.9.2.
 
-Pri testovaní boli zaznamenané problémy s regulárnymi výrazmi u starších verzií
+Pri testovaní boli zaznamenané problémy s~regulárnymi výrazmi u~starších verzií
 (konkrétne 4.7.2), ktoré ich plne nepodporovali.
 
 Zdrojové kódy programu najnovšej verzie si môžeme stiahnuť pomocou $Git$u príkazom
@@ -55,29 +55,29 @@ TREES:
   <-tt|--template-tree> [--type DOCUMENT_TYPE] DOCUMENT FILE_FASTA
 \end{code}
 
-Stručnú nápovedu k programu získame spustením so štandardným
+Stručnú nápovedu k~programu získame spustením so štandardným
 \paramI{h}, alebo \param{help} argumentom.
 
-Prepínače \param{ted} a \param{draw} sú zjednotené v \param{all} argumente.
-Ich existencia nám umožňuje predpočítať si mapovanie a následne vygenerovať
-aj niekoľko druhov obrázkov. Počítanie tree-edit-distance je totiž mnohonásobne
+Prepínače \param{ted} a~\param{draw} sú zjednotené v~\param{all} argumente.
+Ich existencia nám umožňuje predpočítať si mapovanie a~následne vygenerovať
+aj niekoľko druhov obrázkov. Počítanie TEDu je totiž mnohonásobne
 pomalšie ako samotná vizualizácia.
 
 Prepínač \param{match-tree} nám určuje RNA molekulu ktorú ideme vizualizovať.
 Ako ďalší parameter očakáva FASTA súbor, ktorého formát uvedieme neskôr.
 Šablónu nám určuje prepínač \param{template-tree}.
-Kým strom vizualizovanej molekuly sa načítava iba z fasta súboru,
-šablónová molekula potrebuje aj nakreslenie - obrázok z parametra DOCUMENT.
-Podrobnosti ohľadom parametra \param{type} nájdete v kapitole \nameref{kap:rozsirenie}.
+Kým strom vizualizovanej molekuly sa načítava iba z~fasta súboru,
+šablónová molekula potrebuje aj nakreslenie - obrázok z~parametra DOCUMENT.
+Podrobnosti ohľadom parametra \param{type} nájdete v~kapitole \nameref{kap:rozsirenie}.
 
 Prepínač \param{overlaps} nám po vygenerovaní obrázku spočíta počet prekryvov
-a vyznačí ich. Ich počet vypíše do samostatného logovacieho súboru, vďaka čomu
+a~vyznačí ich. Ich počet vypíše do samostatného logovacieho súboru, vďaka čomu
 rýchlejšie dokážeme identifikovať molekuly, ktoré potrebujú našu zvýšenú
 pozornosť.
 
 Prepínač \param{colored} aktivuje farebné zvýrazňovanie použitých operácií
-a štruktúrnych zmien v strome pri kreslení cieľovej molekuly co obrázka
-šablóny. Používame kódovanie farbami z tabuľky \ref{obr:color_coding}.
+a~štruktúrnych zmien v~strome pri kreslení cieľovej molekuly do obrázka
+šablóny. Používame kódovanie farbami z~tabuľky \ref{tab:color_coding}.
 
 \begin{table}
   \centering
@@ -101,13 +101,13 @@ Farbami zvýrazňujeme zmeny v strome, to znamená, že ak napríklad
 urobíme $update(AU, AG)$ bázového páru a zmení sa iba jeden nukleotid,
 označený bude celý pár ako editovaný.
 
-Modrou označujeme časti, ktoré sme z nejakého dôvodu poterbovali presunúť a prekresliť.
+Modrou označujeme časti, ktoré sme z~nejakého dôvodu potrebovali presunúť a~prekresliť.
 Typickým príkladom je prekreslenie loop po vložení alebo zmazaní nejakej bázy.
-Vtedy sme kvôli zmene potrebovali prekresliť všetky bázy a uložiť ich na kružnicu.
-Príkladom môže byť obrázok \ref{obr:insert_circle_hairpin} z predchádzajúcej kapitoly.
+Vtedy sme kvôli zmene potrebovali prekresliť všetky bázy a~uložiť ich na kružnicu.
+Príkladom môže byť obrázok \ref{obr:insert_circle_hairpin} z~predchádzajúcej kapitoly.
 
 Hnedou farbou označujeme celé podstromy multibranch loopy, ktorú potrebujeme
-prekresliť. V týchto prípadoch vznikajú často veľké prekryvy a týmto
+prekresliť. V týchto prípadoch vznikajú často veľké prekryvy a~týmto
 sa ich snažíme odlíšiť od ostatných, menej čakaných.
 Ak bol ale vrchol pred tým označený, nemeníme jeho farbu (to znamená, že vložený vrchol
 bude mať vždy rovnakú farbu, aj keď sme museli prekresliť multibranch loop do ktorej patrí).
@@ -119,23 +119,23 @@ bude mať vždy rovnakú farbu, aj keď sme museli prekresliť multibranch loop 
 \subsection{Formát fasta súboru}
 
 Ako formát súborov kodujúcich stromy používame trochu upravený fasta formát.
-Súbor na prvom riadku obsahuje názov molekuly hneď za znakom '>' až po prvú medzeru.
+Súbor na prvom riadku obsahuje názov molekuly hneď za znakom '$>$' až po prvú medzeru.
 Na ďalších riadkoch obsahuje sekvenciu RNA a sekundárnu štruktúru kódovanú
 pomocou dot-bracket formátu \citenum{DRAWING_COMPARISION}.
 Je ešte zvykom, že riadky sú najviac 80 znakov dlhé.
 
-Fasta súbor pre šablónu potrebuje iba názov a sekundárnu štruktúru,
+Fasta súbor pre šablónu potrebuje iba názov a~sekundárnu štruktúru,
 pre cieľovú molekulu aj sekvenciu. Je to dané tým, že sekvenciu
-si pri šablónovej molekule načítame z obrázka.
+si pri šablónovej molekule načítame z~obrázka.
 
 
 
 \section{Príklad vstupu}
 
-Teraz uvedieme príklad fasta súboru pre malú podjednotku rRNA človeka z obrázka
-\ref{obr:human_crw} a ukážeme (jediný) podporovaný formát PostScript obrázka.
-Podporujeme iba formát používaný v CRW databáze \citenum{CRW}.
-Ďalšie možné rozšírenia podpory iných formátov rozoberáme v kapitole
+Teraz uvedieme príklad fasta súboru pre malú podjednotku rRNA človeka z~obrázka
+\ref{obr:human_crw} a~ukážeme (jediný) podporovaný formát PostScript obrázka.
+Podporujeme iba formát používaný v~CRW databáze \citenum{CRW}.
+Ďalšie možné rozšírenia podpory iných formátov rozoberáme v~kapitole
 \nameref{kap:rozsirenie}.
 
 \begin{figure}[H]
@@ -217,12 +217,12 @@ UCCGUAGGUGAACCUGCGGAAGGAUCAUUA
 \end{figure}
 
 Kvôli dĺžke PostScript súboru sme uviedli iba jeho časť na obrázku \ref{obr:ps_format}.
-V súbore ignorujeme všetky riadky ktoré sú iného formátu ako
+V~súbore ignorujeme všetky riadky ktoré sú iného formátu ako
 \\
 \textit{(B) X Y lwstring},
 \\
-Kde $B$ označuje bázu a $X$ a $Y$ sú súradnice bodu, kde je báza nakreslená.
-Vďaka tomu, že sú riadky vypisované v smere $5' \to 3'$, tak zo súboru
+Kde $B$ označuje bázu a~$X$ a $Y$ sú súradnice bodu, kde je báza nakreslená.
+Vďaka tomu, že sú riadky vypisované v~smere $5' \to 3'$, tak zo súboru
 vieme určiť primárnu štruktúru RNA.
 
 
@@ -235,21 +235,21 @@ ako výstup TED algoritmu. Druhým sú obrázky vo formátoch SVG a PS.
 
 \subsection{Mapovacia tabuľka}
 
-Formát súboru s mapovacou tabuľkou je nasledovný. Prvý riadok obsahuje
+Formát súboru s~mapovacou tabuľkou je nasledovný. Prvý riadok obsahuje
 \mbox{\textit{DISTANCE: n}}, kde \textit{n} je editačná vzdialenosť
 medzi stromami.
-Ďalšie riadky sú vo formáte \mbox{$i$ $j$}, kde \mbox{$i, j$} sú rôzne a väčšie ako 0
-a ich význam je nasledovný.
+Ďalšie riadky sú vo formáte \mbox{$i$ $j$}, kde \mbox{$i, j$} sú rôzne a~väčšie ako 0
+a~ich význam je nasledovný.
 Ak \mbox{$i = 0$}, potom do stromu šablóny vkladáme $j$-tý vrchol%
-\footnote{Používame post order poradie vrcholov v strome} cieľovej molekuly.
-naopak ak \mbox{$j = 0$}, potom $i$-tý vrchol zo šablóny mažeme. V ostatných prípadoch
+\footnote{Používame post order poradie vrcholov v~strome} cieľovej molekuly.
+naopak ak \mbox{$j = 0$}, potom $i$-tý vrchol zo šablóny mažeme. V~ostatných prípadoch
 mapujeme $i$-tý vrchol na $j$-tý, tzn. robíme \mbox{$update(i, j)$}.
-Príklad časti súboru z mapovania medzi človekom a žabou (K03432 a X04025)
+Príklad časti súboru z~mapovania medzi človekom a~žabou (K03432 a X04025)
 je na obrázku \ref{obr:mapping_format}.
 Ako vidíme, editačná vzdialenosť je 58, čiže sme 58 nukleotidov pridali alebo zmazali.
-Vkladáme nukleotidy s indexom (v cieľovej molekule) 356, 365,
-nukleotidy číslo 1, 2 v oboch molekulách mapujeme na seba a bázy
-s indexom (v molekule šablóny) 155, 156 mažeme.
+Vkladáme nukleotidy s~indexom (v~cieľovej molekule) 356, 365,
+nukleotidy číslo 1, 2 v~oboch molekulách mapujeme na seba a~bázy
+s~indexom (v~molekule šablóny) 155, 156 mažeme.
 
 \begin{figure}
 \begin{code}[fontsize=\scriptsize, frame=none, samepage=true]
@@ -273,11 +273,11 @@ DISTANCE: 58
 
 \subsection{PostScript obrázok}
 
-PostScript súbor je zložený z hlavičky, v ktorej sú definície kresliacich funkcií za
+PostScript súbor je zložený z~hlavičky, v~ktorej sú definície kresliacich funkcií za
 ktorými sú riadky kreslenia molekuly. Príklad je na obrázku \ref{obr:ps_out}.
 
 Najprv definujeme operácie kreslenia v hlavičke súboru - $lwline$,
-$lwstring$ a $lwarc$ - kreslenie čiar, textu a kružníc a ďalšie 
+$lwstring$ a~$lwarc$ - kreslenie čiar, textu a~kružníc a~ďalšie 
 parametre dokumentu, za ktorými nasleduje samotné kreslenie molekuly.
 
 \begin{figure}
@@ -329,8 +329,8 @@ showpage
 
 Podobne funguje kreslenie v SVG súbore, ktorého príklad je na obrázku \ref{obr:svg_out}.
 Elementy \tagt{text} vypisujú na danú pozíciu text, \tagt{line}
-naopak kreslia čiary a \tagt{circle} zase kružnice.
-Argumenty týchto elementov sú bližšie vysvetlené v SVG tutorále \citenum{SVG_TUTORIAL}.
+naopak kreslia čiary a~\tagt{circle} zase kružnice.
+Argumenty týchto elementov sú bližšie vysvetlené v~SVG tutorále \citenum{SVG_TUTORIAL}.
 
 
 \begin{figure}
@@ -378,26 +378,26 @@ Argumenty týchto elementov sú bližšie vysvetlené v SVG tutorále \citenum{S
 Ako sme už uviedli, momentálne podporujeme iba jediný vstupný formát obrázkov.
 Je ním PostScript formát používaný databázou CRW od autorov \citet{CRW}.
 
-Pri tvorbe aplikácie sme mysleli na budúcnosť a tak načítavanie súboru
-robíme v jednom, ľahko rozšíriteľnom module.
-Ak potrebujeme pracovať s inými vstupnými súbormi, naimplementujeme extractor
-(viď definícia) a parametrom \param{type} ho môžeme použiť.
-Predvoleným a jediným implementovaným je práve PostScript extractor
-fungujúci nad súbormi z CRW databázy.
+Pri tvorbe aplikácie sme mysleli na budúcnosť a~tak načítavanie súboru
+robíme v~jednom, ľahko rozšíriteľnom module.
+Ak potrebujeme pracovať s~inými vstupnými súbormi, naimplementujeme extractor
+(viď definícia) a~parametrom \param{type} ho môžeme použiť.
+Predvoleným a~jediným implementovaným je práve PostScript extractor
+fungujúci nad súbormi z~CRW databázy.
 
 \begin{definice}
   Extractor je objekt, ktorý vie pracovať so súbormi určitého typu
-  a vie z nich vyňať potrebné položky reprezentujúce sekvenciu RNA
-  a pozície jej báz v obrázku.
+  a~vie z~nich vyňať potrebné položky reprezentujúce sekvenciu RNA
+  a~pozície jej báz v~obrázku.
 \end{definice}
 
 \renewcommand{\tagt}[1]{\mbox{\textit{#1}}}
 
-Vytvorenie nového typu spočíva v implementácií rozhrania \tagt{extractor}
-a jeho metódu \tagt{init}, ktorá ako jediný parameter dostáva názov súboru.
+Vytvorenie nového typu spočíva v~implementácií rozhrania \tagt{extractor}
+a~jeho metódu \tagt{init}, ktorá ako jediný parameter dostáva názov súboru.
 Druhou úlohou je pridať dvojicu \tagt{názov, extractor} do tabuľky
-implementovaných v metóde \tagt{create\_extractors}.
-Pri spustení programu s parametrom \param{type názov} použijeme
+implementovaných v~metóde \tagt{create\_extractors}.
+Pri spustení programu s~parametrom \param{type názov} použijeme
 novoimplementovaný extractor.
 
 
