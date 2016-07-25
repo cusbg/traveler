@@ -7,7 +7,7 @@
 V~rámci bakalárskej práce sme vyvinuli konzolovú aplikáciu TRAVeLer.
 Program bol vyvíjaný v~C++ a~je určený pre operačné systémy UNIX-ového typu.
 Vyvíjaný a~testovaný bol na Linux-e a~FreeBSD.
-Podpora ostatných systémov nieje zaručená.
+Podpora ostatných systémov nie je zaručená.
 
 
 
@@ -55,7 +55,7 @@ TREES:
   <-tt|--template-tree> [--type DOCUMENT_TYPE] DOCUMENT FILE_FASTA
 \end{code}
 
-Stručnú nápovedu k~programu získame spustením so štandardným
+Stručný návod k~programu získame spustením so štandardným
 \paramI{h}, alebo \param{help} argumentom.
 
 Prepínače \param{ted} a~\param{draw} sú zjednotené v~\param{all} argumente.
@@ -76,7 +76,7 @@ rýchlejšie dokážeme identifikovať molekuly, ktoré potrebujú našu zvýše
 pozornosť.
 
 Prepínač \param{colored} aktivuje farebné zvýrazňovanie použitých operácií
-a~štruktúrnych zmien v~strome pri kreslení cieľovej molekuly do obrázka
+a~\mbox{štruktúrnych} zmien v~strome pri kreslení cieľovej molekuly do obrázka
 šablóny. Používame kódovanie farbami z~tabuľky \ref{tab:color_coding}.
 
 \begin{table}
@@ -121,7 +121,7 @@ bude mať vždy rovnakú farbu, aj keď sme museli prekresliť multibranch loop 
 Ako formát súborov kodujúcich stromy používame trochu upravený fasta formát.
 Súbor na prvom riadku obsahuje názov molekuly hneď za znakom '$>$' až po prvú medzeru.
 Na ďalších riadkoch obsahuje sekvenciu RNA a sekundárnu štruktúru kódovanú
-pomocou dot-bracket formátu \citenum{DRAWING_COMPARISION}.
+pomocou dot-bracket formátu\footnote{bližšie je popísaný v článku od autorov \citet{DRAWING_COMPARISION}}.
 Je ešte zvykom, že riadky sú najviac 80 znakov dlhé.
 
 Fasta súbor pre šablónu potrebuje iba názov a~sekundárnu štruktúru,
@@ -134,7 +134,7 @@ si pri šablónovej molekule načítame z~obrázka.
 
 Teraz uvedieme príklad fasta súboru pre malú podjednotku rRNA človeka z~obrázka
 \ref{obr:human_crw} a~ukážeme (jediný) podporovaný formát PostScript obrázka.
-Podporujeme iba formát používaný v~CRW databáze \citenum{CRW}.
+Podporujeme iba formát používaný v~CRW databáze (\citet{CRW}).
 Ďalšie možné rozšírenia podpory iných formátov rozoberáme v~kapitole
 \nameref{kap:rozsirenie}.
 
@@ -330,7 +330,8 @@ showpage
 Podobne funguje kreslenie v SVG súbore, ktorého príklad je na obrázku \ref{obr:svg_out}.
 Elementy \tagt{text} vypisujú na danú pozíciu text, \tagt{line}
 naopak kreslia čiary a~\tagt{circle} zase kružnice.
-Argumenty týchto elementov sú bližšie vysvetlené v~SVG tutorále \citenum{SVG_TUTORIAL}.
+Argumenty týchto elementov sú bližšie vysvetlené v~nejakom SVG tutorále
+(napríklad online tutoriál od autora \citet{SVG_TUTORIAL}).
 
 
 \begin{figure}
