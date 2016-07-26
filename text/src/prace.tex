@@ -1,7 +1,5 @@
 %%% Hlavní soubor. Zde se definují základní parametry a odkazuje se na ostatní části. %%%
 
-%TODO predlozky na konci riadku
-
 %% Verze pro jednostranný tisk:
 % Okraje: levý 40mm, pravý 25mm, horní a dolní 25mm
 % (ale pozor, LaTeX si sám přidává 1in)
@@ -105,37 +103,53 @@
 % Nepovinné poděkování (vedoucímu práce, konzultantovi, tomu, kdo
 % zapůjčil software, literaturu apod.)
 \def\Podekovani{%
-Poděkování.
+Rád by som poďakoval môjmu vedúcemu práce RNDr. Davidovi Hokszovi, Ph.D.
+za jeho cenné pripomienky, čas a~ústretovosť pri konzultáciách,
+vedení a~v~neposlednom rade aj spracovaní bakalárskej práce.
+
+Ďalej by som rád poďakoval všetkým, ktorí ma počas štúdia neustále podporovali
+a~posúvali vpred.
 }
 
 % Abstrakt (doporučený rozsah cca 80-200 slov; nejedná se o zadání práce)
 \def\Abstrakt{%
-Abstrakt .. TODO
+Molekula RNA sa stáva predmetom mnohých štúdií, vďaka čomu
+rastie dopyt po nástrojoch pomáhajúcich pri jej analýze.
+Prvým krokom je často rozbor obrázka jej sekundárnej štruktúry.
+Aby sme molekulu rozvrhli čo najlepšie,
+potrebujeme poznať kritéria, ktoré by malo nakreslenie spĺňať.
+Tie neboli formalizované a~tak tento problém obchádzame novým algoritmom
+schopným vizualizovať RNA sekundárnu štruktúru pomocou podobnej štruktúry
+s~existujúcim nakreslením. RNA prevedieme do stromovej reprezentácie,
+algoritmom \textit{tree-edit-distance} minimálny počet operácií, ktoré
+nám prevedú jeden strom na druhý.
+Preto motívy spoločné pre obidva štruktúry ostanú nedotknuté a~tie zvyšné dokreslíme.
+Výsledky ukazujú, že náš algoritmus je schopný vizualizovať aj relatívne vzdialené
+štruktúry. Využitie nájde najmä pri vizualizácií homologických štruktúr.
 }
 \def\AbstraktEN{%
-RNA secondary structure data, both experimental and predicted, are becoming increasingly
-available which is reflected in the increased demand for tools enabling their analysis. The common first step
-in the analysis of RNA molecules is visual inspection of their secondary structure. In order to correctly lay
-out an RNA structure, the notion of optimal layout is required. However, optimal layout of RNA structure has
-never been formalized and is largely habitual. To tackle this problem we propose an algorithm capable of
-visualizing an RNA structure using a related structure with a well-defined layout. The algorithm first
-converts both structures into a tree representation and then uses tree-edit distance algorithm to find out
-the minimum number of tree edit operations to convert one structure into the other. We couple each tree
-edit operation with a layout modification operation which is then used to gradually transform the known
-layout into the target one. The optimality of tree edit distance algorithm causes that the common motives
-are retained and the regions which differ in both the structures are taken care of. Visual inspection and
-planarity evaluation reveals that the algorithm is able to give good layouts even for relatively distant
-structures while keeping the layout planar. The new method is well suited for situations when one needs to
-visualize a structure for with a homologous structure with a good visualization is already available.
+Many research aim to RNA molecules and demand for tools enabling their
+analysis increased. First step is visual inspection of their secondary structure.
+In order to correctly lay out structure, the notion of optimal layout is required.
+However, this has never been formalized and is largely habitual.
+To tackle this problem we propose an algorithm capable of
+visualizing RNA structure using related one with known layout.
+Algorithm first converts both RNAs into a tree representation and
+using \textit{tree-edit-distance} algorithm finds out the minimum number of
+operations to convert one structure into the other.
+All common motives are retained and the regions which differ
+are taken care of.
+Results show, that our algorithm is able to give good layouts
+even for relatively distant structures. It is well suited for
+visualization of homologous structures.
 }
 
 % 3 až 5 klíčových slov (doporučeno), každé uzavřeno ve složených závorkách
 \def\KlicovaSlova{%
-{TODO}
-{klíčová} {slova}
+  RNA, sekundárna štruktúra, vizualizácia, konzervovanosť
 }
 \def\KlicovaSlovaEN{%
-RNA secondary structure, visualization, homology
+  RNA, secondary structure, visualization, conservation
 }
 
 %% Balíček hyperref, kterým jdou vyrábět klikací odkazy v PDF,
