@@ -1,6 +1,6 @@
-\newcommand{\Cdel}{\ensuremath{c_{del}}}
-\newcommand{\Cins}{\ensuremath{c_{ins}}}
-\newcommand{\Cupd}{\ensuremath{c_{upd}}}
+\newcommand{\Cdel}{\ensuremath{c_{del}}\xspace}
+\newcommand{\Cins}{\ensuremath{c_{ins}}\xspace}
+\newcommand{\Cupd}{\ensuremath{c_{upd}}\xspace}
 
 \newcommand{\AfullDecomposition}{\ensuremath{\mathcal{A}}}
 \newcommand{\FrelevantSubforests}{\ensuremath{\mathcal{F}}}
@@ -104,7 +104,7 @@ V~nasledujúcich častiach sa budeme venovať výhradne algoritmu RTED od tvorco
 Ich algoritmus rozdelíme na 2 časti, rovnako pomenovaný RTED a GTED.
 
 RTED (Robust Tree Edit Distance) algoritmus bude pre nás algoritmus na výpočet
-optimálnej dekompozičnej stratégie (viď definícia \ref{def:strategy})
+optimálnej dekompozičnej stratégie (pozri definíciu \ref{def:strategy})
 a~GTED (General Tree Edit Distance), algoritmus pre samotný výpočet editačnej
 vzdialenosti z~rekurzie \ref{eq:ted} s~aplikovaním danej stratégie.
 
@@ -184,9 +184,9 @@ Pozrime sa znovu na algoritmus a~na hodnoty používané v podmienkach na riadko
 Počítame hodnotu zmazania a~vloženia vrcholu \mbox{z/do} \tree{F}.
 Tretia hodnota sa líši podľa toho, či sú lesy zároveň stromami. Ak sú, tak na danom mieste
 je cena namapovania podstromov $\tree{F_{v}} - v$ na $\tree{G_{w}} - w$ a~updatu vrcholu $v$ na $w$.
-Ináč, keď aspoň jeden z~lesov nieje strom, tak cenu mapovania medzi
+Ináč, keď aspoň jeden z~lesov nie je strom, tak cenu mapovania medzi
 $\tree{F_{Last_{\tree{F}}}}$ a~$\tree{G_{Last_{\tree{G}}}}$
-máme vyrátanú z predchádzajúcich krokoch, alebo z~inej vetvy rekurzie.
+máme vyrátanú z predchádzajúcich krokov, alebo z~inej vetvy rekurzie.
 Následne nastavíme hodnotu vzdialenosti medzi lesmi na minimum a~v~prípade že sú to obidva stromy,
 tak si uložíme aj ich vzdialenosť.
 
@@ -214,11 +214,11 @@ tak si uložíme aj ich vzdialenosť.
 
 \begin{dukaz}
   Hodnota $ForestDistance$ pre použitie s~prázdnym lesom je inicializovaná, a~pri každej iterácií
-  algoritmu čítam iba z~hodnôt z~predchadzajúcich iteracií, napríklad
+  algoritmu čítam iba z~hodnôt z~predchádzajúcich iterácií, napríklad
   $ForestDistance[F - Last_{F}][G - Last_{G}]$, alebo $ForestDistance[F - F_{Last_{F}}][G - G_{Last_{G}}]$.
   V~prvom prípade mažem iba jeden vrchol, v~druhom celý jeho podstrom.
 
-  Hodnoty $TreeDistance$ používame iba v~prípade, že aspoň jeden z~lesov \tree{F'} alebo \tree{G'} nieje stromom.
+  Hodnoty $TreeDistance$ používame iba v~prípade, že aspoň jeden z~lesov \tree{F'} alebo \tree{G'} nie je stromom.
   To znamená, že ak posledne pridaný vrchol $Last_{F}$ je mimo cesty $\gamma_{F}$, tak sme vzdialenosť
   od $Last_{G}$ vyrátali rekurzívne po dekompozicií $F$ už skôr.
   Naopak ak $Last_{F}$ leži na ceste, potom $Last_{G}$ je mimo cesty, a~editačnú vzdialenosť
@@ -256,7 +256,7 @@ vzdialenosti medzi vrcholmi na ceste $\gamma$ a~druhým stromom.
 Výpočet je uvedený v~tabuľke na obrázku \ref{obr:gted_priklad}.
 Začne porovnávať dva lesy, \set{1} a \set{A}. Najmenšiu vzdialenosť (0) získame operáciou
 update(1, A), teda zmeníme hodnotu vo vrchole z 1 na A. Vzdialenosť si uložíme do $TreeDistance$
-tabuľky, keďže podmienka, aby boli obidva lesy aj stromami platí.
+tabuľky, keďže podmienka, aby boli obidva lesy aj stromami, platí.
 Pokračujeme porovnávaním lesov \set{1} a \set{A, B}.
 Máme tri možnosti:
 \begin{itemize}
@@ -305,7 +305,7 @@ Výsledné mapovanie je $4 \to C, 3 \to B, 2 \to \emptyset, 1 \to A$.
 \subsubsection{RTED: Robust Tree Edit Distance algoritmus}
 
 RTED budeme vnímať ako algoritmus na počítanie optimálnej stratégie - teda algoritmus,
-ktorý nám poradí ako najlepšie dekomponovať obidva stromy.
+ktorý nám poradí, ako najlepšie dekomponovať obidva stromy.
 
 Funguje tak, že si predpočíta koľko podproblémov budeme musieť vyriešiť, ak použijeme stratégiu
 $left$, $right$, alebo $heavy$.

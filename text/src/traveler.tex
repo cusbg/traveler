@@ -109,8 +109,9 @@ Príkladom môže byť obrázok \ref{obr:insert_circle_hairpin} z~predchádzajú
 Hnedou farbou označujeme celé podstromy multibranch loopy, ktorú potrebujeme
 prekresliť. V týchto prípadoch vznikajú často veľké prekryvy a~týmto
 sa ich snažíme odlíšiť od ostatných, menej čakaných.
-Ak bol ale vrchol pred tým označený, nemeníme jeho farbu (to znamená, že vložený vrchol
-bude mať vždy rovnakú farbu, aj keď sme museli prekresliť multibranch loop, do ktorej patrí).
+Ak bol ale vrchol pred tým označený, nemeníme jeho farbu%
+\footnote{Vložený vrchol bude mať vždy rovnakú farbu, aj v prípade
+keď sme museli prekresliť multibranch loop, do ktorej patrí}.
 
 
 
@@ -217,7 +218,7 @@ UCCGUAGGUGAACCUGCGGAAGGAUCAUUA
 \end{figure}
 
 Kvôli dĺžke PostScript súboru sme uviedli iba jeho časť na obrázku \ref{obr:ps_format}.
-V~súbore ignorujeme všetky riadky ktoré sú iného formátu ako
+V~súbore ignorujeme všetky riadky, ktoré sú iného formátu ako
 \\
 \textit{(B) X Y lwstring},
 \\
@@ -259,6 +260,9 @@ DISTANCE: 58
   ...
 1 1
 2 2
+3 3
+4 4
+5 5
   ...
 155 0
 156 0
@@ -382,7 +386,7 @@ Je ním PostScript formát používaný databázou CRW od autorov \citet{CRW}.
 Pri tvorbe aplikácie sme mysleli na budúcnosť a~tak načítavanie súboru
 robíme v~jednom, ľahko rozšíriteľnom module.
 Ak potrebujeme pracovať s~inými vstupnými súbormi, naimplementujeme extractor
-(viď definícia) a~parametrom \param{type} ho môžeme použiť.
+(pozri definíciu \ref{def:extractor}) a~parametrom \param{type} ho môžeme použiť.
 Predvoleným a~jediným implementovaným je práve PostScript extractor
 fungujúci nad súbormi z~CRW databázy.
 
@@ -390,6 +394,7 @@ fungujúci nad súbormi z~CRW databázy.
   Extractor je objekt, ktorý vie pracovať so súbormi určitého typu
   a~vie z~nich vyňať potrebné položky reprezentujúce sekvenciu RNA
   a~pozície jej báz v~obrázku.
+  \label{def:extractor}
 \end{definice}
 
 \renewcommand{\tagt}[1]{\mbox{\textit{#1}}}

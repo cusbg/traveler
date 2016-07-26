@@ -2,10 +2,10 @@
 
 \chapter{Kreslenie molekuly}
 
-Po tom čo získame a~aplikujeme mapovanie medzi šablonovou a~cieľovou molekulou RNA,
-získame cieľovú molekulu s~čiastočnou vizualizáciou, ktorej zvyšok potrebujeme dopočitať.
+Po tom, čo získame a~aplikujeme mapovanie medzi šablónovou a~cieľovou molekulou RNA,
+získame cieľovú molekulu s~čiastočnou vizualizáciou, ktorej zvyšok potrebujeme dopočítať.
 
-Príklad ako to vyzerá je na obrázku \ref{obr:frog_to_human}, kde sme
+Príklad, ako to vyzerá je na obrázku \ref{obr:frog_to_human}, kde sme
 namapovali sekundárnu štruktúru malej podjednotky rRNA 16S žaby (\textit{X04025}) do
 obrázka sekundárnej štruktúry malej podjednotky rRNA 16S človeka.
 Ako si môžeme všimnúť, v obrázku (najmä v~spodnej časti) sú bázy nakreslené
@@ -24,7 +24,7 @@ báza na danom mieste.
 \end{figure}
 
 Čiastočnej vizualizácie sa chceme dotýkať čo najmenej. To znamená, že všetky zásahy sa
-snažíme robiť iba v~miestach, ktoré sa zmenili - boli dotknuté vkladaním alebo mazaním báz.
+snažíme robiť iba v~miestach, ktoré sa zmenili - boli dotknuté vkladaním, alebo mazaním báz.
 
 Jediné dve výnimky budú normalizácia vzdialeností medzi bázovými pármi a~vyrovnávanie stemov.
 
@@ -35,7 +35,7 @@ Jediné dve výnimky budú normalizácia vzdialeností medzi bázovými pármi a
 \section{Normalizácia vzdialeností v~bázových pároch a~vyrovnavanie stemov}
 
 Tieto dve výnimky sme sa rozhodli urobiť, keďže časté výnimky nám sťažovali
-prácu a~veci, ktoré predpokladáme, že v~obrázku nájdeme neboli vždy skutočnosťou.
+prácu a~veci, ktoré predpokladáme, že v~obrázku nájdeme, neboli vždy skutočnosťou.
 
 Ako príklad môžeme uviesť, že ak chceme nakresliť nový bázový pár a~máme nakreslený
 rodičovský párový vrchol. Následne v~smere od jeho rodiča (nášho prapredka) kreslíme nový
@@ -79,7 +79,7 @@ To sa môže stať napríklad, ak je samotná vzdialenosť medzi bodmi príliš 
 Na obrázku \ref{obr:insert_circle_hairpin} vidíme celý algoritmus zväčšovania kružnice.
 Začíname kružnicou medzi $Begin$ a~$Eend$ bodmi, ktoré reprezentujú bázy posledného
 páru v~smere $5' \to 3'$. V ďalších dvoch iteráciách zväčšujeme kružnicu až kým
-nieje dostatočne veľká pre daný počet báz. Následne vrcholy hairpinu na ňu uložíme.
+nie je dostatočne veľká pre daný počet báz. Následne vrcholy hairpinu na ňu uložíme.
 Pôvodné vrcholy sú označené modrou, vložené sú zase červené I.
 
 \renewcommand{\wi}{0.24\textwidth}
@@ -113,7 +113,7 @@ Pri vkladaní nového vrcholu do stromu môžu nastať nasledovné možnosti.
 
 Ak vkladáme listy do hairpinu, je to jednoduché. Potrebujeme iba použiť
 procedúru z~algoritmu \ref{alg:operacia_circle_reinsert}
-s~parametrami $Begin = $ požicia prvej bázy z~bázového páru, $End = $ pozícia
+s~parametrami $Begin = $ pozícia prvej bázy z~bázového páru, $End = $ pozícia
 druhej bázy z~páru a~$Bases = $ zoznam všetkých potomkov.
 Príklad sme už ukázali na obrázku \ref{obr:insert_circle_hairpin}.
 

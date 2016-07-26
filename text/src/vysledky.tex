@@ -133,20 +133,20 @@ Po použití operácie prekresľovania multibranch loop sme zaznamenali
 zvýšený výskyt prekryvov. Závislosť medzi použitím tejto operácie
 a~počtom prekryvov nám vyjadrujú ďalšie dva grafy,
 prvý - \ref{obr:statistika_prekryvy_s_rotaciami} nám ukazuje, že ak
-program musel rotovať a~prekreslovať multibranch loopy,
+program musel rotovať a~prekresľovať multibranch loopy,
 nedarilo sa mu najlepšie. Naopak, ak berieme do úvahy iba vizualizácie bez
 prekresľovania multibranch loopy (graf \ref{obr:statistika_prekryvy_bez_rotacii}),
 vidíme, že prekryvy vznikali iba ojedinele.
 
 \begin{figure}
   \includegraphics[width=1\textwidth]{../img/statistika/prekryvy-pocetmolekul-s-rotaciami}
-  \caption{Počet prekryvov: molekuly, ktoré potrebovali prekreslit multibranch loop}
+  \caption{Počet prekryvov: molekuly, ktoré potrebovali prekresliť multibranch loop}
   \label{obr:statistika_prekryvy_bez_rotacii}
 \end{figure}
 
 \begin{figure}
   \includegraphics[width=1\textwidth]{../img/statistika/prekryvy-pocetmolekul-bez-rotacii}
-  \caption{Počet prekryvov: molekuly bez prekreslovania multibranch loop}
+  \caption{Počet prekryvov: molekuly bez prekresľovania multibranch loop}
   \label{obr:statistika_prekryvy_s_rotaciami}
 \end{figure}
 
@@ -157,12 +157,26 @@ Pre každú dvojicu molekúl sme si spočítali vzdialenosť medzi nimi.
 Poradie je v~závislosti od TED vzdialenosti medzi molekulami%
 \footnote{1. je najbližšia (najmenšia hodnota TED), 15. je najvzdialenejšia}
 
+Ako vidíme, so vzdialenosťou medzi štruktúrami nám síce počty prekryvov v priemere
+nestúpali. Rástla ale smerodajná odchýlka - oproti priemeru nastávali väčšie výkyvy.
+To spôsobuje najmä to, že väčšina molekúl je dobre konzervovaných a~preto počty
+prekryvov držia na nízkej úrovni, na druhú stranu je pár extrémov, ktoré sa
+prejavili v odchýlke.
+
+Zaujímavosťou je, že ku všetkým molekulám bola najvzdialenejšia (pätnásta v~poradí)
+molekula \textit{Echinococcus granulosus (U27015)}.
+Štruktúra je veľmi odlišná od ostatných. Chýbajú jej celé vetvy,
+čo zapríčiňuje ich mazanie, a následné vkladanie
+nepárových nukleotidov, ktoré sú na ich miestach spôsobí nakreslenie jednej veľkej kružnice
+(príklad je na obrázku \ref{obr:chyba_rozloženie_loopy}). Prekryvov spôsobených
+touto kružnicou je relatívne málo a preto posledná hodnota tabuľky je taká nízka.
+
 \begin{table}
   \centering
   \begin{tabular}{c|c|c|c}
     \toprule
     \mc{\textbf{Poradie}}  & \mc{\textbf{TED}}          & \mc{\textbf{Počet}}     & \mc{\textbf{Smerodajná}}   \\
-    \mc{}                  & \mc{\textbf{(priemer)}}    & \mc{\textbf{prekryvov}} & \mc{\textbf{odchýlka}}     \\
+    \mc{}                  & \mc{}                      & \mc{\textbf{prekryvov}} & \mc{\textbf{odchýlka}}     \\
     \midrule
     1   & 85,94   & 5,13  & 1,64  \\
     2   & 113,94  & 13,56 & 11,50 \\
@@ -184,10 +198,6 @@ Poradie je v~závislosti od TED vzdialenosti medzi molekulami%
   \caption{Počty prekryvov v~závislosti od tree-edit-distance vzdialenosti}
   \label{tab:statistika_prekryvy}
 \end{table}
-
-Zaujímavosťou je, že ku všetkým molekulám bola najvzdialenejšia (pätnásta v~poradí)
-molekula \textit{Echinococcus granulosus (U27015)} s~priemernou TED
-vzdialenosťou $805,63$ a~odchýlkou $12,92$.
 
 
 
@@ -236,11 +246,11 @@ V~tomto prípade až príliž veľkú%
 \begin{figure}
 %trim=left bottom right top
   \includegraphics[clip, trim=0 10cm 3cm 2cm,width=1\textwidth]{../img/chyby/african_frog-echinococcus_granulosus}
-  \caption{Chyba pri rozkladaní báz na kružnicu}
+  \caption{Vizualizácia rRNA mušle (\textit{X53899}) do obrázka cikády (\textit{U06478}) a chyba pri rozkladaní báz na kružnicu}
   \label{obr:chyba_rozloženie_loopy}
 \end{figure}
 
-\subsection{Otáčanie vetvy kvôli prekreslovaniu multibranch loopy}
+\subsection{Otáčanie vetvy kvôli prekreslovaniu multibranch \mbox{loopy}}
 
 Ako už aj graf na obrázku \ref{obr:statistika_prekryvy_bez_rotacii} ukázal,
 prekresľovanie multibranch loopy a~rotácie všetkych vetiev spôsobuje masívne prekryvy.

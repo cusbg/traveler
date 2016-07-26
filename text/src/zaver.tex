@@ -1,2 +1,38 @@
-\chapter*{Závěr}
-\addcontentsline{toc}{chapter}{Závěr}
+\chapter*{Záver}
+\addcontentsline{toc}{chapter}{Záver}
+
+V rámci práce sme vytvorili program TRAVeLer umožňujúci
+vizualizáciu sekundárnej štruktúry RNA pomocou existujúceho
+obrázka molekuly, ktorý nám slúži ako predloha.
+
+Stromová reprezentácia štruktúry a~následné
+použitie \textit{tree-edit-distance} metriky podobnosti dvoch
+štruktúr sa ukázali ako správna voľba.
+Algoritmus TED nám nie len dá informáciu o tom,
+s ako vzdialenými štruktúrami pracujeme, ale dáva nám
+aj návod, ako transformovať šablónovú molekulu na tu cieľovú.
+U dostatočne podobných štruktúr nám už namapovaná štruktúra
+ukáže aké častí sú spoločné a ktoré sa líšia a dá nám
+predstavu, ako bude výsledná vizualizácia vyzerať.
+
+Výsledky ukazujú, že ak použijeme štruktúrne dostatočne blízku
+molekulu ako šablónu, výsledok vizualizácie je uspokojujúci.
+S väčšou vzdialenosťou ale počet prekryvov vo výsledných obrázkoch
+stúpa.
+
+V budúcnosti bude vhodné upraviť naše primitívne kresliace algoritmy.
+Takýmto vylepšením by bola implementácia otáčania vetiev RNA stromov,
+v prípade, že sme našli prekryv.
+Druhou možnosťou by bolo pridanie interaktívneho nástroja na úpravu
+vzniknutých obrázkov. Ten by umožnil ručne upraviť výsledné vizualizácie.
+
+V našej práci sme sa úplne vyhli pseudouzlom. To nám umožnilo
+reprezentovať sekundárnu štruktúru RNA ako usporiadaný, zakorenený strom.
+Avšak, pseudouzly sú jej dôležitou súčasťou.
+Možným vylepšením by preto bolo, zohľadniť ich existenciu pri mapovaní.
+To si ale bude vyžadovať hlbšiu analýzu tohoto problému.
+
+Program bol uvolnený pre používanie biológmi. Budeme očakávať ich reakcie,
+na základe ktorých budeme implementovať ďalšie vylepšenia programu.
+Dúfame, že aplikácia nájde miesto k svojím používateľom.
+
