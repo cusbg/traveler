@@ -5,10 +5,10 @@ V rámci práce sme vytvorili program TRAVeLer umožňujúci
 vizualizáciu sekundárnej štruktúry RNA pomocou existujúceho
 obrázka molekuly, ktorý nám slúži ako predloha.
 
-Stromová reprezentácia štruktúry a~následné
-použitie \textit{tree-edit-distance} metriky podobnosti dvoch
-štruktúr sa ukázali ako správna voľba.
-Algoritmus TED nám nie len dá informáciu o tom,
+Reprezentovať sekundárnu štruktúru RNA sme sa rozhodli pomocou
+stromov. To nám umožnilo použiť \textit{tree-edit-distance}
+metriku podobnosti dvoch štruktúr.
+Algoritmus TED nám nedáva len informáciu o tom,
 s ako vzdialenými štruktúrami pracujeme, ale dáva nám
 aj návod, ako transformovať šablónovú molekulu na tu cieľovú.
 U dostatočne podobných štruktúr nám už namapovaná štruktúra
@@ -20,7 +20,7 @@ molekulu ako šablónu, výsledok vizualizácie bude uspokojujúci.
 S väčšou vzdialenosťou ale počet prekryvov vo výsledných obrázkoch
 stúpa.
 
-V budúcnosti bude vhodné upraviť naše primitívne kresliace algoritmy.
+V budúcnosti bude vhodné upraviť naše kresliace algoritmy.
 Takýmto vylepšením by bola implementácia otáčania vetiev RNA stromov,
 v prípade, že sme našli prekryv.
 Druhou možnosťou by bolo pridanie interaktívneho nástroja na úpravu
@@ -35,5 +35,4 @@ To si ale bude vyžadovať hlbšiu analýzu tohoto problému.
 
 Program bol uvolnený pre používanie biológmi. Budeme očakávať ich reakcie,
 na základe ktorých budeme implementovať ďalšie vylepšenia programu.
-Dúfame, že aplikácia nájde cestu k svojím používateľom.
 
