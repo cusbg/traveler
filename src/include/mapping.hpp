@@ -25,6 +25,9 @@
 #include <vector>
 #include <istream>
 
+/**
+ * representation for mapping between two trees
+ */
 class mapping
 {
 public:
@@ -38,15 +41,28 @@ public:
     };
 
 private:
+    /**
+     * read mapping from input stream
+     */
     static mapping read_mapping(
                 std::istream& in);
+    /**
+     * transform mapping from text to pair object representation
+     */
     static mapping_pair split(
                 const std::string& text);
 
 public:
     mapping() = default;
 
+    /**
+     * filter only inserts
+     */
     indexes get_to_insert() const;
+
+    /**
+     * filter only deletes
+     */
     indexes get_to_remove() const;
 
 public:

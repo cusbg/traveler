@@ -44,14 +44,27 @@ struct compact::intervals
     rna_structure_type type;
 };
 
+/**
+ * interval between two stems
+ * vector contains all non-paired bases between stems
+ */
 struct compact::interval
 {
     struct
     {
+        /**
+         * which node
+         */
         iterator it;
+        /**
+         * index of base in pair
+         */
         bool index;
     } beg, end;
     nodes_vec vec;
+    /**
+     * if interval should be remade
+     */
     bool remake = false;
 };
 

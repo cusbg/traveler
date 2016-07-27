@@ -29,6 +29,9 @@
 
 struct RGB;
 
+/**
+ * class for printing visualization
+ */
 class document_writer
 {
 public:
@@ -39,6 +42,9 @@ protected:
     document_writer() = default;
 
 public:
+    /**
+     * initialize, and return all known writers
+     */
     static std::vector<std::unique_ptr<document_writer>> get_writers(
                 bool use_colors);
 
@@ -48,6 +54,9 @@ public:
     virtual streampos print(
                 const std::string& text) = 0;
 
+    /**
+     * set, if writer should use colors in output
+     */
     void use_colors(
                 bool colored);
 
@@ -69,6 +78,9 @@ public: // formatters
                 const RGB& color) const = 0;
 
 public:
+    /**
+     * returns rna backbone visualization
+     */
     std::string get_rna_background_formatted(
                 rna_tree::pre_post_order_iterator begin,
                 rna_tree::pre_post_order_iterator end) const;
@@ -85,6 +97,9 @@ public:
      */
     void init(
                 const std::string& filename);
+    /**
+     * initialize writer, set basic properties to document (scale/..)
+     */
     virtual void init(
                 const std::string& filename,
                 rna_tree::iterator root) = 0;
@@ -118,8 +133,14 @@ protected:
                 point from,
                 point to,
                 const RGB& color) const = 0;
+    /**
+     * flush `text` to output
+     */
     void print_to_stream(
                 const std::string& text);
+    /**
+     * seek with offset
+     */
     void seek_from_current_pos(
                 off_type offset);
 
@@ -135,6 +156,9 @@ private:
 };
 
 
+/**
+ * RGB colors
+ */
 struct RGB
 {
 public: /* constants: */

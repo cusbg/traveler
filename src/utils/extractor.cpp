@@ -49,7 +49,7 @@ static extractor_map_type create_extractors()
     assert_err(it != map.end(), "type '%s' is not supported", to_cstr(doctype));
 
     extractor& extractor = *it->second;
-    extractor.init(docfile);
+    extractor.extract(docfile);
 
     return extractor;
 }

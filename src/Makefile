@@ -25,6 +25,9 @@ build: mkdir make_modules ${BUILDDIR}/Makefile compile
 run: build cleanLog cp mkdir
 	sh -x run.sh
 
+doc:
+	doxygen
+
 debug: build cp mkdir
 	sh -x run.sh debug
 

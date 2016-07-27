@@ -27,6 +27,9 @@
 #include "tree_base_node.hpp"
 #include "point.hpp"
 
+/**
+ * object representing one base
+ */
 struct rna_label
 {
     bool operator==(
@@ -36,7 +39,9 @@ struct rna_label
     point p;
 };
 
-
+/**
+ * object representing one node in tree - base or base pair
+ */
 class rna_pair_label : public node_base
 {
 public:
@@ -78,16 +83,28 @@ public:
                 status_type status);
 
     size_t size() const;
+    /**
+     * returns if this node is base pair
+     */
     bool paired() const;
+    /**
+     * returns if all points are inited (in pair-bases or single base)
+     */
     bool inited_points() const;
+    /**
+     * returns point between bases in pair. If signle pase is present, returns its position
+     */
     point centre() const;
 
     void clear_points();
+    /**
+     * set bases
+     */
     void set_label_strings(
                 const rna_pair_label& other);
-    void set_points_nearby(
-                point p,
-                size_t index);
+    /**
+     * set point for base
+     */
     void set_points_exact(
                 point p,
                 size_t index);

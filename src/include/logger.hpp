@@ -28,12 +28,21 @@
 
 #include <stdexcept>
 
+/**
+ * printf using variadic c++ template
+ */
 template<typename Stream, typename T, typename... Args>
 Stream&& mprintf(const char* format, Stream&& stream, const T value, Args... args);
 
+/**
+ * printf using variadic c++ template
+ */
 template<typename Stream>
 Stream&& mprintf(const char* format, Stream&& stream);
 
+/**
+ * printf using variadic c++ template
+ */
 template<typename... Args>
 std::string msprintf(const char* format, Args... args)
 {
@@ -111,6 +120,9 @@ class logger
 
 
 public:
+    /**
+     * logging priority
+     */
     enum priority : char
     {
         DEBUG   = 0,
@@ -120,6 +132,9 @@ public:
         EMERG   = 4,
     };
 
+    /**
+     * stream object for logging
+     */
     class logger_stream
     {
         friend logger;
@@ -155,10 +170,17 @@ public:
     ~logger();
 
 public:
+    /**
+     * returns priority for this logger
+     */
     inline priority get_priority() const
     {
         return p;
     }
+
+    /**
+     * sets priority for this logger
+     */
     inline void set_priority(
                 priority other)
     {
@@ -166,22 +188,37 @@ public:
     }
 
 protected:
+    /**
+     * returns header for priority
+     */
     std::string message_header(
                 priority p) const;
 
+    /**
+     * print `text` with priority `p`
+     */
     void log(
                 priority p,
                 const std::string& text);
 
+    /**
+     * create new stream for this logger with pirority `p`
+     */
     inline logger_stream get_stream(
                 priority p)
     {
         return logger_stream(*this, p);
     }
 
+    /**
+     * check IO errors
+     */
     void check_errors();
 
 protected:
+    /**
+     * returns if priority for new message higher than logger is printing
+     */
     inline bool can_log(
                 priority other) const
     {
@@ -196,6 +233,9 @@ public:
     LOGGER_FUNCTIONS(emerg, EMERG);
 
 public:
+    /**
+     * returns file descriptors for all opened logging files
+     */
     std::vector<int> opened_files() const;
 
 protected:

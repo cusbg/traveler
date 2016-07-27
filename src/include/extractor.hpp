@@ -32,11 +32,17 @@
 class extractor
 {
 public:
+    /**
+     * returns extractor with `type`, run extraction from file `filename`
+     */
     static extractor& get_extractor(
                 const std::string& filename,
                 const std::string& type);
 protected:
-    virtual void init(
+    /**
+     * run extraction
+     */
+    virtual void extract(
                 const std::string& filename) = 0;
 
 public:

@@ -27,6 +27,9 @@
 class rna_tree;
 class mapping;
 
+/**
+ * class to handle flow
+ */
 class app
 {
 private:
@@ -54,12 +57,19 @@ private:
     void run(
                 arguments args);
 
+    /**
+     * run tree-edit-distance algorithm
+     * returns mapping between templated and matched tree
+     */
     mapping run_ted(
                 rna_tree& templated,
                 rna_tree& matched,
                 bool save,
                 const std::string& mapping_file);
 
+    /**
+     * run drawing algorithm, visualized molecule will be saved
+     */
     void run_drawing(
                 rna_tree& templated,
                 rna_tree& matched,
@@ -95,6 +105,9 @@ private:
                 const std::string& templatetype,
                 const std::string& fastafile);
 
+    /**
+     * save number of overlaps to log file
+     */
     void log_overlaps(
                 const std::string& name,
                 size_t size);

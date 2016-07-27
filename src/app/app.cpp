@@ -63,6 +63,9 @@ struct app::arguments
     } draw;
 
 public:
+    /**
+     * parse arguments
+     */
     static arguments parse(
                 const std::vector<std::string>& args);
 

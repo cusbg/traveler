@@ -24,6 +24,9 @@
 
 #include "rna_tree.hpp"
 
+/**
+ * precompute and store some frequently needed values in gted
+ */
 struct gted_tree : public rna_tree
 {
 public:
@@ -39,6 +42,10 @@ public:
 public:
     gted_tree(
                 const rna_tree& t);
+
+    /**
+     * initialize all table values
+     */
     void init();
 
 private:
@@ -58,30 +65,49 @@ public:
         assert(_tree.begin() == it);
     }
 public:
+    /**
+     * returns `it`s heavy child
+     */
     inline iterator get_heavy_child(
                 const iterator& it) const
     {
         check_same_tree(it);
         return heavy_children[id(it)];
     }
+
+    /**
+     * returns `it`s subtree size
+     */
     inline size_t get_size(
                 const iterator& it) const
     {
         check_same_tree(it);
         return sizes[id(it)];
     }
+
+    /**
+     * returns `it`s leafs (left/right/heavy)
+     */
     inline LRH get_leafs(
                 const iterator& it) const
     {
         check_same_tree(it);
         return leafs[id(it)];
     }
+
+    /**
+     * returns `it`s keyroots
+     */
     inline LRH_table get_keyroots(
                 const iterator& it) const
     {
         check_same_tree(it);
         return keyroots[id(it)];
     }
+
+    /**
+     * returns `it`s subforests
+     */
     inline LRH_table get_subforests(
                 const iterator& it) const
     {
@@ -89,17 +115,27 @@ public:
         return subforests[id(it)];
     }
 
-public:
+    /**
+     * returns if `it` is left child
+     */
     inline bool is_left(
                 iterator it) const
     {
         return is_first_child(it);
     }
+
+    /**
+     * returns if `it` is right child
+     */
     inline bool is_right(
                 iterator it) const
     {
         return is_last_child(it);
     }
+
+    /**
+     * returns if `it` is heavy child
+     */
     inline bool is_heavy(
                 iterator it) const
     {

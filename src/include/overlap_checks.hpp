@@ -45,6 +45,10 @@ public:
 
 public:
     overlap_checks();
+
+    /**
+     * run overlap checks
+     */
     overlaps run(
                 rna_tree& _rna);
 
@@ -60,6 +64,9 @@ private:
     edges get_edges(
                 rna_tree& rna);
 
+    /**
+     * run checks for edges
+     */
     overlaps run(
                 const edges& e);
 

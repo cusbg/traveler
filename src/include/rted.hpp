@@ -26,7 +26,6 @@
 #include "rna_tree.hpp"
 
 
-// TODO: prepisat na templatovanu verziu, nepouzivat rna_tree, ale radsej tree_base<T>
 class rted
 {
 public:
@@ -41,6 +40,9 @@ public:
     rted(
                 const tree_type& _t1,
                 const tree_type& _t2);
+    /**
+     * run computations
+     */
     void run();
 
 private:

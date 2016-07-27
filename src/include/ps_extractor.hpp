@@ -30,7 +30,7 @@
 class ps_extractor : public extractor
 {
 protected:
-    virtual void init(
+    virtual void extract(
                 const std::string& filename);
 
 public:

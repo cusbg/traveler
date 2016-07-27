@@ -24,6 +24,7 @@
 #include "utils.hpp"
 #include "mapping.hpp"
 #include "ps_extractor.hpp"
+#include "exception.hpp"
 
 using namespace std;
 

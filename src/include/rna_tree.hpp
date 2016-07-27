@@ -64,25 +64,50 @@ public:
                 sibling_iterator sib);
 
     std::string name() const;
+
+    /**
+     * sets name for RNA
+     */
     void set_name(
                 const std::string& name);
 
 public:
+    /**
+     * returns sequence RNA
+     */
     static std::string get_labels(
                 const iterator& root);
+    /**
+     * returns sequence RNA
+     */
     std::string get_labels() const;
+    /**
+     * returns dot-bracket secondary structure
+     */
     static std::string get_brackets(
                 const iterator& root);
+    /**
+     * returns dot-bracket secondary structure
+     */
     std::string get_brackets() const;
 
+    /**
+     * check if all inner node are paired and leafs are non-paired
+     */
     bool correct_pairing() const;
 
 public:
     static point base_pair_edge_point(
                 point from,
                 point to);
+    /**
+     * returns top right corner of tree visualization
+     */
     static point top_right_corner(
                     rna_tree::iterator root);
+    /**
+     * returns bottom left corner of tree visualization
+     */
     static point bottom_left_corner(
                     rna_tree::iterator root);
 

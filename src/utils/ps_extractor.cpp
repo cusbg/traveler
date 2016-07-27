@@ -40,7 +40,7 @@ static regex create_regex(const std::string& pattern)
 }
 
 
-void ps_extractor::init(
+void ps_extractor::extract(
                 const std::string& filename)
 {
     labels = "";

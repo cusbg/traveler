@@ -53,7 +53,7 @@ void gted::run(
 
     STR = _str;
 
-    checks();
+    check_ids_postorder();
 
     tdist.resize(t1.size(), vector<size_t>(t2.size(), BAD));
 
@@ -297,7 +297,7 @@ mapping gted::get_mapping()
 
     typedef post_order_iterator iterator_type;
 
-    checks();
+    check_ids_postorder();
 
     mapping map;
     vector<pair<iterator_type, iterator_type>> to_be_matched;
@@ -549,7 +549,7 @@ mapping gted::get_mapping()
     fdist[i1][i2] = value;
 }
 
-/* inline */ void gted::checks()
+/* inline */ void gted::check_ids_postorder()
 {
     size_t i;
 
@@ -562,16 +562,7 @@ mapping gted::get_mapping()
 }
 
 
-void gted::set_tdist_table(
-                const tree_distance_table_type& _tdist)
-{
-    tdist = _tdist;
-}
 
-gted::tree_distance_table_type& gted::get_tree_distances()
-{
-    return tdist;
-}
 
 
 // costs

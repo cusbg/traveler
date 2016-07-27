@@ -48,6 +48,12 @@ public:
 public:
     compact(
                 rna_tree& _rna);
+
+    /**
+     * run compact algorithm.
+     * After run all nodes will be initialized
+     * and layout can be visualized
+     */
     void run();
 
 private:
@@ -71,6 +77,9 @@ private:
                 iterator parent,
                 point vec);
 
+    /**
+     * rotate branch from `parent` arount circle `c` with angle `alpha`
+     */
     static void rotate_branch(
                 iterator parent,
                 circle c,
@@ -108,6 +117,9 @@ private:
      */
     void init();
 
+    /**
+     * make all branches lie on straight line
+     */
     void init_even_branches();
 
     /**
@@ -120,9 +132,18 @@ private:
                 sibling_iterator it,
                 point from);
 
+    /**
+     * init branch botton-up
+     * if stem is inited in subtree, shift it and
+     * make place for new node and return its position
+     * otherwise return badpoint
+     */
     point init_branch_recursive(
                 sibling_iterator it);
 
+    /**
+     * init with parent and its parent position
+     */
     void init_by_ancestor(
                 sibling_iterator it);
 
@@ -132,6 +153,9 @@ private:
     void make_branch_even(
                 sibling_iterator it);
 
+    /**
+     * lay out nodes on circle, rotate and shift branches if needed
+     */
     void init_multibranch(
                 sibling_iterator parent);
     // INIT ^^

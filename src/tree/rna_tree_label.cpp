@@ -219,20 +219,6 @@ void rna_pair_label::set_points_exact(
     (*this)[index].p = p;
 }
 
-void rna_pair_label::set_points_nearby(
-                point p,
-                size_t index)
-{
-    //APP_DEBUG_FNAME;
-
-    double i;
-    i = 5 + rand() % 10;
-    p.x += i;
-    p.y += i;
-
-    (*this)[index].p = p;
-}
-
 void rna_pair_label::set_label_strings(
                 const rna_pair_label& other)
 {

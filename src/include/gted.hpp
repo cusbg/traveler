@@ -29,7 +29,6 @@
 
 class mapping;
 
-// TODO: prepisat na templatovanu verziu, nepouzivat rna_tree, ale radsej tree_base<T>
 class gted
 {
 public:
@@ -41,6 +40,11 @@ public:
                                                         rev_post_order_iterator;
     typedef std::vector<std::vector<size_t>>            tree_distance_table_type;
     typedef std::vector<std::vector<size_t>>            forest_distance_table_type;
+
+    /**
+     * instead of using constants, use this functions
+     * for consts of insert/delete/update
+     */
     struct costs
     {
         static size_t del(iterator it);
@@ -57,18 +61,15 @@ public:
                 const rna_tree& _t2);
 
     /**
-     * runs gted
+     * run gted
      */
     void run(
                 const strategy_table_type& _str);
 
+    /**
+     * compute mapping between trees
+     */
     mapping get_mapping();
-
-public:
-    void set_tdist_table(
-                const tree_distance_table_type& _tdist);
-    tree_distance_table_type& get_tree_distances();
-
 
 private:
     /**
@@ -128,7 +129,7 @@ private: // functions allowing some checks..
                 size_t id1,
                 size_t id2);
 
-    inline void checks();
+    inline void check_ids_postorder();
 
 private:
     tree_type t1, t2;

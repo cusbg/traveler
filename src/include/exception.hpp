@@ -62,6 +62,16 @@ public:
 };
 
 
+class io_exception : public my_exception
+{
+public:
+    io_exception(const std::string& msg)
+        : my_exception(msg)
+    { }
+    virtual ~io_exception() noexcept = default;
+};
+
+
 #endif /* !EXCEPTION_HPP */
 
 // should always redefine, e.g. assert(), abort(), ..
