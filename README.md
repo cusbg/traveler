@@ -8,35 +8,32 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 
 ## Compiling:
     cd traveler/src
-    make
+    make build
 
 ## Usage:
     traveler [-h|--help]
 	traveler [OPTIONS] <TREES>
 
 	TREES:
-		<-mt|--match-tree> FASTAFile
-		<-tt|--template-tree> PSFile FASTAFile
+		<-mt|--match-tree> FILE_FASTA
+		<-tt|--template-tree [--type DOCUMENT_TYPE]> DOCUMENT FILE_FASTA
 
-        FASTAFile is in format like in example below
-		PSFile contains post-script file*
+        FILE_FASTA is in format like in example below
+	DOCUMENT only supported type is .ps format from CRW database*, but other can be implemented and specified by DOCUMENT_TYPE argument
 
-		* the only supported .ps format is from database
-            (http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
+	*(http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
 
 	OPTIONS:
 	[-a|--all [--overlaps] [--colored] <FILE_OUT>]
             # compute TED and draw images to FILE_OUT
             # if optional argument --overlaps is present, compute overlaps in image and highlight them
             # for detailed use of --colored argument, see COLOR CODING section
-        [-t|--ted <FILE_DISTANCES_OUT> <FILE_MAPPING_OUT>]
-            # run only TED, save distance table and mapping to files FILE_DISTANCES_OUT and FILE_MAPPING_OUT
-        [-d|--draw --mapping <FILE_MAPPING_IN> [--overlaps] [--colored] <FILE_OUT>]
+        [-t|--ted <FILE_MAPPING_OUT>]
+            # run only TED, save mapping table to file FILE_MAPPING_OUT
+        [-d|--draw [--overlaps] [--colored] <FILE_MAPPING_IN> <FILE_OUT>]
             # use mapping in FILE_MAPPING_IN and draw images to FILE_OUT
             # if optional argument --overlaps is present, compute overlaps in image and highlight them
             # for detailed use of --colored argument, see COLOR CODING section
-	    # if optional argument --colored is present -- see COLOR CODING section
-        [--debug]
 
 	COLOR CODING:
 	    We use following color coding of nucleotides in molecule:
