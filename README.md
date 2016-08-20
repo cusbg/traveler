@@ -19,7 +19,8 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 		<-tt|--template-tree [--type DOCUMENT_TYPE]> DOCUMENT FILE_FASTA
 
 	FILE_FASTA is in format like in example below
-	DOCUMENT only supported type is .ps format from CRW database*, but other can be implemented and specified by DOCUMENT_TYPE argument
+	DOCUMENT only supported type is .ps format from CRW database*, but other can be implemented
+	and specified by DOCUMENT_TYPE argument
 
 	*(http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
 
@@ -38,9 +39,11 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 	COLOR CODING:
 		We use following color coding of nucleotides in molecule:
 		Inserted bases are marked red
-		Edited bases are green (e.g. template had base 'A', and other had on same position 'C', so 'C' will be green)
+		Edited bases are green (e.g. template had base 'A', and other had on same position 'C', so 'C' will
+		be green)
 		Reinserted bases - program need to redraw simple structure (like hairpin) - are blue
-		Rotated - like reinserted, but when redrawing multibranch loop - all branches are rotated to lie on circles - they are brown
+		Rotated - like reinserted, but when redrawing multibranch loop - all branches are rotated to lie on
+		circles - they are brown
 
 
 
