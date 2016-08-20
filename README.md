@@ -24,7 +24,7 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 	*(http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
 
 	OPTIONS:
-	[-a|--all [--overlaps] [--colored] <FILE_OUT>]
+		[-a|--all [--overlaps] [--colored] <FILE_OUT>]
 			# compute TED and draw images to FILE_OUT
 			# if optional argument --overlaps is present, compute overlaps in image and highlight them
 			# for detailed use of --colored argument, see COLOR CODING section
