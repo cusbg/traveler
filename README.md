@@ -83,7 +83,7 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 	$ ./build/traveler \
 		--match-tree $INDIR/mouse.fasta \
 		--template-tree $INDIR/human.ps $INDIR/human.fasta \
-		--draw --overlaps --mapping $OUTDIR/mouse_to_human.map $OUTDIR/mouse_to_human
+		--draw --overlaps --colored $OUTDIR/mouse_to_human.map $OUTDIR/mouse_to_human
 
 	$ # generate .svg and .ps files
 	$ # checks also if output molecule has overlaps and draws them in output image
