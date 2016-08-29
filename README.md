@@ -75,7 +75,7 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 	$ ./build/traveler \
 		--match-tree $INDIR/mouse.fasta \
 		--template-tree $INDIR/human.ps $INDIR/human.fasta \
-		--ted $OUTDIR/mouse_to_human.ted $OUTDIR/mouse_to_human.map
+		--ted $OUTDIR/mouse_to_human.map
 
 ### Example3 - prints image using precomputed mapping from previous example
 	$ INDIR="../InFiles/"
