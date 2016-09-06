@@ -21,6 +21,7 @@
 \setblockspacing{0.5}
 \setblocktitleheight{1}
 \setmargin{3}
+\setcolumnnumber{3}
 
 \newcommand{\odkaz}[2]{\href{#1#2}{\nolinkurl{#2}}}
 \def\Autor{Richard Eliáš}
@@ -29,8 +30,8 @@
 \def\Fakulta{Matematicko-fyzikální fakulta}
 \def\Nazov{Vizualizace sekundární struktury RNA s využitím existujících struktur}
 
-\newcommand{\scale}{} %iba aby som mohol pouzivat vsade renewcommand
-\newcommand{\height}{} %dtto
+\newlength{\innerScale}
+\newlength{\outerScale}
 \newcommand{\mc}[1]{\multicolumn{1}{c}{#1}}
 \newcommand{\ted}[0]{\textit{tree-edit-distance}\hspace{5pt}}
 \renewcommand{\O}[1]{\sloppy\mbox{\ensuremath{\mathcal{O}}(#1)}}
@@ -82,14 +83,59 @@
     nakresliť cieľovú.
   }
 
-  \renewcommand{\scale}{0.25\textwidth}
+  \blocknode{Stromová reprezentácia RNA a~použitie \ted algoritmu}{
+    RNA sekundárnu štruktúru reprezentujeme ako usporiadaný zakorenený strom.
+    Vďaka tomu môžeme využiť stromové algoritmy, ako napríklad \ted algoritmus.
+    Ten rekurzívnym vzorcom spočíta vzdialenosť medzi stromami a~následne vie
+    aj transformovať jeden strom na iný.
+    Na príklade ukážeme postup výpočtu a~transformáciu medzi stromami.
+
+    \setlength{\innerScale}{0.25\textwidth}
+    \setlength{\outerScale}{30cm}
+    \begin{tikzfigure}
+      \begin{adjustbox}{totalheight=\outerScale}
+        \begin{tabular}{c c c}
+          \\[-3cm]
+            \newcolumn{
+              %trim=left bottom right top
+              \includegraphics[clip, trim = 4cm 12cm 3cm 11cm, width=\innerScale]{./include/rna_tree}
+            } & \newcolumn{
+              %trim=left bottom right top
+              \includegraphics[clip, trim = 7cm 12.5cm 6cm 11cm, width=\innerScale]{./include/ted}
+            }
+            \\[-1cm]
+            \newcolumn{
+              %trim=left bottom right top
+              \includegraphics[clip, trim = 4cm 14cm 11.5cm 13cm, width=\innerScale]{./include/gted-forest_dist}
+            }
+            \\[-1cm]
+            \newcolumn{
+              %trim=left bottom right top
+              \includegraphics[clip, trim = 8cm 12cm 6cm 11cm, width=\innerScale]{./include/gted-tree_dist}
+            } & \newcolumn{
+              %trim=left bottom right top
+              \includegraphics[clip, trim = 10cm 11.5cm 3.5cm 11cm, width=\innerScale]{./include/gted-forest_dist}
+            }
+            \\[-2cm]
+        \end{tabular}
+      \end{adjustbox}
+    \end{tikzfigure}
+  }
+
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DRUHY STLPEC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \startsecondcolumn
+
   \blocknode{Kreslenie chýbajúcich častí v molekule}{
-    \begin{wrapfigure}{R}{0.27\textwidth}
-      \vspace{-2.7cm}
+    \setlength{\innerScale}{0.35\textwidth}
+    \setlength{\outerScale}{0.37\textwidth}
+
+    \begin{wrapfigure}{R}{\outerScale}
+      \vspace{-1cm}
       \addfigure{
         \node {
           %trim=left bottom right top
-          \includegraphics[clip, trim = 1cm 25cm 7cm 1cm, width=\scale]{./include/stem}
+          \includegraphics[clip, trim = 1cm 25cm 7cm 1cm, width=\innerScale]{./include/stem}
         };
       }
       \vspace{-3cm}
@@ -99,12 +145,12 @@
     ostávajú prázdne miesta, naopak po insertoch potrebujeme pre dané vrcholy urobiť
     v obrázku miesto.
 
-    \begin{wrapfigure}{L}{0.27\textwidth}
+    \begin{wrapfigure}{L}{\outerScale}
       \vspace{-2cm}
       \addfigure{
         \node {
           %trim=left bottom right top
-          \includegraphics[clip, trim = 0cm 17.5cm 5cm 0cm, width=\scale]{./include/multibranch-redraw}
+          \includegraphics[clip, trim = 0cm 17.5cm 5cm 0cm, width=\innerScale]{./include/multibranch-redraw}
         };
       }
     \end{wrapfigure}
@@ -121,66 +167,36 @@
     vkladáme celú novú vetvu RNA.
   }
 
-  \renewcommand{\scale}{0.25\textwidth}
-  \newcommand{\id}[2]{#1 {\small \texttt{(#2)}}}
-  \blocknode{Príklady vizualizácií: \id{človek}{K03432} a \id{žaba}{X04025}, \id{mušľa}{L24489} a \id{cikáda}{U06478}, \id{žiabronôžka}{X01723} a \id{pásomnička}{U27015}}{
-    \begin{tikzfigure}
-      \begin{adjustbox}{totalheight=22cm}
-        \begin{tabular}{c c c}
-          \newcolumn{
-            %trim=left bottom right top
-            \includegraphics[clip, trim = 0 4cm 7cm 2cm, width=\scale]{./include/human-DRAW-TO-african_frog}
-          } & \newcolumn{
-            %trim=left bottom right top
-            \includegraphics[clip, trim = 0.5cm 4cm 4cm 2cm, width=0.29\textwidth]{./include/blue_mussel-DRAW-TO-cicadas}
-          } & \newcolumn{
-            %trim=left bottom right top
-            \includegraphics[clip, trim = 0 4cm 7cm 2cm, width=\scale]{./include/artemia_salina-DRAW-TO-echinococcus_granulosus}
-          }
-        \end{tabular}
-      \end{adjustbox}
-    \end{tikzfigure}
+  \blocknode{Výsledky experimentov}{
+    Program sme testovali na reálnych obrázkoch 16 molekúl malej podjednotky 18S ribozomálnej RNA
+    z~CRW databázy. Z testov sme získali 256 výsledných vizualizácií (každý s~každým).
+
+    Celkové štatistiky prekryvov ukazuje graf. Pre prípady molekúl, ktoré nepotrebovali prekresliť
+    multibranch loop sa štatistika zmenila - do 10 prekryvov bolo 150 nakreslení, nad 10 iba 29.
+
+    Počty prekryvov v~závislosti na vzdialenosti TED nieje až taká zjavná. Ak vezmeme najbližšie
+    štruktúry, je v~priemere asi 5 prekryvov a~so zväčšujúcou sa vzdialenosťou rástli výkyvy hlavne kvôli tomu,
+    že niektoré štruktúry boli dobre konzervované a~na druhej strane bolo pár extrémov, ktoré sa vizualizovali
+    veľmi ťažko.
+
+    V~budúcnosti by bolo vhodné upraviť kresliace algoritmy, implementovať otáčanie vetiev RNA stromov v~prípade
+    indikovania prekryvov alebo pridať interaktívny nástroj na úpravu obrázkov, čím by užívateľ prekryvy mohol
+    ručne odstrániť.
+
+    \setlength{\outerScale}{0.97\textwidth}
+    \setlength{\innerScale}{0.95\textwidth}
+    \addfigure{
+      \node {
+        %trim=left bottom right top
+        \includegraphics[width=\innerScale]{./include/prekryvy-pocetmolekul}
+      };
+    }
   }
 
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% TRETI STLPEC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  \startthirdcolumn
 
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%% DRUHY STLPEC %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  \startsecondcolumn
 
-  \blocknode{Stromová reprezentácia RNA a~použitie \ted algoritmu}{
-    RNA sekundárnu štruktúru reprezentujeme ako usporiadaný zakorenený strom.
-    Vďaka tomu môžeme využiť stromové algoritmy, ako napríklad \ted algoritmus.
-    Ten rekurzívnym vzorcom spočíta vzdialenosť medzi stromami a~následne vie
-    aj transformovať jeden strom na iný.
-    Na príklade ukážeme postup výpočtu a~transformáciu medzi stromami.
-
-    \renewcommand{\scale}{0.25\textwidth}
-    \begin{tikzfigure}
-      \begin{adjustbox}{totalheight=22cm}
-        \begin{tabular}{c c c}
-          \\[-3cm]
-            \newcolumn{
-              %trim=left bottom right top
-              \includegraphics[clip, trim = 4cm 12cm 3cm 11cm, width=\scale]{./include/rna_tree}
-            } & \newcolumn{
-              %trim=left bottom right top
-              \includegraphics[clip, trim = 7cm 12.5cm 6cm 11cm, width=\scale]{./include/ted}
-            }
-            \\[-1cm]
-            \newcolumn{
-              %trim=left bottom right top
-              \includegraphics[clip, trim = 4cm 14cm 11.5cm 13cm, width=\scale]{./include/gted-forest_dist}
-            } & \newcolumn{
-              %trim=left bottom right top
-              \includegraphics[clip, trim = 8cm 12cm 6cm 11cm, width=\scale]{./include/gted-tree_dist}
-            } & \newcolumn{
-              %trim=left bottom right top
-              \includegraphics[clip, trim = 10cm 11.5cm 3.5cm 11cm, width=\scale]{./include/gted-forest_dist}
-            }
-            \\[-2cm]
-        \end{tabular}
-      \end{adjustbox}
-    \end{tikzfigure}
-  }
   \blocknode{Nástroj TRAVeLer}{
     V~rámci práce sme implementovali nástroj TRAVeLer (Template RnA VisuaLization)
     schopný vizualizovať aj veľke rRNA molekuly podľa vstupného vzorového obrázka.
@@ -203,31 +219,33 @@
     \textbf{modrá} - prekreslenie báz, \textbf{hnedá} - prekreslenie multibranch loopy.
   }
 
-  \renewcommand{\scale}{0.35\textwidth}
-  \blocknode{Výsledky experimentov}{
-    \begin{wrapfigure}{L}{\scale}
-      \vspace{-1cm}
-      \addfigure{
-        \node {
-          %trim=left bottom right top
-          \includegraphics[width=0.33\textwidth]{./include/prekryvy-pocetmolekul}
-        };
-      }
-    \end{wrapfigure}
-    Program sme testovali na reálnych obrázkoch 16 molekúl malej podjednotky 18S ribozomálnej RNA
-    z~CRW databázy. Z testov sme získali 256 výsledných vizualizácií (každý s~každým).
+  \newcommand{\id}[2]{#1 {\small \texttt{(#2)}}}
+  \setblocktitleheight{4.5}
+  %\blocknode{\addfigure{\node (A){Príklady vizualizácií:}; \node [below = of A]{\id{človek}{K03432} a \id{žaba}{X04025}, \id{mušľa}{L24489} a \id{cikáda}{U06478}, \id{žiabronôžka}{X01723} a \id{pásomnička}{U27015}};}}{
+  \blocknode{\parbox{0.28\textwidth}{Príklady vizualizácií: \id{človek}{K03432} a \id{žaba}{X04025}, \\\id{mušľa}{L24489} a \id{cikáda}{U06478}, \id{žiabronôžka}{X01723} a \id{pásomnička}{U27015}}}{
 
-    Celkové štatistiky prekryvov ukazuje graf. Pre prípady molekúl, ktoré nepotrebovali prekresliť
-    multibranch loop sa štatistika zmenila - do 10 prekryvov bolo 150 nakreslení, nad 10 iba 29.
-
-    Počty prekryvov v~závislosti na vzdialenosti TED nieje až taká zjavná. Ak vezmeme najbližšie
-    štruktúry, je v~priemere asi 5 prekryvov a~so zväčšujúcou sa vzdialenosťou rástli výkyvy hlavne kvôli tomu,
-    že niektoré štruktúry boli dobre konzervované a~na druhej strane bolo pár extrémov, ktoré sa vizualizovali
-    veľmi ťažko.
-
-    V~budúcnosti by bolo vhodné upraviť kresliace algoritmy, implementovať otáčanie vetiev RNA stromov v~prípade
-    indikovania prekryvov alebo pridať interaktívny nástroj na úpravu obrázkov, čím by užívateľ prekryvy mohol
-    ručne odstrániť.
+    \setlength{\innerScale}{0.35\textwidth}
+    \setlength{\outerScale}{22cm}
+    \begin{tikzfigure}
+        \begin{tabular}{c c}
+          \\[-2cm]
+          \newcolumn{
+            %trim=left bottom right top
+            \includegraphics[clip, trim = 0 4cm 7cm 2cm, width=\innerScale]{./include/human-DRAW-TO-african_frog}
+          }
+          \\[-14cm]
+          & \newcolumn{
+            %trim=left bottom right top
+            \includegraphics[clip, trim = 0 4cm 7cm 2cm, width=\innerScale]{./include/artemia_salina-DRAW-TO-echinococcus_granulosus}
+          }
+          \\[-13cm]
+          \newcolumn{
+            %trim=left bottom right top
+            \includegraphics[clip, trim = 0.5cm 4cm 4cm 2cm, width=0.42\textwidth]{./include/blue_mussel-DRAW-TO-cicadas}
+          }
+          \\[-5cm]
+        \end{tabular}
+    \end{tikzfigure}
   }
 \end{tikzpicture}
 \end{document}

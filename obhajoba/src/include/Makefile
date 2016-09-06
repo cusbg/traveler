@@ -1,6 +1,11 @@
+RUN = make --directory=.. --file=Makefile $@
 
 build:
-	make --directory=.. --file=Makefile $@
+	${RUN}
 
 run:
-	make --directory=.. --file=Makefile $@
+	${RUN}
+
+clean:
+	${RUN}
+
