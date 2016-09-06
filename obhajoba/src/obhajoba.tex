@@ -57,7 +57,7 @@
 \begin{tikzpicture}
   \initializesizeandshifts
   \titleblock{65}{1}
-  \blocknode{Motivácia a ciele práce}{
+  \blocknode{Motivácia a~ciele práce}{
     Molekula RNA sa stáva predmetom mnohých štúdií, vďaka čomu rastie
     dopyt po nástrojoch pomáhajúcich pri jej analýze. Vlastnosti molekuly
     sú síce ovplyvnené primárou štruktúrou (poradím nukleotidov v~reťazci),
@@ -74,7 +74,7 @@
     Pri porovnávaní štruktúr sa využíva taktiež kreslenie častí majúcich podobnú
     funkciu a~tvar na rovnaké miesta v~obrázkoch, čo pomáha lepšej orientácií
     v~molekule a~napomáha nájsť konzervované časti v~molekulách.
-    V súčastných nástrojoch (mFold, RNAViz, RNAView, $\cdots$) sa toto posledné
+    V~súčastných nástrojoch (mFold, RNAViz, RNAView, $\cdots$) sa toto posledné
     kritérium nedodržuje, čo má za následok ťažké nachádzanie konzervovaných častí
     v~molekulách.
 
@@ -141,7 +141,7 @@
       \vspace{-3cm}
     \end{wrapfigure}
     Po transformácií šablónovej molekuly na cieľovú, získavame čiastočnú vizualizáciu
-    cieľovej RNA a jej zvyšok potrebujeme dopočítať. Po operáciách delete nám v obrázku
+    cieľovej RNA a~jej zvyšok potrebujeme dopočítať. Po operáciách delete nám v~obrázku
     ostávajú prázdne miesta, naopak po insertoch potrebujeme pre dané vrcholy urobiť
     v obrázku miesto.
 
@@ -155,10 +155,10 @@
       }
     \end{wrapfigure}
 
-    Mazanie vrcholov stromu je inverzná operácia ku vkladaniu a tak si ukážeme iba vkladnie.
+    Mazanie vrcholov stromu je inverzná operácia ku vkladaniu a~tak si ukážeme iba vkladnie.
     Vkladanie báz do loopu (okrem multibranch) je jednoduché, vytvoríme si iba novú kružnicu na ktorú všetky
     bázy uložíme. Vkladanie báz do stemu potrebuje najprv urobiť pre nich najprv urobiť
-    miesto a tak celú štruktúru posunie smerom od rodičovského vrcholu v strome.
+    miesto a~tak celú štruktúru posunie smerom od rodičovského vrcholu v~strome.
     Algoritmus vkladania je uvedený na obrázku.
 
     Pre multibranch loopy je to trochu zložitejšie, chceme sa totiž vyhnúť prípadom, kedy ju musíme
@@ -169,13 +169,13 @@
 
   \blocknode{Výsledky experimentov}{
     Program sme testovali na reálnych obrázkoch 16 molekúl malej podjednotky 18S ribozomálnej RNA
-    z~CRW databázy. Z testov sme získali 256 výsledných vizualizácií (každý s~každým).
+    z~CRW databázy. Z~testov sme získali 256 výsledných vizualizácií (každý s~každým).
 
     Celkové štatistiky prekryvov ukazuje graf. Pre prípady molekúl, ktoré nepotrebovali prekresliť
     multibranch loop sa štatistika zmenila - do 10 prekryvov bolo 150 nakreslení, nad 10 iba 29.
 
     Počty prekryvov v~závislosti na vzdialenosti TED nieje až taká zjavná. Ak vezmeme najbližšie
-    štruktúry, je v~priemere asi 5 prekryvov a~so zväčšujúcou sa vzdialenosťou rástli výkyvy hlavne kvôli tomu,
+    štruktúry, je v~priemere asi 5~prekryvov a~so zväčšujúcou sa vzdialenosťou rástli výkyvy hlavne kvôli tomu,
     že niektoré štruktúry boli dobre konzervované a~na druhej strane bolo pár extrémov, ktoré sa vizualizovali
     veľmi ťažko.
 
@@ -202,7 +202,7 @@
     schopný vizualizovať aj veľke rRNA molekuly podľa vstupného vzorového obrázka.
     Implementujeme v~ňom \ted algoritmus, ktorý nám transformuje jednu molekulu na druhú.
     Následným použitím nášho dokresľovacieho algoritmu vznikne výsledná vizualizácia.
-    Na príklade ilustrujeme vstupy a výstupy programu. Vstupom sú dve RNA sekundárne štruktúry,
+    Na príklade ilustrujeme vstupy a~výstupy programu. Vstupom sú dve RNA sekundárne štruktúry,
     vzorová potrebuje aj obrázok. Výstupom je obrázok cieľovej molekuly, alebo mapovanie medzi
     štruktúrami (ak si chceme vygenerovať viac typov obrázkov, nemusíme nanovo počítať mapovanie).
 
