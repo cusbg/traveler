@@ -3,7 +3,7 @@ BUILDDIR	= .
 LATEX_CMD	= pdflatex ${TARGET}.tex --output-directory ${BUILDDIR}
 BIBTEX_CMD	= bibtex ${TARGET}
 
-build: ${TARGET}.pdf
+build: ${TARGET}.pdf clear
 
 run: build
 	atril $(TARGET).pdf&
