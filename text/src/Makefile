@@ -1,6 +1,7 @@
 TARGET		= prace
 BUILDDIR	= .
-IMGDIR		= ../img
+LATEX_CMD	= pdflatex ${TARGET}.tex --output-directory ${BUILDDIR}
+BIBTEX_CMD	= bibtex ${TARGET}
 
 build: ${TARGET}.pdf
 
@@ -9,8 +10,10 @@ run: build
 
 # LaTeX je potreba spustit nekolikrat, aby spravne spocital odkazy
 ${TARGET}.pdf: ${TARGET}.tex *.tex *.bib */*.tex
-	${SHELL} run.sh ${TARGET} ${BUILDDIR}
-
+	${LATEX_CMD}
+	${BIBTEX_CMD}
+	${LATEX_CMD}
+	${LATEX_CMD}
 
 clean: clear
 	rm -f ${TARGET}.pdf
