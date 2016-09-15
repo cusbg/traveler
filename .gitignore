@@ -4,6 +4,5 @@ build/
 bin/
 precomputed/
 .ycm_extra_conf.pyc
-a0header.ps
 
 generated-images*
