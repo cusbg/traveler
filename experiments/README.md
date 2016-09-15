@@ -18,6 +18,6 @@ We ran application TRAVeLer on all input molecules. We test visualization - ever
 ### ICBCB - International Conference on Bioinformatics and Computational Biology
 All results presented in ICBCB conference can be found [here](http://richard.ba30.eu/traveler/img/output/icbcb-conference/).
 
-### Baechelor thesis
+### Baechelor thesis - RNA secondary structure visualization using existing structures
 All results presented in our baechelor thesis can be found [here](http://richard.ba30.eu/traveler/img/output/bakalarka/).
 
