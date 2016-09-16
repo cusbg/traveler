@@ -31,6 +31,18 @@
 #include "rted.hpp"
 #include "gted.hpp"
 
+#define ARGS_HELP                           {"-h", "--help"}
+#define ARGS_TARGET_STRUCTURE               {"-gs", "--target-structure"}
+#define ARGS_TEMPLATE_STRUCTURE             {"-ts", "--template-structure"}
+#define ARGS_TEMPLATE_STRUCTURE_FILE_TYPE   "--file-format"
+#define ARGS_ALL                            {"-a", "--all"}
+#define ARGS_ALL_OVERLAPS                   "--overlaps"
+#define ARGS_TED                            {"-t", "--ted"}
+#define ARGS_DRAW                           {"-d", "--draw"}
+#define ARGS_DRAW_OVERLAPS                  "--overlaps"
+#define ARGS_VERBOSE                        {"-v", "--verbose"}
+#define ARGS_DEBUG                          {"--debug"}
+
 
 
 using namespace std;
@@ -70,7 +82,6 @@ public:
 private:
     arguments() = default;
 };
-
 
 
 void app::run(
@@ -247,26 +258,45 @@ void app::usage(
 
     char endl = '\n';
 
+    auto get_args = [](vector<string> args)
+    {
+        assert(!args.empty());
+
+        ostringstream out;
+        for (const string& a : args)
+            out << a << "|";
+        string str = out.str();
+        // delete last '|'
+        return str.substr(0, str.size() - 1);
+    };
+
     logger.info_stream()
         << "usage():"
         << endl
         << endl
         << appname
-            << " [-h|--help]"
+            << " [" << get_args(ARGS_HELP) << "]"
             << endl
         << appname
             << " [OPTIONS]"
-            << " <-mt|--match-tree> FASTA_FILE"
-            << " <-tt|--template-tree> [--type TYPE] DOCUMENT FASTA_FILE"
+            << " <" << get_args(ARGS_TARGET_STRUCTURE) << ">"
+                << " DBN_FILE"
+            << " <" << get_args(ARGS_TEMPLATE_STRUCTURE) << ">"
+                << " [" << ARGS_TEMPLATE_STRUCTURE_FILE_TYPE << " FILE_FORMAT]"
+                << " IMAGE_FILE DBN_FILE"
             << endl
         << endl
         << "OPTIONS:" << endl
-        << "\t[-a|--all [--overlaps] <FILE_OUT>]" << endl
-        << "\t[-t|--ted <FILE_MAPPING_OUT>]" << endl
-        << "\t[-d|--draw"
-            << " [--overlaps]]"
-            << " <FILE_MAPPING_IN> <FILE_OUT>" << endl
-        << "\t[--debug]" << endl;
+        << "\t[" << get_args(ARGS_ALL)
+            << "] [" << ARGS_ALL_OVERLAPS << "] FILE_OUT"
+        << endl
+        << "\t[" << get_args(ARGS_TED) << "] FILE_MAPPING_OUT"
+        << endl
+        << "\t[" << get_args(ARGS_DRAW)
+            << "] [" << ARGS_DRAW_OVERLAPS << "] FILE_MAPPING_IN FILE_OUT"
+        << endl
+        << "\t[" << get_args(ARGS_VERBOSE) << "]"
+        << endl;
 }
 
 void app::print(
@@ -329,13 +359,13 @@ void app::print(
         if (arg.empty())
             continue;
 
-        if (is_argument({"-h", "--help"}))
+        if (is_argument(ARGS_HELP))
         {
             DEBUG("arg help");
             app::usage(args.at(0));
             exit(0);
         }
-        else if (is_argument({"-mt", "--match-tree"}))
+        else if (is_argument(ARGS_TARGET_STRUCTURE))
         {
             DEBUG("arg match-tree");
             string fastafile = args.at(i + 1);
@@ -343,12 +373,12 @@ void app::print(
             ++i;
             continue;
         }
-        else if (is_argument({"-tt", "--template-tree"}))
+        else if (is_argument(ARGS_TEMPLATE_STRUCTURE))
         {
             DEBUG("arg template-tree");
             string templatefile, fastafile;
             string templatetype = "ps";
-            if (nextarg() == "--type")
+            if (nextarg() == ARGS_TEMPLATE_STRUCTURE_FILE_TYPE)
             {
                 templatetype = args.at(i + 2);
                 i += 2;
@@ -358,13 +388,13 @@ void app::print(
             a.templated = app::create_templated(templatefile, templatetype, fastafile);
             i += 2;
         }
-        else if (is_argument({"-a", "--all"}))
+        else if (is_argument(ARGS_ALL))
         {
             DEBUG("arg all");
             a.all.run = true;
             while (true)
             {
-                if (nextarg() == "--overlaps")
+                if (nextarg() == ARGS_ALL_OVERLAPS)
                 {
                     a.all.overlap_checks = true;
                     i += 1;
@@ -375,20 +405,20 @@ void app::print(
             a.all.file = args.at(i + 1);
             ++i;
         }
-        else if (is_argument({"-t", "--ted"}))
+        else if (is_argument(ARGS_TED))
         {
             DEBUG("arg ted");
             a.ted.run = true;
             a.ted.mapping = args.at(i + 1);
             i += 1;
         }
-        else if (is_argument({"-d", "--draw"}))
+        else if (is_argument(ARGS_DRAW))
         {
             DEBUG("arg draw");
             a.draw.run = true;
             while (true)
             {
-                if (nextarg() == "--overlaps")
+                if (nextarg() == ARGS_DRAW_OVERLAPS)
                 {
                     a.draw.overlap_checks = true;
                     i += 1;
@@ -400,10 +430,15 @@ void app::print(
             a.draw.file = args.at(i + 2);
             i += 2;
         }
-        else if (is_argument({"--debug"}))
+        else if (is_argument(ARGS_VERBOSE))
+        {
+            logger.set_priority(logger::INFO);
+            INFO("Enabled verbose mode");
+        }
+        else if (is_argument(ARGS_DEBUG))
         {
             logger.set_priority(logger::DEBUG);
-            DEBUG("enabled debug mode");
+            INFO("Enabled debug mode");
         }
         else
         {
