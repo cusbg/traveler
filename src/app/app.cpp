@@ -44,7 +44,6 @@ struct app::arguments
     struct
     {
         bool run = false;
-        bool colors = false;
         bool overlap_checks = false;
         string file;
     } all;
@@ -57,7 +56,6 @@ struct app::arguments
     {
         bool run = false;
         bool overlap_checks = false;
-        bool colors = false;
         string mapping;
         string file;
     } draw;
@@ -96,7 +94,6 @@ void app::run(
     bool rted = args.all.run || args.ted.run;
     bool draw = args.all.run || args.draw.run;
     bool overlaps = args.all.overlap_checks || args.draw.overlap_checks;
-    bool colored = args.all.colors || args.draw.colors;
     mapping map;
     string img_out = args.all.file;
 
@@ -110,7 +107,7 @@ void app::run(
         img_out = args.draw.file;
     }
 
-    run_drawing(args.templated, args.matched, map, draw, overlaps, colored, img_out);
+    run_drawing(args.templated, args.matched, map, draw, overlaps, img_out);
 
     INFO("END: APP");
 }
@@ -152,7 +149,6 @@ void app::run_drawing(
                 const mapping& mapping,
                 bool run,
                 bool run_overlaps,
-                bool colored,
                 const std::string& file)
 {
     APP_DEBUG_FNAME;
@@ -163,60 +159,42 @@ void app::run_drawing(
     templated = matcher(templated, matched).run(mapping);
     compact(templated).run();
 
-    save(file, templated, run_overlaps, colored);
+    save(file, templated, run_overlaps);
 }
-
 
 void app::save(
                 const std::string& filename,
                 rna_tree& rna,
-                bool overlap,
-                bool colored)
+                bool overlap)
 {
     APP_DEBUG_FNAME;
-
-    auto writers = document_writer::get_writers(colored);
 
     overlap_checks::overlaps overlaps;
     if (overlap)
         overlaps = overlap_checks().run(rna);
 
-    for (auto& writer : writers)
+    for (bool colored : {true, false})
     {
-        writer->init(filename, rna.begin());
-        writer->print(writer->get_rna_formatted(rna));
+        auto writers = document_writer::get_writers(colored);
 
-        for (const auto& p : overlaps)
-            writer->print(writer->get_circle_formatted(p.centre, p.radius));
-    }
-
-    for (auto it = rna.begin(); it != rna.end(); ++it)
-    {
-        if (it->status == rna_pair_label::rotated)
+        for (auto& writer : writers)
         {
-            class logger rotated("build/logs/rotated.log", logger::DEBUG);
+            string file = colored ? filename + ".colored" : filename;
+            writer->init(file, rna.begin());
+            writer->print(writer->get_rna_formatted(rna));
 
-            rotated.debug("%s", rna.name());
-            break;
+            for (const auto& p : overlaps)
+                writer->print(writer->get_circle_formatted(p.centre, p.radius));
         }
     }
 
-
-    log_overlaps(rna.name(), overlaps.size());
-}
-
-void app::log_overlaps(
-                const std::string& name,
-                size_t size)
-{
-    class logger overlaps("build/logs/overlaps.log", logger::DEBUG);
-
-    overlaps.debug("%s %u", to_cstr(name), size);
-
-    if (size != 0)
+    if (overlap)
     {
-        WARN("overlaps occurs in %s, count=%u",
-                to_cstr(name), size);
+        INFO("Overlaps computed: found %s in rna %s", overlaps.size(), rna.name());
+    }
+    else
+    {
+        INFO("Overlaps computation was skipped for %s", rna.name());
     }
 }
 
@@ -283,10 +261,9 @@ void app::usage(
             << endl
         << endl
         << "OPTIONS:" << endl
-        << "\t[-a|--all [--colored] [--overlaps] <FILE_OUT>]" << endl
+        << "\t[-a|--all [--overlaps] <FILE_OUT>]" << endl
         << "\t[-t|--ted <FILE_MAPPING_OUT>]" << endl
         << "\t[-d|--draw"
-            << " [--colored]"
             << " [--overlaps]]"
             << " <FILE_MAPPING_IN> <FILE_OUT>" << endl
         << "\t[--debug]" << endl;
@@ -297,46 +274,26 @@ void app::print(
 {
     APP_DEBUG_FNAME;
 
-    char endl = '\n';
-    logger.info_stream()
-        << boolalpha
-        << "ARGUMENTS:"
-            << endl
-        << "templated: "
-            << args.templated.name()
-            << ":"
-            << args.templated.print_tree(false)
-            << endl
-        << "matched: "
-            << args.matched.name()
-            << ":"
-            << args.matched.print_tree(false)
-            << endl
-        << "all:"
-            << endl << '\t'
-            << " run=" << args.all.run << ";"
-            << endl << '\t'
-            << " file=" << args.all.file
-            << endl
-        << "ted:"
-            << endl << '\t'
-            << " run=" << args.ted.run << ";"
-            << endl << '\t'
-            << " ted-mapping-file=" << args.ted.mapping
-            << endl
-        << "draw:"
-            << endl << '\t'
-            << " run=" << args.draw.run
-            << endl << '\t'
-            << " overlaps=" << args.draw.overlap_checks
-            << endl << '\t'
-            << " colored=" << args.draw.colors
-            << endl << '\t'
-            << " mapping-table-in-file=" << args.draw.mapping
-            << endl << '\t'
-            << " draw-out-file=" << args.draw.file
-            << endl
-        << endl;
+    INFO("ARGUMENTS:\n"
+            "templated: %s: %s\n"
+            "matched: %s: %s\n"
+            "all:\n"
+                "\trun=%s\n"
+                "\timage-file=%s\n"
+                "\toverlaps=%s\n"
+            "ted:\n"
+                "\trun=%s\n"
+                "\tmapping-file=%s\n"
+            "draw:\n"
+                "\trun=%s\n"
+                "\toverlaps=%s\n"
+                "\tmapping-file=%s\n"
+                "\timage-file=%s",
+            args.templated.name(), args.templated.print_tree(false),
+            args.matched.name(), args.matched.print_tree(false),
+            args.all.run, args.all.file, args.all.overlap_checks,
+            args.ted.run, args.ted.mapping,
+            args.draw.run, args.draw.overlap_checks, args.draw.mapping, args.draw.file);
 }
 
 
@@ -407,12 +364,7 @@ void app::print(
             a.all.run = true;
             while (true)
             {
-                if (nextarg() == "--colored")
-                {
-                    a.all.colors = true;
-                    i += 1;
-                }
-                else if (nextarg() == "--overlaps")
+                if (nextarg() == "--overlaps")
                 {
                     a.all.overlap_checks = true;
                     i += 1;
@@ -439,11 +391,6 @@ void app::print(
                 if (nextarg() == "--overlaps")
                 {
                     a.draw.overlap_checks = true;
-                    i += 1;
-                }
-                else if (nextarg() == "--colored")
-                {
-                    a.draw.colors = true;
                     i += 1;
                 }
                 else

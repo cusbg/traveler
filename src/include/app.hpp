@@ -76,18 +76,15 @@ private:
                 const mapping& mapping,
                 bool run,
                 bool run_overlaps,
-                bool colored,
                 const std::string& file);
 
     /**
-     * save rna to document,
-     * take prolog from `templated_ps` document
+     * save both, colored and not colored documents
      */
     void save(
                 const std::string& filename,
                 rna_tree& rna,
-                bool overlaps,
-                bool colored);
+                bool overlaps);
 
 private:
     /**
@@ -104,13 +101,6 @@ private:
                 const std::string& templatefile,
                 const std::string& templatetype,
                 const std::string& fastafile);
-
-    /**
-     * save number of overlaps to log file
-     */
-    void log_overlaps(
-                const std::string& name,
-                size_t size);
 
     /**
      * print arguments

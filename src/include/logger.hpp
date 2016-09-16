@@ -32,7 +32,7 @@
  * printf using variadic c++ template
  */
 template<typename Stream, typename T, typename... Args>
-Stream&& mprintf(const char* format, Stream&& stream, const T value, Args... args);
+Stream&& mprintf(const char* format, Stream&& stream, const T& value, Args... args);
 
 /**
  * printf using variadic c++ template
@@ -49,8 +49,27 @@ std::string msprintf(const char* format, Args... args)
     return mprintf(format, std::ostringstream(), args...).str();
 }
 
+/**
+ * how to print value to stream
+ */
+template<typename Stream, typename T>
+void print(Stream& stream, const T& value)
+{
+    stream << value;
+}
+
+/**
+ * specialization how to print bool value to stream - use true/false instead of 1/0
+ */
+template<typename Stream>
+void print(Stream& stream, bool value)
+{
+    stream << (value == true ? "true" : "false");
+}
+
+
 template<typename Stream, typename T, typename... Args>
-Stream&& mprintf(const char* format, Stream&& stream, const T value, Args... args)
+Stream&& mprintf(const char* format, Stream&& stream, const T& value, Args... args)
 {
     while (*format != '\0')
     {
@@ -60,14 +79,14 @@ Stream&& mprintf(const char* format, Stream&& stream, const T value, Args... arg
                 ++format;
             else
             {
-                stream << value;
+                print(stream, value);
                 format += 2;
                 return mprintf(format, std::move(stream), args...);
             }
         }
         stream << *format++;
     }
-    throw std::runtime_error(mprintf("invalid number of arguments", std::ostringstream()).str());
+    throw std::runtime_error("invalid number of arguments");
 }
 
 template<typename Stream>
