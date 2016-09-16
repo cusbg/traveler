@@ -27,24 +27,23 @@
 class svg_writer : public document_writer
 {
 private:
+    struct properties;
     struct style;
-    struct property;
 
 public:
-    svg_writer();
-    virtual streampos print(
-                const std::string& text);
+    virtual ~svg_writer() = default;
+
+public:
     virtual void init(
                 const std::string& filename,
                 rna_tree::iterator root);
+    virtual streampos print(
+                const std::string& text);
 
 public: // formatters
     virtual std::string get_circle_formatted(
                 point centre,
                 double radius) const;
-    virtual std::string get_text_formatted(
-                point p,
-                const std::string& text) const;
     virtual std::string get_label_formatted(
                 const rna_label& label,
                 const RGB& color) const;
@@ -58,29 +57,26 @@ protected:
 private:
     std::string get_header_element(
                 rna_tree::iterator root);
-    style get_svg_color_style(
+    style get_color_style(
                 const RGB& color) const;
-    template <typename value_type>
-    std::string create_property(
-                const std::string& name,
-                const value_type& value) const;
-    std::string create_style(
-                const std::vector<style> styles) const;
+    properties get_styles(
+                const std::vector<style>& styles) const;
     std::string create_element(
                 const std::string& name,
-                const std::string& properties,
+                const properties& properties,
                 const std::string& value = "") const;
     std::string create_white_background() const;
+    std::string create_style_definitions() const;
 
-    std::string get_point_formatted(
+    properties get_point_formatted(
                 point p,
                 const std::string& prefix,
                 const std::string& postfix,
-                bool change_y_direction = true) const;
+                bool should_shift_p = true) const;
 
 private:
     point shift;
-    point letter;
+    const point letter = {LETTER.x / SCALE.x, LETTER.y / SCALE.y};
 };
 
 

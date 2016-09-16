@@ -23,10 +23,10 @@
 
 #include "ps_writer.hpp"
 
-#define PS_COLUMNS_WIDTH    15
-#define PS_END_STRING       "showpage\n"
-#define PS_END_LENGTH       (sizeof(PS_END_STRING) - 1)
-
+#define PS_COLUMNS_WIDTH        15
+#define PS_END_STRING           "showpage\n"
+#define PS_END_LENGTH           (sizeof(PS_END_STRING) - 1)
+#define PS_FILENAME_EXTENSION   ".ps"
 
 using namespace std;
 
@@ -38,7 +38,7 @@ void ps_writer::init(
 
     assert_err(!filename.empty(), "Filename should not be empty");
 
-    document_writer::init(filename + ".ps");
+    document_writer::init(filename, PS_FILENAME_EXTENSION);
 
     print(get_default_prologue(root));
 }
@@ -157,28 +157,6 @@ std::string ps_writer::get_default_prologue() const
     return out.str();
 }
 
-/* virtual */ std::string ps_writer::get_text_formatted(
-                point p,
-                const std::string& text) const
-{
-    ostringstream out;
-
-    out
-        << std::left
-        << std::setw(PS_COLUMNS_WIDTH)
-        << ("(" + text + ")")   // full text should have aligned width
-        << " "
-        << std::setw(PS_COLUMNS_WIDTH)
-        << p.x
-        << std::setw(PS_COLUMNS_WIDTH)
-        << p.y
-        << std::setw(PS_COLUMNS_WIDTH)
-        << " lwstring"
-        << endl;
-
-    return out.str();
-}
-
 /* virtual */ std::string ps_writer::get_label_formatted(
                 const rna_label& label,
                 const RGB& color) const
@@ -197,6 +175,28 @@ std::string ps_writer::get_default_prologue() const
             << get_text_formatted(label.p, label.label)
             << get_color_formatted(RGB::BLACK);
     }
+
+    return out.str();
+}
+
+std::string ps_writer::get_text_formatted(
+                point p,
+                const std::string& text) const
+{
+    ostringstream out;
+
+    out
+        << std::left
+        << std::setw(PS_COLUMNS_WIDTH)
+        << ("(" + text + ")")   // full text should have aligned width
+        << " "
+        << std::setw(PS_COLUMNS_WIDTH)
+        << p.x
+        << std::setw(PS_COLUMNS_WIDTH)
+        << p.y
+        << std::setw(PS_COLUMNS_WIDTH)
+        << " lwstring"
+        << endl;
 
     return out.str();
 }

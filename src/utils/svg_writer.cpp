@@ -21,124 +21,121 @@
 
 #include "svg_writer.hpp"
 
-#define SVG_END_STRING      "</svg>\n"
-#define SVG_END_LENGTH      (sizeof(SVG_END_STRING) - 1)
+#define SVG_END_STRING          "</svg>\n"
+#define SVG_END_LENGTH          (sizeof(SVG_END_STRING) - 1)
+#define SVG_FILENAME_EXTENSION  ".svg"
 
-#define quoted(text)        (string() + "\"" + to_string(text) + "\"")
+
 
 using namespace std;
 
-
-static int indentation = 0;
-
-
-static std::string indent()
+struct svg_writer::properties
 {
-    ostringstream out;
+public:
+    struct property
+    {
+        const std::string name;
+        const std::string value;
 
-    out << endl;
+        template<typename value_type>
+        property(
+                    const std::string& name,
+                    const value_type& value)
+            : name(name), value(to_string(value))
+        { }
 
-    for (int i = 0; i <= indentation; ++i)
-        out << "  ";
+        friend std::ostream& operator<< (
+                    std::ostream& out,
+                    const property& p)
+        {
+            out
+                << " "
+                << p.name
+                << "=\""
+                << p.value
+                << "\"";
 
-    return out.str();
-}
+            return out;
+        }
+    };
 
+private:
+    std::vector<property> props;
+
+public:
+    properties() = default;
+    properties(const property& property)
+    {
+        *this << property;
+    }
+    properties& operator<<(
+                const property& property)
+    {
+        props.emplace_back(property);
+        return *this;
+    }
+    properties& operator<<(
+                const properties& other)
+    {
+        for (const property p : other.props)
+            *this << p;
+        return *this;
+    }
+
+    friend std::ostream& operator<<(
+                std::ostream& out,
+                const properties& props)
+    {
+        for (const property& p: props.props)
+        {
+            out
+                << " "
+                << p;
+        }
+        return out;
+    }
+#define property svg_writer::properties::property
+};
 
 struct svg_writer::style
 {
-    std::string name;
-    std::string value;
+    const std::string name;
+    const std::string value;
+
+    template<typename value_type>
+    style(
+                const std::string& name,
+                const value_type& value)
+        : name(name), value(to_string(value))
+    { }
 
     friend std::ostream& operator<< (
                 std::ostream& out,
-                const style& s)
+                const style& p)
     {
-        ++indentation;
         out
-            << indent()
-            << s.name
+            << p.name
             << ": "
-            << s.value;
-        --indentation;
+            << p.value
+            << "; ";
+
         return out;
     }
 };
 
-
-svg_writer::svg_writer()
-{
-    assert(indentation == 0);
-}
-
-std::string svg_writer::get_header_element(
-                rna_tree::iterator root)
-{
-    APP_DEBUG_FNAME;
-
-    ostringstream out;
-
-    letter = LETTER;
-
-    point scale = {0.54, 0.54};
-    letter.x /= scale.x;
-    letter.y /= scale.y;
-
-    point bl = rna_tree::bottom_left_corner(root);
-    point tr = rna_tree::top_right_corner(root);
-
-    shift = -bl + point({50, 50});
-    point size = abs(bl) + abs(tr) + point({100, 100});
-
-    out
-        << "<svg"
-        << create_property("xmlns", "http://www.w3.org/2000/svg")
-        << create_property("xmlns:xlink", "http://www.w3.org/1999/xlink")
-        << create_property("width", letter.x)
-        << create_property("height", letter.y)
-        << create_property("viewBox", "0 0 " + to_string(size.x) + "px " + to_string(size.y) + "px")
-        << create_style({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
-        << ">"
-        << endl;
-
-    ++indentation;
-
-    return out.str();
-}
-
-void svg_writer::init(
+/* virtual */ void svg_writer::init(
                 const std::string& filename,
                 rna_tree::iterator root)
 {
     APP_DEBUG_FNAME;
 
-    assert_err(!filename.empty(), "Filename should not be empty");
+    document_writer::init(filename, SVG_FILENAME_EXTENSION);
 
-    document_writer::init(filename + ".svg");
+    shift = -rna_tree::bottom_left_corner(root) + point({50, 50});
 
-    print(get_header_element(root) + create_white_background());
-}
-
-
-svg_writer::style svg_writer::get_svg_color_style(
-                const RGB& color) const
-{
-    ostringstream out;
-
-#define rgb_value(value)    (255 * value)
-
-    out
-        << "rgb("
-        << rgb_value(color.get_red())
-        << ", "
-        << rgb_value(color.get_green())
-        << ", "
-        << rgb_value(color.get_blue())
-        << ")";
-
-#undef rgb_value
-
-    return {"stroke", out.str()};
+    print(get_header_element(root));
+    print(create_white_background());
+    print(create_style_definitions());
 }
 
 /* virtual */ streampos svg_writer::print(
@@ -156,117 +153,81 @@ svg_writer::style svg_writer::get_svg_color_style(
     return pos;
 }
 
+
 /* virtual */ std::string svg_writer::get_circle_formatted(
                 point centre,
                 double radius) const
 {
-    ostringstream out;
+    properties out;
 
     out
         << get_point_formatted(centre, "c", "")
-        << create_property("r", radius)
-        << create_style({get_svg_color_style(RGB::BLACK), {"fill", "none"}});
+        << property("r", radius);
 
-    return create_element("circle", out.str(), "");
-}
-
-/* virtual */ std::string svg_writer::get_text_formatted(
-                point p,
-                const std::string& text) const
-{
-    ostringstream out;
-
-    out
-        << get_point_formatted(p, "", "")
-        << create_style({{string("font-size"), string("8px")}});
-
-    return create_element("text", out.str(), text);
+    return create_element("circle", out);
 }
 
 /* virtual */ std::string svg_writer::get_label_formatted(
                 const rna_label& label,
                 const RGB& color) const
 {
-    ostringstream out;
+    properties out;
 
     out
         << get_point_formatted(label.p, "", "")
-        << create_style({get_svg_color_style(color)});
+        << property("class", color.get_name());
 
-    return create_element("text", out.str(), label.label);
+    return create_element("text", out, label.label);
 }
+
 
 /* virtual */ std::string svg_writer::get_line_formatted(
                 point from,
                 point to,
                 const RGB& color) const
 {
-    ostringstream out;
+    properties out;
 
     out
         << get_point_formatted(from, "", "1")
-        << " "
         << get_point_formatted(to, "", "2")
-        << create_style({get_svg_color_style(color), {"stroke-width", "2"}});
+        << property("class", color.get_name());
 
-    return create_element("line", out.str());
+    return create_element("line", out);
 }
 
-std::string svg_writer::get_point_formatted(
+svg_writer::properties svg_writer::get_point_formatted(
                 point p,
                 const std::string& prefix,
                 const std::string& postfix,
-                bool change_y_direction) const
+                bool should_shift_p) const
 {
-    ostringstream out;
+    properties out;
 
-    if (change_y_direction)
+    if (should_shift_p)
     {
         p += shift;
         p.y = letter.y - p.y;
     }
 
     out
-        << create_property(prefix + "x" + postfix, p.x)
-        << create_property(prefix + "y" + postfix, p.y);
+        << property(prefix + "x" + postfix, p.x)
+        << property(prefix + "y" + postfix, p.y);
 
-    return out.str();
-}
-
-template <typename value_type>
-std::string svg_writer::create_property(
-                const std::string& name,
-                const value_type& value) const
-{
-    return indent() + name + "=" + quoted(value);
-}
-
-std::string svg_writer::create_style(
-                const std::vector<style> styles) const
-{
-    ostringstream out;
-
-    for (const style& s : styles)
-    {
-        out
-            << s
-            << "; ";
-    }
-    
-    return create_property("style", out.str());
+    return out;
 }
 
 std::string svg_writer::create_element(
                 const std::string& name,
-                const std::string& properties,
+                const properties& properties,
                 const std::string& value) const
 {
     ostringstream out;
 
-    --indentation;
+    //--indentation;
 
     out
-        << indent()
+        //<< indent()
         << "<"
         << name
         << " "
@@ -290,22 +251,143 @@ std::string svg_writer::create_element(
     out
         << endl;
 
-    ++indentation;
+    //++indentation;
+
+    return out.str();
+}
+
+svg_writer::style svg_writer::get_color_style(
+                const RGB& color) const
+{
+    ostringstream out;
+
+#define rgb_value(value)    (255.0 * value)
+
+    out
+        << "rgb("
+        << rgb_value(color.get_red())
+        << ", "
+        << rgb_value(color.get_green())
+        << ", "
+        << rgb_value(color.get_blue())
+        << ")";
+
+#undef rgb_value
+
+    return {"stroke", out.str()};
+}
+
+svg_writer::properties svg_writer::get_styles(
+                const std::vector<style>& styles) const
+{
+    ostringstream out;
+
+    for (const style& s : styles)
+    {
+        out
+            << s;
+    }
+
+    return properties(property("style", out.str()));
+}
+
+std::string svg_writer::create_style_definitions() const
+{
+    ostringstream out;
+
+    out
+        << endl
+        << "<![CDATA[";
+
+    struct element
+    {
+        string name;
+        vector<style> styles;
+    };
+
+    vector<element> elements;
+    elements.push_back({"text", {}});
+    elements.push_back({"circle", {{"fill", "none"}}});
+    elements.push_back({"line", {}});
+
+    for (const auto& element : elements)
+    {
+        for (const RGB& rgb : RGB::get_all())
+        {
+            out
+                << endl
+                << element.name
+                << "."
+                << rgb.get_name()
+                << " {"
+                << get_color_style(rgb);
+
+            for (const style& s : element.styles)
+            {
+                out
+                    << s;
+            }
+            out
+                << "}";
+        }
+
+        // by default when no color is specified, black is used
+        out
+            << endl
+            << element.name
+            << " {"
+            << get_color_style(RGB::BLACK)
+            << style("fill", "none")
+            << "}";
+    }
+
+    out
+        << "]]>"
+        << endl;
+
+    return create_element("style", properties(property("type", "text/css")), out.str());
+}
+
+std::string svg_writer::get_header_element(
+                rna_tree::iterator root)
+{
+    APP_DEBUG_FNAME;
+
+    ostringstream out;
+
+
+    point bl = rna_tree::bottom_left_corner(root);
+    point tr = rna_tree::top_right_corner(root);
+
+    point size = abs(bl) + abs(tr) + point({100, 100});
+
+    out
+        << "<svg"
+        << property("xmlns", "http://www.w3.org/2000/svg")
+        << property("xmlns:xlink", "http://www.w3.org/1999/xlink")
+        << property("width", letter.x)
+        << property("height", letter.y)
+        << property("viewBox", "0 0 " + to_string(size.x) + "px " + to_string(size.y) + "px")
+        << get_styles({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
+        << ">"
+        << endl;
+
+    //++indentation;
 
     return out.str();
 }
 
 std::string svg_writer::create_white_background() const
 {
-    ostringstream out;
+    properties out;
 
     out
         << get_point_formatted({-500, -500}, "", "", false)
-        << create_property("height", "150%")
-        << create_property("width", "150%")
-        << create_style({{"stroke", "none"}, {"fill", "#FFF"}});
+        << property("height", "150%")
+        << property("width", "150%")
+        << get_styles({{"stroke", "none"}, {"fill", "#FFF"}});
 
-    return create_element("rect", out.str(), "");
+    return create_element("rect", out);
 }
 
 

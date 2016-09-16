@@ -33,37 +33,34 @@ using namespace std;
 #define COLOR_DEFAULT       RGB::BLACK
 
 // initialize RGB constants:
-const RGB RGB::RED = RGB(1., 0., 0.);
-const RGB RGB::GREEN = RGB(0., 1., 0.);
-const RGB RGB::BLUE = RGB(0., 0., 1.);
-const RGB RGB::BLACK = RGB(0., 0., 0.);
-const RGB RGB::GRAY = RGB(0.8, 0.8, 0.8);
-const RGB RGB::BROWN = RGB::for_255(210, 105, 30);
+const RGB RGB::RED = RGB(1., 0., 0., "red");
+const RGB RGB::GREEN = RGB(0., 1., 0., "green");
+const RGB RGB::BLUE = RGB(0., 0., 1., "blue");
+const RGB RGB::BLACK = RGB(0., 0., 0., "black");
+const RGB RGB::GRAY = RGB(0.8, 0.8, 0.8, "gray");
+const RGB RGB::BROWN = RGB::for_255(210, 105, 30, "brown");
 
 RGB::RGB(
                 double _red,
                 double _green,
-                double _blue)
-{
-    red = _red;
-    green = _green;
-    blue = _blue;
-}
+                double _blue,
+                const std::string& _name)
+    : red(_red), green(_green), blue(_blue), name(_name)
+{ }
 
 /* static */ RGB RGB::for_255(
                 size_t _red,
                 size_t _green,
-                size_t _blue)
+                size_t _blue,
+                const std::string& _name)
 {
-    return RGB(_red / 255., _green / 255., _blue / 255.);
+    return RGB(_red / 255., _green / 255., _blue / 255., _name);
 }
 
 bool RGB::operator==(
                 const RGB& other) const
 {
-    return red == other.red &&
-        green == other.green &&
-        blue == other.blue;
+    return name == other.name;
 }
 
 
@@ -262,20 +259,25 @@ std::string document_writer::get_rna_formatted(
 }
 
 void document_writer::init(
-                const std::string& filename)
+                const std::string& filename,
+                const std::string& suffix)
 {
     APP_DEBUG_FNAME;
-    DEBUG("init(%s)", to_cstr(filename));
     assert(!filename.empty());
+
+    string file = filename + suffix;
+    DEBUG("init(%s)", to_cstr(file));
+
+
 
     out.close();
 
     // create file & truncate
-    out.open(filename, ios::out);
+    out.open(file, ios::out);
     out.close();
 
     // open in normal mode
-    out.open(filename, ios::out | ios::in);
+    out.open(file, ios::out | ios::in);
     out
         << std::unitbuf
         << std::scientific;

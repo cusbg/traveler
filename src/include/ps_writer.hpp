@@ -32,6 +32,8 @@ struct point;
 class ps_writer : public document_writer
 {
 public:
+    virtual ~ps_writer() = default;
+public:
     virtual streampos print(
                 const std::string& text);
     virtual void init(
@@ -42,9 +44,6 @@ public:
     virtual std::string get_circle_formatted(
                 point centre,
                 double radius) const;
-    virtual std::string get_text_formatted(
-                point p,
-                const std::string& text) const;
     virtual std::string get_label_formatted(
                 const rna_label& label,
                 const RGB& color) const;
@@ -54,6 +53,11 @@ protected:
                 point from,
                 point to,
                 const RGB& color) const;
+
+private:
+    std::string get_text_formatted(
+                point p,
+                const std::string& text) const;
 
 private:
     std::string get_color_formatted(

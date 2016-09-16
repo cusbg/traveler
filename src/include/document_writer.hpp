@@ -26,6 +26,7 @@
 #include "rna_tree.hpp"
 
 #define LETTER              point({612, 792})
+#define SCALE               point({0.54, 0.54})
 
 struct RGB;
 
@@ -68,9 +69,6 @@ public: // formatters
                 point from,
                 point to,
                 bool is_base_pair = true) const;
-    virtual std::string get_text_formatted(
-                point p,
-                const std::string& text) const = 0;
     std::string get_label_formatted(
                 rna_tree::pre_post_order_iterator it) const;
     virtual std::string get_label_formatted(
@@ -93,10 +91,11 @@ public:
 
 public:
     /**
-     * initialize new document_writer on document `filename`
+     * initialize new document_writer on document `filename`.`suffix`
      */
     void init(
-                const std::string& filename);
+                const std::string& filename,
+                const std::string& suffix);
     /**
      * initialize writer, set basic properties to document (scale/..)
      */
@@ -169,16 +168,24 @@ public: /* constants: */
     static const RGB GRAY;
     static const RGB BROWN;
 
+public:
+    static std::vector<RGB> get_all()
+    {
+        return {RED, GREEN, BLUE, BLACK, GRAY, BROWN};
+    }
+
 private:
     RGB(
                 double _red,
                 double _green,
-                double _blue);
+                double _blue,
+                const std::string& _name);
 
     static RGB for_255(
                 size_t _red,
                 size_t _green,
-                size_t _blue);
+                size_t _blue,
+                const std::string& _name);
 
 public:
     bool operator==(
@@ -195,11 +202,16 @@ public:
     {
         return blue;
     }
+    inline std::string get_name() const
+    {
+        return name;
+    }
 
 private:
-    double red;
-    double green;
-    double blue;
+    const double red;
+    const double green;
+    const double blue;
+    const std::string name;
 };
 
 
