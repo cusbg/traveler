@@ -60,19 +60,19 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 	other lines are filled with LABELS and BRACKETS in dot-bracket notation of secondary structure pairing
 	match-tree must contain both LABELS and BRACKETS, templated-tree need only BRACKETS
 
-### Example1 - prints .svg/.ps image of mouse mapped to human
+### Example 1 - prints .svg/.ps image of mouse mapped to human
 	$ ./build/traveler \
 		--match-tree $INDIR/mouse.fasta \
 		--template-tree $INDIR/human.ps $INDIR/human.fasta \
 		--all $OUTDIR/mouse_draw-to_human
 
-### Example2 - compute only distances and mapping between mouse and human
+### Example 2 - compute only distances and mapping between mouse and human
 	$ ./build/traveler \
 		--match-tree $INDIR/mouse.fasta \
 		--template-tree $INDIR/human.ps $INDIR/human.fasta \
 		--ted $OUTDIR/mouse_draw-to_human.map
 
-### Example3 - prints images using precomputed mapping from previous example
+### Example 3 - prints images using precomputed mapping from previous example
 	$ ./build/traveler \
 		--match-tree $INDIR/mouse.fasta \
 		--template-tree $INDIR/human.ps $INDIR/human.fasta \
