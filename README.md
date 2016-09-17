@@ -15,12 +15,11 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 	traveler [OPTIONS] <TREES>
 
 	TREES:
-		<-mt|--match-tree> DBN_FILE
-		<-tt|--template-tree [--file-format FILE_FORMAT]> IMAGE_FILE DBN_FILE
+		<-gs|--target-structure> DBN_FILE
+		<-ts|--template-structure [--file-format FILE_FORMAT]> IMAGE_FILE DBN_FILE
 
 	DBN_FILE (Varna/DotBracketNotation) is in format like in example below
-	IMAGE_FILE - only supported type is post-script from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php),
-	but other can be implemented and specified by FILE_FORMAT argument
+	IMAGE_FILE* - visualization of template molecule, type of file can be specified by FILE_FORMAT argument
 
 	OPTIONS:
 		[-a|--all] [--overlaps] FILE_OUT
@@ -41,11 +40,17 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 		Rotated - like reinserted, but when redrawing multibranch loop - all branches are rotated to lie on
 		circles - they are brown
 
+#### Note:
+Only supported type of IMAGE\_FILE is post-script (ps) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php),
+but other can be implemented and specified by FILE\_FORMAT argument.
+
 ### Example 0.A - download test files
 	$ mkdir 18S/
 	$ cd 18S/
-	$ wget --recursive --no-directories --no-parent http://richard.ba30.eu/traveler/img/input/18S/
-	$ # in other examples, we will use this directory as INDIR, input directory with files, OUTDIR will be /tmp/
+	$ wget --recursive --no-directories --no-parent \
+        http://richard.ba30.eu/traveler/img/input/18S/
+
+In other examples, we will use 18S/ directory as INDIR, OUTDIR will be /tmp/
 
 ### Example 0.B - Varna/DBN file format
 	$ cat $INDIR/mouse.fasta
