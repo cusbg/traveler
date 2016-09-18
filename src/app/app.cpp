@@ -186,9 +186,7 @@ void app::save(
 
     for (bool colored : {true, false})
     {
-        auto writers = document_writer::get_writers(colored);
-
-        for (auto& writer : writers)
+        for (auto& writer : document_writer::get_writers(colored))
         {
             string file = colored ? filename + ".colored" : filename;
             writer->init(file, rna.begin());

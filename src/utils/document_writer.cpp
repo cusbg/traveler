@@ -65,10 +65,10 @@ bool RGB::operator==(
 
 
 
-/* static */ std::vector<std::unique_ptr<document_writer>> document_writer::get_writers(
+/* static */ image_writers document_writer::get_writers(
                 bool use_colors)
 {
-    std::vector<std::unique_ptr<document_writer>> vec;
+    image_writers vec;
     vec.emplace_back(new svg_writer());
     vec.emplace_back(new ps_writer());
 

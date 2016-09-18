@@ -1,7 +1,7 @@
 #
 # File: src/Makefile
 # Created: 2014-09-01 14:42
-# By: eliasr <eliasr@u-pl22>
+# By: Richard Eliáš <richard.elias@matfyz.cz>
 #
 
 TARGET                  = traveler
@@ -28,7 +28,7 @@ run: build cleanLog cp mkdir
 doc:
 	doxygen
 
-debug: build cp mkdir
+debug: build mkdir
 	sh -x run.sh debug
 
 CORES                   = $(shell nproc)
@@ -59,9 +59,6 @@ prepare_test:
 
 force_rebuild_main:
 	@rm -rf ${BUILDDIR}/main* ${BUILDDIR}/${TARGET}
-
-cp:
-	cp -R ../InFiles/* ./precomputed
 
 mkdir:
 	@mkdir -p ${BUILDDIR}/files ${LOGDIR}

@@ -4,7 +4,7 @@
 - gcc with support of c++11
 
 ## Download:
-Use `git clone https://github.com/rikiel/bc traveler` to download project
+Use `git clone https://github.com/rikiel/traveler` to download project
 
 ## Compiling:
 	cd traveler/src
@@ -12,9 +12,9 @@ Use `git clone https://github.com/rikiel/bc traveler` to download project
 
 ## Usage:
 	traveler [-h|--help]
-	traveler [OPTIONS] <TREES>
+	traveler [OPTIONS] <STRUCTURES>
 
-	TREES:
+	STRUCTURES:
 		<-gs|--target-structure> DBN_FILE
 		<-ts|--template-structure [--file-format FILE_FORMAT]> IMAGE_FILE DBN_FILE
 

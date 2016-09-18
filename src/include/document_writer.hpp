@@ -29,6 +29,9 @@
 #define SCALE               point({0.54, 0.54})
 
 struct RGB;
+class document_writer;
+
+typedef std::vector<std::unique_ptr<document_writer>> image_writers;
 
 /**
  * class for printing visualization
@@ -46,8 +49,10 @@ public:
     /**
      * initialize, and return all known writers
      */
-    static std::vector<std::unique_ptr<document_writer>> get_writers(
+    static image_writers get_writers(
                 bool use_colors);
+
+public:
 
     /**
      * print `text` to document
