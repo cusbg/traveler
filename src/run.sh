@@ -8,11 +8,11 @@ FILES2="cicadas"
 #FILES2="artemia_salina"
 
 EXECUTABLE="build/traveler"
-DIR="/tmp/"
+DIR="/tmp/18S/"
 DIR_IMG="build/files"
 ONCE=false
 
-#OVERLAPS="--overlaps"
+OVERLAPS="--overlaps"
 
 #mv ${EXECUTABLE} ${EXECUTABLE}2
 #EXECUTABLE="${EXECUTABLE}2"
@@ -34,13 +34,14 @@ init_variables() {
     file_in="${DIR}/${file1}-${file2}"
     file_out="${DIR_IMG}/${file1}-${file2}"
     debug="--debug"
-    tt="--template-tree ${DIR}/${file1}.ps ${DIR}/${file1}.fasta"
-    mt="--match-tree ${DIR}/${file2}.fasta"
+    tt="--template-structure ${DIR}/${file1}.ps ${DIR}/${file1}.fasta"
+    mt="--target-structure ${DIR}/${file2}.fasta"
 }
 
 run_ted() {
     ${EXECUTABLE} \
-        ${tt} ${mt} ${debug} \
+        ${debug} \
+        ${tt} ${mt} \
         --ted ${file_out}.map \
         || fail_function
 }
@@ -49,8 +50,9 @@ run_draw() {
     init_variables
 
     ${EXECUTABLE} \
-        ${tt} ${mt} ${debug} \
-	    --draw ${COLORED} ${OVERLAPS} ${file_in}.map ${file_out} \
+        ${debug} \
+        ${tt} ${mt} \
+	    --draw ${COLORED} ${OVERLAPS} ${file_out}.map ${file_out} \
 	|| fail_function
 }
 

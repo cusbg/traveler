@@ -22,7 +22,7 @@ SHELL                   = /bin/bash -o pipefail
 
 build: mkdir make_modules ${BUILDDIR}/Makefile compile
 
-run: build cleanLog cp mkdir
+run: build cleanLog mkdir
 	sh -x run.sh
 
 doc:

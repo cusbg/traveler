@@ -23,6 +23,15 @@
 #define EXCEPTION_HPP
 
 #include <stdexcept>
+#include "mprintf.hpp"
+
+#define DEFAULT_EXCEPTION_METHODS(ex_name) \
+    virtual ~ex_name() noexcept = default; \
+    template <typename ...Args> \
+    ex_name( \
+            const char* _msg_format, Args... args) \
+        : my_exception(_msg_format, args...) \
+    { }
 
 class my_exception : public std::exception
 {
@@ -32,6 +41,12 @@ public:
 protected:
     my_exception(
                 const std::string& _msg);
+
+    template <typename ...Args>
+    my_exception(
+                const char* _msg_format, Args... args)
+        : my_exception(msprintf(_msg_format, args...))
+    { }
     virtual ~my_exception() noexcept = default;
 
 private:
@@ -42,7 +57,8 @@ private:
 class abort_exception : public my_exception
 {
 public:
-    virtual ~abort_exception() noexcept = default;
+    DEFAULT_EXCEPTION_METHODS(abort_exception);
+
     abort_exception(
                 int line,
                 const std::string& file,
@@ -53,7 +69,8 @@ public:
 class assert_exception : public my_exception
 {
 public:
-    virtual ~assert_exception() noexcept = default;
+    DEFAULT_EXCEPTION_METHODS(assert_exception);
+
     assert_exception(
                 const std::string& condiniton,
                 int line,
@@ -65,17 +82,38 @@ public:
 class io_exception : public my_exception
 {
 public:
+    DEFAULT_EXCEPTION_METHODS(io_exception);
+
     io_exception(const std::string& msg)
         : my_exception(msg)
     { }
-    virtual ~io_exception() noexcept = default;
 };
+
+
+class illegal_state_exception : public my_exception
+{
+public:
+    DEFAULT_EXCEPTION_METHODS(illegal_state_exception);
+
+    illegal_state_exception(const std::string& msg)
+        : my_exception(msg)
+    { }
+};
+
+
+class wrong_argument : public my_exception
+{
+public:
+    DEFAULT_EXCEPTION_METHODS(wrong_argument);
+};
+
 
 
 #endif /* !EXCEPTION_HPP */
 
 // should always redefine, e.g. assert(), abort(), ..
 
+#undef abort
 #define abort() \
     throw abort_exception(__LINE__, __FILE__, __PRETTY_FUNCTION__);
 
@@ -84,15 +122,6 @@ public:
     { \
         if (!(boolean)) \
         { \
-            throw assert_exception(#boolean, __LINE__, __FILE__, __PRETTY_FUNCTION__); \
-        } \
-    }
-
-#define assert_err(boolean, ...) \
-    { \
-        if (!(boolean)) \
-        { \
-            ERR(__VA_ARGS__); \
             throw assert_exception(#boolean, __LINE__, __FILE__, __PRETTY_FUNCTION__); \
         } \
     }

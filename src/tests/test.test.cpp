@@ -28,6 +28,7 @@
 #include "rted.test.hpp"
 #include "overlap_checks.test.hpp"
 #include "utils.test.hpp"
+#include "mprintf.test.hpp"
 
 using namespace std;
 
@@ -44,6 +45,7 @@ using namespace std;
         new rted_test(),
         new overlap_checks_test(),
         new utils_test(),
+        new mprinf_test(),
     };
 
     for (test* t : vec)

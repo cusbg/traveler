@@ -34,21 +34,6 @@ compact::compact(
     : rna(_rna)
 { }
 
-void print(rna_tree::iterator root)
-{
-    auto writers = document_writer::get_writers(true);
-    for (const auto& writer : writers)
-    {
-        writer->init("build/files/0", root);
-        writer->print(writer->get_rna_subtree_formatted(root));
-    } 
-}
-
-void print(rna_tree rna)
-{
-    print(rna.begin());
-}
-
 
 void compact::run()
 {
@@ -176,7 +161,7 @@ void compact::run()
         c.p1 = ch->at(ch.label_index()).p;
         c.p2 = move_point(c.centre, c.p2, dist);
 
-        ch->set_points_exact(c.rotate(alpha), ch.label_index());
+        ch->at(ch.label_index()).p = c.rotate(alpha);
     }
 }
 
@@ -322,8 +307,8 @@ void compact::init_by_ancestor(
     p1 = par->at(0).p + vec;
     p2 = par->at(1).p + vec;
 
-    it->set_points_exact(p1, 0);
-    it->set_points_exact(p2, 1);
+    it->at(0).p = p1;
+    it->at(1).p = p2;
     // ^^ initialize points of `it` to lie next to parent
     // .. that means only initialization, to get direction where child should be
 
@@ -362,16 +347,16 @@ void compact::init_multibranch(
                             rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
                         });
 
-                root->set_points_exact(p1, 0);
-                root->set_points_exact(p2, 1);
+                root->at(0).p = p1;
+                root->at(1).p = p2;
                 return;
             }
 
             point rp1 = root->at(0).p;
             point rp2 = root->at(1).p;
 
-            root->set_points_exact(p1, 0);
-            root->set_points_exact(p2, 1);
+            root->at(0).p = p1;
+            root->at(1).p = p2;
 
             double beta = angle(rp1 - rp2) - angle(p1 - p2);
 
@@ -408,7 +393,7 @@ void compact::init_multibranch(
     {
         if (rna_tree::is_leaf(ch))
         {
-            ch->set_points_exact(points[i], 0);
+            ch->at(0).p = points[i];
 
             i += LEAF_POINTS;
         }
@@ -637,8 +622,7 @@ void compact::split(
         p2[j] = p;
     }
 
-    assert_err(j == p2.size(), "i %lu, j %lu, p1 %lu, p2 %lu",
-            i, j, p1.size(), p2.size());
+    assert(j == p2.size());
 
     j = 0;
     for (auto val : in.vec)
@@ -661,7 +645,7 @@ void compact::reinsert(
     {
         assert(rna_tree::is_leaf(nodes[i]));
 
-        nodes[i]->set_points_exact(points[i], 0);
+        nodes[i]->at(0).p = points[i];
         if (is(nodes[i], rna_pair_label::touched))
             nodes[i]->status = rna_pair_label::reinserted;
     }
@@ -722,9 +706,7 @@ double compact::get_length(
     {
         if (!it->inited_points())
         {
-            ERR("!inited(%s) after compact",
-                    clabel(it));
-            abort();
+            throw illegal_state_exception("All bases should be visualized, but they are not.");
         }
     }
 }

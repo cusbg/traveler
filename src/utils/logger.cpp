@@ -24,11 +24,12 @@
 
 #include "logger.hpp"
 #include "types.hpp"
+#include "mprintf.hpp"
+
+#define LOG_FILE "build/logs/program.log"
 
 
 using namespace std;
-
-#define LOG_FILE "build/logs/program.log"
 
 /* global */
 class logger logger(LOG_FILE, logger::ERROR, {stdout});
@@ -49,8 +50,8 @@ logger::logger(
     out = streams;
     FILE* f = fopen(filename.c_str(), "a");
 
-    assert_err(f != nullptr && !ferror(f),
-            "cannot open file '%s' to log in", to_cstr(filename));
+    if (f == nullptr || ferror(f))
+        throw io_exception("cannot open file '" + filename + "' to log in");
 
     out.push_back(f);
 
@@ -128,7 +129,10 @@ string logger::message_header(
 void logger::check_errors()
 {
     for (FILE* f : out)
-        assert_err(!ferror(f), "LOGGER FILE OUTPUT ERROR");
+    {
+        if (ferror(f))
+            throw io_exception("logger output error");
+    }
 }
 
 std::vector<int> logger::opened_files() const
@@ -191,5 +195,7 @@ std::ostream& operator<<(
 
     return out;
 }
+
+
 
 

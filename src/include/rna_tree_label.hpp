@@ -102,12 +102,6 @@ public:
      */
     void set_label_strings(
                 const rna_pair_label& other);
-    /**
-     * set point for base
-     */
-    void set_points_exact(
-                point p,
-                size_t index);
 
 public:
     status_type status = untouched;

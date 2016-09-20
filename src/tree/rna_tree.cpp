@@ -96,7 +96,7 @@ void rna_tree::update_points(
     for (it = ++begin_pre_post();
             it != end_pre_post() && i < points.size();
             ++it, ++i)
-        it->set_points_exact(points[i], it.label_index());
+        it->at(it.label_index()).p = points[i];
 
     assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
 

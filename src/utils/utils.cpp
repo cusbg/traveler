@@ -25,6 +25,7 @@
 #include "mapping.hpp"
 #include "ps_extractor.hpp"
 #include "exception.hpp"
+#include "mprintf.hpp"
 
 using namespace std;
 
@@ -328,9 +329,9 @@ rna_tree get_rna(const string& name)
     l = read_file(name + ".seq");
     b = read_file(name + ".fold");
 
-    extractor& doc = extractor::get_extractor(name + ".ps", "ps");
+    extractor_ptr doc = extractor::get_extractor(name + ".ps", "ps");
 
-    return rna_tree(b, l, doc.points, name);
+    return rna_tree(b, l, doc->points, name);
 }
 
 

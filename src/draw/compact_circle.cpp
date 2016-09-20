@@ -23,9 +23,19 @@
 
 using namespace std;
 
+static inline bool has_bad(const vector<point>& points)
+{
+    for (const point& p : points)
+        if (p.bad())
+            return true;
+    return false;
+}
+
 #define CIRCLE_POINTS_INITED() \
-    assert(!(centre.bad() || p1.bad() || \
-                p2.bad() || direction.bad()))
+     if (has_bad({centre, p1, p2, direction})) \
+     { \
+        throw illegal_state_exception("Points in circle are not initialized, could not use them for drawing"); \
+     }
 #define CIRCLE_SGN_INITED() \
     assert(sgn == 1 || sgn == -1)
 
@@ -63,8 +73,12 @@ double compact::circle::segment_angle() const
 {
     CIRCLE_POINTS_INITED();
     CIRCLE_SGN_INITED();
-    assert_err(double_equals(distance(p1, centre), distance(p2, centre)),
-            "%s != %s", to_cstr(distance(p1, centre)), to_cstr(distance(p2, centre)));
+
+    if (!double_equals(distance(p1, centre), distance(p2, centre)))
+    {
+        throw illegal_state_exception("Distance from centre is not same (%i != %i), circle is in illegal state",
+                distance(p1, centre), distance(p2, centre));
+    }
 
     if (sgn == 1)
         return angle(p1, centre, p2);

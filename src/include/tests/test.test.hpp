@@ -76,7 +76,7 @@ protected:
             try  \
             { \
                 if ((expected) != (value)) \
-                    add_failed(msprintf("%s (=%s) != %s (=%s)", #expected, (expected), #value, (value))); \
+                    add_failed(msprintf("TEST FAILED: %s == %s \n Expected: %s \n Found: %s", #expected, #value, (expected), (value))); \
                 else \
                     test_ok(); \
             } \
@@ -95,13 +95,13 @@ protected:
                 DEBUG("Running operation %s", #operation); \
                 { \
                     LOGGER_PRIORITY_ON_FUNCTION(EMERG); \
-                    operation; \
+                    static_cast<void>((operation)); \
                 } \
                 add_failed(format_failed((operation) " should fail" )); \
             } \
-            catch (...) \
+            catch (const std::exception& e) \
             { \
-                DEBUG("Catched expected exception"); \
+                DEBUG("Catched expected exception: msg=%s", e.what()); \
                 test_ok(); \
             } \
             print_test_number(); \

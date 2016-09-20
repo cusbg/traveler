@@ -51,7 +51,8 @@ const rna_label& rna_pair_label::operator[](
     }
     catch (const out_of_range& e)
     {
-        assert_err(false, "label(%s)[%lu]: %s", to_cstr(*this), index, e.what());
+        ERR("Trying to get label at illegal index %s; labels=%s", index, *this);
+        throw;
     }
 }
 
@@ -66,7 +67,8 @@ rna_label& rna_pair_label::operator[](
     }
     catch (const out_of_range& e)
     {
-        assert_err(false, "label(%s)[%lu]: %s", to_cstr(*this), index, e.what());
+        ERR("Trying to get label at illegal index %s; labels=%s", index, *this);
+        throw;
     }
 }
 
@@ -152,16 +154,16 @@ std::ostream& operator<<(
                 std::ostream& out,
                 rna_pair_label::status_type s)
 {
-#define ST(status) case rna_pair_label::status: out << #status; break;
+#define switchcase(status) case rna_pair_label::status: out << #status; break;
     switch (s)
     {
-        ST(inserted)
-        ST(deleted)
-        ST(touched)
-        ST(untouched)
-        ST(edited)
-        ST(reinserted)
-        ST(pair_changed)
+        switchcase(inserted)
+        switchcase(deleted)
+        switchcase(touched)
+        switchcase(untouched)
+        switchcase(edited)
+        switchcase(reinserted)
+        switchcase(pair_changed)
 
         default:
             abort();
@@ -210,15 +212,6 @@ void rna_pair_label::clear_points()
         val.p = point::bad_point();
 }
 
-void rna_pair_label::set_points_exact(
-                point p,
-                size_t index)
-{
-    //APP_DEBUG_FNAME;
-
-    (*this)[index].p = p;
-}
-
 void rna_pair_label::set_label_strings(
                 const rna_pair_label& other)
 {
@@ -234,7 +227,7 @@ void rna_pair_label::set_label_strings(
                 to_cstr(*this), to_cstr(status));
         abort();
     }
-    if (paired() != other.paired())
+    else if (paired() != other.paired())
     {
         ERR("set_label_strings: not compatible nodes: %s-%s",
                 to_cstr(*this), to_cstr(other));

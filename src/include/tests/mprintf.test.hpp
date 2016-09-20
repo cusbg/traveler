@@ -1,5 +1,5 @@
 /*
- * File: extractor.hpp
+ * File: mprintf.test.hpp
  *
  * Copyright (C) 2016 Richard Eliáš <richard@ba30.eu>
  *
@@ -19,43 +19,22 @@
  * USA.
  */
 
-#ifndef EXTRACTOR_HPP
-#define EXTRACTOR_HPP
+#ifndef MPRINTF_TEST_HPP
+#define MPRINTF_TEST_HPP
 
-#include <string>
-#include <vector>
-#include <memory>
+#include "test.test.hpp"
 
-#include "point.hpp"
-
-class extractor;
-
-typedef std::unique_ptr<extractor> extractor_ptr;
-
-/**
- * extracts labels and points from document
- */
-class extractor
+class mprinf_test : public test
 {
 public:
-    /**
-     * returns extractor with `type`, run extraction from file `filename`
-     */
-    static extractor_ptr get_extractor(
-                const std::string& filename,
-                const std::string& type);
-protected:
-    /**
-     * run extraction
-     */
-    virtual void extract(
-                const std::string& filename) = 0;
-
-public:
-    std::string labels;
-    std::vector<point> points;
+    mprinf_test();
+    virtual ~mprinf_test() = default;
+    virtual void run();
+private:
+    void test_successfull_mprintf();
+    void test_fail_mprintf();
 };
 
 
-#endif /* !EXTRACTOR_HPP */
+#endif /* !MPRINTF_TEST_HPP */
 

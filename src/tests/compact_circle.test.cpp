@@ -32,7 +32,7 @@ compact_circle_test::compact_circle_test()
     : test("compact_circle_test")
 { }
 
-compact::circle create_valid_circle()
+static compact::circle create_valid_circle()
 {
     APP_DEBUG_FNAME;
 
@@ -49,7 +49,7 @@ compact::circle create_valid_circle()
     return c;
 }
 
-compact::circle create_invalid_circle()
+static compact::circle create_invalid_circle()
 {
     APP_DEBUG_FNAME;
 

@@ -36,8 +36,6 @@ void ps_writer::init(
 {
     APP_DEBUG_FNAME;
 
-    assert_err(!filename.empty(), "Filename should not be empty");
-
     document_writer::init(filename, PS_FILENAME_EXTENSION);
 
     print(get_default_prologue(root));
@@ -83,15 +81,29 @@ std::string ps_writer::get_default_prologue(
 }
 
 std::string ps_writer::get_default_prologue() const
-{
-    return
-        "%!\n"
-        "/lwline {newpath moveto lineto stroke} def\n"
-        "/lwstring {moveto show} def\n"
-        "/lwarc {newpath gsave translate scale /rad exch def /ang1 exch def"
-            " /ang2 exch def 0.0 0.0 rad ang1 ang2 arc stroke grestore} def\n"
-        "/Helvetica findfont 8.00 scalefont setfont\n"
-        ;
+ {
+    auto define_color = [](const RGB& rgb) {
+        return msprintf("/%s {%i %i %i setrgbcolor} def\n",
+                rgb.get_name(), rgb.get_red(), rgb.get_green(), rgb.get_blue());
+    };
+    ostringstream out;
+
+    out
+        << "%!\n"
+        << "/lwline {newpath moveto lineto stroke} def\n"
+        << "/lwstring {moveto show} def\n"
+        << "/lwarc {newpath gsave translate scale /rad exch def /ang1 exch def\n\t"
+        <<     " /ang2 exch def 0.0 0.0 rad ang1 ang2 arc stroke grestore} def\n"
+        << "/lwcircle {/rad exch def /pos2 exch def /pos1 exch def \n\t"
+        <<     " 360 0 rad 1.0 1.0 pos1 pos2 lwarc } def\n";
+
+    for (const RGB& rgb : RGB::get_all())
+        out << define_color(rgb);
+
+    out
+        << "/Helvetica findfont 8.00 scalefont setfont\n";
+
+    return out.str();
 }
 
 
@@ -112,17 +124,7 @@ std::string ps_writer::get_default_prologue() const
                 point centre,
                 double radius) const
 {
-    ostringstream out;
-
-    out
-        << "360 0 "
-        << radius
-        << " 1.0 1.0 "
-        << centre
-        << " lwarc"
-        << endl;
-
-    return out.str();
+    return get_color_formatted(RGB::BLACK) + msprintf("%s %s lwcircle\n", centre, radius);
 }
 
 /* virtual */ std::string ps_writer::get_line_formatted(
@@ -137,8 +139,7 @@ std::string ps_writer::get_default_prologue() const
 
     string color_beg, color_end;
 
-    if (color != RGB::BLACK)
-        out << get_color_formatted(color);
+    out << get_color_formatted(color);
 
     for (double coordinates : {from.x, from.y, to.x, to.y})
     {
@@ -151,9 +152,6 @@ std::string ps_writer::get_default_prologue() const
         << " lwline"
         << endl;
 
-    if (color != RGB::BLACK)
-        out << get_color_formatted(RGB::BLACK);
-
     return out.str();
 }
 
@@ -163,18 +161,9 @@ std::string ps_writer::get_default_prologue() const
 {
     ostringstream out;
 
-    if (color == RGB::BLACK)
-    {
-        out
-            << get_text_formatted(label.p, label.label);
-    }
-    else
-    {
-        out
-            << get_color_formatted(color)
-            << get_text_formatted(label.p, label.label)
-            << get_color_formatted(RGB::BLACK);
-    }
+    out
+        << get_color_formatted(color)
+        << get_text_formatted(label.p, label.label);
 
     return out.str();
 }
@@ -204,20 +193,13 @@ std::string ps_writer::get_text_formatted(
 std::string ps_writer::get_color_formatted(
                 const RGB& color) const
 {
-    ostringstream out;
-
-    for (double fragment : {color.get_red(), color.get_green(), color.get_blue()})
+    if (color == *last_used)
+        return "";
+    else
     {
-        out
-            << std::left
-            << std::setw(PS_COLUMNS_WIDTH)
-            << fragment;
+        last_used = &color;
+        return color.get_name() + "\n";
     }
-    out
-        << " setrgbcolor"
-        << endl;
-
-    return out.str();
 }
 
 

@@ -42,11 +42,10 @@ rna_tree& matcher::run(
     mark(t1, map.get_to_remove(), rna_pair_label::deleted);
     mark(t2, map.get_to_insert(), rna_pair_label::inserted);
 
-    assert_err((t1.size() - map.get_to_remove().size()) ==
-            (t2.size() - map.get_to_insert().size()),
-            "t1.size:%lu - to_remove.size:%lu != t2.size:%lu - to_insert.size:%lu",
-            t1.size(), map.get_to_remove().size(),
-            t2.size(), map.get_to_insert().size());
+    if (t1.size() - map.get_to_remove().size() != t2.size() - map.get_to_insert().size())
+    {
+        throw illegal_state_exception("Computed sizes of removing/inserting does not match current trees");
+    }
 
     erase();
 
@@ -57,10 +56,12 @@ rna_tree& matcher::run(
 
     merge();
 
-    logger.debug_stream() << "MATCH OUT: " << t1.print_tree(false);
+    DEBUG("Match out: %s", t1.print_tree(false));
 
-    assert_err(t1.correct_pairing(), "uncorrect tree pairing");
-    assert_err(t2.correct_pairing(), "uncorrect tree pairing");
+    if (!t1.correct_pairing() || !t2.correct_pairing())
+    {
+        throw illegal_state_exception("Uncorrect tree pairing after transforming template to target tree");
+    }
 
     update_ends_in_rna(t1);
     t1.set_postorder_ids();
@@ -117,8 +118,6 @@ void matcher::erase()
             ++ch;
         }
     }
-
-    assert_err(t1.correct_pairing(), "uncorrect tree pairing");
 }
 
 void matcher::merge()

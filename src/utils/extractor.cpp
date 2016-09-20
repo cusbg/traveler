@@ -20,7 +20,6 @@
  */
 
 #include <map>
-#include <memory>
 
 #include "extractor.hpp"
 #include "ps_extractor.hpp"
@@ -28,30 +27,33 @@
 
 using namespace std;
 
-typedef map<string, shared_ptr<extractor>> extractor_map_type;
+typedef map<string, extractor_ptr> extractor_map_type;
 
 static extractor_map_type create_extractors()
 {
     extractor_map_type map;
-    map["ps"] = make_shared<ps_extractor>();
+    map["ps"] = unique_ptr<ps_extractor>(new ps_extractor());
 
     return map;
 }
 
-/* static */ extractor& extractor::get_extractor(
+/* static */ extractor_ptr extractor::get_extractor(
                 const std::string& docfile,
                 const std::string& doctype)
 {
-    static extractor_map_type map = create_extractors();
+    extractor_map_type map = create_extractors();
 
     extractor_map_type::iterator it = map.find(doctype);
 
-    assert_err(it != map.end(), "type '%s' is not supported", to_cstr(doctype));
+    if (it == map.end())
+    {
+        throw illegal_state_exception("Document type '%s' is not supported", doctype);
+    }
 
-    extractor& extractor = *it->second;
-    extractor.extract(docfile);
+    extractor_ptr& extractor = it->second;
+    extractor->extract(docfile);
 
-    return extractor;
+    return std::move(extractor);
 }
 
 

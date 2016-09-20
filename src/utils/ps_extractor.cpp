@@ -25,17 +25,28 @@
 #include "ps_extractor.hpp"
 #include "utils.hpp"
 
+#define ERR_OLD_GCC "You need newer compiler. Actual does not support necessary regex patterns. Please, use g++ version >= 4.9.2."
+
 using namespace std;
 
 static regex create_regex(const std::string& pattern)
 {
+    struct regex_exception : public my_exception
+    {
+        regex_exception(const std::regex_error& e)
+            : my_exception(to_string(ERR_OLD_GCC) + "[error=" + to_string(e.what()) + "]")
+        { }
+
+        virtual ~regex_exception() noexcept = default;
+    };
+
     try
     {
         return regex(pattern);
     }
     catch (const std::regex_error& e)
     {
-        throw runtime_error("regex_error: You need newer compiler. Actual does not support necessary regex patterns, use gcc version >= 4.9.2");
+        throw regex_exception(e);
     }
 }
 
@@ -43,12 +54,15 @@ static regex create_regex(const std::string& pattern)
 void ps_extractor::extract(
                 const std::string& filename)
 {
+    APP_DEBUG_FNAME;
+
     labels = "";
     points = vector<point>();
 
-    APP_DEBUG_FNAME;
-    assert_err(exist_file(filename),
-            "ps_document(%s): file does not exist", to_cstr(filename));
+    if (!exist_file(filename))
+    {
+        throw io_exception("Document '%s' does not exist. Cannot extract RNA structure", filename);
+    }
 
     string line, str;
     ifstream in(filename);

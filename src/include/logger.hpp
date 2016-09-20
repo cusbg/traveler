@@ -26,96 +26,11 @@
 #include <vector>
 #include <sstream>
 
-#include <stdexcept>
-
-/**
- * printf using variadic c++ template
- */
-template<typename Stream, typename T, typename... Args>
-Stream&& mprintf(const char* format, Stream&& stream, const T& value, Args... args);
-
-/**
- * printf using variadic c++ template
- */
-template<typename Stream>
-Stream&& mprintf(const char* format, Stream&& stream);
-
-/**
- * printf using variadic c++ template
- */
-template<typename... Args>
-std::string msprintf(const char* format, Args... args)
-{
-    return mprintf(format, std::ostringstream(), args...).str();
-}
-
-/**
- * how to print value to stream
- */
-template<typename Stream, typename T>
-void print(Stream& stream, const T& value)
-{
-    stream << value;
-}
-
-/**
- * specialization how to print bool value to stream - use true/false instead of 1/0
- */
-template<typename Stream>
-void print(Stream& stream, bool value)
-{
-    stream << (value == true ? "true" : "false");
-}
-
-
-template<typename Stream, typename T, typename... Args>
-Stream&& mprintf(const char* format, Stream&& stream, const T& value, Args... args)
-{
-    while (*format != '\0')
-    {
-        if (*format == '%')
-        {
-            if (*(format + 1) == '%')
-                ++format;
-            else
-            {
-                print(stream, value);
-                format += 2;
-                return mprintf(format, std::move(stream), args...);
-            }
-        }
-        stream << *format++;
-    }
-    throw std::runtime_error("invalid number of arguments");
-}
-
-template<typename Stream>
-Stream&& mprintf(const char* format, Stream&& stream)
-{
-    while (*format != '\0')
-    {
-        if (*format == '%')
-        {
-            if (*(format + 1) == '%')
-                ++format;
-            else
-                throw std::runtime_error(mprintf("invalid format string: missing arguments, format string '%s'",
-                        std::ostringstream(),
-                        format).str());
-        }
-        stream << *format++;
-    }
-    return std::move(stream);
-}
-
-
-
-
 class logger
 {
 #define LOGGER_PRIORITY_FUNCTION(_fname, _priority) \
     template<typename ...Args> \
-    inline void _fname(const char* msg, Args... args) \
+    void _fname(const char* msg, Args... args) \
     { \
         mprintf(msg, get_stream(_priority), args...); \
     }
@@ -174,7 +89,7 @@ public:
                     const T& value);
     private:
         logger& l;
-        priority p;
+        const priority p;
         std::ostringstream stream;
     };
 
@@ -288,10 +203,8 @@ logger::logger_stream& logger::logger_stream::operator<<(
     return *this;
 }
 
-std::ostream& operator<<(
-                    std::ostream& out,
-                    logger::priority p);
 
+// Define standard macros for using logger
 
 #define DEBUG(...) \
     if (logger.is_debug_enabled()) \
@@ -303,7 +216,6 @@ std::ostream& operator<<(
     ::logger.warn(__VA_ARGS__)
 #define ERR(...) \
     ::logger.error(__VA_ARGS__)
-
 
 #endif /* !LOGGER_HPP */
 

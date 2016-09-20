@@ -66,6 +66,8 @@ private:
     std::string get_default_prologue(
                 rna_tree::pre_post_order_iterator root) const;
 
+private:
+    mutable const RGB* last_used = &RGB::BLACK;
 };
 
 

@@ -162,7 +162,8 @@ void document_writer::seek_from_current_pos(
 
 void document_writer::validate_stream() const
 {
-    assert_err(!out.fail(), "Error in document stream");
+    if (out.fail())
+        throw io_exception("Writing document failed");
 }
 
 std::string document_writer::get_rna_subtree_formatted(

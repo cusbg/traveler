@@ -222,7 +222,7 @@ rna_tree app::create_matched(
     }
     catch (const exception& e)
     {
-        throw invalid_argument("creating matched rna " + f.id + " failed:" + e.what());
+        throw wrong_argument("creating templated rna %s failed: %s", f.id, e.what());
     }
 }
 
@@ -235,14 +235,14 @@ rna_tree app::create_templated(
 
     fasta f = read_fasta_file(fastafile);
 
-    extractor& doc = extractor::get_extractor(templatefile, templatetype);
+    extractor_ptr doc = extractor::get_extractor(templatefile, templatetype);
     try
     {
-        return rna_tree(f.brackets, doc.labels, doc.points, f.id);
+        return rna_tree(f.brackets, doc->labels, doc->points, f.id);
     }
     catch (const exception& e)
     {
-        throw invalid_argument("creating templated rna " + f.id + " failed:" + e.what());
+        throw wrong_argument("creating templated rna %s failed: %s", f.id, e.what());
     }
 }
 
@@ -440,21 +440,13 @@ void app::print(
         }
         else
         {
-            ostringstream out;
-            out
-                << "wrong parameter no."
-                << i
-                << ": '"
-                << arg
-                << "'; try running "
-                << args[0]
-                << " --help for more arguments details";
-            throw invalid_argument(out.str());
+            throw wrong_argument("Wrong parameter no.%i: '%s'; try running %s --help for more arguments details",
+                    i, arg, args[0]);
         }
     }
 
     if (a.templated == rna_tree() || a.matched == rna_tree())
-        throw invalid_argument("Trees are missing, try running " + args[0] + " -h for more arguments details");
+        throw wrong_argument("Trees are missing, try running %s --help for more arguments details", args[0]);
 
     return a;
 }
