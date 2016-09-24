@@ -360,10 +360,8 @@ void compact::init_multibranch(
 
             double beta = angle(rp1 - rp2) - angle(p1 - p2);
 
-            int i = 0;  // TODO: remove
             for (pre_post_order_iterator it = ++pre_post_order_iterator(root, true); id(it) < id(root); ++it)
             {
-                ++i;
                 point from = it->at(it.label_index()).p;
                 if (from.bad())
                     continue;
@@ -376,8 +374,6 @@ void compact::init_multibranch(
                 DEBUG("from %s to %s", to_cstr(from), to_cstr(to));
                 it->at(it.label_index()).p = to;
             }
-
-            DEBUG("i=%i", i);
         };
 
     circle c;
@@ -569,17 +565,17 @@ void compact::set_distance_multibranch_loop(
 
     for (size_t i = 0; i < in.vec.size(); ++i)
     {
-    try {
-        if (in.vec[i].vec.size() > MULTIBRANCH_MINIMUM_SPLIT)
+        try {
+            if (in.vec[i].vec.size() > MULTIBRANCH_MINIMUM_SPLIT)
+            {
+                split(in.vec[i]);
+                in.vec[i].remake = false;
+            }
+        } catch (...)
         {
-            split(in.vec[i]);
-            in.vec[i].remake = false;
+            // TODO handle error
+            return;
         }
-    } catch (...)
-    {
-        // TODO opravit bug
-        continue;
-    }
     }
 }
 

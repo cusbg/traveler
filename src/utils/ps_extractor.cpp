@@ -38,6 +38,10 @@ static regex create_regex(const std::string& pattern)
         { }
 
         virtual ~regex_exception() noexcept = default;
+        virtual std::string get_type() const
+        {
+            return "regex_exception";
+        }
     };
 
     try

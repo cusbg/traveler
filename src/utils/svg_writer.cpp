@@ -146,6 +146,7 @@ struct svg_writer::style
     fill();
 
     print_to_stream(text);
+
     print_to_stream(SVG_END_STRING);
 
     seek_from_current_pos(-SVG_END_LENGTH);
@@ -211,8 +212,8 @@ svg_writer::properties svg_writer::get_point_formatted(
     }
 
     out
-        << property(prefix + "x" + postfix, p.x)
-        << property(prefix + "y" + postfix, p.y);
+        << property(msprintf("%sx%s", prefix, postfix), p.x)
+        << property(msprintf("%sy%s", prefix, postfix), p.y);
 
     return out;
 }
@@ -222,59 +223,20 @@ std::string svg_writer::create_element(
                 const properties& properties,
                 const std::string& value) const
 {
-    ostringstream out;
-
-    //--indentation;
-
-    out
-        //<< indent()
-        << "<"
-        << name
-        << " "
-        << properties;
 
     if (value.empty())
-    {
-        out
-            << "/>";
-    }
+        return msprintf("<%s %s />\n", name, properties);
     else
-    {
-        out
-            << ">"
-            << value
-            << "</"
-            << name
-            << ">";
-    }
-
-    out
-        << endl;
-
-    //++indentation;
-
-    return out.str();
+        return msprintf("<%s %s>%s</%s>", name, properties, value, name);
 }
 
 svg_writer::style svg_writer::get_color_style(
                 const RGB& color) const
 {
-    ostringstream out;
-
 #define rgb_value(value)    (255.0 * value)
-
-    out
-        << "rgb("
-        << rgb_value(color.get_red())
-        << ", "
-        << rgb_value(color.get_green())
-        << ", "
-        << rgb_value(color.get_blue())
-        << ")";
-
+    string text = msprintf("rgb(%s, %s, %s)", rgb_value(color.get_red()), rgb_value(color.get_green()), rgb_value(color.get_blue()));
+    return {"stroke", text};
 #undef rgb_value
-
-    return {"stroke", out.str()};
 }
 
 svg_writer::properties svg_writer::get_styles(
@@ -355,7 +317,6 @@ std::string svg_writer::get_header_element(
 
     ostringstream out;
 
-
     point bl = rna_tree::bottom_left_corner(root);
     point tr = rna_tree::top_right_corner(root);
 
@@ -367,12 +328,10 @@ std::string svg_writer::get_header_element(
         << property("xmlns:xlink", "http://www.w3.org/1999/xlink")
         << property("width", letter.x)
         << property("height", letter.y)
-        << property("viewBox", "0 0 " + to_string(size.x) + "px " + to_string(size.y) + "px")
+        << property("viewBox", msprintf("0 0  %spx %spx", size.x, size.y))
         << get_styles({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
         << ">"
         << endl;
-
-    //++indentation;
 
     return out.str();
 }

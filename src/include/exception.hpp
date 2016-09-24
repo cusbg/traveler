@@ -29,25 +29,37 @@
     virtual ~ex_name() noexcept = default; \
     template <typename ...Args> \
     ex_name( \
-            const char* _msg_format, Args... args) \
+            const char* _msg_format, const Args& ... args) \
         : my_exception(_msg_format, args...) \
-    { }
+    { } \
+    std::string get_type() const \
+    { \
+        return #ex_name; \
+    }
 
 class my_exception : public std::exception
 {
 public:
     virtual const char* what() const noexcept;
+    virtual std::string get_type() const = 0;
 
 protected:
     my_exception(
                 const std::string& _msg);
+    virtual ~my_exception() noexcept = default;
 
     template <typename ...Args>
     my_exception(
-                const char* _msg_format, Args... args)
+                const char* _msg_format, const Args& ... args)
         : my_exception(msprintf(_msg_format, args...))
     { }
-    virtual ~my_exception() noexcept = default;
+    friend std::ostream& operator<<(
+                std::ostream& out,
+                const my_exception& ex)
+    {
+        out << ex.get_type() << ": " << ex.msg;
+        return out;
+    }
 
 private:
     std::string msg;
@@ -101,10 +113,10 @@ public:
 };
 
 
-class wrong_argument : public my_exception
+class wrong_argument_exception : public my_exception
 {
 public:
-    DEFAULT_EXCEPTION_METHODS(wrong_argument);
+    DEFAULT_EXCEPTION_METHODS(wrong_argument_exception);
 };
 
 

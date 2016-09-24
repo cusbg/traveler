@@ -81,9 +81,9 @@ std::string ps_writer::get_default_prologue(
 }
 
 std::string ps_writer::get_default_prologue() const
- {
+{
     auto define_color = [](const RGB& rgb) {
-        return msprintf("/%s {%i %i %i setrgbcolor} def\n",
+        return msprintf("/set%s {%i %i %i setrgbcolor} def\n",
                 rgb.get_name(), rgb.get_red(), rgb.get_green(), rgb.get_blue());
     };
     ostringstream out;
@@ -198,7 +198,7 @@ std::string ps_writer::get_color_formatted(
     else
     {
         last_used = &color;
-        return color.get_name() + "\n";
+        return msprintf("set%s\n", color.get_name());
     }
 }
 

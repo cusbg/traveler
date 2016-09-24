@@ -30,7 +30,7 @@ class logger
 {
 #define LOGGER_PRIORITY_FUNCTION(_fname, _priority) \
     template<typename ...Args> \
-    void _fname(const char* msg, Args... args) \
+    void _fname(const char* msg, const Args& ... args) \
     { \
         mprintf(msg, get_stream(_priority), args...); \
     }

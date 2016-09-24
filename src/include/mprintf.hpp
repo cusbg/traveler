@@ -33,7 +33,7 @@
  * printf using variadic c++ template
  */
 template<typename Stream, typename T, typename... Args>
-Stream&& mprintf(const char* format, Stream&& stream, const T& value, Args... args);
+Stream&& mprintf(const char* format, Stream&& stream, const T& value, const Args& ... args);
 
 /**
  * printf using variadic c++ template
@@ -45,7 +45,7 @@ Stream&& mprintf(const char* format, Stream&& stream);
  * printf using variadic c++ template
  */
 template<typename... Args>
-std::string msprintf(const char* format, Args... args)
+std::string msprintf(const char* format, const Args& ... args)
 {
     return mprintf(format, std::ostringstream(), args...).str();
 }
@@ -69,7 +69,7 @@ void print(Stream& stream, bool value)
 }
 
 template<typename Stream, typename T, typename... Args>
-Stream&& mprintf(const char* format, Stream&& stream, const T& value, Args... args)
+Stream&& mprintf(const char* format, Stream&& stream, const T& value, const Args& ... args)
 {
     while (*format != '\0')
     {

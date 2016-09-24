@@ -170,8 +170,6 @@ std::vector<point> compact::circle::init(
     if (n == 0)
         return split(0);
 
-    circle c = *this;   // TODO: only to debug output... remove?
-
     DEBUG("init(%lu, %s)", n, to_cstr(*this));
 
     size_t max_iterations = 100;
@@ -209,9 +207,7 @@ std::vector<point> compact::circle::init(
             shift_size /= 2.0;
     }
     if (max_iterations == 0)
-        WARN("max_iterations reached");
-
-    DEBUG("from circle \n%s -> to \n%s", to_cstr(c), to_cstr(*this));
+        DEBUG("max_iterations reached");
 
     return split(n);
 }

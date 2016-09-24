@@ -142,15 +142,14 @@ protected:
      */
     void print_to_stream(
                 const std::string& text);
+    const RGB& get_default_color(
+                rna_pair_label::status_type status) const;
+
     /**
      * seek with offset
      */
     void seek_from_current_pos(
                 off_type offset);
-
-    const RGB& get_default_color(
-                rna_pair_label::status_type status) const;
-
 private:
     void validate_stream() const;
 

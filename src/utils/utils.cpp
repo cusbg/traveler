@@ -320,19 +320,4 @@ std::ostream& operator<<(
     return out;
 }
 
-// TODO: remove
-rna_tree get_rna(const string& name)
-{
-    DEBUG("get_rna(%s)", to_cstr(name));
-
-    string l, b;
-    l = read_file(name + ".seq");
-    b = read_file(name + ".fold");
-
-    extractor_ptr doc = extractor::get_extractor(name + ".ps", "ps");
-
-    return rna_tree(b, l, doc->points, name);
-}
-
-
 

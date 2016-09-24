@@ -28,6 +28,11 @@
 
 #include "logger.hpp"
 
+inline std::string to_string(
+                bool value)
+{
+    return value ? "true" : "false";
+}
 
 template <typename T>
 inline std::string to_string(
@@ -37,7 +42,7 @@ inline std::string to_string(
     // funkcia sa pouziva aj pri operator<<(bool/char[]/..)
     // takze treba napisat vsade operator<< a to_string() bude fungovat ok
     std::stringstream str;
-    str << std::boolalpha << t;
+    str << t;
     return str.str();
 }
 
@@ -72,7 +77,7 @@ void wait_for_input();
 
 #define WAIT \
         { \
-            DEBUG("%s: %lu", __PRETTY_FUNCTION__, __LINE__); \
+            WARN("%s: %lu", __PRETTY_FUNCTION__, __LINE__); \
             wait_for_input(); \
         }
 

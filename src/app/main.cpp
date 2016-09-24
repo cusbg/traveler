@@ -118,7 +118,7 @@ int main(int argc, char** argv)
 #ifdef TESTS
     test::run_tests();
     return 0;
-#endif
+#else
 
     try
     {
@@ -127,14 +127,14 @@ int main(int argc, char** argv)
         args = vector<string>(argv, argv + argc);
         app.run(args);
     }
-    catch (const exception& e)
+    catch (const my_exception& e)
     {
-        ERR("Exception caught:");
-        ERR("%s", e.what());
+        ERR("Exception caught: %s", e);
         return 1;
     }
 
     return 0;
+#endif
 }
 
 

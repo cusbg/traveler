@@ -43,6 +43,7 @@
 #define ARGS_VERBOSE                        {"-v", "--verbose"}
 #define ARGS_DEBUG                          {"--debug"}
 
+#define COLORED_FILENAME_EXTENSION          ".colored"
 
 
 using namespace std;
@@ -114,7 +115,6 @@ void app::run(
     {
         assert(!args.draw.mapping.empty());
         map = load_mapping_table(args.draw.mapping);
-        args.templated.set_name(args.matched.name() + "_mapped_to_" + args.templated.name());
         img_out = args.draw.file;
     }
 
@@ -148,7 +148,7 @@ mapping app::run_ted(
     }
     else
     {
-        DEBUG("skipping rted run, returning default mapping");
+        INFO("skipping rted run, returning default mapping");
     }
 
     return mapping;
@@ -165,7 +165,10 @@ void app::run_drawing(
     APP_DEBUG_FNAME;
 
     if (!run)
+    {
+        INFO("skipping draw run");
         return;
+    }
 
     templated = matcher(templated, matched).run(mapping);
     compact(templated).run();
@@ -188,7 +191,7 @@ void app::save(
     {
         for (auto& writer : document_writer::get_writers(colored))
         {
-            string file = colored ? filename + ".colored" : filename;
+            string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
             writer->init(file, rna.begin());
             writer->print(writer->get_rna_formatted(rna));
 
@@ -215,14 +218,14 @@ rna_tree app::create_matched(
 {
     APP_DEBUG_FNAME;
 
-    fasta f = read_fasta_file(fastafile);
     try
     {
+        fasta f = read_fasta_file(fastafile);
         return rna_tree(f.brackets, f.labels, f.id);
     }
-    catch (const exception& e)
+    catch (const my_exception& e)
     {
-        throw wrong_argument("creating templated rna %s failed: %s", f.id, e.what());
+        throw wrong_argument_exception("Creating target rna failed: %s", e);
     }
 }
 
@@ -233,16 +236,15 @@ rna_tree app::create_templated(
 {
     APP_DEBUG_FNAME;
 
-    fasta f = read_fasta_file(fastafile);
-
-    extractor_ptr doc = extractor::get_extractor(templatefile, templatetype);
     try
     {
+        extractor_ptr doc = extractor::get_extractor(templatefile, templatetype);
+        fasta f = read_fasta_file(fastafile);
         return rna_tree(f.brackets, doc->labels, doc->points, f.id);
     }
-    catch (const exception& e)
+    catch (const my_exception& e)
     {
-        throw wrong_argument("creating templated rna %s failed: %s", f.id, e.what());
+        throw wrong_argument_exception("Creating templated rna failed: %s", e);
     }
 }
 
@@ -440,13 +442,13 @@ void app::print(
         }
         else
         {
-            throw wrong_argument("Wrong parameter no.%i: '%s'; try running %s --help for more arguments details",
+            throw wrong_argument_exception("Wrong parameter no.%i: '%s'; try running %s --help for more arguments details",
                     i, arg, args[0]);
         }
     }
 
     if (a.templated == rna_tree() || a.matched == rna_tree())
-        throw wrong_argument("Trees are missing, try running %s --help for more arguments details", args[0]);
+        throw wrong_argument_exception("Trees are missing, try running %s --help for more arguments details", args[0]);
 
     return a;
 }
