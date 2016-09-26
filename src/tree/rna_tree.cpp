@@ -41,15 +41,8 @@ rna_tree::rna_tree(
 {
     set_postorder_ids();
 
-    logger.debug_stream()
-        << "TREE '"
-        << id()
-        << ":"
-        << _name
-        << "' WAS CONSTRUCTED, size = "
-        << size()
-        << "\n"
-        << print_tree(false);
+    mprintf("TREE '%s:%s' was constructed. Size = %s\n%s", logger.debug_stream(),
+            id(), _name, size(), print_tree(false));
 }
 
 rna_tree::rna_tree(

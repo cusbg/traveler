@@ -227,7 +227,7 @@ std::string svg_writer::create_element(
     if (value.empty())
         return msprintf("<%s %s />\n", name, properties);
     else
-        return msprintf("<%s %s>%s</%s>", name, properties, value, name);
+        return msprintf("<%s %s>%s</%s>\n", name, properties, value, name);
 }
 
 svg_writer::style svg_writer::get_color_style(

@@ -32,6 +32,10 @@ class ps_extractor : public extractor
 protected:
     virtual void extract(
                 const std::string& filename);
+    virtual std::string get_type() const
+    {
+        return "ps";
+    }
 
 public:
     std::string prolog;

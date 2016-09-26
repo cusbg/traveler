@@ -70,11 +70,6 @@ class abort_exception : public my_exception
 {
 public:
     DEFAULT_EXCEPTION_METHODS(abort_exception);
-
-    abort_exception(
-                int line,
-                const std::string& file,
-                const std::string& fname);
 };
 
 
@@ -82,12 +77,6 @@ class assert_exception : public my_exception
 {
 public:
     DEFAULT_EXCEPTION_METHODS(assert_exception);
-
-    assert_exception(
-                const std::string& condiniton,
-                int line,
-                const std::string& file,
-                const std::string& fname);
 };
 
 
@@ -127,14 +116,14 @@ public:
 
 #undef abort
 #define abort() \
-    throw abort_exception(__LINE__, __FILE__, __PRETTY_FUNCTION__);
+    throw abort_exception("abort() called in function %s; line %s; file %s", __PRETTY_FUNCTION__, __LINE__, __FILE__);
 
 #undef assert
 #define assert(boolean) \
     { \
         if (!(boolean)) \
         { \
-            throw assert_exception(#boolean, __LINE__, __FILE__, __PRETTY_FUNCTION__); \
+            throw assert_exception("assert(%s) failed; look in function %s; line %s; file %s", #boolean, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
         } \
     }
 

@@ -86,7 +86,7 @@ Stream&& mprintf(const char* format, Stream&& stream, const T& value, const Args
         }
         stream << *format++;
     }
-    throw std::runtime_error(msprintf("invalid number of arguments: +%i more than expected", sizeof...(Args) + 1));
+    throw std::runtime_error(msprintf("mprintf: invalid number of arguments: +%i more than expected", sizeof...(Args) + 1));
 }
 
 template<typename Stream>
@@ -100,7 +100,7 @@ Stream&& mprintf(const char* format, Stream&& stream)
                 ++format;
             else
                 throw std::runtime_error(
-                        msprintf("invalid format string: missing arguments, format string '%s'", format));
+                        msprintf("mprintf: invalid format string: missing arguments, format string '%s'", format));
         }
         stream << *format++;
     }

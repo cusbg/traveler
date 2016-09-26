@@ -1,7 +1,7 @@
 /*
- * File: exception.cpp
+ * File: varna_extractor.hpp
  *
- * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard@ba30.eu>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,18 +19,22 @@
  * USA.
  */
 
-#include <sstream>
+#ifndef VARNA_EXTRACTOR_HPP
+#define VARNA_EXTRACTOR_HPP
 
-#include "exception.hpp"
+#include "extractor.hpp"
 
-using namespace std;
-
-my_exception::my_exception(const std::string& _msg)
-    : msg(_msg)
-{ }
-
-const char* my_exception::what() const noexcept
+class varna_extractor : public extractor
 {
-    return msg.c_str();
-}
+protected:
+    virtual void extract(
+                const std::string& filename);
+    virtual std::string get_type() const
+    {
+        return "varna";
+    }
+};
+
+
+#endif /* !VARNA_EXTRACTOR_HPP */
 

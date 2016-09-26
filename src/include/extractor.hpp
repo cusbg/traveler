@@ -25,8 +25,13 @@
 #include <string>
 #include <vector>
 #include <memory>
+#include <regex>
 
 #include "point.hpp"
+
+#define BASE_REGEX      "([A-Z])"
+#define DOUBLE_REGEX    "(-?[0-9]+(\\.[0-9]+)?)"
+
 
 class extractor;
 
@@ -50,6 +55,12 @@ protected:
      */
     virtual void extract(
                 const std::string& filename) = 0;
+    virtual std::string get_type() const = 0;
+    std::regex create_regex(
+                const std::string& pattern);
+
+private:
+    static std::vector<extractor_ptr> get_all_extractors();
 
 public:
     std::string labels;

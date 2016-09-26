@@ -23,37 +23,71 @@
 
 #include "extractor.hpp"
 #include "ps_extractor.hpp"
+#include "varna_extractor.hpp"
 #include "types.hpp"
+#include "utils.hpp"
+
+#define ERR_OLD_GCC "You need newer compiler. Actual does not support necessary regex patterns. Please, use g++ version >= 4.9.2."
 
 using namespace std;
 
-typedef map<string, extractor_ptr> extractor_map_type;
-
-static extractor_map_type create_extractors()
+/* static */ std::vector<extractor_ptr> extractor::get_all_extractors()
 {
-    extractor_map_type map;
-    map["ps"] = unique_ptr<ps_extractor>(new ps_extractor());
-
-    return map;
+    std::vector<extractor_ptr> extractors;
+    for (extractor* e : std::vector<extractor*>({new ps_extractor(), new varna_extractor()}))
+        extractors.push_back(extractor_ptr(e));
+    return extractors;
 }
 
 /* static */ extractor_ptr extractor::get_extractor(
                 const std::string& docfile,
                 const std::string& doctype)
 {
-    extractor_map_type map = create_extractors();
-
-    extractor_map_type::iterator it = map.find(doctype);
-
-    if (it == map.end())
+    extractor_ptr extractor;
+    for (extractor_ptr& e : extractor::get_all_extractors())
     {
-        throw illegal_state_exception("Document type '%s' is not supported", doctype);
+        if (e->get_type() == doctype)
+        {
+            swap(e, extractor);
+            break;
+        }
     }
+    if (extractor.get() == nullptr)
+        throw wrong_argument_exception("Document type '%s' is not supported", doctype);
 
-    extractor_ptr& extractor = it->second;
+    if (!exist_file(docfile))
+        throw io_exception("Document '%s' does not exist. Cannot extract RNA structure", docfile);
+
+    INFO("Extracting RNA structure from file %s with extractor %s", docfile, extractor->get_type());
     extractor->extract(docfile);
 
-    return std::move(extractor);
+    return extractor;
 }
 
+regex extractor::create_regex(
+                const std::string& pattern)
+{
+    struct regex_exception : public my_exception
+    {
+        regex_exception(const std::regex_error& e)
+            : my_exception(msprintf("%s [error=%s]", ERR_OLD_GCC, e.what()))
+        { }
+
+        virtual ~regex_exception() noexcept = default;
+        virtual std::string get_type() const
+        {
+            return "regex_exception";
+        }
+    };
+
+    try
+    {
+        DEBUG("regex=%s", pattern);
+        return regex(pattern);
+    }
+    catch (const std::regex_error& e)
+    {
+        throw regex_exception(e);
+    }
+}
 

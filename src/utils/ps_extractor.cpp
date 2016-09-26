@@ -20,39 +20,12 @@
  */
 
 #include <fstream>
-#include <regex>
 
 #include "ps_extractor.hpp"
-#include "utils.hpp"
+#include "types.hpp"
 
-#define ERR_OLD_GCC "You need newer compiler. Actual does not support necessary regex patterns. Please, use g++ version >= 4.9.2."
 
 using namespace std;
-
-static regex create_regex(const std::string& pattern)
-{
-    struct regex_exception : public my_exception
-    {
-        regex_exception(const std::regex_error& e)
-            : my_exception(to_string(ERR_OLD_GCC) + "[error=" + to_string(e.what()) + "]")
-        { }
-
-        virtual ~regex_exception() noexcept = default;
-        virtual std::string get_type() const
-        {
-            return "regex_exception";
-        }
-    };
-
-    try
-    {
-        return regex(pattern);
-    }
-    catch (const std::regex_error& e)
-    {
-        throw regex_exception(e);
-    }
-}
 
 
 void ps_extractor::extract(
@@ -60,23 +33,16 @@ void ps_extractor::extract(
 {
     APP_DEBUG_FNAME;
 
-    labels = "";
-    points = vector<point>();
-
-    if (!exist_file(filename))
-    {
-        throw io_exception("Document '%s' does not exist. Cannot extract RNA structure", filename);
-    }
+    labels.clear();
+    points.clear();
 
     string line, str;
     ifstream in(filename);
     point p;
     auto stream_pos = in.tellg();
     regex regexp_base_line = create_regex(
-            "^\\([A-Z]\\)\\s+"                                 //(%BASE%)
-            "-?[0-9]+(\\.[0-9]+)?\\s+-?[0-9]+(\\.[0-9]+)?\\s+"  //+-%DOUBLE% +-%DOUBLE%
-            "lwstring\\s*$"                                     // %LWSTRING%
-            );
+            msprintf("^\\(%s\\)\\s+%s\\s+%s\\s+lwstring\\s*$",
+                BASE_REGEX, DOUBLE_REGEX, DOUBLE_REGEX));
     auto endings = {
         "lwline",
         "lwfarc",
@@ -102,17 +68,6 @@ void ps_extractor::extract(
             if (regex_search(line, match, r))
                 return true;
         return false;
-    };
-    auto is_rgb_funct = [](const std::string& line)
-    {
-        stringstream str(line);
-        string other;
-        float f;
-        str >> f >> f >> f >> other;
-        return 
-            !str.fail() &&
-            str.eof() &&
-            other == "setrgbcolor";
     };
     auto is_base_line = [&regexp_base_line](const std::string& line)
     {
@@ -148,11 +103,6 @@ void ps_extractor::extract(
         getline(in, line);
         assert(!in.fail());
 
-        if (is_rgb_funct(line))
-        {
-            DEBUG("is_rgb_funct(%s), continue", line.c_str());
-            continue;
-        }
         if (ignore_line(line))
             continue;
         if (!is_base_line(line))

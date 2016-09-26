@@ -122,10 +122,10 @@ private:
 
 #define LOGGER_PRINT_CONTAINER(container, name) \
         { \
-            std::stringstream stream; \
+            auto stream = logger.debug_stream(); \
+            stream << (name) << ":\n"; \
             for (auto __value : container) \
-                stream << to_string(__value) << " "; \
-            logger.debug("%s", to_cstr(stream.str())); \
+                stream << __value << " "; \
         }
 
 

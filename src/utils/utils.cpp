@@ -104,7 +104,7 @@ bool contains_one_of(
         if (contains(line, '>'))
             break;
 
-        if (contains_one_of(line, "(.)"))
+        if (contains_one_of(line, "[{(.)}]"))
             brackets << line;
         else
             labels << line;

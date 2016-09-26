@@ -3,12 +3,12 @@
 ALL="african_frog artemia_salina blue_mussel cicadas echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
 FILES1=${ALL}
 FILES2=${ALL}
-FILES1="african_frog"
-FILES2="cicadas"
+FILES1="varna"
+FILES2="varna"
 #FILES2="artemia_salina"
 
 EXECUTABLE="build/traveler"
-DIR="/tmp/18S/"
+DIR="/tmp/"
 DIR_IMG="build/files"
 ONCE=false
 
@@ -33,8 +33,9 @@ fail_function() {
 init_variables() {
     file_in="${DIR}/${file1}-${file2}"
     file_out="${DIR_IMG}/${file1}-${file2}"
+    image_format="varna"
     debug="--debug"
-    tt="--template-structure ${DIR}/${file1}.ps ${DIR}/${file1}.fasta"
+    tt="--template-structure --file-format ${image_format} ${DIR}/${file1}.${image_format} ${DIR}/${file1}.fasta"
     mt="--target-structure ${DIR}/${file2}.fasta"
 }
 
@@ -69,7 +70,7 @@ run_all() {
 run() {
     init_variables
 
-    #run_ted
+    run_ted
     run_draw
     #run_all
 

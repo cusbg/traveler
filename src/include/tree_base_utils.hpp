@@ -24,6 +24,7 @@
 
 #include "tree_base.hpp"
 
+#define PSEUDOKNOT_CHARACTERS "[{}]"
 
 //
 // tree<> functions:
@@ -46,7 +47,7 @@ tree_base<label_type>::tree_base(
     size_t i = 0;
 
     if (_brackets.size() != _labels.size())
-        throw std::invalid_argument("Length of brackets != length of labels");
+        throw wrong_argument_exception("Length of brackets != length of labels");
 
     label_type root = label_type("ROOT_" + std::to_string(_id)) + label_type("");
     _tree.set_head(root);
@@ -55,30 +56,26 @@ tree_base<label_type>::tree_base(
 
     while(i < _brackets.size())
     {
-        switch (_brackets[i])
+        char ch = _brackets[i];
+        if (ch == '(')
         {
-            assert(_tree.is_valid(it));
-            case '(':
-                it = _tree.append_child(it, _labels[i]);
-                ++_size;
-                break;
-            case ')':
-                assert(!is_root(it));
-                *it = *it + _labels[i];
-                it = parent(it);
-                break;
-            case '.':
-                _tree.append_child(it, _labels[i]);
-                ++_size;
-                break;
-            default:
-                throw std::invalid_argument(
-                        std::string() +
-                        "Tree constructor: invalid bracket character '" +
-                        _brackets[i] +
-                        "' at index " +
-                        std::to_string(i)
-                        );
+            it = _tree.append_child(it, _labels[i]);
+            ++_size;
+        }
+        else if(ch == ')')
+        {
+            assert(!is_root(it));
+            *it = *it + _labels[i];
+            it = parent(it);
+        }
+        else if (ch == '.' || contains(PSEUDOKNOT_CHARACTERS, ch))
+        {
+            _tree.append_child(it, _labels[i]);
+            ++_size;
+        }
+        else
+        {
+            throw wrong_argument_exception("Invalid dot-bracket character '%s' at index %s", ch, i);
         }
         ++i;
     }

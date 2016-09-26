@@ -32,7 +32,8 @@ class logger
     template<typename ...Args> \
     void _fname(const char* msg, const Args& ... args) \
     { \
-        mprintf(msg, get_stream(_priority), args...); \
+        if (is_ ## _fname ## _enabled()) \
+            mprintf(msg, get_stream(_priority), args...); \
     }
 
 #define LOGGER_ENABLED_PRIORITY_FUNCTION(_fname, _priority) \
