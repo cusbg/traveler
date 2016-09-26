@@ -91,8 +91,6 @@ public:
                 rna_tree rna) const;
     std::string get_rna_subtree_formatted(
                 rna_tree::iterator root) const;
-    std::string get_rna_subtree_formatted_colored(
-                rna_tree::iterator root) const;
 
 public:
     /**

@@ -131,27 +131,34 @@ mapping app::run_ted(
 {
     APP_DEBUG_FNAME;
 
-    mapping mapping;
-
-    if (run)
+    try
     {
-        rted r(templated, matched);
-        r.run();
+        mapping mapping;
 
-        gted g(templated, matched);
-        g.run(r.get_strategies());
+        if (run)
+        {
+            rted r(templated, matched);
+            r.run();
 
-        mapping = g.get_mapping();
+            gted g(templated, matched);
+            g.run(r.get_strategies());
 
-        if (!mapping_file.empty())
-            save_tree_mapping_table(mapping_file, mapping);
+            mapping = g.get_mapping();
+
+            if (!mapping_file.empty())
+                save_tree_mapping_table(mapping_file, mapping);
+        }
+        else
+        {
+            INFO("skipping rted run, returning default mapping");
+        }
+
+        return mapping;
     }
-    else
+    catch (const my_exception& e)
     {
-        INFO("skipping rted run, returning default mapping");
+        throw illegal_state_exception("Tree-edit-distance computation failed: %s", e);
     }
-
-    return mapping;
 }
 
 void app::run_drawing(
@@ -164,16 +171,23 @@ void app::run_drawing(
 {
     APP_DEBUG_FNAME;
 
-    if (!run)
+    try
     {
-        INFO("skipping draw run");
-        return;
+        if (!run)
+        {
+            INFO("skipping draw run");
+            return;
+        }
+
+        templated = matcher(templated, matched).run(mapping);
+        compact(templated).run();
+
+        save(file, templated, run_overlaps);
     }
-
-    templated = matcher(templated, matched).run(mapping);
-    compact(templated).run();
-
-    save(file, templated, run_overlaps);
+    catch (const my_exception& e)
+    {
+        throw illegal_state_exception("Drawing structure failed: %s", e);
+    }
 }
 
 void app::save(

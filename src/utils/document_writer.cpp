@@ -182,49 +182,6 @@ std::string document_writer::get_rna_subtree_formatted(
     return out.str();
 }
 
-std::string document_writer::get_rna_subtree_formatted_colored(
-                rna_tree::iterator root) const
-{
-    APP_DEBUG_FNAME;
-
-    ostringstream out;
-
-    struct
-    {
-        size_t from, to;
-    } ids;
-
-    for (rna_tree::iterator it = rna_tree::first_child(root);;)
-    {
-        if (rna_tree::is_leaf(it))
-        {
-            ids.from = id(it);
-            break;
-        }
-        else 
-            it = rna_tree::first_child(it);
-    }
-    ids.to = id(root);
-
-    rna_tree::print_subtree(root);
-    auto print =
-        [&out, this, ids](rna_tree::pre_post_order_iterator it)
-        {
-            if (!it->inited_points())
-                return;
-
-            rna_label lbl = it->at(it.label_index());
-            if (ids.from <= id(it) && id(it) <= ids.to)
-                out << get_label_formatted(lbl, RGB::RED);
-            else
-                out << get_label_formatted(lbl, RGB::BLACK);
-        };
-
-    rna_tree::for_each_in_subtree(rna_tree::parent(root), print);
-
-    return out.str();
-}
-
 std::string document_writer::get_rna_background_formatted(
                 rna_tree::pre_post_order_iterator begin,
                 rna_tree::pre_post_order_iterator end) const
