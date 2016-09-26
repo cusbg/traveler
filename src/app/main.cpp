@@ -127,6 +127,11 @@ int main(int argc, char** argv)
         args = vector<string>(argv, argv + argc);
         app.run(args);
     }
+    catch (const aplication_error& e)
+    {
+        ERR("Exception caugth: %s", e);
+        return e.get_return_status();
+    }
     catch (const my_exception& e)
     {
         ERR("Exception caught: %s", e);

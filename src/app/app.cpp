@@ -46,6 +46,7 @@
 #define COLORED_FILENAME_EXTENSION          ".colored"
 
 
+
 using namespace std;
 
 
@@ -157,7 +158,7 @@ mapping app::run_ted(
     }
     catch (const my_exception& e)
     {
-        throw illegal_state_exception("Tree-edit-distance computation failed: %s", e);
+        throw aplication_error("Tree-edit-distance computation failed: %s", e).with(ERROR_TED);
     }
 }
 
@@ -186,7 +187,7 @@ void app::run_drawing(
     }
     catch (const my_exception& e)
     {
-        throw illegal_state_exception("Drawing structure failed: %s", e);
+        throw aplication_error("Drawing structure failed: %s", e).with(ERROR_DRAW);
     }
 }
 
@@ -239,7 +240,7 @@ rna_tree app::create_matched(
     }
     catch (const my_exception& e)
     {
-        throw wrong_argument_exception("Creating target rna failed: %s", e);
+        throw aplication_error("Creating target rna failed: %s", e).with(ERROR_ARGUMENTS);
     }
 }
 
@@ -258,7 +259,7 @@ rna_tree app::create_templated(
     }
     catch (const my_exception& e)
     {
-        throw wrong_argument_exception("Creating templated rna failed: %s", e);
+        throw aplication_error("Creating templated rna failed: %s", e).with(ERROR_ARGUMENTS);
     }
 }
 
@@ -346,125 +347,132 @@ void app::print(
 {
     APP_DEBUG_FNAME;
 
-    size_t i;
-    string arg;
-    arguments a;
-
-    auto nextarg =
-        [&args, &i]()
-        {
-            if (i + 1 < args.size())
-                return args[i + 1];
-            else
-                return args.back();
-        };
-    auto is_argument =
-        [&arg](const std::vector<std::string>& arguments)
-        {
-            for (const string& a : arguments)
-                if (a == arg)
-                    return true;
-            return false;
-        };
-
-    for (i = 1; i < args.size(); ++i)
+    try
     {
-        arg = args.at(i);
-        if (arg.empty())
-            continue;
+        size_t i;
+        string arg;
+        arguments a;
 
-        if (is_argument(ARGS_HELP))
-        {
-            DEBUG("arg help");
-            app::usage(args.at(0));
-            exit(0);
-        }
-        else if (is_argument(ARGS_TARGET_STRUCTURE))
-        {
-            DEBUG("arg match-tree");
-            string fastafile = args.at(i + 1);
-            a.matched = app::create_matched(fastafile);
-            ++i;
-            continue;
-        }
-        else if (is_argument(ARGS_TEMPLATE_STRUCTURE))
-        {
-            DEBUG("arg template-tree");
-            string templatefile, fastafile;
-            string templatetype = "ps";
-            if (nextarg() == ARGS_TEMPLATE_STRUCTURE_FILE_TYPE)
+        auto nextarg =
+            [&args, &i]()
             {
-                templatetype = args.at(i + 2);
+                if (i + 1 < args.size())
+                    return args[i + 1];
+                else
+                    return args.back();
+            };
+        auto is_argument =
+            [&arg](const std::vector<std::string>& arguments)
+            {
+                for (const string& a : arguments)
+                    if (a == arg)
+                        return true;
+                return false;
+            };
+
+        for (i = 1; i < args.size(); ++i)
+        {
+            arg = args.at(i);
+            if (arg.empty())
+                continue;
+
+            if (is_argument(ARGS_HELP))
+            {
+                DEBUG("arg help");
+                app::usage(args.at(0));
+                exit(0);
+            }
+            else if (is_argument(ARGS_TARGET_STRUCTURE))
+            {
+                DEBUG("arg match-tree");
+                string fastafile = args.at(i + 1);
+                a.matched = app::create_matched(fastafile);
+                ++i;
+                continue;
+            }
+            else if (is_argument(ARGS_TEMPLATE_STRUCTURE))
+            {
+                DEBUG("arg template-tree");
+                string templatefile, fastafile;
+                string templatetype = "ps";
+                if (nextarg() == ARGS_TEMPLATE_STRUCTURE_FILE_TYPE)
+                {
+                    templatetype = args.at(i + 2);
+                    i += 2;
+                }
+                templatefile = args.at(i + 1);
+                fastafile = args.at(i + 2);
+                a.templated = app::create_templated(templatefile, templatetype, fastafile);
                 i += 2;
             }
-            templatefile = args.at(i + 1);
-            fastafile = args.at(i + 2);
-            a.templated = app::create_templated(templatefile, templatetype, fastafile);
-            i += 2;
-        }
-        else if (is_argument(ARGS_ALL))
-        {
-            DEBUG("arg all");
-            a.all.run = true;
-            while (true)
+            else if (is_argument(ARGS_ALL))
             {
-                if (nextarg() == ARGS_ALL_OVERLAPS)
+                DEBUG("arg all");
+                a.all.run = true;
+                while (true)
                 {
-                    a.all.overlap_checks = true;
-                    i += 1;
+                    if (nextarg() == ARGS_ALL_OVERLAPS)
+                    {
+                        a.all.overlap_checks = true;
+                        i += 1;
+                    }
+                    else
+                        break;
                 }
-                else
-                    break;
+                a.all.file = args.at(i + 1);
+                ++i;
             }
-            a.all.file = args.at(i + 1);
-            ++i;
-        }
-        else if (is_argument(ARGS_TED))
-        {
-            DEBUG("arg ted");
-            a.ted.run = true;
-            a.ted.mapping = args.at(i + 1);
-            i += 1;
-        }
-        else if (is_argument(ARGS_DRAW))
-        {
-            DEBUG("arg draw");
-            a.draw.run = true;
-            while (true)
+            else if (is_argument(ARGS_TED))
             {
-                if (nextarg() == ARGS_DRAW_OVERLAPS)
-                {
-                    a.draw.overlap_checks = true;
-                    i += 1;
-                }
-                else
-                    break;
+                DEBUG("arg ted");
+                a.ted.run = true;
+                a.ted.mapping = args.at(i + 1);
+                i += 1;
             }
-            a.draw.mapping = args.at(i + 1);
-            a.draw.file = args.at(i + 2);
-            i += 2;
+            else if (is_argument(ARGS_DRAW))
+            {
+                DEBUG("arg draw");
+                a.draw.run = true;
+                while (true)
+                {
+                    if (nextarg() == ARGS_DRAW_OVERLAPS)
+                    {
+                        a.draw.overlap_checks = true;
+                        i += 1;
+                    }
+                    else
+                        break;
+                }
+                a.draw.mapping = args.at(i + 1);
+                a.draw.file = args.at(i + 2);
+                i += 2;
+            }
+            else if (is_argument(ARGS_VERBOSE))
+            {
+                logger.set_priority(logger::INFO);
+                INFO("Enabled verbose mode");
+            }
+            else if (is_argument(ARGS_DEBUG))
+            {
+                logger.set_priority(logger::DEBUG);
+                INFO("Enabled debug mode");
+            }
+            else
+            {
+                throw wrong_argument_exception("Wrong parameter no.%i: '%s'; try running %s --help for more arguments details",
+                        i, arg, args[0]);
+            }
         }
-        else if (is_argument(ARGS_VERBOSE))
-        {
-            logger.set_priority(logger::INFO);
-            INFO("Enabled verbose mode");
-        }
-        else if (is_argument(ARGS_DEBUG))
-        {
-            logger.set_priority(logger::DEBUG);
-            INFO("Enabled debug mode");
-        }
-        else
-        {
-            throw wrong_argument_exception("Wrong parameter no.%i: '%s'; try running %s --help for more arguments details",
-                    i, arg, args[0]);
-        }
+
+        if (a.templated == rna_tree() || a.matched == rna_tree())
+            throw wrong_argument_exception("Trees are missing, try running %s --help for more arguments details", args[0]);
+
+        return a;
     }
-
-    if (a.templated == rna_tree() || a.matched == rna_tree())
-        throw wrong_argument_exception("Trees are missing, try running %s --help for more arguments details", args[0]);
-
-    return a;
+    catch (const my_exception& e)
+    {
+        throw aplication_error("Error while parsing arguments: %s", e).with(ERROR_ARGUMENTS);
+    }
 }
 
 

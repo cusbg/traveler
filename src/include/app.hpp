@@ -110,5 +110,30 @@ private:
 
 };
 
+
+#define ERROR_DEFAULT           100
+#define ERROR_ARGUMENTS         101
+#define ERROR_TED               102
+#define ERROR_DRAW              103
+class aplication_error : public my_exception
+{
+public:
+    DEFAULT_EXCEPTION_METHODS(aplication_error);
+
+    aplication_error& with(int _return_status)
+    {
+        return_status = _return_status;
+        return *this;
+    }
+    int get_return_status() const
+    {
+        return return_status;
+    }
+
+private:
+    int return_status = ERROR_DEFAULT;
+};
+
+
 #endif /* !APP_HPP */
 
