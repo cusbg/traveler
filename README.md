@@ -67,20 +67,20 @@ In other examples, we will use 18S/ directory as INDIR, OUTDIR will be /tmp/
 
 ### Example 1 - prints .svg/.ps image of mouse mapped to human
 	$ ./build/traveler \
-		--match-tree $INDIR/mouse.fasta \
-		--template-tree $INDIR/human.ps $INDIR/human.fasta \
+		--target-structure $INDIR/mouse.fasta \
+		--template-structure $INDIR/human.ps $INDIR/human.fasta \
 		--all $OUTDIR/mouse_draw-to_human
 
 ### Example 2 - compute only distances and mapping between mouse and human
 	$ ./build/traveler \
-		--match-tree $INDIR/mouse.fasta \
-		--template-tree $INDIR/human.ps $INDIR/human.fasta \
+		--target-structure $INDIR/mouse.fasta \
+		--template-structure $INDIR/human.ps $INDIR/human.fasta \
 		--ted $OUTDIR/mouse_draw-to_human.map
 
 ### Example 3 - prints images using precomputed mapping from previous example
 	$ ./build/traveler \
-		--match-tree $INDIR/mouse.fasta \
-		--template-tree $INDIR/human.ps $INDIR/human.fasta \
+		--target-structure $INDIR/mouse.fasta \
+		--template-structure $INDIR/human.ps $INDIR/human.fasta \
 		--draw --overlaps $OUTDIR/mouse_draw-to_human.map $OUTDIR/mouse_draw-to_human
 
 	$ # generate 4 files - .svg and .ps files, both with/without colored bases (see COLOR CODING section)
