@@ -36,106 +36,40 @@ void ps_extractor::extract(
     labels.clear();
     points.clear();
 
-    string line, str;
     ifstream in(filename);
-    point p;
-    auto stream_pos = in.tellg();
+
     regex regexp_base_line = create_regex(
             msprintf("^\\(%s\\)\\s+%s\\s+%s\\s+lwstring\\s*$",
                 BASE_REGEX, DOUBLE_REGEX, DOUBLE_REGEX));
-    auto endings = {
-        "lwline",
-        "lwfarc",
-        "lwarc",
-        //"lwstring",
-        "lineto",
-        "moveto",
-        "setlinewidth",
-        "setlinecap",
-        "newpath",
-        "stroke",
-        "setrgbcolor",
-    };
-    vector<regex> ignore_regexps;
-    for (string val : endings)
-        ignore_regexps.push_back(create_regex(val + "\\s*$"));
 
-    auto ignore_line = [&ignore_regexps](const std::string& line)
-    {
-        smatch match;
+    smatch match;
+    string line;
+    point p;
+    string base;
 
-        for (const auto& r : ignore_regexps)
-            if (regex_search(line, match, r))
-                return true;
-        return false;
-    };
-    auto is_base_line = [&regexp_base_line](const std::string& line)
-    {
-        smatch match;
-
-        return regex_search(line, match, regexp_base_line);
-    };
-
-    // nacita prolog suboru
-    // vsetko az po bazy s bodmi..
-    while(true)
-    {
-        getline(in, line);
-        assert(!in.fail());
-
-        if (is_base_line(line))
-        {
-            // vrat sa pred nacitanie riadku...
-            in.seekg(stream_pos);
-            break;
-        }
-        stream_pos = in.tellg();
-
-        if (ignore_line(line))
-            continue;
-        prolog += line + "\n";
-        DEBUG("prolog '%s'", line.c_str());
-    }
-
-    // nacita bazy..
-    while(true)
-    {
-        getline(in, line);
-        assert(!in.fail());
-
-        if (ignore_line(line))
-            continue;
-        if (!is_base_line(line))
-        {
-            in.seekg(stream_pos);
-            break;
-        }
-        stream_pos = in.tellg();
-
-        stringstream stream(line);
-        stream
-            >> str
-            >> p.x
-            >> p.y
-            >> str;
-
-        labels.push_back(line.at(1));
-        points.push_back(p);
-
-        DEBUG("base_line '%s'", line.c_str());
-    }
-
-    // nacita epilog suboru
-    // vsetko od baz az po koniec suboru
-    while(true)
+    while (true)
     {
         getline(in, line);
         if (in.fail())
             break;
-        epilog += line + "\n";
-        DEBUG("epilog '%s'", line.c_str());
-    }
 
-    DEBUG("%s", labels.c_str());
+        if (regex_search(line, match, regexp_base_line))
+        {
+            // is base line
+            stringstream str;
+
+            str << match[1] << " " << match[2] << " " << match[4];
+
+            str
+                >> base
+                >> p.x
+                >> p.y;
+
+            assert(!str.fail() && str.eof() && base.size() == 1);
+
+            labels.push_back(base[0]);
+            points.push_back(p);
+        }
+    }
 }
 

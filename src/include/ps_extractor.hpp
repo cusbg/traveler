@@ -25,7 +25,7 @@
 #include "extractor.hpp"
 
 /**
- * ps document extractor
+ * PS CRW document extractor
  */
 class ps_extractor : public extractor
 {
@@ -36,10 +36,6 @@ protected:
     {
         return "ps";
     }
-
-public:
-    std::string prolog;
-    std::string epilog;
 };
 
 

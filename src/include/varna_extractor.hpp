@@ -24,6 +24,9 @@
 
 #include "extractor.hpp"
 
+/**
+ * varna SVG document extractor
+ */
 class varna_extractor : public extractor
 {
 protected:

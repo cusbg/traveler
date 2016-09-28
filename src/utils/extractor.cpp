@@ -31,6 +31,20 @@
 
 using namespace std;
 
+struct regex_exception : public my_exception
+{
+    regex_exception(const std::regex_error& e)
+        : my_exception(msprintf("%s [error=%s]", ERR_OLD_GCC, e.what()))
+    { }
+
+    virtual ~regex_exception() noexcept = default;
+    virtual std::string get_type() const
+    {
+        return "regex_exception";
+    }
+};
+
+
 /* static */ std::vector<extractor_ptr> extractor::get_all_extractors()
 {
     std::vector<extractor_ptr> extractors;
@@ -61,28 +75,19 @@ using namespace std;
     INFO("Extracting RNA structure from file %s with extractor %s", docfile, extractor->get_type());
     extractor->extract(docfile);
 
+    if (extractor->labels.size() != extractor->points.size())
+    {
+        throw illegal_state_exception("Number of extracted bases does not match number of extracted points");
+    }
+
     return extractor;
 }
 
 regex extractor::create_regex(
                 const std::string& pattern)
 {
-    struct regex_exception : public my_exception
-    {
-        regex_exception(const std::regex_error& e)
-            : my_exception(msprintf("%s [error=%s]", ERR_OLD_GCC, e.what()))
-        { }
-
-        virtual ~regex_exception() noexcept = default;
-        virtual std::string get_type() const
-        {
-            return "regex_exception";
-        }
-    };
-
     try
     {
-        DEBUG("regex=%s", pattern);
         return regex(pattern);
     }
     catch (const std::regex_error& e)

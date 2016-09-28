@@ -37,15 +37,17 @@ void varna_extractor::extract(
     labels.clear();
     points.clear();
 
+    ifstream in(filename);
+
     regex regexp_base_line = create_regex(
             msprintf("^<text.*\\s+x=%s.*\\s+y=%s\\s+.*>%s</text>",
                 property(DOUBLE_REGEX), property(DOUBLE_REGEX), BASE_REGEX));
+
     smatch match;
-
-    ifstream in(filename);
     string line;
+    point p;
+    string base;
 
-    // nacita bazy..
     while(true)
     {
         getline(in, line);
@@ -55,8 +57,6 @@ void varna_extractor::extract(
         if (regex_search(line, match, regexp_base_line))
         {
             stringstream str;
-            point p;
-            string base;
 
             str << match[1] << " " << match[3] << " " << match[5];
 
@@ -69,12 +69,7 @@ void varna_extractor::extract(
 
             labels.push_back(base[0]);
             points.push_back(p);
-            DEBUG("read base %s, point %s from base line '%s'", base, p, line);
         }
     }
-
-    DEBUG("labels(%s):\n%s", labels.size(), labels);
-    LOGGER_PRINT_CONTAINER(points, msprintf("points(%s)", points.size()));
-    assert(labels.size() == points.size());
 }
 
