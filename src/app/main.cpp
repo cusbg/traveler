@@ -34,8 +34,9 @@
 using namespace std;
 
 
-vector<string> args;
+static vector<string> args;
 
+// for signal_handler - print args
 static std::ostream& operator<<(
                 std::ostream& out,
                 const std::vector<std::string>& vec)
@@ -54,7 +55,7 @@ void signal_handler(
         << endl
         << logger.message_header(logger::priority::EMERG)
         << "ERROR: signal "
-        << to_string(signal)
+        << signal
         << ":"
         << strsignal(signal)
         << " caught, exiting"
@@ -74,7 +75,7 @@ void signal_handler(
         // ^^ ((void) + 1)to prevent warning warn-unused-result
     }
 
-    exit(2);
+    exit(ERROR_SIGNAL);
 }
 
 static void set_signal_handler()
@@ -95,12 +96,13 @@ static void set_signal_handler()
     {
         if (sigaction(sig, &act, NULL) != 0)
         {
-            ERR("sigaction on signal %i failed, err: %s", sig, strerror(errno));
+            ERR("Setting signal handler for signal %s:%s failed: %s",
+                    sig, strsignal(sig), strerror(errno));
         }
     }
 }
 
-void init()
+static void init()
 {
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
 
@@ -135,7 +137,7 @@ int main(int argc, char** argv)
     catch (const my_exception& e)
     {
         ERR("Exception caught: %s", e);
-        return 1;
+        return ERROR_DEFAULT;
     }
 
     return 0;

@@ -4,8 +4,8 @@ ALL="african_frog artemia_salina blue_mussel cicadas echinococcus_granulosus fru
 FILES1=${ALL}
 FILES2=${ALL}
 FILES1="varna"
+FILES1="artemia_salina"
 FILES2="human"
-#FILES2="artemia_salina"
 
 EXECUTABLE="build/traveler"
 DIR="/tmp/"
@@ -33,7 +33,7 @@ fail_function() {
 init_variables() {
     file_in="${DIR}/${file1}-${file2}"
     file_out="${DIR_IMG}/${file1}-${file2}"
-    image_format="varna"
+    image_format="ps"
     debug="--debug"
     tt="--template-structure --file-format ${image_format} ${DIR}/${file1}.${image_format} ${DIR}/${file1}.fasta"
     mt="--target-structure ${DIR}/${file2}.fasta"
@@ -70,7 +70,7 @@ run_all() {
 run() {
     init_variables
 
-    #run_ted
+    run_ted
     run_draw
     #run_all
 

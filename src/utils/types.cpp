@@ -56,12 +56,12 @@ print_class_BEG_END_name::print_class_BEG_END_name(
                 const std::string& _fname)
     : fname(_fname)
 {
-    DEBUG("BEG function: %s", fname.c_str());
+    TRACE("BEG function: %s", fname);
 }
 
 print_class_BEG_END_name::~print_class_BEG_END_name()
 {
-    DEBUG("END function: %s", fname.c_str());
+    TRACE("END function: %s", fname);
 }
 
 

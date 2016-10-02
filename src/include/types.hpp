@@ -77,7 +77,7 @@ void wait_for_input();
 
 #define WAIT \
         { \
-            WARN("%s: %lu", __PRETTY_FUNCTION__, __LINE__); \
+            WARN("WAIT: %s: %lu", __PRETTY_FUNCTION__, __LINE__); \
             wait_for_input(); \
         }
 

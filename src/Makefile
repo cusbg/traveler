@@ -1,7 +1,5 @@
 #
-# File: src/Makefile
-# Created: 2014-09-01 14:42
-# By: Richard Eliáš <richard.elias@matfyz.cz>
+# Richard Eliáš <richard.elias@matfyz.cz>
 #
 
 TARGET                  = traveler
@@ -13,11 +11,7 @@ MODULES                 = tree ted utils draw app tests
 MODULESVARS             = $$\{TREE} $$\{TED} $$\{UTILS} $$\{DRAW} $$\{APP} $$\{TESTS}
 MODULETARGET            = make
 
-CC                      = g++
-DEBUG                   = -g -Wall
-RELEASE                 = -O3
-LFLAGS                  = ${DEBUG} ${RELEASE} -std=c++11 -lrt
-SHELL                   = /bin/bash -o pipefail
+include ${ROOTDIR}/def.mk
 
 
 build: mkdir make_modules ${BUILDDIR}/Makefile compile
@@ -75,9 +69,6 @@ ${BUILDDIR}/Makefile:
 			\\nclean: \
 				\\n\\trm -rf \*.o ${TARGET} \
 					>>$@
-
-sort:
-	cat ${LOGDIR}/overlaps.log | sed 's/^.*DEBUG\] //' | sort -n -k 3 > ${LOGDIR}/overlaps.sorted.log
 
 
 #OTHER GLOBAL targets

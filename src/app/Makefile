@@ -1,3 +1,6 @@
+#
+# Richard Eliáš <richard.elias@matfyz.cz>
+#
 
 MODULE                  = app
 ROOTDIR                 = ..

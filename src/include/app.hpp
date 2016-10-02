@@ -111,6 +111,7 @@ private:
 };
 
 
+#define ERROR_SIGNAL            99
 #define ERROR_DEFAULT           100
 #define ERROR_ARGUMENTS         101
 #define ERROR_TED               102

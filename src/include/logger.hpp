@@ -60,11 +60,12 @@ public:
      */
     enum priority : char
     {
-        DEBUG   = 0,
-        INFO    = 1,
-        WARN    = 2,
-        ERROR   = 3,
-        EMERG   = 4,
+        TRACE   = 0,
+        DEBUG   = 1,
+        INFO    = 2,
+        WARN    = 3,
+        ERROR   = 4,
+        EMERG   = 5,
     };
 
     /**
@@ -95,13 +96,16 @@ public:
     };
 
 public:
+#ifdef NO_LOGGING
+    logger();
+#endif
     logger(
                 const std::string& filename,
                 priority priority);
     logger(
                 const std::string& filename,
                 priority priority,
-                std::vector<FILE*> streams);
+                const std::vector<FILE*>& streams);
     ~logger();
 
 public:
@@ -161,6 +165,7 @@ protected:
     }
 
 public:
+    LOGGER_FUNCTIONS(trace, TRACE);
     LOGGER_FUNCTIONS(debug, DEBUG);
     LOGGER_FUNCTIONS(info,  INFO);
     LOGGER_FUNCTIONS(warn,  WARN);
@@ -206,7 +211,10 @@ logger::logger_stream& logger::logger_stream::operator<<(
 
 
 // Define standard macros for using logger
-
+#ifndef NO_LOGGING
+#define TRACE(...) \
+    if (logger.is_trace_enabled()) \
+        ::logger.trace(__VA_ARGS__)
 #define DEBUG(...) \
     if (logger.is_debug_enabled()) \
         ::logger.debug(__VA_ARGS__)
@@ -218,5 +226,13 @@ logger::logger_stream& logger::logger_stream::operator<<(
 #define ERR(...) \
     ::logger.error(__VA_ARGS__)
 
+#else
+// no logging
+#define TRACE(...)
+#define DEBUG(...)
+#define INFO(...)
+#define WARN(...)
+#define ERR(...)
+#endif
 #endif /* !LOGGER_HPP */
 

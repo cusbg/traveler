@@ -26,13 +26,27 @@
 #include "types.hpp"
 #include "mprintf.hpp"
 
-#define LOG_FILE "build/logs/program.log"
-
 
 using namespace std;
 
+#ifndef NO_LOGGING
+
+#ifndef LOG_FILE
+#define LOG_FILE "/tmp/traveler.log"
+#endif
+
+
 /* global */
 class logger logger(LOG_FILE, logger::ERROR, {stdout});
+#else
+class logger logger;
+
+logger::logger()
+{
+    p = priority::EMERG;
+    // no logging output streams
+}
+#endif
 
 
 logger::logger(
@@ -44,19 +58,16 @@ logger::logger(
 logger::logger(
                 const std::string& filename,
                 priority priority,
-                std::vector<FILE*> streams)
+                const std::vector<FILE*>& streams)
 {
     p = priority;
     out = streams;
     FILE* f = fopen(filename.c_str(), "a");
 
     if (f == nullptr || ferror(f))
-        throw io_exception("cannot open file '" + filename + "' to log in");
+        throw io_exception("Cannot open log file %s", filename);
 
     out.push_back(f);
-
-    for (FILE *f : out)
-        setvbuf(f, NULL, _IOFBF, 0);
 }
 
 logger::~logger()
@@ -131,7 +142,7 @@ void logger::check_errors()
     for (FILE* f : out)
     {
         if (ferror(f))
-            throw io_exception("logger output error");
+            throw io_exception("Error occured while printing log messages");
     }
 }
 
@@ -183,6 +194,7 @@ std::ostream& operator<<(
         break;
     switch (p)
     {
+        switchcase(TRACE);
         switchcase(DEBUG);
         switchcase(INFO);
         switchcase(WARN);
@@ -195,7 +207,5 @@ std::ostream& operator<<(
 
     return out;
 }
-
-
 
 

@@ -74,9 +74,7 @@ void compact::run()
             return out;
         };
 
-    size_t n;
-    n = recursion(parent);
-    DEBUG("shift #%lu '%s'", n, to_cstr(vector));
+    recursion(parent);
 }
 
 /* static */ void compact::set_distance(
