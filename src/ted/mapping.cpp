@@ -57,31 +57,9 @@ mapping::indexes mapping::get_to_remove() const
     return vec;
 }
 
-/* static */ mapping::mapping_pair mapping::split(
-                const std::string& text)
-{
-    mapping_pair m;
-    stringstream str;
-    char ch;
 
-    str << text;
-
-    str
-        >> m.from
-        >> ch
-        >> ch
-        >> m.to;
-
-    assert(!str.fail());
-
-    //DEBUG("%lu -> %lu",
-            //m.from, m.to);
-
-    return m;
-}
-
-
-bool mapping::mapping_pair::operator< (const mapping_pair& other) const
+bool mapping::mapping_pair::operator<(
+                const mapping_pair& other) const
 {
     return from < other.from ||
         (from == other.from &&

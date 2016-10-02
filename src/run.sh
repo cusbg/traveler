@@ -3,14 +3,14 @@
 ALL="african_frog artemia_salina blue_mussel cicadas echinococcus_granulosus fruit_fly human kenyan_frog microciona_prolifera mnemiopsis_leidyi mouse rabbit rat scorpion sea_scallop tripedalia_cystophora"
 FILES1=${ALL}
 FILES2=${ALL}
-FILES1="varna"
 FILES1="artemia_salina"
 FILES2="human"
 
 EXECUTABLE="build/traveler"
-DIR="/tmp/"
+DIR="./precomputed/"
 DIR_IMG="build/files"
 ONCE=false
+DEBUG="--debug"
 
 OVERLAPS="--overlaps"
 
@@ -34,14 +34,13 @@ init_variables() {
     file_in="${DIR}/${file1}-${file2}"
     file_out="${DIR_IMG}/${file1}-${file2}"
     image_format="ps"
-    debug="--debug"
     tt="--template-structure --file-format ${image_format} ${DIR}/${file1}.${image_format} ${DIR}/${file1}.fasta"
     mt="--target-structure ${DIR}/${file2}.fasta"
 }
 
 run_ted() {
     ${EXECUTABLE} \
-        ${debug} \
+        ${DEBUG} \
         ${tt} ${mt} \
         --ted ${file_out}.map \
         || fail_function
@@ -51,7 +50,7 @@ run_draw() {
     init_variables
 
     ${EXECUTABLE} \
-        ${debug} \
+        ${DEBUG} \
         ${tt} ${mt} \
 	    --draw ${COLORED} ${OVERLAPS} ${file_out}.map ${file_out} \
 	|| fail_function
@@ -61,7 +60,8 @@ run_all() {
     init_variables
 
     ${EXECUTABLE} \
-        ${tt} ${mt} ${debug} \
+        ${DEBUG} \
+        ${tt} ${mt} \
         --all ${COLORED} ${OVERLAPS} ${file_out} \
         --debug \
         || fail_function
@@ -71,7 +71,7 @@ run() {
     init_variables
 
     run_ted
-    run_draw
+    #run_draw
     #run_all
 
     #{

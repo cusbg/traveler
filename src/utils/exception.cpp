@@ -19,8 +19,6 @@
  * USA.
  */
 
-#include <sstream>
-
 #include "exception.hpp"
 
 using namespace std;

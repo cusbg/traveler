@@ -53,8 +53,6 @@ static inline bool has_bad(const vector<point>& points)
     else if (nodes_count < 3)
         out += 3;
 
-    DEBUG("min_circle_length(%lu) = %f", nodes_count, out);
-
     return out;
 }
 
@@ -97,13 +95,15 @@ bool compact::circle::lies_in_segment(
     CIRCLE_POINTS_INITED();
 
     // angle(p1, centre, p) + angle(p, centre, p2) == segment_angle()
-    assert(
-            double_equals(
-                fmod(angle(p1, centre, p) + angle(p, centre, p2) + 360, 360),
-                fmod(segment_angle() + 360, 360)) ||
-            double_equals(
-                fmod(angle(p2, centre, p) + angle(p, centre, p1) + 360, 360),
-                fmod(segment_angle() + 360, 360)));
+    if (!double_equals(
+            fmod(angle(p1, centre, p) + angle(p, centre, p2) + 360, 360),
+            fmod(segment_angle() + 360, 360)) &&
+        !double_equals(
+            fmod(angle(p2, centre, p) + angle(p, centre, p1) + 360, 360),
+            fmod(segment_angle() + 360, 360)))
+    {
+        throw illegal_state_exception("Angle in circle does not match segment angle.");
+    }
 
     if (sgn == 1)
         return angle(p1, centre, p) < segment_angle();
@@ -131,8 +131,6 @@ std::vector<point> compact::circle::split(
     vector<point> vec;
     double delta = segment_angle() / (double)(n + 1);
 
-    DEBUG("segment_angle: %f, n %lu", segment_angle(), n);
-
     for (size_t i = 1; i <= n; ++i)
         vec.push_back(rotate(delta * i));
 
@@ -143,8 +141,6 @@ std::vector<point> compact::circle::split(
 void compact::circle::compute_sgn()
 {
     CIRCLE_POINTS_INITED();
-
-    DEBUG("%s", to_cstr(print_points()));
 
     assert(centre != direction);
     assert(!lies_on_line(p1, p2, direction));
@@ -170,7 +166,7 @@ std::vector<point> compact::circle::init(
     if (n == 0)
         return split(0);
 
-    DEBUG("init(%lu, %s)", n, to_cstr(*this));
+    DEBUG("Initialize circle for %s nodes", n);
 
     size_t max_iterations = 100;
     double needed_length, actual_length, shift_size;
@@ -214,36 +210,12 @@ std::vector<point> compact::circle::init(
 
 
 
-std::string compact::circle::print_points() const
-{
-    stringstream out;
-
-    out
-        << "p1= "
-        << p1
-        << "| p2= "
-        << p2
-        << "| centre= "
-        << centre
-        << "| direction= "
-        << direction;
-
-    return out.str();
-}
-
 std::ostream& operator<<(
                 std::ostream& out,
                 const compact::circle& c)
 {
-    out
-        << "circle:"
-        << c.print_points()
-        << "; radius="
-        << c.radius()
-        << "; seg_length="
-        << c.segment_length()
-        << "; seg_angle="
-        << c.segment_angle();
+    out << msprintf("circle: p1=%s| p2=%s| centre=%s| direction=%s;\nradius=%s; seg_length=%s; seg_angle=%s",
+            c.p1, c.p2, c.centre, c.direction, c.radius(), c.segment_length(), c.segment_angle());
 
     return out;
 }

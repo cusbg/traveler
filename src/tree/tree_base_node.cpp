@@ -40,7 +40,7 @@ void node_base::reset_id()
 /* static */
 void node_base::reset_ID()
 {
-    APP_DEBUG_FNAME;
+    INFO("Reseting tree IDs");
 
     ID = 0;
 }

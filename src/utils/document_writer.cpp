@@ -85,7 +85,7 @@ std::string document_writer::get_edge_formatted(
 {
     if (from.bad() || to.bad())
     {
-        WARN("cannot draw line between bad points");
+        WARN("Cannot draw line between bad points");
         return "";
     }
     if (is_base_pair)
@@ -224,9 +224,7 @@ void document_writer::init(
     assert(!filename.empty());
 
     string file = filename + suffix;
-    DEBUG("init(%s)", to_cstr(file));
-
-
+    INFO("Opening document %s for writing RNA", file);
 
     out.close();
 

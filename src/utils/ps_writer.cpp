@@ -60,7 +60,7 @@ std::string ps_writer::get_default_prologue(
     letter.y /= scale.y;
 
     if (size(letter) > distance(tr, bl))
-        WARN("rna probably wont fit document");
+        WARN("Rna probably wont fit document");
 
     tr = -tr;
     bl = -bl;

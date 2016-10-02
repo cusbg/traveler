@@ -37,15 +37,15 @@ matcher::matcher(
 rna_tree& matcher::run(
                 const mapping& map)
 {
-    APP_DEBUG_FNAME;
-
-    mark(t1, map.get_to_remove(), rna_pair_label::deleted);
-    mark(t2, map.get_to_insert(), rna_pair_label::inserted);
+    INFO("BEG: Transforming trees with mapping function");
 
     if (t1.size() - map.get_to_remove().size() != t2.size() - map.get_to_insert().size())
     {
         throw illegal_state_exception("Computed sizes of removing/inserting does not match current trees");
     }
+
+    mark(t1, map.get_to_remove(), rna_pair_label::deleted);
+    mark(t2, map.get_to_insert(), rna_pair_label::inserted);
 
     erase();
 
@@ -56,8 +56,6 @@ rna_tree& matcher::run(
 
     merge();
 
-    DEBUG("Match out: %s", t1.print_tree(false));
-
     if (!t1.correct_pairing() || !t2.correct_pairing())
     {
         throw illegal_state_exception("Uncorrect tree pairing after transforming template to target tree");
@@ -66,6 +64,7 @@ rna_tree& matcher::run(
     update_ends_in_rna(t1);
     t1.set_postorder_ids();
 
+    INFO("END: Transforming trees with mapping function");
     return t1;
 }
 
@@ -76,8 +75,6 @@ void matcher::mark(
                 const indexes_type& postorder_indexes,
                 rna_pair_label::status_type status)
 {
-    APP_DEBUG_FNAME;
-
     post_order_iterator it = rna.begin_post();
     size_t i = 0;
 
@@ -90,8 +87,6 @@ void matcher::mark(
         assert(!rna_tree::is_root(it));
         it->status = status;
         i = index;
-
-        DEBUG("node '%s' marked", clabel(it));
     }
 
     rna.print_tree();
@@ -99,8 +94,6 @@ void matcher::mark(
 
 void matcher::erase()
 {
-    APP_DEBUG_FNAME;
-
     iterator it;
     sibling_iterator ch;
 
@@ -122,8 +115,6 @@ void matcher::erase()
 
 void matcher::merge()
 {
-    APP_DEBUG_FNAME;
-
     iterator it1, it2;
     sibling_iterator ch1, ch2, ins;
     size_t actual, needed, steal;
@@ -164,7 +155,6 @@ void matcher::merge()
             }
             else
             {
-                DEBUG("modify %s -> %s", clabel(ch1), clabel(ch2));
                 ch1->set_label_strings(*ch2);
             }
 

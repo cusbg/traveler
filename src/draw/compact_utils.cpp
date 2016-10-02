@@ -27,8 +27,6 @@ using namespace std;
 void compact::intervals::init(
                 iterator parent)
 {
-    APP_DEBUG_FNAME;
-
     assert(!rna_tree::is_leaf(parent));
 
     sibling_iterator ch;
@@ -78,8 +76,6 @@ void compact::intervals::init(
             typeswitch(multibranch_loop);
 #undef typeswitch
     }
-
-    DEBUG("created:%s", to_cstr(*this));
 }
 
 point compact::intervals::get_circle_direction() const
@@ -98,54 +94,6 @@ point compact::intervals::get_circle_direction() const
         ++n;
     }
     psum = psum / n;
-    DEBUG("direction = %s", to_cstr(psum));
     return psum;
-}
-
-
-
-std::ostream& operator<<(
-                std::ostream& out,
-                const compact::intervals& i)
-{
-    out << "intervals:";
-    switch (i.type)
-    {
-#define typeswitch(t) case compact::intervals::t : out << #t; break;
-        typeswitch(hairpin);
-        typeswitch(multibranch_loop);
-        typeswitch(interior_loop);
-
-        default:
-            abort();
-#undef typeswitch
-    }
-    out << endl;
-
-    for (const auto& val : i.vec)
-        out << val << endl;
-
-    return out;
-}
-
-std::ostream& operator<<(
-                std::ostream& out,
-                const compact::interval& i)
-{
-    out
-        << "INTERVAL: "
-        << label(i.beg.it)
-        << ":"
-        << (int)i.beg.index
-        << "| "
-        << label(i.end.it)
-        << ":"
-        << (int)i.end.index
-        << endl;
-
-    for (auto val : i.vec)
-        out << clabel(val) << " ";
-
-    return out;
 }
 

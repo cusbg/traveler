@@ -357,7 +357,7 @@ void app::print(
             [&args, &i]()
             {
                 if (i + 1 < args.size())
-                    return args[i + 1];
+                    return args.at(i + 1);
                 else
                     return args.back();
             };
@@ -454,8 +454,8 @@ void app::print(
             }
             else if (is_argument(ARGS_DEBUG))
             {
-                logger.set_priority(logger::DEBUG);
-                INFO("Enabled debug mode");
+                logger.set_priority(logger::TRACE);
+                INFO("Enabled trace mode");
             }
             else
             {

@@ -197,7 +197,7 @@ point rna_pair_label::centre() const
 {
     if (!inited_points())
     {
-        WARN("centre() -> points not inited");
+        DEBUG("WARNING: Points for rna pair centre are not inited");
         return point::bad_point();
     }
     if (paired())
@@ -219,25 +219,21 @@ void rna_pair_label::set_label_strings(
     //  edited          - ak labels su rozne
     //
 
-    APP_DEBUG_FNAME;
-
     if (status != untouched)
     {
-        ERR("set_label_strings: %s - status=%s",
-                to_cstr(*this), to_cstr(status));
-        abort();
+        throw illegal_state_exception("Setting bases failed, trying to modify once modified base: %s - status %s",
+                *this, status);
     }
     else if (paired() != other.paired())
     {
-        ERR("set_label_strings: not compatible nodes: %s-%s",
-                to_cstr(*this), to_cstr(other));
-        abort();
+        throw illegal_state_exception("Setting bases failed, not compatible nodes: %s-%s",
+                *this, other);
     }
 
     if (to_string(*this) != to_string(other))
     {
         status = edited;
-        DEBUG("edit %s -> %s", to_cstr(*this), to_cstr(other));
+        DEBUG("edit %s -> %s", *this, other);
     }
     else
         status = touched;

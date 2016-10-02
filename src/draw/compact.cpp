@@ -23,8 +23,6 @@
 #include "compact_circle.hpp"
 #include "compact_utils.hpp"
 
-#include "document_writer.hpp"
-
 using namespace std;
 
 #define MULTIBRANCH_MINIMUM_SPLIT   10
@@ -39,15 +37,13 @@ void compact::run()
 {
     APP_DEBUG_FNAME;
 
-    LOGGER_PRIORITY_ON_FUNCTION_AT_LEAST(INFO);
-
-    INFO("BEG: COMPACT");
+    INFO("BEG: Computing RNA layout");
 
     init();
     make();
     checks();
 
-    INFO("END: COMPACT");
+    INFO("END: Computing RNA layout");
 }
 
 
@@ -56,8 +52,6 @@ void compact::run()
                 iterator parent,
                 point vector)
 {
-    APP_DEBUG_FNAME;
-
     function<size_t(iterator)> recursion =
         [&recursion, &vector](iterator it) {
 
@@ -82,8 +76,6 @@ void compact::run()
                 iterator child,
                 double dist)
 {
-    APP_DEBUG_FNAME;
-
     assert(rna_tree::parent(child) == parent);
 
     set_distance(child, parent->centre(), dist);
@@ -94,8 +86,6 @@ void compact::run()
                 point from,
                 double dist)
 {
-    APP_DEBUG_FNAME;
-
     point p = it->centre();
     point vec = normalize(p - from);
     double actual = distance(p, from);
@@ -144,11 +134,7 @@ void compact::run()
                 circle c,
                 double alpha)
 {
-    APP_DEBUG_FNAME;
-
     assert(!rna_tree::is_leaf(it));
-
-    DEBUG("rotate %s by %f", clabel(it), alpha);
 
     for (pre_post_order_iterator ch = pre_post_order_iterator(it, true); id(ch) <= id(it); ++ch)
     {
@@ -186,7 +172,7 @@ void compact::init()
         }
         else if (!init_branch_recursive(it, p).bad())    // => is good
         {
-            DEBUG("INIT_rec OK");
+            // init OK
         }
         else
         {
@@ -227,8 +213,6 @@ point compact::init_branch_recursive(
                 sibling_iterator it,
                 point from)
 {
-    APP_DEBUG_FNAME;
-
     point p;
     sibling_iterator ch;
 
@@ -261,7 +245,6 @@ point compact::init_branch_recursive(
                 sibling_iterator it)
 {
     // init for root children
-    APP_DEBUG_FNAME;
 
     point p;
     sibling_iterator ch;
@@ -293,8 +276,6 @@ point compact::init_branch_recursive(
 void compact::init_by_ancestor(
                 sibling_iterator it)
 {
-    APP_DEBUG_FNAME;
-
     assert(rna_tree::is_valid(get_onlyone_branch(rna_tree::parent(it))));   // => 1 branch
 
     point p1, p2, vec;
@@ -309,8 +290,6 @@ void compact::init_by_ancestor(
     it->at(1).p = p2;
     // ^^ initialize points of `it` to lie next to parent
     // .. that means only initialization, to get direction where child should be
-
-    DEBUG("INIT OK");
 }
 
 void compact::init_multibranch(
@@ -368,8 +347,6 @@ void compact::init_multibranch(
                 double radius = distance(from, rp1);
 
                 point to = rotate(p1, alpha - beta, radius);
-
-                DEBUG("from %s to %s", to_cstr(from), to_cstr(to));
                 it->at(it.label_index()).p = to;
             }
         };
@@ -413,7 +390,6 @@ void compact::init_multibranch(
 void compact::make_branch_even(
                 sibling_iterator it)
 {
-    APP_DEBUG_FNAME;
     assert(!rna_tree::is_leaf(it));
 
     vector<sibling_iterator> vec;
@@ -508,8 +484,6 @@ void compact::make()
 void compact::set_distances(
                 intervals& in)
 {
-    APP_DEBUG_FNAME;
-
     switch (in.type)
     {
         case intervals::hairpin:
@@ -526,11 +500,8 @@ void compact::set_distances(
 void compact::set_distance_interior_loop(
                 intervals& in)
 {
-    APP_DEBUG_FNAME;
     assert(in.type == intervals::interior_loop &&
             in.vec.size() == 2);
-
-    rna.print_subtree(in.vec[0].beg.it);
 
     iterator parent, child;
     double actual, avg;
@@ -559,8 +530,6 @@ void compact::set_distance_interior_loop(
 void compact::set_distance_multibranch_loop(
                 intervals& in)
 {
-    APP_DEBUG_FNAME;
-
     for (size_t i = 0; i < in.vec.size(); ++i)
     {
         try {
@@ -571,6 +540,7 @@ void compact::set_distance_multibranch_loop(
             }
         } catch (...)
         {
+            ERR("Error occured in drawing multibranch loop. Some bases could not be drawn");
             // TODO handle error
             return;
         }
@@ -580,8 +550,6 @@ void compact::set_distance_multibranch_loop(
 void compact::split(
                 const interval& in)
 {
-    APP_DEBUG_FNAME;
-
     vector<point> p1, p2;
     point p;
     double length;
@@ -627,8 +595,6 @@ void compact::reinsert(
                 const points_vec& points,
                 const nodes_vec& nodes)
 {
-    APP_DEBUG_FNAME;
-
     if (nodes.empty())
         return;
 
@@ -649,8 +615,6 @@ void compact::remake(
                 const interval& i,
                 point direction)
 {
-    APP_DEBUG_FNAME;
-
     assert(i.remake);
 
     circle c;
@@ -686,15 +650,12 @@ double compact::get_length(
     p2 = in.end.it->at(in.end.index).p;
     len += distance(p1, p2);
     len = len / (in.vec.size() + 1);
-    DEBUG("len = %f", len);
     return len;
 }
 
 
 /* inline */ void compact::checks()
 {
-    APP_DEBUG_FNAME;
-
     // all but root should be inited
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     {

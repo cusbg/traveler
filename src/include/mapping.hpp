@@ -23,7 +23,7 @@
 #define MAPPING_HPP
 
 #include <vector>
-#include <istream>
+#include <cstddef> // size_t
 
 /**
  * representation for mapping between two trees
@@ -37,20 +37,9 @@ public:
     {
         size_t from, to;
 
-        bool operator< (const mapping_pair& other) const;
+        bool operator<(
+                    const mapping_pair& other) const;
     };
-
-private:
-    /**
-     * read mapping from input stream
-     */
-    static mapping read_mapping(
-                std::istream& in);
-    /**
-     * transform mapping from text to pair object representation
-     */
-    static mapping_pair split(
-                const std::string& text);
 
 public:
     mapping() = default;

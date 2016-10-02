@@ -25,7 +25,6 @@
 #include "mapping.hpp"
 #include "ps_extractor.hpp"
 #include "exception.hpp"
-#include "mprintf.hpp"
 
 using namespace std;
 
@@ -45,7 +44,7 @@ bool contains_one_of(
                 const std::string& filename)
 {
     if (!exist_file(filename))
-        throw io_exception(msprintf("read_file(%s) failed, file does not exist", filename));
+        throw io_exception("read_file(%s) failed, file does not exist", filename);
 
     ifstream in(filename);
     stringstream s;
@@ -68,14 +67,14 @@ bool contains_one_of(
     out.flush();
 
     if (!exist_file(filename))
-        throw io_exception(msprintf("write_file(%s) failed", filename));
+        throw io_exception("write_file(%s) failed", filename);
 }
 
 /* global */ fasta read_fasta_file(
                 const std::string& filename)
 {
     if (!exist_file(filename))
-        throw io_exception(msprintf("read_file(%s) failed, file does not exist", filename));
+        throw io_exception("read_file(%s) failed, file does not exist", filename);
 
     ifstream in(filename);
     ostringstream labels, brackets;
@@ -86,7 +85,7 @@ bool contains_one_of(
         char ch;
         in >> ch;
         if (in.fail() || ch != '>')
-            throw invalid_argument(msprintf("starting character '>' is missing"));
+            throw invalid_argument("starting character '>' is missing");
 
         getline(in, id);
         size_t index = id.find_first_of(' ');
@@ -128,7 +127,7 @@ table_type load_table(
     APP_DEBUG_FNAME;
 
     if (!exist_file(filename))
-        throw io_exception(msprintf("load_table(%s) failed, file does not exist", filename));
+        throw io_exception("load_table(%s) failed, file does not exist", filename);
 
     std::ifstream in(filename);
     size_t m, n;
@@ -167,7 +166,7 @@ void save_table(
                 const table_type& table)
 {
     APP_DEBUG_FNAME;
-    DEBUG("save: %s", to_cstr(filename));
+    DEBUG("save: %s", filename);
 
     using std::endl;
 
@@ -195,7 +194,7 @@ void save_table(
     }
 
     if (out.fail())
-        throw io_exception(msprintf("save_table(%s) failed", filename));
+        throw io_exception("save_table(%s) failed", filename);
 }
 
 
@@ -245,7 +244,7 @@ void save_tree_mapping_table(
 {
     APP_DEBUG_FNAME;
 
-    DEBUG("save: %s", to_cstr(filename));
+    DEBUG("save: %s", filename);
     ofstream out(filename);
 
     out
@@ -263,7 +262,7 @@ void save_tree_mapping_table(
     }
 
     if (out.fail())
-        throw io_exception(msprintf("save_table(%s) failed", filename));
+        throw io_exception("save_table(%s) failed", filename);
 }
 
 mapping load_mapping_table(
@@ -272,7 +271,7 @@ mapping load_mapping_table(
     APP_DEBUG_FNAME;
 
     if (!exist_file(filename))
-        throw io_exception(msprintf("load_file(%s) failed, file does not exist", filename));
+        throw io_exception("load_file(%s) failed, file does not exist", filename);
 
     string s;
     mapping map;

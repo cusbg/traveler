@@ -43,21 +43,15 @@ void rted::run()
 {
     APP_DEBUG_FNAME;
 
-    LOGGER_PRIORITY_ON_FUNCTION_AT_LEAST(INFO);
-
-    post_order_iterator it1, it2;
-
     init();
 
-    INFO("BEG: RTED(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
-    for (it1 = t1.begin_post(); it1 != t1.end_post(); ++it1)
-    {
-        for (it2 = t2.begin_post(); it2 != t2.end_post(); ++it2)
-        {
-            DEBUG("%s:%u <-> %s:%u",
-                    clabel(it1), id(it1),
-                    clabel(it2), id(it2));
+    INFO("BEG: Computing RTED between RNAs %s and %s",
+            t1.name(), t2.name());
 
+    for (post_order_iterator it1 = t1.begin_post(); it1 != t1.end_post(); ++it1)
+    {
+        for (post_order_iterator it2 = t2.begin_post(); it2 != t2.end_post(); ++it2)
+        {
             first_visit(it1, it2);
 
             size_t c_min = update_STR_table(it1, it2);
@@ -69,9 +63,10 @@ void rted::run()
         }
     }
 
-    INFO("END: RTED(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
+    DEBUG("Strategy computed, STR=%s", STR[id(t1.begin())][id(t2.begin())]);
 
-    DEBUG("STR: %s", to_cstr(STR[id(t1.begin())][id(t2.begin())]));
+    INFO("END: Computing RTED between RNAs %s and %s",
+            t1.name(), t2.name());
 }
 
 void rted::init()
@@ -176,16 +171,6 @@ void rted::compute_full_decomposition(
     A[it_id]        = a;
     ALeft[it_id]    = left;
     ARight[it_id]   = right;
-
-    DEBUG("A\t[%s]\t == %u",
-            clabel(it),
-            A[it_id]);
-    DEBUG("ALeft\t[%s]\t == %u",
-            clabel(it),
-            ALeft[it_id]);
-    DEBUG("ARight\t[%s]\t == %u",
-            clabel(it),
-            ARight[it_id]);
 }
 
 void rted::compute_relevant_subforrests(
@@ -219,11 +204,6 @@ void rted::compute_relevant_subforrests(
     }
     FLeft[it_id]    = left;
     FRight[it_id]   = right;
-
-    DEBUG("FLeft\t[%s]\t == %u",
-            clabel(it), FLeft[it_id]);
-    DEBUG("FRight\t[%s]\t == %u",
-            clabel(it), FRight[it_id]);
 }
 
 void rted::compute_subtree_size(
@@ -237,18 +217,12 @@ void rted::compute_subtree_size(
         s += Size[id(ch)];
 
     Size[it_id] = s;
-
-    DEBUG("Size\t[%s]\t == %u",
-            clabel(it),
-            Size[it_id]);
 }
 
 void rted::init_T1_LRH_v_tables(
                 iterator it1,
                 iterator it2)
 {
-    //APP_DEBUG_FNAME;
-
     assert(tree_type::is_leaf(it1));
 
     size_t it1_id = id(it1);
@@ -257,25 +231,16 @@ void rted::init_T1_LRH_v_tables(
     T1_Lv[it1_id][it2_id] =
         T1_Rv[it1_id][it2_id] =
         T1_Hv[it1_id][it2_id] = 0;
-
-    DEBUG("T1_{LRH}v\t[%s][%s]\t == 0 (init)",
-            clabel(it1),
-            clabel(it2));
 }
 
 void rted::init_T2_LRH_w_tables(
                 iterator it2)
 {
-    //APP_DEBUG_FNAME;
-
     size_t it2_id = id(it2);
 
     T2_Lw[it2_id] =
         T2_Rw[it2_id] =
         T2_Hw[it2_id] = 0;
-
-    DEBUG("T2_{LRH}w\t[%s]\t == 0 (init)",
-            clabel(it2));
 }
 
 void rted::first_visit(
@@ -285,8 +250,6 @@ void rted::first_visit(
     size_t it1_id = id(it1);
     size_t it2_id = id(it2);
     std::vector<bool> vec;
-
-    DEBUG("check %s <-> %s", clabel(it1), clabel(it2));
 
     if (tree_type::is_leaf(it1))
         init_T1_LRH_v_tables(it1, it2);
@@ -318,8 +281,6 @@ void rted::first_visit(
             T2_Lw[parent2_id] =
                 T2_Rw[parent2_id] =
                 T2_Hw[parent2_id] = 0;
-
-            DEBUG("T2_{LRH}w[%s] parent init", clabel(tree_type::parent(iter2)));
         }
     };
     auto init_parent_v_tables = [this](iterator iter1, iterator iter2) {
@@ -347,9 +308,6 @@ void rted::first_visit(
             T1_Lv[parent1_id][it2_id] =
                 T1_Rv[parent1_id][it2_id] =
                 T1_Hv[parent1_id][it2_id] = 0;
-
-            DEBUG("T1_{LRH}v[%s][%s] parent init",
-                    clabel(tree_type::parent(iter1)), clabel(iter2));
         }
     };
 
@@ -381,7 +339,6 @@ void rted::first_visit(
         }
     }
 #undef all_same
-
 }
 
 size_t rted::update_STR_table(
@@ -415,13 +372,7 @@ size_t rted::update_STR_table(
     size_t c_min = *c_min_it;
     size_t index = distance(vec.begin(), c_min_it);
 
-    DEBUG("c_min %u, index %u", c_min, index);
     STR[it1_id][it2_id] = strategy(index);
-
-    DEBUG("STR\t[%s][%s]\t == %s",
-            clabel(it1),
-            clabel(it2),
-            to_cstr(STR[it1_id][it2_id]));
 
     return c_min;
 }
@@ -480,20 +431,6 @@ void rted::update_T1_LRH_v_tables(
         val = c_min;
 
     T1_Hv[parent1_id][it2_id] += val;
-
-
-    DEBUG("T1_Lv\t[%s][%s]\t = %u \t (update)",
-            clabel(tree_type::parent(it1)),
-            clabel(it2),
-            T1_Lv[parent1_id][it2_id]);
-    DEBUG("T1_Rv\t[%s][%s]\t = %u \t (update)",
-            clabel(tree_type::parent(it1)),
-            clabel(it2),
-            T1_Rv[parent1_id][it2_id]);
-    DEBUG("T1_Hv\t[%s][%s]\t = %u \t (update)",
-            clabel(tree_type::parent(it1)),
-            clabel(it2),
-            T1_Hv[parent1_id][it2_id]);
 }
 
 void rted::update_T2_LRH_w_tables(
@@ -547,17 +484,6 @@ void rted::update_T2_LRH_w_tables(
     }
     else
         T2_Hw[parent2_id] += c_min;
-
-
-    DEBUG("T2_Lw\t[%s]\t = %u \t (update)",
-            clabel(tree_type::parent(it2)),
-            T2_Lw[parent2_id]);
-    DEBUG("T2_Rw\t[%s]\t = %u \t (update)",
-            clabel(tree_type::parent(it2)),
-            T2_Rw[parent2_id]);
-    DEBUG("T2_Hw\t[%s]\t = %u \t (update)",
-            clabel(tree_type::parent(it2)),
-            T2_Hw[parent2_id]);
 }
 
 void rted::check_postorder()

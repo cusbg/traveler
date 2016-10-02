@@ -21,13 +21,14 @@
 
 
 #include <iomanip>
+#include <cmath>
 
 #include "point.hpp"
 #include "types.hpp"
 
 using namespace std;
 
-#define BAD_POINT       (point({0xBADF00D, 0xBADF00D}))
+
 #define squared(val)    ((val) * (val))
 
 
@@ -60,7 +61,13 @@ point::point(double _x, double _y)
     : x(_x), y(_y)
 { }
 
-bool point::operator==(point other) const
+/* static */ const point& point::bad_point()
+{
+    static point bad = point({0xBADF00D, 0xBADF00D});
+    return bad;
+}
+
+bool point::operator==(const point& other) const
 {
     //BINARY(*this, other); // !!!
 
@@ -69,7 +76,7 @@ bool point::operator==(point other) const
         double_equals(y, other.y);
 }
 
-std::ostream& operator<<(std::ostream& out, point p)
+std::ostream& operator<<(std::ostream& out, const point& p)
 {
     if (p.bad())
         out << "0xBADF00D 0xBADF00D";
@@ -86,14 +93,14 @@ std::ostream& operator<<(std::ostream& out, point p)
 }
 
 
-point point::operator+(point other) const
+point point::operator+(const point& other) const
 {
     BINARY(*this, other);
 
     return {x + other.x, y + other.y};
 }
 
-point point::operator-(point other) const
+point point::operator-(const point& other) const
 {
     BINARY(*this, other);
 
@@ -107,7 +114,7 @@ point point::operator-() const
     return {-x, -y};
 }
 
-point point::operator/(point other) const
+point point::operator/(const point& other) const
 {
     BINARY(*this, other);
     for (double value : {other.x, other.y})
@@ -140,41 +147,35 @@ bool point::bad() const
         ::isnan(x) || ::isnan(y);
 }
 
-/* static */ const point& point::bad_point()
-{
-    static point bad = BAD_POINT;
-    return bad;
-}
-
-point operator*(double value, point p)
+point operator*(double value, const point& p)
 {
     return p * value;
 }
 
 
 
-point centre(point p1, point p2)
+point centre(const point& p1, const point& p2)
 {
     BINARY(p1, p2);
 
     return (p1 + p2) / 2;
 }
 
-double distance(point p1, point p2)
+double distance(const point& p1, const point& p2)
 {
     BINARY(p1, p2);
 
     return size(p2 - p1);
 }
 
-double size(point vector)
+double size(const point& vector)
 {
     UNARY(vector);
 
     return sqrt(squared(vector.x) + squared(vector.y));
 }
 
-point normalize(point p)
+point normalize(const point& p)
 {
     UNARY(p);
 
@@ -182,7 +183,7 @@ point normalize(point p)
     return p / size(p);
 }
 
-double angle(point p)
+double angle(const point& p)
 {
     UNARY(p);
 
@@ -193,7 +194,7 @@ double angle(point p)
     return out;
 }
 
-double angle(point p1, point centre, point p2)
+double angle(const point& p1, const point& centre, const point& p2)
 {
     BINARY(p1, p2);
     UNARY(centre);
@@ -205,7 +206,7 @@ double angle(point p1, point centre, point p2)
     return out;
 }
 
-point rotate(point centre, double alpha, double radius)
+point rotate(const point& centre, double alpha, double radius)
 {
     UNARY(centre);
     assert(!double_equals(radius, 0));
@@ -218,14 +219,14 @@ point rotate(point centre, double alpha, double radius)
     return out;
 }
 
-point orthogonal(point p)
+point orthogonal(const point& p)
 {
     UNARY(p);
 
     return normalize({p.y, -p.x});
 }
 
-point orthogonal(point p, point direction)
+point orthogonal(const point& p, const point& direction)
 {
     BINARY(p, direction);
 
@@ -239,7 +240,7 @@ point orthogonal(point p, point direction)
         return -o;
 }
 
-point move_point(point p, point move_to, double length)
+point move_point(const point& p, const point& move_to, double length)
 {
     BINARY(p, move_to);
 
@@ -248,7 +249,7 @@ point move_point(point p, point move_to, double length)
     return p + length * vec;
 }
 
-bool lies_on_line(point p1, point p2, point p3)
+bool lies_on_line(const point& p1, const point& p2, const point& p3)
 {
     BINARY(p1, p2);
     UNARY(p3);
@@ -294,11 +295,45 @@ bool lies_between(point p, point from, point to)
         double_equals(p.x / to.x, p.y / to.y);
 }
 
-point abs(point p)
+point abs(const point& p)
 {
     UNARY(p);
 
     return {fabs(p.x), fabs(p.y)};
 }
 
+
+
+bool double_equals_precision(
+                double val1,
+                double val2,
+                double precision)
+{
+    return fabs(val1 - val2) < fabs(precision);
+}
+
+bool double_equals(
+                double val1,
+                double val2)
+{
+    return double_equals_precision(val1, val2, 0.0001);
+}
+
+double radians_to_degrees(
+                double val)
+{
+    return val * 180. / M_PI;
+}
+
+double degrees_to_radians(
+                double val)
+{
+    return val * M_PI / 180.;
+}
+
+bool iszero(
+                double val)
+{
+    return double_equals(val, 0);
+}
 

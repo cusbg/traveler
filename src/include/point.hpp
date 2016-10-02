@@ -22,12 +22,7 @@
 #ifndef POINT_HPP
 #define POINT_HPP
 
-#include <sstream>
-#include <cmath>
-
-#ifndef M_PI
-#define M_PI		3.14159265358979323846
-#endif
+#include <ios>
 
 
 struct point
@@ -35,14 +30,15 @@ struct point
     double x;
     double y;
 
+public:
     point();
     point(double _x, double _y);
-    bool operator==(point other) const;
+    bool operator==(const point& other) const;
 
-    point operator+(point other) const;
-    point operator-(point other) const;
+    point operator+(const point& other) const;
+    point operator-(const point& other) const;
     point operator-() const;
-    point operator/(point other) const;
+    point operator/(const point& other) const;
     point operator/(double value) const;
     point operator*(double value) const;
 
@@ -52,6 +48,7 @@ struct point
         *this = *this operation other; \
         return *this; \
     }
+    // operations +=, -=, /=
     OPERATION_FUNCTION(+);
     OPERATION_FUNCTION(-);
     OPERATION_FUNCTION(/);
@@ -61,71 +58,61 @@ struct point
     bool bad() const;
     static const point& bad_point();
 
-    friend std::ostream& operator<<(std::ostream& out, point p);
+    friend std::ostream& operator<<(std::ostream& out, const point& p);
 };
 
 
 
-inline bool double_equals_precision(
-                double val1,
-                double val2,
-                double precision)
-{
-    return fabs(val1 - val2) < fabs(precision);
-}
+// other useful functions for points
 
-inline bool double_equals(
-                double val1,
-                double val2)
-{
-    return double_equals_precision(val1, val2, 0.0001);
-}
+point operator*(double value, const point& p);
 
-inline double radians_to_degrees(
-                double val)
-{
-    return val * 180. / M_PI;
-}
+point centre(const point& p1, const point& p2);
 
-inline double degrees_to_radians(
-                double val)
-{
-    return val * M_PI / 180.;
-}
+double distance(const point& p1, const point& p2);
 
-inline bool iszero(
-                double val)
-{
-    return double_equals(val, 0);
-}
+double size(const point& vector);
 
-point operator*(double value, point p);
+point normalize(const point& p);
 
-point centre(point p1, point p2);
+double angle(const point& p);
 
-double distance(point p1, point p2);
+double angle(const point& p1, const point& centre, const point& p2);
 
-double size(point vector);
+point rotate(const point& centre, double alpha, double radius);
 
-point normalize(point p);
+point orthogonal(const point& p);
 
-double angle(point p);
+point orthogonal(const point& p, const point& direction);
 
-double angle(point p1, point centre, point p2);
+point move_point(const point& p, const point& move_to, double length);
 
-point rotate(point centre, double alpha, double radius);
-
-point orthogonal(point p);
-
-point orthogonal(point p, point direction);
-
-point move_point(point p, point move_to, double length);
-
-bool lies_on_line(point p1, point p2, point p3);
+bool lies_on_line(const point& p1, const point& p2, const point& p3);
 
 bool lies_between(point p, point from, point to);
 
-point abs(point p);
+point abs(const point& p);
+
+
+// functions for double comparing
+
+bool double_equals_precision(
+                double val1,
+                double val2,
+                double precision);
+
+bool double_equals(
+                double val1,
+                double val2);
+
+double radians_to_degrees(
+                double val);
+
+double degrees_to_radians(
+                double val);
+
+bool iszero(
+                double val);
 
 #endif /* !POINT_HPP */
 

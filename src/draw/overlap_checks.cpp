@@ -26,23 +26,17 @@ using namespace std;
 
 
 overlap_checks::overlap_checks()
-{
-    APP_DEBUG_FNAME;
-}
+{ }
 
 overlap_checks::overlaps overlap_checks::run(
                 rna_tree& rna)
 {
     APP_DEBUG_FNAME;
 
-    LOGGER_PRIORITY_ON_FUNCTION_AT_LEAST(INFO);
-
-    INFO("BEG: OVERLAP_CHECKS(%s)", to_cstr(rna.name()));
+    INFO("BEG: Checking overlaps for RNA %s", rna.name());
 
     edges vec = get_edges(rna);
     overlaps overlaps = run(vec);
-
-    INFO("END: OVERLAP_CHECKS(%s)", to_cstr(rna.name()));
 
     return overlaps;
 }
@@ -101,8 +95,6 @@ overlap_checks::overlaps overlap_checks::run(
                     distance(p, e2.p2),
                 };
                 double radius = *std::max_element(distances.begin(), distances.end());
-                DEBUG("overlap occured");
-
                 vec.push_back({p, radius});
             }
         }

@@ -74,7 +74,6 @@ public:
                 size_t n);
 
 public:
-    std::string print_points() const;
     friend std::ostream& operator<<(
                 std::ostream& out,
                 const circle& c);

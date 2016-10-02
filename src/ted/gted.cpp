@@ -47,9 +47,7 @@ void gted::run(
 {
     APP_DEBUG_FNAME;
 
-    LOGGER_PRIORITY_ON_FUNCTION_AT_LEAST(INFO);
-
-    INFO("BEG: GTED(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
+    INFO("BEG: Running GTED for RNAs %s and %s", t1.name(), t2.name());
 
     STR = _str;
 
@@ -59,11 +57,11 @@ void gted::run(
 
     compute_distance_recursive(t1.begin(), t2.begin());
 
-    INFO("tdist[%s][%s] = %u",
-            clabel(t1.begin()), clabel(t2.begin()),
+    INFO("Computed Tree-Edit-Distance between RNAs: tdist[%s][%s] = %s",
+            label(t1.begin()), label(t2.begin()),
             tdist[id(t1.begin())][id(t2.begin())]);
 
-    INFO("END: GTED(%s, %s)", to_cstr(t1.name()), to_cstr(t2.name()));
+    INFO("END: Running GTED for RNAs %s and %s", t1.name(), t2.name());
 }
 
 void gted::compute_distance_recursive(
@@ -71,14 +69,8 @@ void gted::compute_distance_recursive(
                 iterator root2)
 {
     // using keyroots
-
-    APP_DEBUG_FNAME;
-
     t1.check_same_tree(root1);
     t2.check_same_tree(root2);
-
-    DEBUG("recursion, its %s, %s",
-            clabel(root1), clabel(root2));
 
     strategy str = STR[id(root1)][id(root2)];
 
@@ -86,11 +78,8 @@ void gted::compute_distance_recursive(
         str = strategy(RTED_T2_RIGHT);  // TODO nahodne
     actual_str = str;
 
-    DEBUG("str = %s", to_cstr(actual_str));
-
     if (str.is_T1())
     {
-        DEBUG("decomponing T1 - keyroots");
         for (const auto& val :
                 get_table(actual_str, t1.get_keyroots(root1)))
         {
@@ -99,7 +88,6 @@ void gted::compute_distance_recursive(
     }
     else
     {
-        DEBUG("decomponing T2 - keyroots");
         for (const auto& val :
                 get_table(actual_str, t2.get_keyroots(root2)))
         {
@@ -117,21 +105,14 @@ void gted::single_path_function(
 {
     // using subforests
 
-    APP_DEBUG_FNAME;
-
-    DEBUG("single_path_function %s, %s",
-            clabel(root1), clabel(root2));
-
     if (actual_str.is_T1())
     {
-        DEBUG("decomponing T2 - subforests");
         for (const auto& val :
                 get_table(actual_str, t2.get_subforests(root2)))
             compute_distance(root1, val);
     }
     else
     {
-        DEBUG("decomponing T1 - subforests");
         for (const auto& val :
                 get_table(actual_str, t1.get_subforests(root1)))
             compute_distance(val, root2);
@@ -144,8 +125,6 @@ gted::forest_distance_table_type gted::compute_distance(
                 iterator root1,
                 iterator root2)
 {
-    APP_DEBUG_FNAME;
-
     tree_type *t1ptr = &t1;
     tree_type *t2ptr = &t2;
     forest_distance_table_type table;
@@ -190,14 +169,6 @@ gted::forest_distance_table_type gted::compute_distance_LR(
 {
     // subtree has id-s (id(leafs.left) ... id(root1))
 
-    APP_DEBUG_FNAME;
-
-    DEBUG("root1 %s:%u, root2 %s:%u",
-            clabel(root1), id(root1),
-            clabel(root2), id(root2));
-    t1.print_subtree(root1);
-    t2.print_subtree(root2);
-
     forest_distance_table_type fdist(
                 t1.get_size(root1) + 1,
                     vector<size_t>(t2.get_size(root2) + 1, BAD));
@@ -220,23 +191,16 @@ gted::forest_distance_table_type gted::compute_distance_LR(
 #define get_fdist(iter1, iter2) \
     get_fdist(fdist, iter1, iter2, id1, id2)
 
-    DEBUG("BEG init");
-
     set_fdist(empty, empty, 0);
     for (it1 = beg1; it1 != end1; ++it1)
         set_fdist(it1, empty, get_fdist(prev(1), empty) + costs::del(it1));
     for (it2 = beg2; it2 != end2; ++it2)
         set_fdist(empty, it2, get_fdist(empty, prev(2)) + costs::ins(it2));
 
-    DEBUG("END init");
-    DEBUG("BEG main cycle");
-
     for (it1 = beg1; it1 != end1; ++it1)
     {
         for (it2 = beg2; it2 != end2; ++it2)
         {
-            DEBUG("its: %s - %s", clabel(it1), clabel(it2));
-
             size_t min;
             bool b = get_begin_leaf(t1, it1) == beg1 &&
                     get_begin_leaf(t2, it2) == beg2;
@@ -277,8 +241,6 @@ gted::forest_distance_table_type gted::compute_distance_LR(
         }
     }
 
-    DEBUG("END main cycle");
-
     return fdist;
 
 #undef set_fdist
@@ -290,10 +252,8 @@ mapping gted::get_mapping()
 {
     APP_DEBUG_FNAME;
 
-    LOGGER_PRIORITY_ON_FUNCTION_AT_LEAST(INFO);
-
-    INFO("BEG: GTED_MAPPING(%s, %s)",
-            to_cstr(t1.name()), to_cstr(t2.name()));
+    INFO("BEG: Computing mapping between RNAs %s and %s",
+            t1.name(), t2.name());
 
     typedef post_order_iterator iterator_type;
 
@@ -343,11 +303,9 @@ mapping gted::get_mapping()
         root2 = to_be_matched.back().second;
         to_be_matched.pop_back();
 
-        logger.debug_stream()
-            << "matching roots:\n"
-            << tree_type::print_subtree(root1, false)
-            << '\n'
-            << tree_type::print_subtree(root2, false);
+        DEBUG("Matching subtrees: \n%s\n%s",
+                tree_type::print_subtree(root1, false),
+                tree_type::print_subtree(root2, false));
 
         fdist = compute_distance_local(root1, root2);
 
@@ -366,13 +324,11 @@ mapping gted::get_mapping()
     get_fdist(fdist, iter1, iter2, id1, id2)
         while (tree_type::is_valid(it1) || tree_type::is_valid(it2))
         {
-            DEBUG("its: %s - %s", clabel(it1), clabel(it2));
-
             if (tree_type::is_valid(it1) &&
                     get_fdist(prev(1), it2) + costs::del(it1) ==
                     get_fdist(it1, it2))
             {
-                DEBUG("delete %s:%u", clabel(it1), id(it1));
+                DEBUG("delete %s:%u", label(it1), id(it1));
 
                 map.map.push_back({id(it1) + 1, 0});
 
@@ -382,7 +338,7 @@ mapping gted::get_mapping()
                     get_fdist(it1, prev(2)) + costs::ins(it2) ==
                     get_fdist(it1, it2))
             {
-                DEBUG("insert %s:%u", clabel(it2), id(it2));
+                DEBUG("insert %s:%u", label(it2), id(it2));
 
                 map.map.push_back({0, id(it2) + 1});
 
@@ -394,8 +350,8 @@ mapping gted::get_mapping()
                         get_begin_leaf(t2, it2) == beg2)
                 {
                     DEBUG("match %s:%u -> %s:%u",
-                            clabel(it1), id(it1),
-                            clabel(it2), id(it2));
+                            label(it1), id(it1),
+                            label(it2), id(it2));
 
                     map.map.push_back({id(it1) + 1, id(it2) + 1});
 
@@ -404,11 +360,9 @@ mapping gted::get_mapping()
                 }
                 else
                 {
-                    logger.debug_stream()
-                        << "matching roots:\n"
-                        << tree_type::print_subtree(it1, false)
-                        << '\n'
-                        << tree_type::print_subtree(it2, false);
+                    DEBUG("To be matched:\n%s\n%s",
+                        tree_type::print_subtree(it1, false),
+                        tree_type::print_subtree(it2, false));
 
                     to_be_matched.push_back({it1, it2});
 
@@ -427,8 +381,8 @@ mapping gted::get_mapping()
 
     sort(map.map.begin(), map.map.end());
 
-    INFO("END: GTED_MAPPING(%s, %s)",
-            to_cstr(t1.name()), to_cstr(t2.name()));
+    INFO("END: Computing mapping between RNAs %s and %s",
+            t1.name(), t2.name());
 
 
     return map;
@@ -459,11 +413,6 @@ mapping gted::get_mapping()
 
     assert(i1 < tdist.size() && i2 < tdist[i1].size());
 
-    DEBUG("\tget TDist[%s:%u][%s:%u] -> %u",
-            clabel(it1), i1,
-            clabel(it2), i2,
-            tdist[i1][i2]);
-
     out = tdist[i1][i2];
 
     assert(out != BAD);
@@ -491,11 +440,6 @@ mapping gted::get_mapping()
     assert(i1 < tdist.size() && i2 < tdist[i1].size());
     assert(value != BAD);
 
-    DEBUG("set TDist[%s:%u][%s:%u] = %u",
-            clabel(it1), i1,
-            clabel(it2), i2,
-            value);
-
     tdist[i1][i2] = value;
 }
 
@@ -513,11 +457,6 @@ mapping gted::get_mapping()
 
     assert((int)i1 >= 0 && (int)i2 >= 0);
     assert(i1 < fdist.size() && i2 < fdist[i1].size());
-
-    DEBUG("\tget FDist[%s:%u:%u][%s:%u:%u] -> %u",
-            clabel(it1), valid(it1) ? id(it1) : 0, i1,
-            clabel(it2), valid(it2) ? id(it2) : 0, i2,
-            fdist[i1][i2]);
 
     out = fdist[i1][i2];
 
@@ -540,11 +479,6 @@ mapping gted::get_mapping()
 
     assert((int)i1 >= 0 && (int)i2 >= 0);
     assert(i1 < fdist.size() && i2 < fdist[i1].size());
-
-    DEBUG("set FDist[%s:%u:%u][%s:%u:%u] = %u",
-            clabel(it1), valid(it1) ? id(it1) : 0, i1,
-            clabel(it2), valid(it2) ? id(it2) : 0, i2,
-            value);
 
     fdist[i1][i2] = value;
 }
@@ -571,6 +505,9 @@ mapping gted::get_mapping()
 #define GTED_COST_INSERT    1
 #define GTED_COST_ROOT      10000
 
+#define get_cost(iter, value) \
+    (rna_tree::is_root(iter) ? GTED_COST_ROOT : value)
+
 /* static */ size_t gted::costs::del(
                 iterator it)
 {
@@ -590,10 +527,4 @@ mapping gted::get_mapping()
     return (rna_tree::is_root(it1) != rna_tree::is_root(it2)) ? GTED_COST_ROOT : GTED_COST_MODIFY;
 }
 
-/* static */ size_t gted::costs::get_cost(
-                iterator it,
-                size_t value)
-{
-    return rna_tree::is_root(it) ? GTED_COST_ROOT : value;
-}
 

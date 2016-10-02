@@ -238,12 +238,6 @@ private:
     friend std::ostream& operator<<(
                 std::ostream& out,
                 const circle& c);
-    friend std::ostream& operator<<(
-                std::ostream& out,
-                const intervals& c);
-    friend std::ostream& operator<<(
-                std::ostream& out,
-                const interval& c);
 
 private:
     rna_tree &rna;

@@ -41,8 +41,8 @@ rna_tree::rna_tree(
 {
     set_postorder_ids();
 
-    mprintf("TREE '%s:%s' was constructed. Size = %s\n%s", logger.debug_stream(),
-            id(), _name, size(), print_tree(false));
+    DEBUG("Tree '%s:%s' was constructed, size=%s;\n%s",
+            id(), name(), size(), print_tree(false));
 }
 
 rna_tree::rna_tree(
@@ -112,7 +112,7 @@ void update_ends_in_rna(
 
     if (f == l && !f->paired())
     {
-        WARN("cannot initialize rna ends, returning");
+        WARN("Cannot initialize rna ends (3', 5'), returning");
         return;
     }
 
@@ -121,7 +121,7 @@ void update_ends_in_rna(
 
     if (p1.bad() || p2.bad() || p1 == p2)
     {
-        WARN("cannot initialize rna ends, returning");
+        WARN("Cannot initialize rna ends (3', 5'), returning");
         return;
     }
     point dir = normalize(p2 - p1) * 7;
@@ -131,7 +131,7 @@ void update_ends_in_rna(
     root->at(1).p = p2 + dir;
     root->at(1).label = "3'";
 
-    INFO("RNA ends updated OK");
+    INFO("RNA ends (3', 5') are updated");
 }
 
 
@@ -139,7 +139,7 @@ void update_ends_in_rna(
 rna_tree::sibling_iterator rna_tree::erase(
                 sibling_iterator sib)
 {
-    DEBUG("erase(%s:%lu)", clabel(sib), ::id(sib));
+    DEBUG("Erasing node %s:%s", label(sib), ::id(sib));
 
     sibling_iterator del;
 
@@ -158,9 +158,8 @@ rna_tree::sibling_iterator rna_tree::insert(
                 rna_pair_label lbl,
                 size_t steal_children)
 {
-    // TODO: skontrolovat
-    DEBUG("insert(%s, %lu) <- %s",
-            clabel(sib), steal_children, to_cstr(lbl));
+    DEBUG("Inserting node %s to %s with %s children",
+            lbl, label(sib), steal_children);
 
     sibling_iterator pos, beg, end;
     rna_pair_label node(lbl);
@@ -274,7 +273,6 @@ point rna_tree::top_right_corner(
     rna_tree::for_each_in_subtree(root, f);
 
     assert(p.x != -DBL_MAX && p.y != -DBL_MAX);
-    DEBUG("top_right_corner = %s", to_cstr(p));
 
     return p;
 }
@@ -298,7 +296,6 @@ point rna_tree::bottom_left_corner(
     rna_tree::for_each_in_subtree(root, f);
 
     assert(p.x != DBL_MAX && p.y != DBL_MAX);
-    DEBUG("bottom_left_corner = %s", to_cstr(p));
 
     return p;
 }

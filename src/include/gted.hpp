@@ -43,16 +43,13 @@ public:
 
     /**
      * instead of using constants, use this functions
-     * for consts of insert/delete/update
+     * for costs of insert/delete/update
      */
     struct costs
     {
         static size_t del(iterator it);
         static size_t ins(iterator it);
         static size_t upd(iterator it1, iterator it2);
-
-    private:
-        static size_t get_cost(iterator it, size_t value);
     };
 
 public:

@@ -127,8 +127,6 @@ struct svg_writer::style
                 const std::string& filename,
                 rna_tree::iterator root)
 {
-    APP_DEBUG_FNAME;
-
     document_writer::init(filename, SVG_FILENAME_EXTENSION);
 
     shift = -rna_tree::bottom_left_corner(root) + point({50, 50});
@@ -313,8 +311,6 @@ std::string svg_writer::create_style_definitions() const
 std::string svg_writer::get_header_element(
                 rna_tree::iterator root)
 {
-    APP_DEBUG_FNAME;
-
     ostringstream out;
 
     point bl = rna_tree::bottom_left_corner(root);
