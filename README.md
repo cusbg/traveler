@@ -41,8 +41,9 @@ Use `git clone https://github.com/rikiel/traveler` to download project
 		circles - they are brown
 
 #### Note:
-Only supported type of IMAGE\_FILE is post-script (ps) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php),
-but other can be implemented and specified by FILE\_FORMAT argument.
+We support two types of IMAGE\_FILE. One is PostScript (ps) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php),
+second is VARNA (varna) format of SVG images produced by tool [VARNA](http://varna.lri.fr/).
+Other extractors of RNA structure can be implemented and specified by FILE\_FORMAT argument.
 
 ### Example 0.A - download test files
 	$ mkdir 18S/

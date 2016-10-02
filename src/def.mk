@@ -2,7 +2,7 @@
 # Richard Eliáš <richard.elias@matfyz.cz>
 #
 
-LOG_FILE				= "/tmp/traveler.log"
+LOG_FILE                = "/tmp/traveler.log"
 
 CC                      = g++
 DEBUG                   = -g -Wall
