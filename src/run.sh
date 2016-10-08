@@ -10,7 +10,7 @@ EXECUTABLE="build/traveler"
 DIR="./precomputed/"
 DIR_IMG="build/files"
 ONCE=false
-DEBUG="--debug"
+DEBUG="--verbose"
 
 OVERLAPS="--overlaps"
 

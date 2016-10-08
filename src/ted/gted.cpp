@@ -75,7 +75,11 @@ void gted::compute_distance_recursive(
     strategy str = STR[id(root1)][id(root2)];
 
     if (str.is_heavy())
-        str = strategy(RTED_T2_RIGHT);  // TODO nahodne
+    {
+        // heavy decomposition is not implemented. Use left or right one.
+        vector<rted_strategy> strategies = {RTED_T1_LEFT, RTED_T1_RIGHT, RTED_T2_LEFT, RTED_T2_RIGHT};
+        str = strategy(strategies.at(rand() % strategies.size()));
+    }
     actual_str = str;
 
     if (str.is_T1())

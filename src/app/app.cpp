@@ -353,6 +353,12 @@ void app::print(
         string arg;
         arguments a;
 
+        auto show_usage_and_exit =
+            [&args]()
+            {   
+                app::usage(args.at(0));
+                exit(0);
+            };
         auto nextarg =
             [&args, &i]()
             {
@@ -370,6 +376,13 @@ void app::print(
                 return false;
             };
 
+        if (args.size() == 2)
+        {
+            DEBUG("No arguments");
+            show_usage_and_exit();
+        }
+
+
         for (i = 1; i < args.size(); ++i)
         {
             arg = args.at(i);
@@ -379,8 +392,7 @@ void app::print(
             if (is_argument(ARGS_HELP))
             {
                 DEBUG("arg help");
-                app::usage(args.at(0));
-                exit(0);
+                show_usage_and_exit();
             }
             else if (is_argument(ARGS_TARGET_STRUCTURE))
             {
@@ -465,7 +477,7 @@ void app::print(
         }
 
         if (a.templated == rna_tree() || a.matched == rna_tree())
-            throw wrong_argument_exception("Trees are missing, try running %s --help for more arguments details", args[0]);
+            throw wrong_argument_exception("RNA structures are missing, try running %s --help for more arguments details", args[0]);
 
         return a;
     }
