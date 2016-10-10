@@ -1,4 +1,4 @@
-# TRAVeLer - Template RnA VisuaLization
+# traveler - Template-based RnA VisuaLization
 
 ## Requirements:
 - gcc with support of c++11
@@ -6,9 +6,11 @@
 ## Download:
 Use `git clone https://github.com/rikiel/traveler` to download project
 
-## Compiling:
+## Build:
 	cd traveler/src
 	make build
+
+The binaries will be copied into traveler/bin. To navigate there from the src directory use: `cd ../bin`
 
 ## Usage:
 	traveler [-h|--help]
@@ -22,28 +24,30 @@ Use `git clone https://github.com/rikiel/traveler` to download project
 	IMAGE_FILE* - visualization of template molecule, type of file can be specified by FILE_FORMAT argument
 
 	OPTIONS:
-		[-a|--all] [--overlaps] FILE_OUT
-			# compute TED and draw images to FILE_OUT
-			# if optional argument --overlaps is present, compute overlaps in image and highlight them
+		[-a|--all] [--overlaps] OUT_PREFIX
+			# computes mapping (TED) and outputs target leayout as both .ps and .svg image to files with prefix OUT_PREFIX
+			# with the optional --overlaps argument, overlaps in the layout are identified and highlited
 		[-t|--ted <FILE_MAPPING_OUT>]
-			# run only TED, save mapping table to file FILE_MAPPING_OUT
-		[-d|--draw] [--overlaps] FILE_MAPPING_IN FILE_OUT
-			# use mapping in FILE_MAPPING_IN and draw images to FILE_OUT
-			# if optional argument --overlaps is present, compute overlaps in image and highlight them
+			# runs mapping (TED) only and saves mapping table to FILE_MAPPING_OUT file
+		[-d|--draw] [--overlaps] FILE_MAPPING_IN OUT_PREFIX
+			# use mapping in FILE_MAPPING_IN and outputs layout as both .ps and .svg image to files with prefix OUT_PREFIX
+			# if optional argument --overlaps is present overlaps in the layout are identified and highlighted
 
 	COLOR CODING:
-		We use following color coding of nucleotides in molecule:
-		Inserted bases are marked red
-		Edited bases are green (e.g. template had base 'A', and other had on same position 'C', so 'C' will
-		be green)
-		Reinserted bases - program need to redraw simple structure (like hairpin) - are blue
-		Rotated - like reinserted, but when redrawing multibranch loop - all branches are rotated to lie on
-		circles - they are brown
+		Traveler uses the following color coding of nucleotides:
+		* Red - inserted bases
+		* Green - edited bases - e.g. the template has adenosine at a position while target has cytosine at the same position and therefore cytosine will be green)
+		* Blue - reinserted bases - happens when traveler needs to redraw simple structures like hairpins (for example due to the change in the number of bases)
+		* Brown - rotated parts - similar situation to reinserted bases but takes place when redrawing multibranch loop (in that case all branches are rotated to lie on a circle)
 
 #### Note:
-We support two types of IMAGE\_FILE. One is PostScript (ps) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php),
-second is VARNA (varna) format of SVG images produced by tool [VARNA](http://varna.lri.fr/).
-Other extractors of RNA structure can be implemented and specified by FILE\_FORMAT argument.
+
+Two types of template IMAGE\_FILE are currectly supported by Traveler:
+	
+* PostScript (ps) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
+* VARNA (varna) format of SVG images produced by tool [VARNA](http://varna.lri.fr/)
+
+Other extractors of RNA structure can be implemented and specified by the FILE\_FORMAT argument.
 
 ### Example 0.A - download test files
 	$ mkdir 18S/
@@ -66,29 +70,28 @@ In other examples, we will use 18S/ directory as INDIR, OUTDIR will be /tmp/
 	other lines are filled with LABELS and BRACKETS in dot-bracket notation of secondary structure pairing
 	match-tree must contain both LABELS and BRACKETS, templated-tree need only BRACKETS
 
-### Example 1 - prints .svg/.ps image of mouse mapped to human
+### Example 1: Visualize mouse 18S rRNA using human 18S rRNA as template using CRW ps image as the template layout.
 	$ ./build/traveler \
 		--target-structure $INDIR/mouse.fasta \
 		--template-structure $INDIR/human.ps $INDIR/human.fasta \
 		--all $OUTDIR/mouse_draw-to_human
 
-### Example 2 - compute only distances and mapping between mouse and human
+### Example 2: Compute TED distance and mapping between human 18S rRNA (template) and mouse 18S rRNA (target).
 	$ ./build/traveler \
 		--target-structure $INDIR/mouse.fasta \
 		--template-structure $INDIR/human.ps $INDIR/human.fasta \
 		--ted $OUTDIR/mouse_draw-to_human.map
 
-### Example 3 - prints images using precomputed mapping from previous example
+### Example 3: Generate visualization for the mapping generated in Example 2.
 	$ ./build/traveler \
 		--target-structure $INDIR/mouse.fasta \
 		--template-structure $INDIR/human.ps $INDIR/human.fasta \
 		--draw --overlaps $OUTDIR/mouse_draw-to_human.map $OUTDIR/mouse_draw-to_human
 
-	$ # generate 4 files - .svg and .ps files, both with/without colored bases (see COLOR CODING section)
+	$ # generates 4 files - .svg and .ps files, both with/without colored bases (see COLOR CODING section)
 	$ # checks also if output molecule has overlaps and draws them in output image
 
 
 #### Note:
-Options --ted and --draw are for separated runs of application, because computations of TED may take a while
-and more types of images can be generated (with overlaps).
-
+Options --ted and --draw serve for separatation of mapping and visualization since TED computation and on the other hand, Traveler allows for multiple output visualization (coloring, overlaps).
+ 
