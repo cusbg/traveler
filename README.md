@@ -95,7 +95,7 @@ In other examples, we will use 18S/ directory as INDIR, OUTDIR will be /tmp/
 #### Note:
 Options --ted and --draw serve for separatation of mapping and visualization since TED computation and on the other hand, Traveler allows for multiple output visualization (coloring, overlaps).
  
-## Support for other imput images: How to implement own extractor
+## Support for other input images: How to implement own extractor
 As we said, we support two types of input images - crw and varna. There are three steps you need to satisfy, when you want to support other image types.
 
 * You need to implement `extractor` interface and it's method `extract`. Method should obtain all nucleotides (the primary structure) and their position in image (points) from given file.
