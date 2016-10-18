@@ -1,7 +1,7 @@
 /*
  * File: varna_extractor.cpp
  *
- * Copyright (C) 2016 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
+
 
 #include <fstream>
 

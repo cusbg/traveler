@@ -1,7 +1,7 @@
 /*
  * File: logger.cpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
+
 
 #include <iomanip>
 #include <unistd.h>
@@ -109,7 +110,7 @@ string logger::message_header(
     millisecond = clocks.tv_nsec / 1000000LL;
 
     // PATTERN:
-    //  %TIME% [%PRIORITY%] %MESSAGE%
+    //  21:28 [%PRIORITY%] %MESSAGE%
     //
     stream
         << setfill('0') << setw(2)

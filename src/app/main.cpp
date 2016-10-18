@@ -1,7 +1,7 @@
 /*
  * File: main.cpp
  *
- * Copyright (C) 2014 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License

@@ -19,6 +19,7 @@
  * USA.
  */
 
+
 #include "svg_writer.hpp"
 
 #define SVG_END_STRING          "</svg>\n"

@@ -1,7 +1,7 @@
 /*
  * File: compact.cpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -661,7 +661,7 @@ double compact::get_length(
     {
         if (!it->inited_points())
         {
-            throw illegal_state_exception("All bases should be visualized, but they are not.");
+            ERR("All bases should be visualized, but they are not.");
         }
     }
 }

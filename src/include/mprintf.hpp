@@ -1,7 +1,7 @@
 /*
  * File: mprintf.hpp
  *
- * Copyright (C) 2016 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
  * USA.
  */
 
+
 #ifndef MPRINTF_HPP
 #define MPRINTF_HPP
 
@@ -33,13 +34,13 @@
  * printf using variadic c++ template
  */
 template<typename Stream, typename T, typename... Args>
-Stream&& mprintf(const char* format, Stream&& stream, const T& value, const Args& ... args);
+void mprintf(const char* format, Stream& stream, const T& value, const Args& ... args);
 
 /**
  * printf using variadic c++ template
  */
 template<typename Stream>
-Stream&& mprintf(const char* format, Stream&& stream);
+void mprintf(const char* format, Stream& stream);
 
 /**
  * printf using variadic c++ template
@@ -47,7 +48,9 @@ Stream&& mprintf(const char* format, Stream&& stream);
 template<typename... Args>
 std::string msprintf(const char* format, const Args& ... args)
 {
-    return mprintf(format, std::ostringstream(), args...).str();
+    std::ostringstream stream;
+    mprintf(format, stream, args...);
+    return stream.str();
 }
 
 /**
@@ -69,7 +72,7 @@ void print(Stream& stream, bool value)
 }
 
 template<typename Stream, typename T, typename... Args>
-Stream&& mprintf(const char* format, Stream&& stream, const T& value, const Args& ... args)
+void mprintf(const char* format, Stream& stream, const T& value, const Args& ... args)
 {
     while (*format != '\0')
     {
@@ -81,16 +84,22 @@ Stream&& mprintf(const char* format, Stream&& stream, const T& value, const Args
             {
                 print(stream, value);
                 format += 2;
-                return mprintf(format, std::move(stream), args...);
+                mprintf(format, stream, args...);
+                return;
             }
         }
         stream << *format++;
     }
-    throw std::runtime_error(msprintf("mprintf: invalid number of arguments: +%i more than expected", sizeof...(Args) + 1));
+    std::ostringstream error_stream;
+    error_stream
+        << "mprintf: invalid number of arguments: +"
+        << (sizeof...(Args) + 1)
+        << " more than expected";
+    throw std::runtime_error(error_stream.str());
 }
 
 template<typename Stream>
-Stream&& mprintf(const char* format, Stream&& stream)
+void mprintf(const char* format, Stream& stream)
 {
     while (*format != '\0')
     {
@@ -99,12 +108,17 @@ Stream&& mprintf(const char* format, Stream&& stream)
             if (*(format + 1) == '%')
                 ++format;
             else
-                throw std::runtime_error(
-                        msprintf("mprintf: invalid format string: missing arguments, format string '%s'", format));
+            {
+                std::ostringstream error_stream;
+                error_stream
+                    << "mprintf: invalid format string: missing arguments. Format string ='"
+                    << format
+                    << "'";
+                throw std::runtime_error(error_stream.str());
+            }
         }
         stream << *format++;
     }
-    return std::move(stream);
 }
 
 #endif /* !MPRINTF_HPP */

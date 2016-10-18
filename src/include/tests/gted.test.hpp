@@ -1,7 +1,7 @@
 /*
  * File: gted.test.hpp
  *
- * Copyright (C) 2016 Richard Eliáš <richard@ba30.eu>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,6 +18,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
+
+
 
 #ifndef GTED_TEST_HPP
 #define GTED_TEST_HPP

@@ -19,6 +19,7 @@
  * USA.
  */
 
+
 #include "exception.hpp"
 
 using namespace std;

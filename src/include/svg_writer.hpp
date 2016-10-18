@@ -19,6 +19,7 @@
  * USA.
  */
 
+
 #ifndef SVG_WRITER_HPP
 #define SVG_WRITER_HPP
 

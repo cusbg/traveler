@@ -1,7 +1,7 @@
 /*
  * File: logger.hpp
  *
- * Copyright (C) 2015 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,6 +19,7 @@
  * USA.
  */
 
+
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
@@ -33,7 +34,10 @@ class logger
     void _fname(const char* msg, const Args& ... args) \
     { \
         if (is_ ## _fname ## _enabled()) \
-            mprintf(msg, get_stream(_priority), args...); \
+        { \
+            auto stream = get_stream(_priority); \
+            mprintf(msg, stream, args...); \
+        } \
     }
 
 #define LOGGER_ENABLED_PRIORITY_FUNCTION(_fname, _priority) \
