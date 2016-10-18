@@ -6,6 +6,7 @@ TARGET                  = traveler
 LOGDIR                  = $(BUILDDIR)/logs
 ROOTDIR                 = .
 BUILDDIR                = ${ROOTDIR}/build
+BIN                     = ${ROOTDIR}/bin
 
 MODULES                 = tree ted utils draw app tests
 MODULESVARS             = $$\{TREE} $$\{TED} $$\{UTILS} $$\{DRAW} $$\{APP} $$\{TESTS}
@@ -15,6 +16,8 @@ include ${ROOTDIR}/def.mk
 
 
 build: mkdir make_modules ${BUILDDIR}/Makefile compile
+	mkdir -p ${BIN}
+	cp ${BUILDDIR}/${TARGET} ${BIN}/${TARGET}
 
 run: build cleanLog mkdir
 	sh -x run.sh
