@@ -44,7 +44,7 @@ The binaries will be copied into traveler/bin. To navigate there from the src di
 
 Two types of template IMAGE\_FILE are currectly supported by Traveler:
 	
-* PostScript (ps) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
+* PostScript (crw) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
 * VARNA (varna) format of SVG images produced by tool [VARNA](http://varna.lri.fr/)
 
 Other extractors of RNA structure can be implemented and specified by the FILE\_FORMAT argument.
@@ -95,3 +95,16 @@ In other examples, we will use 18S/ directory as INDIR, OUTDIR will be /tmp/
 #### Note:
 Options --ted and --draw serve for separatation of mapping and visualization since TED computation and on the other hand, Traveler allows for multiple output visualization (coloring, overlaps).
  
+## Support for other imput images: How to implement own extractor
+As we said, we support two types of input images - crw and varna. There are three steps you need to satisfy, when you want to support other image types.
+
+* You need to implement `extractor` interface and it's method `extract`. Method should obtain all nucleotides (the primary structure) and their position in image (points) from given file.
+* In the class, you need to implement method `get_type`, that should only return extractor's type that is used in IMAGE\_FILE argument.
+* Adds your new extractor to method `extractor.get_all_extractors()`
+
+For more ideas, how it should be implemented, see usage of `crw_extractor` and `varna_extractor`.
+
+
+
+
+
