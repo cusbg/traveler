@@ -85,7 +85,7 @@ bool contains_one_of(
         char ch;
         in >> ch;
         if (in.fail() || ch != '>')
-            throw invalid_argument("starting character '>' is missing");
+            throw wrong_argument_exception("starting character of dot-bracket fasta file '>' is missing");
 
         getline(in, id);
         size_t index = id.find_first_of(' ');

@@ -131,6 +131,11 @@ int main(int argc, char** argv)
         ERR("Exception caught: %s", e);
         return ERROR_DEFAULT;
     }
+    catch (const exception& e)
+    {
+        ERR("Exception caugth: %s", e.what());
+        return ERROR_DEFAULT;
+    }
 
     return 0;
 #endif
