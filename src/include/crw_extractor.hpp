@@ -1,5 +1,5 @@
 /*
- * File: utils_ps_reader.hpp
+ * File: crw_extractor.hpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
@@ -27,14 +27,14 @@
 /**
  * PS CRW document extractor
  */
-class ps_extractor : public extractor
+class crw_extractor : public extractor
 {
 protected:
     virtual void extract(
                 const std::string& filename);
     virtual std::string get_type() const
     {
-        return "ps";
+        return "crw";
     }
 };
 

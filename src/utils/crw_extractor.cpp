@@ -1,5 +1,5 @@
 /*
- * File: utils_ps_reader.cpp
+ * File: crw_extractor.cpp
  *
  * Copyright (C) 2015 Richard Eliáš <richard@ba30.eu>
  *
@@ -21,14 +21,14 @@
 
 #include <fstream>
 
-#include "ps_extractor.hpp"
+#include "crw_extractor.hpp"
 #include "types.hpp"
 
 
 using namespace std;
 
 
-void ps_extractor::extract(
+void crw_extractor::extract(
                 const std::string& filename)
 {
     APP_DEBUG_FNAME;

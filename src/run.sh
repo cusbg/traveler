@@ -11,6 +11,7 @@ DIR="./precomputed/"
 DIR_IMG="build/files"
 ONCE=false
 DEBUG="--verbose"
+IMAGE_FORMAT="crw"
 
 OVERLAPS="--overlaps"
 
@@ -33,8 +34,7 @@ fail_function() {
 init_variables() {
     file_in="${DIR}/${file1}-${file2}"
     file_out="${DIR_IMG}/${file1}-${file2}"
-    image_format="ps"
-    tt="--template-structure --file-format ${image_format} ${DIR}/${file1}.${image_format} ${DIR}/${file1}.fasta"
+    tt="--template-structure --file-format ${IMAGE_FORMAT} ${DIR}/${file1}.ps ${DIR}/${file1}.fasta"
     mt="--target-structure ${DIR}/${file2}.fasta"
 }
 
