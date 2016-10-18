@@ -95,7 +95,7 @@ void logger::log(
 string logger::message_header(
                 priority p) const
 {
-    size_t hour, minute, second, millisecond, cputacts;
+    size_t hour, minute, second, millisecond;
     timespec cputime, clocks;
     std::ostringstream stream;
 
@@ -107,10 +107,9 @@ string logger::message_header(
     minute = c.tm_min;
     second = c.tm_sec;
     millisecond = clocks.tv_nsec / 1000000LL;
-    cputacts = cputime.tv_sec * 1000000LL + cputime.tv_nsec / 1000;
 
     // PATTERN:
-    //  %TIME% %CPUTACTS% <%PID%> [%PRIORITY%] %MESSAGE%
+    //  %TIME% [%PRIORITY%] %MESSAGE%
     //
     stream
         << setfill('0') << setw(2)
@@ -124,12 +123,6 @@ string logger::message_header(
         << ':'
         << setfill('0') << setw(3)
         << millisecond
-        << ' '
-        << setfill(' ') << setw(9) << left
-        << cputacts
-        << ' '
-        << setfill(' ') << setw(10) << left
-        << ("<" + to_string(getpid()) + ">")
         << ' '
         << setfill(' ') << setw(8) << left
         << ("[" + to_string(p) + "]");
