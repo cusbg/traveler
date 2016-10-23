@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef OVERLAP_CHECKS_TEST_HPP
 #define OVERLAP_CHECKS_TEST_HPP
 
@@ -40,7 +39,6 @@ private:
                 point p2,
                 bool intersects);
 };
-
 
 #endif /* !OVERLAP_CHECKS_TEST_HPP */
 

@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef LOGGER_HPP
 #define LOGGER_HPP
 
@@ -238,5 +237,6 @@ logger::logger_stream& logger::logger_stream::operator<<(
 #define WARN(...)
 #define ERR(...)
 #endif
+
 #endif /* !LOGGER_HPP */
 

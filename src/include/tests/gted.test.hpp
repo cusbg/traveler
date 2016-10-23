@@ -19,8 +19,6 @@
  * USA.
  */
 
-
-
 #ifndef GTED_TEST_HPP
 #define GTED_TEST_HPP
 
@@ -38,7 +36,6 @@ public:
 private:
     void test_gted(rna_tree rna1, rna_tree rna2, size_t distance);
 };
-
 
 #endif /* !GTED_TEST_HPP */
 

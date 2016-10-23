@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef SVG_WRITER_HPP
 #define SVG_WRITER_HPP
 
@@ -66,7 +65,6 @@ private:
                 const std::string& name,
                 const properties& properties,
                 const std::string& value = "") const;
-    std::string create_white_background() const;
     std::string create_style_definitions() const;
 
     properties get_point_formatted(
@@ -77,9 +75,10 @@ private:
 
 private:
     point shift;
-    const point letter = {LETTER.x / SCALE.x, LETTER.y / SCALE.y};
+    point scale;
+    point tr, bl;
+    point letter;
 };
-
 
 #endif /* !SVG_WRITER_HPP */
 

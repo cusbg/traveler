@@ -19,12 +19,10 @@
  * USA.
  */
 
-
 #ifndef COMPACT_HPP
 #define COMPACT_HPP
 
 #include "rna_tree.hpp"
-
 
 #define PAIRS_DISTANCE              20
 #define BASES_DISTANCE              8
@@ -243,9 +241,6 @@ private:
 private:
     rna_tree &rna;
 };
-
-
-
 
 #endif /* !COMPACT_HPP */
 

@@ -19,15 +19,16 @@
  * USA.
  */
 
-
-#ifndef UTILS_DOCUMENT_WRITER_HPP
-#define UTILS_DOCUMENT_WRITER_HPP
+#ifndef DOCUMENT_WRITER_HPP
+#define DOCUMENT_WRITER_HPP
 
 #include <fstream>
 #include "rna_tree.hpp"
 
+// US letter
 #define LETTER              point({612, 792})
-#define SCALE               point({0.54, 0.54})
+// minimum margin: left + right; top + bottom
+#define MARGIN              point({100, 100})
 
 struct RGB;
 class document_writer;
@@ -184,12 +185,6 @@ private:
                 double _blue,
                 const std::string& _name);
 
-    static RGB for_255(
-                size_t _red,
-                size_t _green,
-                size_t _blue,
-                const std::string& _name);
-
 public:
     bool operator==(
                 const RGB& other) const;
@@ -217,6 +212,5 @@ private:
     const std::string name;
 };
 
-
-#endif /* !UTILS_DOCUMENT_WRITER_HPP */
+#endif /* !DOCUMENT_WRITER_HPP */
 

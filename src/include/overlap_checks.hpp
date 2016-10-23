@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef OVERLAP_CHECKS_HPP
 #define OVERLAP_CHECKS_HPP
 
@@ -83,7 +82,6 @@ public:
                 const edge& e2);
 
 };
-
 
 #endif /* !OVERLAP_CHECKS_HPP */
 

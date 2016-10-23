@@ -19,14 +19,11 @@
  * USA.
  */
 
-
 #ifndef MPRINTF_HPP
 #define MPRINTF_HPP
 
 #include <sstream>
 #include <stdexcept>
-
-
 
 // Printf functions with varargs of T type
 

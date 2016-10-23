@@ -19,9 +19,8 @@
  * USA.
  */
 
-
-#ifndef TEST_HPP
-#define TEST_HPP
+#ifndef TEST_TEST_HPP
+#define TEST_TEST_HPP
 
 #include "types.hpp"
 
@@ -108,6 +107,5 @@ protected:
             print_test_number(); \
         }
 
-
-#endif /* !TEST_HPP */
+#endif /* !TEST_TEST_HPP */
 

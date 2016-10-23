@@ -19,10 +19,8 @@
  * USA.
  */
 
-
 #ifndef COMPACT_CIRCLE_HPP
 #define COMPACT_CIRCLE_HPP
-
 
 #include "compact.hpp"
 
@@ -93,8 +91,6 @@ private:
      */
     signed char sgn = 0;
 };
-
-
 
 #endif /* !COMPACT_CIRCLE_HPP */
 

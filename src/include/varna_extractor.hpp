@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef VARNA_EXTRACTOR_HPP
 #define VARNA_EXTRACTOR_HPP
 
@@ -38,7 +37,6 @@ protected:
         return "varna";
     }
 };
-
 
 #endif /* !VARNA_EXTRACTOR_HPP */
 

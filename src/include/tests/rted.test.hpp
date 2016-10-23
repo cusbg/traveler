@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef RTED_TEST_HPP
 #define RTED_TEST_HPP
 
@@ -42,7 +41,6 @@ private:
                 const std::string& l2,
                 funct test_funct);
 };
-
 
 #endif /* !RTED_TEST_HPP */
 

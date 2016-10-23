@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef TREE_BASE_UTILS_HPP
 #define TREE_BASE_UTILS_HPP
 

@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef RNA_TREE_HPP
 #define RNA_TREE_HPP
 

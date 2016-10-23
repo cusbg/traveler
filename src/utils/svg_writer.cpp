@@ -50,7 +50,6 @@ public:
                     const property& p)
         {
             out
-                << " "
                 << p.name
                 << "=\""
                 << p.value
@@ -90,8 +89,8 @@ public:
         for (const property& p: props.props)
         {
             out
-                << " "
-                << p;
+                << p
+                << " ";
         }
         return out;
     }
@@ -130,10 +129,19 @@ struct svg_writer::style
 {
     document_writer::init(filename, SVG_FILENAME_EXTENSION);
 
-    shift = -rna_tree::bottom_left_corner(root) + point({50, 50});
+    tr = rna_tree::top_right_corner(root);
+    bl = rna_tree::bottom_left_corner(root) - MARGIN;
+
+    shift = -rna_tree::bottom_left_corner(root) + MARGIN / 2;
+
+    scale = abs(tr) + abs(bl);
+    scale.x = LETTER.x / scale.x;
+    scale.y = LETTER.y / scale.y;
+
+    letter.x = LETTER.x / scale.x;
+    letter.y = LETTER.y / scale.y;
 
     print(get_header_element(root));
-    print(create_white_background());
     print(create_style_definitions());
 }
 
@@ -224,7 +232,7 @@ std::string svg_writer::create_element(
 {
 
     if (value.empty())
-        return msprintf("<%s %s />\n", name, properties);
+        return msprintf("<%s %s/>\n", name, properties);
     else
         return msprintf("<%s %s>%s</%s>\n", name, properties, value, name);
 }
@@ -314,36 +322,20 @@ std::string svg_writer::get_header_element(
 {
     ostringstream out;
 
-    point bl = rna_tree::bottom_left_corner(root);
-    point tr = rna_tree::top_right_corner(root);
+    bl = -bl - MARGIN / 2;
 
-    point size = abs(bl) + abs(tr) + point({100, 100});
+    TRACE("scale %s, bl %s, tr %s", scale, bl, tr);
 
     out
         << "<svg"
-        << property("xmlns", "http://www.w3.org/2000/svg")
-        << property("xmlns:xlink", "http://www.w3.org/1999/xlink")
-        << property("width", letter.x)
-        << property("height", letter.y)
-        << property("viewBox", msprintf("0 0  %spx %spx", size.x, size.y))
-        << get_styles({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
+        << "\n\t" << property("xmlns", "http://www.w3.org/2000/svg")
+        << "\n\t" << property("width", letter.x)
+        << "\n\t" << property("height", letter.y)
+        << "\n\t" << get_styles({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
         << ">"
         << endl;
 
     return out.str();
-}
-
-std::string svg_writer::create_white_background() const
-{
-    properties out;
-
-    out
-        << get_point_formatted({-500, -500}, "", "", false)
-        << property("height", "150%")
-        << property("width", "150%")
-        << get_styles({{"stroke", "none"}, {"fill", "#FFF"}});
-
-    return create_element("rect", out);
 }
 
 

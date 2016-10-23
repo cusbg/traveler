@@ -1,3 +1,7 @@
+#
+# Richard Eliáš <richard.elias@matfyz.cz>
+#
+
 ROOTDIR                 = ../../
 
 %:

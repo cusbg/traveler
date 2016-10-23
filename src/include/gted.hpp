@@ -19,14 +19,11 @@
  * USA.
  */
 
-
 #ifndef GTED_HPP
 #define GTED_HPP
 
-
 #include "strategy.hpp"
 #include "gted_tree.hpp"
-
 
 class mapping;
 
@@ -135,7 +132,6 @@ private:
     strategy actual_str;
     tree_distance_table_type tdist;
 };
-
 
 #endif /* !GTED_HPP */
 

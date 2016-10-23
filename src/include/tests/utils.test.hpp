@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef UTILS_TEST_HPP
 #define UTILS_TEST_HPP
 
@@ -42,7 +41,6 @@ private:
     std::string create_fasta_text();
     fasta create_fasta();
 };
-
 
 #endif /* !UTILS_TEST_HPP */
 

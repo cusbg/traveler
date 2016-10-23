@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef TREE_BASE_NODE_HPP
 #define TREE_BASE_NODE_HPP
 
@@ -42,7 +41,6 @@ private:
 protected:
     size_t _id = ID++;
 };
-
 
 #endif /* !TREE_BASE_NODE_HPP */
 

@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef COMPACT_CIRCLE_TEST_HPP
 #define COMPACT_CIRCLE_TEST_HPP
 
@@ -36,7 +35,6 @@ private:
     void test_operations_success();
     void test_operations_fail();
 };
-
 
 #endif /* !COMPACT_CIRCLE_TEST_HPP */
 

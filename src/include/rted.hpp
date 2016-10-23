@@ -19,13 +19,11 @@
  * USA.
  */
 
-
 #ifndef RTED_HPP
 #define RTED_HPP
 
 #include "strategy.hpp"
 #include "rna_tree.hpp"
-
 
 class rted
 {
@@ -233,8 +231,6 @@ private:
                 T1_Hv_partials;
 
 };
-
-
 
 #endif /* !RTED_HPP */
 

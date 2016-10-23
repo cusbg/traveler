@@ -48,26 +48,16 @@ std::string ps_writer::get_default_prologue(
     APP_DEBUG_FNAME;
 
     ostringstream str;
-    point tr, bl, letter, scale;
+    point tr, bl, scale;
 
     tr = rna_tree::top_right_corner(root);
-    bl = rna_tree::bottom_left_corner(root);
+    bl = rna_tree::bottom_left_corner(root) - MARGIN;
 
-    letter = LETTER;
-    double dist = distance(tr, bl);
-    scale = {letter.x / dist, letter.y / dist};
+    scale = abs(tr) + abs(bl);
+    scale.x = LETTER.x / scale.x;
+    scale.y = LETTER.y / scale.y;
 
-    letter.x /= scale.x;
-    letter.y /= scale.y;
-
-    if (size(letter) > distance(tr, bl))
-        WARN("Rna probably wont fit document");
-
-    tr = -tr;
-    bl = -bl;
-
-    bl.x += 50;
-    bl.y = letter.y + tr.y - 50;
+    bl = -bl - MARGIN / 2;
 
     str
         << get_default_prologue()
@@ -76,6 +66,7 @@ std::string ps_writer::get_default_prologue(
             << endl
         << bl
             << " translate"
+            << endl
             << endl;
 
     return str.str();
@@ -84,7 +75,7 @@ std::string ps_writer::get_default_prologue(
 std::string ps_writer::get_default_prologue() const
 {
     auto define_color = [](const RGB& rgb) {
-        return msprintf("/set%s {%i %i %i setrgbcolor} def\n",
+        return msprintf("/lw%s {%i %i %i setrgbcolor} def\n",
                 rgb.get_name(), rgb.get_red(), rgb.get_green(), rgb.get_blue());
     };
     ostringstream out;
@@ -102,6 +93,7 @@ std::string ps_writer::get_default_prologue() const
         out << define_color(rgb);
 
     out
+        << endl
         << "/Helvetica findfont 8.00 scalefont setfont\n";
 
     return out.str();
@@ -199,7 +191,7 @@ std::string ps_writer::get_color_formatted(
     else
     {
         last_used = &color;
-        return msprintf("set%s\n", color.get_name());
+        return msprintf("lw%s\n", color.get_name());
     }
 }
 

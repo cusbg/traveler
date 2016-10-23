@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef MAPPING_HPP
 #define MAPPING_HPP
 
@@ -59,7 +58,6 @@ public:
     size_t distance;
     std::vector<mapping_pair> map;
 };
-
 
 #endif /* !MAPPING_HPP */
 

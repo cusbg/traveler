@@ -39,7 +39,7 @@ const RGB RGB::GREEN = RGB(0., 1., 0., "green");
 const RGB RGB::BLUE = RGB(0., 0., 1., "blue");
 const RGB RGB::BLACK = RGB(0., 0., 0., "black");
 const RGB RGB::GRAY = RGB(0.8, 0.8, 0.8, "gray");
-const RGB RGB::BROWN = RGB::for_255(210, 105, 30, "brown");
+const RGB RGB::BROWN = RGB(0.83, 0.41, 0.12, "brown");
 
 RGB::RGB(
                 double _red,
@@ -48,15 +48,6 @@ RGB::RGB(
                 const std::string& _name)
     : red(_red), green(_green), blue(_blue), name(_name)
 { }
-
-/* static */ RGB RGB::for_255(
-                size_t _red,
-                size_t _green,
-                size_t _blue,
-                const std::string& _name)
-{
-    return RGB(_red / 255., _green / 255., _blue / 255., _name);
-}
 
 bool RGB::operator==(
                 const RGB& other) const

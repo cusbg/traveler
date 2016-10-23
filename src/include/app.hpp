@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef APP_HPP
 #define APP_HPP
 
@@ -135,6 +134,7 @@ public:
 private:
     int return_status = ERROR_DEFAULT;
 };
+
 
 
 #endif /* !APP_HPP */

@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef MPRINTF_TEST_HPP
 #define MPRINTF_TEST_HPP
 
@@ -35,7 +34,6 @@ private:
     void test_successfull_mprintf();
     void test_fail_mprintf();
 };
-
 
 #endif /* !MPRINTF_TEST_HPP */
 

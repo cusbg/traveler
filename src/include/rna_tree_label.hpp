@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef RNA_TREE_LABEL_HPP
 #define RNA_TREE_LABEL_HPP
 
@@ -111,7 +110,6 @@ public:
 private:
     std::vector<rna_label> labels;
 };
-
 
 #endif /* !RNA_TREE_LABEL_HPP */
 

@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef RNA_TREE_TEST_HPP
 #define RNA_TREE_TEST_HPP
 
@@ -32,8 +31,6 @@ public:
     virtual ~rna_tree_test() = default;
     virtual void run();
 };
-
-
 
 #endif /* !RNA_TREE_TEST_HPP */
 

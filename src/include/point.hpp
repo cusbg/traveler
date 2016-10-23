@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef POINT_HPP
 #define POINT_HPP
 
@@ -61,7 +60,6 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const point& p);
 };
-
 
 
 // other useful functions for points

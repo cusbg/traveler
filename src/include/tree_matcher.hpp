@@ -19,10 +19,8 @@
  * USA.
  */
 
-
 #ifndef TREE_MATCHER_HPP
 #define TREE_MATCHER_HPP
-
 
 #include "rna_tree.hpp"
 
@@ -78,7 +76,6 @@ private:
     rna_tree t1, t2;
     std::vector<size_t> s1, s2;
 };
-
 
 #endif /* !TREE_MATCHER_HPP */
 

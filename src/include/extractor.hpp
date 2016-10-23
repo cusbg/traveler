@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef EXTRACTOR_HPP
 #define EXTRACTOR_HPP
 
@@ -67,7 +66,6 @@ public:
     std::string labels;
     std::vector<point> points;
 };
-
 
 #endif /* !EXTRACTOR_HPP */
 

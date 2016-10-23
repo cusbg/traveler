@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef TREE_BASE_ITER_HPP
 #define TREE_BASE_ITER_HPP
 
@@ -437,7 +436,6 @@ funct tree_base<label_type>::for_each(
     }
     return std::move(f);
 }
-
 
 #endif /* !TREE_BASE_ITER_HPP */
 

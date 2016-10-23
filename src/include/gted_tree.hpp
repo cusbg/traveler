@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef GTED_TREE_HPP
 #define GTED_TREE_HPP
 

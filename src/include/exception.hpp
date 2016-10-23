@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef EXCEPTION_HPP
 #define EXCEPTION_HPP
 
@@ -108,8 +107,6 @@ class wrong_argument_exception : public my_exception
 public:
     DEFAULT_EXCEPTION_METHODS(wrong_argument_exception);
 };
-
-
 
 #endif /* !EXCEPTION_HPP */
 

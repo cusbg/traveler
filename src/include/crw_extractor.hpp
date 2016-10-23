@@ -19,9 +19,8 @@
  * USA.
  */
 
-
-#ifndef UTILS_PS_READER_HPP
-#define UTILS_PS_READER_HPP
+#ifndef CRW_EXTRACTOR_HPP
+#define CRW_EXTRACTOR_HPP
 
 #include "extractor.hpp"
 
@@ -40,5 +39,5 @@ protected:
 };
 
 
-#endif /* !UTILS_PS_READER_HPP */
+#endif /* !CRW_EXTRACTOR_HPP */
 

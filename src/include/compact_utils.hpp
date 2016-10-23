@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef COMPACT_UTILS_HPP
 #define COMPACT_UTILS_HPP
 

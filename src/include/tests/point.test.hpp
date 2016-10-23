@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef POINT_TEST_HPP
 #define POINT_TEST_HPP
 
@@ -38,7 +37,6 @@ private:
     void test_operations();
     void test_functions();
 };
-
 
 #endif /* !POINT_TEST_HPP */
 

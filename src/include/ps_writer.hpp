@@ -19,16 +19,12 @@
  * USA.
  */
 
-
-#ifndef UTILS_PS_WRITER_HPP
-#define UTILS_PS_WRITER_HPP
-
+#ifndef PS_WRITER_HPP
+#define PS_WRITER_HPP
 
 #include "document_writer.hpp"
 
-
 struct point;
-
 
 class ps_writer : public document_writer
 {
@@ -71,7 +67,5 @@ private:
     mutable const RGB* last_used = &RGB::BLACK;
 };
 
-
-
-#endif /* !UTILS_PS_WRITER_HPP */
+#endif /* !PS_WRITER_HPP */
 

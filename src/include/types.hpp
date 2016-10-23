@@ -19,7 +19,6 @@
  * USA.
  */
 
-
 #ifndef TYPES_HPP
 #define TYPES_HPP
 
@@ -128,8 +127,6 @@ private:
             for (auto __value : container) \
                 stream << __value << " "; \
         }
-
-
 
 #endif /* !TYPES_HPP */
 
