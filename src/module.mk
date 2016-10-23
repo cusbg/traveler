@@ -38,9 +38,6 @@ ${BUILDDIR}/%.cpp.mk: %.cpp FORCEREBUILD
 		\\t ${CC} ${CFLAGS} $$\< -o $$\@ \
 			>> $@ || rm -rf $@
 
-# For other targets call root makefile
-%:
-	make --directory=${ROOTDIR} --file=Makefile $@
 
 FORCEREBUILD:
 
