@@ -6,8 +6,8 @@ MODULE                  = tree
 ROOTDIR                 = ..
 RELEASE                 = -O3
 
-include ../module.mk
-
 %:
-	make --directory= --file=Makefile ./tree/Makefile
+	make --directory=${ROOTDIR} --file=Makefile $@
+
+include ../module.mk
 

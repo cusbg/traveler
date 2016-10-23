@@ -6,8 +6,8 @@ MODULE                  = ted
 ROOTDIR                 = ..
 RELEASE                 = -O3
 
-include ../module.mk
-
 %:
-	make --directory= --file=Makefile ./ted/Makefile
+	make --directory=${ROOTDIR} --file=Makefile $@
+
+include ../module.mk
 

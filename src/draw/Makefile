@@ -5,8 +5,8 @@
 MODULE                  = draw
 ROOTDIR                 = ..
 
-include ../module.mk
-
 %:
-	make --directory= --file=Makefile ./draw/Makefile
+	make --directory=${ROOTDIR} --file=Makefile $@
+
+include ../module.mk
 

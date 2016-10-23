@@ -19,19 +19,14 @@ reformat_makefile() {
         cat ${file} | grep "^ROOTDIR"
         cat ${file} | grep "^RELEASE"
         echo
-        cat ${file} | grep "include"
-        echo
         echo "%:"
-        echo "	make --directory=${ROOTDIR} --file=Makefile $@"
+        echo "	make --directory=\${ROOTDIR} --file=Makefile \$@"
+        echo
+        cat ${file} | grep "^include"
         echo
     } > "${file}.2"
     mv "${file}.2" "${file}"
 }
-
-
-echo $SOURCES
-echo $HEADERS
-echo $MAKEFILES
 
 for f in ${MAKEFILES}
 do

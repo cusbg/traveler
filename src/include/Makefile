@@ -4,7 +4,7 @@
 
 ROOTDIR                 = ..
 
-
 %:
-	make --directory= --file=Makefile ./include/Makefile
+	make --directory=${ROOTDIR} --file=Makefile $@
+
 

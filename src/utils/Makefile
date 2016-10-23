@@ -5,8 +5,8 @@
 MODULE                  = utils
 ROOTDIR                 = ..
 
-include ../module.mk
-
 %:
-	make --directory= --file=Makefile ./utils/Makefile
+	make --directory=${ROOTDIR} --file=Makefile $@
+
+include ../module.mk
 
