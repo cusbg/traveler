@@ -84,7 +84,7 @@ void compact_circle_test::test_operations_fail()
     assert_fail(circle.radius());
     assert_fail(circle.segment_angle());
     assert_fail(circle.segment_length());
-    assert_fail(circle.init(2));
+    assert_fail(circle.init(2, 20));
     assert_fail(circle.split(3));
     assert_fail(circle.rotate(2));
     assert_fail(circle.lies_in_segment(point::bad_point()));

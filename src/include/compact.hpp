@@ -24,9 +24,6 @@
 
 #include "rna_tree.hpp"
 
-#define PAIRS_DISTANCE              20
-#define BASES_DISTANCE              8
-
 class compact
 {
 #ifdef TEST
@@ -83,12 +80,6 @@ private:
                 iterator parent,
                 circle c,
                 double alpha);
-
-    /**
-     * return only-branch-node if exist, otherwise return non-valid iterator
-     */
-    static sibling_iterator get_onlyone_branch(
-                sibling_iterator it);
 
     /**
      * returns if child number `n` should be remade

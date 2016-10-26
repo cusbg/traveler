@@ -44,13 +44,14 @@ static inline bool has_bad(const vector<point>& points)
 #define BASES_DISTANCE_PRECISION    2.
 
 /* static */ double compact::circle::min_circle_length(
-                size_t nodes_count)
+                size_t nodes_count,
+                double loops_bases_distance)
 {
     double out;
-    out = nodes_count * BASES_DISTANCE * BASES_RATIO;
+    out = nodes_count * loops_bases_distance * BASES_RATIO;
 
     if (nodes_count == 0)
-        out = BASES_DISTANCE;
+        out = loops_bases_distance;
     else if (nodes_count < 3)
         out += 3;
 
@@ -158,7 +159,8 @@ void compact::circle::compute_sgn()
 }
 
 std::vector<point> compact::circle::init(
-                size_t n)
+                size_t n,
+                double loops_bases_distance)
 {
     CIRCLE_POINTS_INITED();
     CIRCLE_SGN_INITED();
@@ -174,7 +176,7 @@ std::vector<point> compact::circle::init(
     point shift;
     bool lt;
 
-    needed_length = min_circle_length(n) + BASES_DISTANCE_PRECISION;
+    needed_length = min_circle_length(n, loops_bases_distance) + BASES_DISTANCE_PRECISION;
     actual_length = segment_length();
     shift_size = 15;
     shift = -normalize(orthogonal(p2 - p1, direction - p1));

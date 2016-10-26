@@ -63,14 +63,16 @@ public:
      * initialize circle (length) for `n` nodes
      */
     std::vector<point> init(
-                size_t n);
+                size_t n,
+                double loops_bases_distance);
 
 public:
     /**
      * minimal length for `n` nodes
      */
     static double min_circle_length(
-                size_t n);
+                size_t n,
+                double loops_bases_distance);
 
 public:
     friend std::ostream& operator<<(

@@ -41,6 +41,7 @@ rna_tree::rna_tree(
             trim(_brackets), convert(trim(_labels))), _name(_name)
 {
     set_postorder_ids();
+    distances = {0xBADF00D, 0xBADF00D};
 
     DEBUG("Tree '%s:%s' was constructed, size=%s;\n%s",
             id(), name(), size(), print_tree(false));
@@ -54,6 +55,7 @@ rna_tree::rna_tree(
     : rna_tree(_brackets, _labels, _name)
 {
     update_points(_points);
+    compute_distances();
 }
 
 void rna_tree::set_name(
@@ -253,6 +255,89 @@ bool rna_tree::correct_pairing() const
     return true;
 }
 
+/* static */ rna_tree::sibling_iterator get_onlyone_branch(
+                rna_tree::sibling_iterator it)
+{
+    rna_tree::sibling_iterator ch, out;
+    rna_tree::sibling_iterator bad;
+
+    if (rna_tree::is_leaf(it))
+        return bad;
+
+    for (ch = it.begin(); ch != it.end(); ++ch)
+    {
+        if (ch->paired() && rna_tree::is_valid(out))
+            return bad;
+        else if (ch->paired())
+            out = ch;
+    }
+    return out;
+}
+
+void rna_tree::compute_distances()
+{
+    int elements;
+    double dist;
+
+    // compute distances between 2 pairs (CG <-> CG)
+    elements = 0;
+    dist = 0;
+    for (iterator it = begin(); it != end(); ++it)
+    {
+        if (!it->inited_points()
+                || is_root(it)
+                || is_leaf(it)
+                || !is_valid(get_onlyone_branch(parent(it))))
+            continue;
+
+        dist += distance(parent(it)->centre(), it->centre());
+        ++elements;
+    }
+    distances.pairs_distance = dist / (double)elements;
+
+    // distance between bases in pair (C <-> G)
+    elements = 0;
+    dist = 0;
+    for (iterator it = begin(); it != end(); ++it)
+    {
+        if (!it->inited_points()
+                || is_leaf(it))
+            continue;
+
+        dist += distance(it->at(0).p, it->at(1).p);
+        ++elements;
+    }
+    distances.pair_base_distance = dist / (double)elements;
+
+    // distance between unpaired bases in loops
+    elements = 0;
+    dist = 0;
+    for (iterator it = begin(); it != end(); ++it)
+    {
+        if (!it->inited_points())
+            continue;
+
+        sibling_iterator end = it.end();
+        for (sibling_iterator ch = it.begin(); ch != end; ++ch)
+        {
+            sibling_iterator prev;
+            while (is_leaf(prev = ch++)
+                    && ch != end
+                    && is_leaf(ch))
+            {
+                dist += distance(prev->centre(), ch->centre());
+                ++elements;
+            }
+        }
+    }
+    distances.loops_bases_distance = dist / (double)elements;
+
+    INFO("distances: pairs %s, pairbase %s, loops %s",
+            distances.pairs_distance,
+            distances.pair_base_distance,
+            distances.loops_bases_distance);
+}
+
 
 
 point rna_tree::top_right_corner(
@@ -300,7 +385,6 @@ point rna_tree::bottom_left_corner(
 
     return p;
 }
-
 
 
 

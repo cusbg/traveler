@@ -111,8 +111,44 @@ public:
     static point bottom_left_corner(
                     rna_tree::iterator root);
 
+public:
+    double get_pairs_distance() const
+    {
+        return distances.pairs_distance;
+    }
+    double get_pair_base_distance() const
+    {
+        return distances.pair_base_distance;
+    }
+    double get_loops_bases_distance() const
+    {
+        return distances.loops_bases_distance;
+    }
+
+private:
+    /**
+     * Compute distances between pairs and distances between unpaired bases in loops
+     * as average distance from rna
+     */
+    void compute_distances();
+
 private:
     std::string _name;
+    struct
+    {
+        /**
+         * distance between paired bases - CG <-> CG
+         */
+        double pairs_distance;
+        /**
+         * distance between bases in pair - C <-> G
+         */
+        double pair_base_distance;
+        /**
+         * distance between unpaired bases in loops
+         */
+        double loops_bases_distance;
+    } distances;
 };
 
 inline bool is(
@@ -127,6 +163,12 @@ void update_ends_in_rna(
 
 size_t child_index(
                 rna_tree::sibling_iterator sib);
+
+/**
+ * return only-branch-node if exist, otherwise return non-valid iterator
+ */
+rna_tree::sibling_iterator get_onlyone_branch(
+                rna_tree::sibling_iterator it);
 
 #endif /* !RNA_TREE_HPP */
 

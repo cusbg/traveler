@@ -27,6 +27,9 @@ using namespace std;
 
 #define MULTIBRANCH_MINIMUM_SPLIT   10
 
+#define PAIRS_DISTANCE rna.get_pair_base_distance()
+#define BASES_DISTANCE rna.get_pairs_distance()
+
 compact::compact(
                 rna_tree& _rna)
     : rna(_rna)
@@ -92,25 +95,6 @@ void compact::run()
     vec = vec * (dist - actual);
 
     shift_branch(it, vec);
-}
-
-/* static */ compact::sibling_iterator compact::get_onlyone_branch(
-                sibling_iterator it)
-{
-    sibling_iterator ch, out;
-    sibling_iterator bad;
-
-    if (rna_tree::is_leaf(it))
-        return bad;
-
-    for (ch = it.begin(); ch != it.end(); ++ch)
-    {
-        if (ch->paired() && rna_tree::is_valid(out))
-            return bad;
-        else if (ch->paired())
-            out = ch;
-    }
-    return out;
 }
 
 /* static */ bool compact::remake_child(
@@ -357,7 +341,7 @@ void compact::init_multibranch(
     c.direction = rna_tree::parent(it)->at(0).p;
     c.centre = centre(c.p1, c.p2);
     c.compute_sgn();
-    auto points = c.init(get_number_of_places_for_bases(it));
+    auto points = c.init(get_number_of_places_for_bases(it), BASES_DISTANCE);
 
     int i = 0;
     for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch)
@@ -511,8 +495,8 @@ void compact::set_distance_interior_loop(
     child = in.vec[0].end.it;
 
     actual = distance(parent->centre(), child->centre());
-    l[0] = circle::min_circle_length(in.vec[0].vec.size());
-    l[1] = circle::min_circle_length(in.vec[1].vec.size());
+    l[0] = circle::min_circle_length(in.vec[0].vec.size(), BASES_DISTANCE);
+    l[1] = circle::min_circle_length(in.vec[1].vec.size(), BASES_DISTANCE);
     sort(l.begin(), l.end());
     avg = l[0] + (l[1] - l[0])/4;
 
@@ -624,7 +608,7 @@ void compact::remake(
     c.centre = centre(c.p1, c.p2);
     c.compute_sgn();
 
-    reinsert(c.init(i.vec.size()), i.vec);
+    reinsert(c.init(i.vec.size(), BASES_DISTANCE), i.vec);
 }
 
 double compact::get_length(
