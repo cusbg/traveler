@@ -62,7 +62,14 @@ print_class_BEG_END_name::print_class_BEG_END_name(
 
 print_class_BEG_END_name::~print_class_BEG_END_name()
 {
-    TRACE("END function: %s", fname);
+    if (uncaught_exception())
+    {
+        TRACE("END function: %s -> EXCEPTION", fname);
+    }
+    else
+    {
+        TRACE("END function: %s", fname);
+    }
 }
 
 

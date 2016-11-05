@@ -40,7 +40,7 @@ void compact::run()
 {
     APP_DEBUG_FNAME;
 
-    INFO("BEG: Computing RNA layout");
+    INFO("BEG: Computing RNA layout for:\n%s", rna.print_tree(false));
 
     init();
     make();
@@ -172,6 +172,40 @@ void compact::init()
     }
 
     init_even_branches();
+
+    auto log = logger.debug_stream();
+    log << "Points initialization:\n";
+    auto f = [&](pre_post_order_iterator it)
+    {
+        if (it->paired())
+        {
+            if (it.preorder())
+            {
+                mprintf("it[%s][%s = %s][%s = %s]\n", log,
+                        it->status,
+                        it->at(0).label, it->at(0).p,
+                        it->at(1).label, it->at(1).p);
+            }
+        }
+        else
+        {
+            mprintf("it[%s][%s = %s]\n", log,
+                    it->status,
+                    it->at(0).label, it->at(0).p);
+        }
+    };
+    rna_tree::for_each_in_subtree(rna.begin_pre_post(), f);
+
+    // if first node was inserted and it is only one branch - do not remake it
+    // because it shares parents (3'5' node) position: 3'-NODE1 <-> NODE2-5'
+    iterator ch = get_onlyone_branch(rna.begin());
+    if (ch != iterator()
+            && !rna.begin()->remake_ids.empty()
+            && ch->inited_points())
+    {
+        DEBUG("clear");
+        rna.begin()->remake_ids.clear();
+    }
 
     DEBUG("compact::init() OK");
 }

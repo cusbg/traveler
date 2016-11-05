@@ -150,7 +150,7 @@ std::string tree_base<label_type>::print_subtree(
     for_each_in_subtree(root, f);
 
     if (debug_out)
-        DEBUG("%s", out.str().c_str());
+        DEBUG("%s", out.str());
 
     return out.str();
 }
@@ -173,8 +173,6 @@ void tree_base<label_type>::set_postorder_ids()
 template <typename label_type>
 bool tree_base<label_type>::is_ordered_postorder() const
 {
-    APP_DEBUG_FNAME;
-
     size_t i = 0;
     for (post_order_iterator it = begin_post(); it != end_post(); ++it, ++i)
         if (i != ::id(it))

@@ -124,9 +124,6 @@ tree_base<label_type>::_pre_post_order_iterator::operator++()
     // if preorder, go unltil i am leaf, then become postorder
     // if postorder and have next sibling, became him, and become preorder
 
-    LOGGER_PRIORITY_ON_FUNCTION(INFO);
-    DEBUG("BEG: %s", clabel(*this));
-
     if (_preorder)
     {
         if (is_leaf(*this))
@@ -160,7 +157,6 @@ tree_base<label_type>::_pre_post_order_iterator::operator++()
             _preorder = false;
         }
     }
-    DEBUG("END: %s", clabel(*this));
 
     return *this;
 }

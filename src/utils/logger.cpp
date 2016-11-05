@@ -87,14 +87,14 @@ void logger::log(
 
     for (FILE* f : out)
     {
-        fprintf(f, "%s%s\n", message_header(p).c_str(), text.c_str());
+        fprintf(f, "%s", text.c_str());
         fflush(f);
     }
     check_errors();
 }
 
-string logger::message_header(
-                priority p) const
+/* static */ string logger::message_header(
+                priority p)
 {
     size_t hour, minute, second, millisecond;
     timespec cputime, clocks;
@@ -158,6 +158,7 @@ logger::logger_stream::logger_stream(
 
 logger::logger_stream::~logger_stream()
 {
+    *this << "\n";
     flush();
 }
 
@@ -172,6 +173,7 @@ void logger::logger_stream::flush()
 {
     if (!l.can_log(p))
         return;
+    l.log(p, message_header(p));
     l.log(p, stream.str());
     stream.str("");
 }

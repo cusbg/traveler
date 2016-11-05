@@ -133,8 +133,8 @@ protected:
     /**
      * returns header for priority
      */
-    std::string message_header(
-                priority p) const;
+    static std::string message_header(
+                priority p);
 
     /**
      * print `text` with priority `p`
