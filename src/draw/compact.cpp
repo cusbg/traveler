@@ -44,6 +44,7 @@ void compact::run()
 
     init();
     make();
+    update_ends_in_rna(rna);
     checks();
 
     INFO("END: Computing RNA layout");
