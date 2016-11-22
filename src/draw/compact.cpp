@@ -199,8 +199,8 @@ void compact::init()
 
     // if first node was inserted and it is only one branch - do not remake it
     // because it shares parents (3'5' node) position: 3'-NODE1 <-> NODE2-5'
-    iterator ch = get_onlyone_branch(rna.begin());
-    if (ch != iterator()
+    sibling_iterator ch = get_onlyone_branch(rna.begin());
+    if (rna_tree::is_valid(ch)
             && !rna.begin()->remake_ids.empty()
             && ch->inited_points())
     {
