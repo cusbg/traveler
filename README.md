@@ -36,9 +36,9 @@ The binaries will be copied into traveler/bin. To navigate there from the src di
 	COLOR CODING:
 		Traveler uses the following color coding of nucleotides:
 		* Red - inserted bases
-		* Green - edited bases - e.g. the template has adenosine at a position while target has cytosine at the same position and therefore cytosine will be green)
+		* Green - edited bases - e.g. the template has an adenosine at a position while the target has a cytosine at the same position and therefore cytosine will be colored green in the resulting layout)
 		* Blue - reinserted bases - happens when traveler needs to redraw simple structures like hairpins (for example due to the change in the number of bases)
-		* Brown - rotated parts - similar situation to reinserted bases but takes place when redrawing multibranch loop (in that case all branches are rotated to lie on a circle)
+		* Brown - rotated parts - similar situation to reinserted bases, but takes place when redrawing a multibranch loop (in that case all branches need to be rotated to lie on a circle)
 
 #### Note:
 
