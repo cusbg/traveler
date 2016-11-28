@@ -406,7 +406,7 @@ void app::print(
             {
                 DEBUG("arg template-tree");
                 string templatefile, fastafile;
-                string templatetype = "ps";
+                string templatetype = "crw";
                 if (nextarg() == ARGS_TEMPLATE_STRUCTURE_FILE_TYPE)
                 {
                     templatetype = args.at(i + 2);
