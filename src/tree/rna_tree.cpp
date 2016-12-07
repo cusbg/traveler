@@ -41,7 +41,7 @@ rna_tree::rna_tree(
             trim(_brackets), convert(trim(_labels))), _name(_name)
 {
     set_postorder_ids();
-    distances = {0xBADF00D, 0xBADF00D};
+    distances = {0xBADF00D, 0xBADF00D, 0xBADF00D};
 
     DEBUG("Tree '%s:%s' was constructed, size=%s;\n%s",
             id(), name(), size(), print_tree(false));
@@ -287,10 +287,12 @@ void rna_tree::compute_distances()
         if (!it->inited_points()
                 || is_root(it)
                 || is_leaf(it)
-                || !is_valid(get_onlyone_branch(parent(it))))
+                || !is_valid(get_onlyone_branch(parent(it)))
+                || !rna_tree::is_only_child(it))
             continue;
 
         dist += distance(parent(it)->centre(), it->centre());
+        DEBUG("dist=%s", dist);
         ++elements;
     }
     distances.pairs_distance = dist / (double)elements;
@@ -332,7 +334,7 @@ void rna_tree::compute_distances()
     }
     distances.loops_bases_distance = dist / (double)elements;
 
-    INFO("distances: pairs %s, pairbase %s, loops %s",
+    INFO("Distances: pairs %s, pairbase %s, loops %s",
             distances.pairs_distance,
             distances.pair_base_distance,
             distances.loops_bases_distance);

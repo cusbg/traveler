@@ -199,13 +199,22 @@ void compact::init()
 
     // if first node was inserted and it is only one branch - do not remake it
     // because it shares parents (3'5' node) position: 3'-NODE1 <-> NODE2-5'
-    sibling_iterator ch = get_onlyone_branch(rna.begin());
+    sibling_iterator root = rna.begin();
+    sibling_iterator ch = get_onlyone_branch(root);
     if (rna_tree::is_valid(ch)
-            && !rna.begin()->remake_ids.empty()
+            && !root->remake_ids.empty()
             && ch->inited_points())
     {
-        sibling_iterator parent = rna_tree::parent(ch);
-        parent->remake_ids.clear();
+        root->remake_ids.clear();
+
+        sibling_iterator ch2 = get_onlyone_branch(ch);
+        if (rna_tree::is_valid(ch2))
+        {
+            point vec = normalize(orthogonal(ch->at(0).p - ch->at(1).p, ch2->centre())) * rna.get_pairs_distance();
+
+            ch->at(0).p = ch2->at(0).p - vec;
+            ch->at(1).p = ch2->at(1).p - vec;
+        }
     }
 
     DEBUG("compact::init() OK");
