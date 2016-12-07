@@ -204,8 +204,8 @@ void compact::init()
             && !rna.begin()->remake_ids.empty()
             && ch->inited_points())
     {
-        DEBUG("clear");
-        rna.begin()->remake_ids.clear();
+        sibling_iterator parent = rna_tree::parent(ch);
+        parent->remake_ids.clear();
     }
 
     DEBUG("compact::init() OK");

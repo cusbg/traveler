@@ -69,7 +69,7 @@ void varna_extractor::extract(
             assert(!str.fail() && str.eof() && base.size() == 1);
 
             labels.push_back(base[0]);
-            points.push_back(p);
+            points.push_back(-p);
         }
     }
 }

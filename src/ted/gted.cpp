@@ -528,7 +528,11 @@ mapping gted::get_mapping()
                 iterator it1,
                 iterator it2)
 {
-    return (rna_tree::is_root(it1) != rna_tree::is_root(it2)) ? GTED_COST_ROOT : GTED_COST_MODIFY;
+    // if one of them is root, but second is not (update root to unrooted node)
+    if (rna_tree::is_root(it1) != rna_tree::is_root(it2))
+        return GTED_COST_ROOT;
+    else
+        return GTED_COST_MODIFY;
 }
 
 
