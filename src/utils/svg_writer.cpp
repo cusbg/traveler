@@ -266,6 +266,8 @@ std::string svg_writer::create_style_definitions() const
 
     out
         << endl
+        << "<!-- create color definitions -->"
+        << endl
         << "<![CDATA[";
 
     struct element
