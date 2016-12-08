@@ -1,6 +1,6 @@
 # traveler - Template-based RnA VisuaLization
 
-Visualization of RNA secondary structure using a template visualization (currently CRW postscripts and VARNA SVG formats are supported). The tool was mainly developed by Richard Elias and the original repositor should be accessible at  https://github.com/rikiel/traveler.
+Visualization of RNA secondary structure using a template visualization (currently [Comparative RNA Web (CRW) Site](http://www.rna.icmb.utexas.edu/) postscripts and [VARNA](http://varna.lri.fr/) SVG formats are supported). The tool was mainly developed by Richard Elias and the original repositor should be accessible at  https://github.com/rikiel/traveler.
 
 ## Requirements:
 - gcc with support of c++11
