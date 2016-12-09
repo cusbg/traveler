@@ -11,6 +11,7 @@ Use `git clone https://github.com/davidhoksza/traveler` to download project
 ## Build:
 	cd traveler/src
 	make build
+	cd ..
 
 The binaries will be copied into traveler/bin. To navigate there from the src directory use: `cd ../bin`
 
@@ -51,16 +52,8 @@ Two types of template IMAGE\_FILE are currectly supported by Traveler:
 
 Other extractors of RNA structure can be implemented and specified by the FILE\_FORMAT argument.
 
-### Example 0.A - download test files
-	$ mkdir 18S/
-	$ cd 18S/
-	$ wget --recursive --no-directories --no-parent \
-        http://richard.ba30.eu/traveler/img/input/18S/
-
-In other examples, we will use 18S/ directory as INDIR, OUTDIR will be /tmp/
-
-### Example 0.B - Varna/DBN file format
-	$ cat $INDIR/mouse.fasta
+### Example 0 - Varna/DBN file format
+	$ cat data/metazoa/mouse.fasta
 		>mouse
 		UACCUGGUUGAUCCUGCCAGUAGCAUAUGCUUGUCUCAAAGAUUAAGCCAUGCAUGUCUAAGUACGCACGGCCGGUACAG
 		UGAAACUGCGAAUGGCUCAUUAAAUCAGUUAUGGUUCCUUUGGUCGCUCGCUCCUCUCCUACUUGGAUAACUGUGGUAAU
@@ -73,22 +66,22 @@ In other examples, we will use 18S/ directory as INDIR, OUTDIR will be /tmp/
 	match-tree must contain both LABELS and BRACKETS, templated-tree need only BRACKETS
 
 ### Example 1: Visualize mouse 18S rRNA using human 18S rRNA as template using CRW ps image as the template layout.
-	$ ./build/traveler \
-		--target-structure $INDIR/mouse.fasta \
-		--template-structure $INDIR/human.ps $INDIR/human.fasta \
-		--all $OUTDIR/mouse_draw-to_human
+	$ bin/traveler \
+		--target-structure data/metazoa/mouse.fasta \
+		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
+		--all test/mouse_from_human
 
 ### Example 2: Compute TED distance and mapping between human 18S rRNA (template) and mouse 18S rRNA (target).
-	$ ./build/traveler \
-		--target-structure $INDIR/mouse.fasta \
-		--template-structure $INDIR/human.ps $INDIR/human.fasta \
-		--ted $OUTDIR/mouse_draw-to_human.map
+	$ bin/traveler \
+		--target-structure data/metazoa/mouse.fasta \
+		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
+		--ted test/mouse_from_human.map
 
 ### Example 3: Generate visualization for the mapping generated in Example 2.
-	$ ./build/traveler \
-		--target-structure $INDIR/mouse.fasta \
-		--template-structure $INDIR/human.ps $INDIR/human.fasta \
-		--draw --overlaps $OUTDIR/mouse_draw-to_human.map $OUTDIR/mouse_draw-to_human
+	$ bin/traveler \
+		--target-structure data/metazoa/mouse.fasta \
+		--template-structure data/metazoa/human.ps data/metazoa/uman.fasta \
+		--draw --overlaps test/mouse_draw-to_human.map test/mouse_draw-to_human
 
 	$ # generates 4 files - .svg and .ps files, both with/without colored bases (see COLOR CODING section)
 	$ # checks also if output molecule has overlaps and draws them in output image
@@ -97,16 +90,11 @@ In other examples, we will use 18S/ directory as INDIR, OUTDIR will be /tmp/
 #### Note:
 Options --ted and --draw serve for separatation of mapping and visualization since TED computation and on the other hand, Traveler allows for multiple output visualization (coloring, overlaps).
  
-## Support for other input images: How to implement own extractor
-As we said, we support two types of input images - crw and varna. There are three steps you need to satisfy, when you want to support other image types.
+## Support for other input images: How to implement one owns extractor
+Traveler supporst two types of input images - crw and varna. There are three steps that need to done when one wants to support other image types.
 
-* You need to implement `extractor` interface and it's method `extract`. Method should obtain all nucleotides (the primary structure) and their position in image (points) from given file.
+* You need to implement `extractor` interface and its method `extract`. The method accepts nucleotides (the primary structure) and their position in the image (points) from given file.
 * In the class, you need to implement method `get_type`, that should only return extractor's type that is used in IMAGE\_FILE argument.
-* Adds your new extractor to method `extractor.get_all_extractors()`
+* Add your new extractor to method `extractor.get_all_extractors()`
 
 For more ideas, how it should be implemented, see usage of `crw_extractor` and `varna_extractor`.
-
-
-
-
-
