@@ -1,0 +1,155 @@
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	width="370.813418"
+	height="389.761170"
+	style="font-size: 8px; stroke: none; font-family: Helvetica; " >
+<style type="text/css" >
+<!-- create color definitions -->
+<![CDATA[
+text.red {stroke: rgb(255, 0, 0); }
+text.green {stroke: rgb(0, 255, 0); }
+text.blue {stroke: rgb(0, 0, 255); }
+text.black {stroke: rgb(0, 0, 0); }
+text.gray {stroke: rgb(204, 204, 204); }
+text.brown {stroke: rgb(211.65, 104.55, 30.6); }
+text {stroke: rgb(0, 0, 0); fill: none; }
+circle.red {stroke: rgb(255, 0, 0); fill: none; }
+circle.green {stroke: rgb(0, 255, 0); fill: none; }
+circle.blue {stroke: rgb(0, 0, 255); fill: none; }
+circle.black {stroke: rgb(0, 0, 0); fill: none; }
+circle.gray {stroke: rgb(204, 204, 204); fill: none; }
+circle.brown {stroke: rgb(211.65, 104.55, 30.6); fill: none; }
+circle {stroke: rgb(0, 0, 0); fill: none; }
+line.red {stroke: rgb(255, 0, 0); }
+line.green {stroke: rgb(0, 255, 0); }
+line.blue {stroke: rgb(0, 0, 255); }
+line.black {stroke: rgb(0, 0, 0); }
+line.gray {stroke: rgb(204, 204, 204); }
+line.brown {stroke: rgb(211.65, 104.55, 30.6); }
+line {stroke: rgb(0, 0, 0); fill: none; }]]>
+</style>
+<text x="131.561330" y="149.017739" class="black" >5'</text>
+<text x="138.561330" y="149.017739" class="black" >C</text>
+<line x1="145.561330" y1="146.017739" x2="170.061330" y2="146.017739" class="black" />
+<text x="138.561330" y="165.684405" class="black" >A</text>
+<line x1="145.561330" y1="162.684405" x2="170.061330" y2="162.684405" class="black" />
+<text x="131.882953" y="181.859941" class="black" >U</text>
+<text x="138.561330" y="198.035478" class="black" >G</text>
+<line x1="145.561330" y1="195.035478" x2="170.061330" y2="195.035478" class="black" />
+<text x="124.790936" y="208.834583" class="black" >C</text>
+<text x="117.032454" y="223.750010" class="black" >A</text>
+<line x1="120.897073" y1="224.655446" x2="126.575295" y2="250.303648" class="black" />
+<text x="97.505272" y="228.073106" class="black" >G</text>
+<line x1="101.369891" y1="228.978543" x2="107.048113" y2="254.626745" class="black" />
+<text x="77.978090" y="232.396203" class="black" >G</text>
+<line x1="81.842709" y1="233.301640" x2="87.520931" y2="258.949842" class="black" />
+<text x="60.862118" y="234.362894" class="black" >U</text>
+<text x="50.000000" y="248.083887" class="black" >G</text>
+<text x="53.782717" y="265.170206" class="black" >C</text>
+<text x="69.421303" y="273.024243" class="black" >C</text>
+<text x="85.385550" y="265.855278" class="black" >C</text>
+<text x="104.912732" y="261.532182" class="black" >C</text>
+<text x="124.439914" y="257.209085" class="black" >U</text>
+<text x="137.769189" y="267.456025" class="black" >A</text>
+<text x="154.811167" y="271.433588" class="black" >G</text>
+<line x1="161.437369" y1="266.745200" x2="183.647858" y2="256.403819" class="black" />
+<text x="148.361789" y="287.035800" class="black" >A</text>
+<line x1="153.010361" y1="287.680277" x2="163.837037" y2="311.614678" class="black" />
+<text x="130.139405" y="295.278658" class="black" >A</text>
+<line x1="134.787977" y1="295.923135" x2="145.614653" y2="319.857536" class="black" />
+<text x="113.379350" y="297.505148" class="black" >A</text>
+<text x="101.431684" y="310.292021" class="black" >A</text>
+<text x="102.003990" y="327.782683" class="black" >A</text>
+<text x="114.761994" y="339.761170" class="black" >A</text>
+<text x="132.253986" y="339.231073" class="black" >A</text>
+<text x="144.263225" y="326.502012" class="black" >U</text>
+<text x="162.485609" y="318.259155" class="black" >U</text>
+<text x="178.461486" y="323.717288" class="black" >G</text>
+<text x="195.713693" y="320.782777" class="black" >U</text>
+<text x="209.064142" y="309.468385" class="black" >G</text>
+<text x="215.170112" y="293.728723" class="black" >C</text>
+<line x1="216.442097" y1="287.121236" x2="205.093688" y2="263.429758" class="black" />
+<text x="233.207548" y="285.088647" class="black" >C</text>
+<line x1="234.479532" y1="278.481159" x2="223.131124" y2="254.789682" class="black" />
+<text x="250.398480" y="288.363109" class="black" >U</text>
+<text x="266.181241" y="280.803036" class="black" >A</text>
+<text x="274.404042" y="265.355195" class="black" >G</text>
+<line x1="275.676026" y1="258.747708" x2="264.327618" y2="235.056230" class="black" />
+<text x="292.441477" y="256.715118" class="black" >G</text>
+<line x1="293.713462" y1="250.107631" x2="282.365054" y2="226.416153" class="black" />
+<text x="309.148746" y="254.121987" class="black" >A</text>
+<text x="320.813418" y="241.076442" class="black" >C</text>
+<text x="319.858075" y="223.602515" class="black" >C</text>
+<text x="306.840717" y="211.906397" class="black" >C</text>
+<text x="289.364535" y="212.819569" class="black" >C</text>
+<text x="277.637039" y="225.808666" class="black" >C</text>
+<text x="259.599603" y="234.448743" class="black" >C</text>
+<text x="242.408675" y="231.174297" class="black" >U</text>
+<text x="226.625921" y="238.734368" class="black" >G</text>
+<text x="218.403109" y="254.182195" class="black" >C</text>
+<text x="200.365673" y="262.822271" class="black" >G</text>
+<text x="184.274061" y="257.715430" class="black" >C</text>
+<text x="192.199387" y="242.112891" class="black" >G</text>
+<text x="192.399062" y="224.614031" class="black" >A</text>
+<text x="184.831827" y="208.834710" class="black" >G</text>
+<text x="171.061330" y="198.035478" class="black" >G</text>
+<text x="177.739707" y="181.859941" class="black" >U</text>
+<text x="171.061330" y="165.684405" class="black" >A</text>
+<text x="171.061330" y="149.017739" class="black" >G</text>
+<text x="178.061330" y="149.017739" class="black" >3'</text>
+<line x1="138.561330" y1="146.017739" x2="137.561330" y2="146.017739" class="gray" />
+<line x1="141.561330" y1="150.017739" x2="141.561330" y2="158.684405" class="gray" />
+<line x1="140.034840" y1="166.381679" x2="136.409442" y2="175.162668" class="gray" />
+<line x1="136.409442" y1="182.557215" x2="140.034840" y2="191.338205" class="gray" />
+<line x1="138.413782" y1="197.503868" x2="130.938483" y2="203.366194" class="gray" />
+<line x1="125.945064" y1="209.383211" x2="121.878326" y2="217.201382" class="gray" />
+<line x1="116.127018" y1="221.614629" x2="104.410708" y2="224.208487" class="gray" />
+<line x1="96.599836" y1="225.937726" x2="84.883527" y2="228.531584" class="gray" />
+<line x1="77.004237" y1="229.852814" x2="67.835971" y2="230.906283" class="gray" />
+<line x1="61.379353" y1="234.499115" x2="55.482765" y2="241.947667" class="gray" />
+<line x1="53.864619" y1="248.989324" x2="55.918098" y2="258.264770" class="gray" />
+<line x1="60.357244" y1="263.965411" x2="68.846776" y2="268.229039" class="gray" />
+<line x1="76.070266" y1="268.385626" x2="84.736587" y2="264.493896" class="gray" />
+<line x1="92.290986" y1="261.990659" x2="104.007296" y2="259.396801" class="gray" />
+<line x1="111.818168" y1="257.667562" x2="123.534478" y2="255.073704" class="gray" />
+<line x1="130.611140" y1="256.646979" x2="137.597963" y2="262.018131" class="gray" />
+<line x1="144.664498" y1="265.365183" x2="153.915857" y2="267.524431" class="gray" />
+<line x1="156.283117" y1="272.130217" x2="152.889839" y2="280.339171" class="gray" />
+<line x1="147.717312" y1="285.684371" x2="136.783882" y2="290.630086" class="gray" />
+<line x1="129.174240" y1="292.805410" x2="120.344515" y2="293.978396" class="gray" />
+<line x1="113.648459" y1="297.427858" x2="107.162575" y2="304.369312" class="gray" />
+<line x1="104.562497" y1="311.289882" x2="104.873177" y2="320.784823" class="gray" />
+<line x1="107.920101" y1="327.520620" x2="114.845883" y2="334.023234" class="gray" />
+<line x1="121.760158" y1="336.640006" x2="131.255821" y2="336.352238" class="gray" />
+<line x1="137.998951" y1="333.321578" x2="144.518260" y2="326.411508" class="gray" />
+<line x1="150.907702" y1="321.853441" x2="161.841132" y2="316.907726" class="gray" />
+<line x1="169.270794" y1="316.552357" x2="177.676300" y2="319.424086" class="gray" />
+<line x1="185.404847" y1="320.046543" x2="194.770331" y2="318.453523" class="gray" />
+<line x1="201.765224" y1="315.196630" x2="209.012610" y2="309.054532" class="gray" />
+<line x1="213.510837" y1="302.739167" x2="216.723416" y2="294.457942" class="gray" />
+<line x1="221.777599" y1="289.000708" x2="232.600061" y2="283.816662" class="gray" />
+<line x1="240.136902" y1="282.837095" x2="249.469125" y2="284.614661" class="gray" />
+<line x1="257.005967" y1="283.635093" x2="265.573754" y2="279.531052" class="gray" />
+<line x1="271.060737" y1="274.272102" x2="275.524545" y2="265.886128" class="gray" />
+<line x1="281.011529" y1="260.627180" x2="291.833990" y2="255.443133" class="gray" />
+<line x1="299.394151" y1="253.101625" x2="308.196072" y2="251.735481" class="gray" />
+<line x1="314.814953" y1="248.140152" x2="321.147210" y2="241.058277" class="gray" />
+<line x1="323.595054" y1="234.082407" x2="323.076438" y2="224.596551" class="gray" />
+<line x1="319.882682" y1="217.929120" x2="312.816109" y2="211.579792" class="gray" />
+<line x1="305.846166" y1="209.115122" x2="296.359085" y2="209.610845" class="gray" />
+<line x1="289.683968" y1="212.788502" x2="283.317606" y2="219.839734" class="gray" />
+<line x1="277.029552" y1="224.536682" x2="266.207090" y2="229.720728" class="gray" />
+<line x1="258.670248" y1="230.700298" x2="249.338030" y2="228.922742" class="gray" />
+<line x1="241.801188" y1="229.902313" x2="233.233408" y2="234.006352" class="gray" />
+<line x1="227.746421" y1="239.265300" x2="223.282609" y2="247.651263" class="gray" />
+<line x1="217.795622" y1="252.910210" x2="206.973160" y2="258.094256" class="gray" />
+<line x1="199.553066" y1="258.612301" x2="191.086667" y2="255.925401" class="gray" />
+<line x1="189.085564" y1="251.149136" x2="193.387884" y2="242.679186" class="gray" />
+<line x1="195.245027" y1="235.113152" x2="195.353422" y2="225.613771" class="gray" />
+<line x1="193.669408" y1="218.007329" x2="189.561480" y2="209.441412" class="gray" />
+<line x1="184.684284" y1="203.366314" x2="177.208872" y2="197.503874" class="gray" />
+<line x1="175.587819" y1="191.338205" x2="179.213217" y2="182.557215" class="gray" />
+<line x1="179.213217" y1="175.162668" x2="175.587819" y2="166.381679" class="gray" />
+<line x1="174.061330" y1="158.684405" x2="174.061330" y2="150.017739" class="gray" />
+<line x1="178.061330" y1="146.017739" x2="177.061330" y2="146.017739" class="gray" />
+</svg>
