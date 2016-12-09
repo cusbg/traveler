@@ -2,7 +2,7 @@ The add* and rm* FASTA files represent simple modifications of the base.fasta la
 
 ```shell
 for fn in `find . -name "*.fasta" -not -name "base*" `; do 
-	./traveler -gs ${fn} -ts --file-format varna base.svg base.fasta -a ${fn/.fasta}; 
+	PATH_TO_TRAVELER/traveler -gs ${fn} -ts --file-format varna base.svg base.fasta -a ${fn/.fasta}; 
 done
 ```
 
