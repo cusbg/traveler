@@ -28,6 +28,10 @@
 
 #include "logger.hpp"
 
+#ifndef M_PI
+#    define M_PI 3.14159265358979323846
+#endif
+
 inline std::string to_string(
                 bool value)
 {

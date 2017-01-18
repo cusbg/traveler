@@ -118,7 +118,7 @@ point point::operator/(const point& other) const
 {
     BINARY(*this, other);
     for (double value : {other.x, other.y})
-        assert(!iszero(value) && !::isnan(x / value) && !::isnan(y / value));
+        assert(!iszero(value) && !std::isnan(x / value) && !std::isnan(y / value));
 
     return {x / other.x, y / other.y};
 }
@@ -126,7 +126,7 @@ point point::operator/(const point& other) const
 point point::operator/(double value) const
 {
     UNARY(*this);
-    assert(!iszero(value) && !::isnan(x / value) && !::isnan(y / value));
+    assert(!iszero(value) && !std::isnan(x / value) && !std::isnan(y / value));
 
     return {x / value, y / value};
 }
@@ -134,7 +134,7 @@ point point::operator/(double value) const
 point point::operator*(double value) const
 {
     UNARY(*this);
-    assert(!iszero(value) && !::isnan(x * value) && !::isnan(y * value));
+    assert(!iszero(value) && !std::isnan(x * value) && !std::isnan(y * value));
 
     return {x * value, y * value};
 }
@@ -144,7 +144,7 @@ bool point::bad() const
     //UNARY(*this); // !!!
 
     return *this == bad_point() ||
-        ::isnan(x) || ::isnan(y);
+            std::isnan(x) || std::isnan(y);
 }
 
 point operator*(double value, const point& p)
