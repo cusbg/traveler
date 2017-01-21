@@ -26,6 +26,8 @@
 #include <vector>
 #include <algorithm>
 
+#include <math.h>
+
 #include "logger.hpp"
 
 #ifndef M_PI
