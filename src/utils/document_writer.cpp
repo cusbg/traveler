@@ -230,6 +230,8 @@ void document_writer::init(
         << std::unitbuf
         << std::scientific;
 
+    if (!out.good())
+        throw io_exception("Cannot open output file %s for writing.", filename);
     assert(out.good());
 }
 
