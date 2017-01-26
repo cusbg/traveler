@@ -66,18 +66,21 @@ Other extractors of RNA structure can be implemented and specified by the FILE\_
 	match-tree must contain both LABELS and BRACKETS, templated-tree need only BRACKETS
 
 ### Example 1: Visualize mouse 18S rRNA using human 18S rRNA as template using CRW ps image as the template layout.
+	$ mkdir test
 	$ bin/traveler \
 		--target-structure data/metazoa/mouse.fasta \
 		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
 		--all test/mouse_from_human
 
 ### Example 2: Compute TED distance and mapping between human 18S rRNA (template) and mouse 18S rRNA (target).
+	$ mkdir test
 	$ bin/traveler \
 		--target-structure data/metazoa/mouse.fasta \
 		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
 		--ted test/mouse_from_human.map
 
 ### Example 3: Generate visualization for the mapping generated in Example 2.
+	$ mkdir test
 	$ bin/traveler \
 		--target-structure data/metazoa/mouse.fasta \
 		--template-structure data/metazoa/human.ps data/metazoa/uman.fasta \
