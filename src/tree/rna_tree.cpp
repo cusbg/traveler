@@ -99,6 +99,7 @@ void rna_tree::update_points(
     update_ends_in_rna(*this);
 }
 
+//zvyraznuje 5' a 3' konec
 void update_ends_in_rna(
                 rna_tree& rna)
 {
@@ -255,9 +256,15 @@ bool rna_tree::correct_pairing() const
     return true;
 }
 
+
 /* static */ rna_tree::sibling_iterator get_onlyone_branch(
                 rna_tree::sibling_iterator it)
 {
+    /*
+     * Goes through all children of one parent and searches for base pairs. If more are found, returns
+     * invalid value.
+     */
+
     rna_tree::sibling_iterator ch, out;
     rna_tree::sibling_iterator bad;
 

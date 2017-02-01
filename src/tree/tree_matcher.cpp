@@ -28,7 +28,7 @@ using namespace std;
 #define set_remake(iter) \
     rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
 
-
+//namapuje stromy na sebe
 matcher::matcher(
                 const rna_tree& templated,
                 const rna_tree& other)
@@ -40,6 +40,7 @@ rna_tree& matcher::run(
 {
     INFO("BEG: Transforming trees with mapping function");
 
+    //Sizes of the trees after deletion from one and insertion into the other should match
     if (t1.size() - map.get_to_remove().size() != t2.size() - map.get_to_insert().size())
     {
         throw illegal_state_exception("Computed sizes of removing/inserting does not match current trees");
@@ -66,7 +67,7 @@ rna_tree& matcher::run(
     t1.set_postorder_ids();
 
     INFO("END: Transforming trees with mapping function");
-    return t1;
+    return t1; //Resulting tree which will be used from now on (we are done with T2 at this point)
 }
 
 
@@ -104,6 +105,10 @@ void matcher::erase()
         {
             if (is(ch, rna_pair_label::deleted))
             {
+                /*
+                 * Set Information for the drawing algorithm that descendants will need to be moved
+                 * and siblings (loop) will need to be replaced on the circle
+                 */
                 set_remake(ch);
                 ch = t1.erase(ch);
 
@@ -114,6 +119,7 @@ void matcher::erase()
     }
 }
 
+//mapovani jednoho stromu na druhy
 void matcher::merge()
 {
     iterator it1, it2;
@@ -134,13 +140,19 @@ void matcher::merge()
         {
             if (is(ch2, rna_pair_label::inserted))
             {
+                /*
+                 * When inserting into a position with N siblings, steal denotes how many siblings will be taken
+                 * as childern of the just inserted node. The reason is that there are more possible ways how to
+                 * carry out insertion at a position where siblings exist.
+                 */
+
                 steal = 0;
                 ins = ch1;
 
                 if (ch2->paired())
                 {
                     actual = 0;
-                    needed = s2.at(id(ch2));
+                    needed = s2.at(id(ch2)); //Taking into account the number of siblings needed in order for the tree to have the required structure
 
                     while (actual < needed)
                     {
@@ -176,9 +188,12 @@ void matcher::merge()
 }
 
 
-
 void matcher::compute_sizes()
 {
+    /*
+     * Counts the size of every subtree (s1 and s2 vectors) for furhter utilization (does not tak einto account
+     * inserted and deleted nodes).
+     */
     APP_DEBUG_FNAME;
 
     auto comp_f =

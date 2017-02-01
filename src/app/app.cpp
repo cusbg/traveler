@@ -138,10 +138,10 @@ mapping app::run_ted(
 
         if (run)
         {
-            rted r(templated, matched);
+            rted r(templated, matched); //Gets a strategy for decomposing a tree
             r.run();
 
-            gted g(templated, matched);
+            gted g(templated, matched); //Computes mapping and ditstanve based on RTED's strategy (faster than using GTED itself)
             g.run(r.get_strategies());
 
             mapping = g.get_mapping();
@@ -180,7 +180,10 @@ void app::run_drawing(
             return;
         }
 
+        //Based on a mapping, matcher returns structure with deleted and inserted nodes
+        // which correspond to the target structure
         templated = matcher(templated, matched).run(mapping);
+        //Compact goes through the structure and computes new coordinates where necessary
         compact(templated).run();
 
         save(file, templated, run_overlaps);

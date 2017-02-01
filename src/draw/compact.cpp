@@ -142,8 +142,8 @@ void compact::init()
     assert(rna.is_ordered_postorder());
 
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
-    {
-        if (it->inited_points() || !it->paired())
+    {//jdu od rootu pre-order
+        if (it->inited_points() || !it->paired()) //pokud ma souradnici nebo je to list, tak se resi individualne
             continue;
 
         iterator par = rna_tree::parent(it);
@@ -151,6 +151,7 @@ void compact::init()
 
         assert(!p.bad());
 
+        //pokud je to napriklad root, tak se bude vkladat kreslit "nad" strukturu
         if (rna_tree::is_root(par))
         {
             init_branch_recursive(it);
@@ -289,7 +290,17 @@ point compact::init_branch_recursive(
         }
         abort();
     }
+
+    /*
+     * The structure obtained from an image does not need to be a tree with a common root but rather a forrest
+     * Eg. homo sapiens's rRNA (http://www.rna.ccbb.utexas.edu/RNA/Structures/d.16.e.H.sapiens.pdf)
+     * is basically a structure with 4 or 5 main substreed formin a virtual multibranch loop
+     */
     ch = get_onlyone_branch(it);
+    /*
+     * Expecting that we are inserting into a branch at a position which does not split (only one non-leaf
+     * child). Otherwise, we do not know how to connect that node to the children
+     */
     assert(rna_tree::is_valid(ch));
 
     p = init_branch_recursive(ch);
