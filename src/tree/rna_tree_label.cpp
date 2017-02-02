@@ -194,11 +194,11 @@ bool rna_pair_label::inited_points() const
     return true;
 }
 
-point rna_pair_label::centre() const
+point rna_pair_label::center() const
 {
     if (!inited_points())
     {
-        DEBUG("WARNING: Points for rna pair centre are not inited");
+        DEBUG("WARNING: Points for rna pair center are not inited");
         return point::bad_point();
     }
     if (paired())

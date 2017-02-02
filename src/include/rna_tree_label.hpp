@@ -94,7 +94,7 @@ public:
     /**
      * returns point between bases in pair. If signle pase is present, returns its position
      */
-    point centre() const;
+    point center() const;
 
     void clear_points();
     /**

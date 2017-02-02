@@ -103,7 +103,7 @@ private:
     // INIT functions:
     /**
      * initialize all branch-nodes in trees
-     * (only primitive initialization)
+     * (only basic positions initialization)
      */
     void init();
 

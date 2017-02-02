@@ -298,7 +298,7 @@ void rna_tree::compute_distances()
                 || !rna_tree::is_only_child(it))
             continue;
 
-        dist += distance(parent(it)->centre(), it->centre());
+        dist += distance(parent(it)->center(), it->center());
         DEBUG("dist=%s", dist);
         ++elements;
     }
@@ -334,7 +334,7 @@ void rna_tree::compute_distances()
                     && ch != end
                     && is_leaf(ch))
             {
-                dist += distance(prev->centre(), ch->centre());
+                dist += distance(prev->center(), ch->center());
                 ++elements;
             }
         }

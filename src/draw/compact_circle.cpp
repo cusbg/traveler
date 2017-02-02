@@ -76,7 +76,7 @@ double compact::circle::segment_angle() const
 
     if (!double_equals(distance(p1, centre), distance(p2, centre)))
     {
-        throw illegal_state_exception("Distance from centre is not same (%i != %i), circle is in illegal state",
+        throw illegal_state_exception("Distance from center is not same (%i != %i), circle is in illegal state",
                 distance(p1, centre), distance(p2, centre));
     }
 
@@ -96,7 +96,7 @@ bool compact::circle::lies_in_segment(
 {
     CIRCLE_POINTS_INITED();
 
-    // angle(p1, centre, p) + angle(p, centre, p2) == segment_angle()
+    // angle(p1, centre, p) + angle(p, center, p2) == segment_angle()
     if (!double_equals(
             fmod(angle(p1, centre, p) + angle(p, centre, p2) + 360, 360),
             fmod(segment_angle() + 360, 360)) &&
@@ -217,7 +217,7 @@ std::ostream& operator<<(
                 std::ostream& out,
                 const compact::circle& c)
 {
-    out << msprintf("circle: p1=%s| p2=%s| centre=%s| direction=%s;\nradius=%s; seg_length=%s; seg_angle=%s",
+    out << msprintf("circle: p1=%s| p2=%s| center=%s| direction=%s;\nradius=%s; seg_length=%s; seg_angle=%s",
             c.p1, c.p2, c.centre, c.direction, c.radius(), c.segment_length(), c.segment_angle());
 
     return out;

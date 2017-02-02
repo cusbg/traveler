@@ -82,7 +82,7 @@ void compact::run()
 {
     assert(rna_tree::parent(child) == parent);
 
-    set_distance(child, parent->centre(), dist);
+    set_distance(child, parent->center(), dist);
 }
 
 /* static */ void compact::set_distance(
@@ -90,7 +90,7 @@ void compact::run()
                 point from,
                 double dist)
 {
-    point p = it->centre();
+    point p = it->center();
     point vec = normalize(p - from);
     double actual = distance(p, from);
     vec = vec * (dist - actual);
@@ -142,12 +142,13 @@ void compact::init()
     assert(rna.is_ordered_postorder());
 
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
-    {//jdu od rootu pre-order
-        if (it->inited_points() || !it->paired()) //pokud ma souradnici nebo je to list, tak se resi individualne
+    { //traverse the tree pre-order
+        if (it->inited_points() || !it->paired())
             continue;
 
+        //For non-initiated points or paired nodes, get their parents
         iterator par = rna_tree::parent(it);
-        point p = par->centre();
+        point p = par->center();
 
         assert(!p.bad());
 
@@ -211,7 +212,7 @@ void compact::init()
         sibling_iterator ch2 = get_onlyone_branch(ch);
         if (rna_tree::is_valid(ch2))
         {
-            point vec = normalize(orthogonal(ch->at(0).p - ch->at(1).p, ch2->centre())) * rna.get_pairs_distance();
+            point vec = normalize(orthogonal(ch->at(0).p - ch->at(1).p, ch2->center())) * rna.get_pairs_distance();
 
             ch->at(0).p = ch2->at(0).p - vec;
             ch->at(1).p = ch2->at(1).p - vec;
@@ -223,7 +224,7 @@ void compact::init()
 
 void compact::init_even_branches()
 {
-    // for nodes in one branch, set them to lie on straight line
+    // for nodes in one branch, set them to lie on a straight line
     for (iterator it = rna.begin(); it != rna.end(); ++it)
     {
         if (rna_tree::is_leaf(it))
@@ -247,7 +248,7 @@ point compact::init_branch_recursive(
 
     if (it->inited_points())
     {
-        p = normalize(it->centre() - from) * BASES_DISTANCE;
+        p = normalize(it->center() - from) * BASES_DISTANCE;
         return p;
     }
 
@@ -284,7 +285,7 @@ point compact::init_branch_recursive(
         {
             if (ch->inited_points())
             {
-                p = it->centre() - ch->centre();
+                p = it->center() - ch->center();
                 return p;
             }
         }
@@ -320,7 +321,7 @@ void compact::init_by_ancestor(
     point p1, p2, vec;
     iterator par = rna_tree::parent(it);
     assert(!rna_tree::is_root(par));
-    vec = normalize(par->centre() - rna_tree::parent(par)->centre());
+    vec = normalize(par->center() - rna_tree::parent(par)->center());
         // ^^ direction (parent(par)->par)
     p1 = par->at(0).p + vec;
     p2 = par->at(1).p + vec;
@@ -353,9 +354,9 @@ void compact::init_multibranch(
             return n;
         };
     auto rotate_subtree =
-        [this](sibling_iterator root, point centre, point p1, point p2)
+        [this](sibling_iterator root, point center, point p1, point p2)
         {
-            if (init_branch_recursive(root, centre).bad())
+            if (init_branch_recursive(root, center).bad())
             {
                 rna_tree::for_each_in_subtree(root,
                         [](iterator iter)
@@ -460,12 +461,12 @@ void compact::make_branch_even(
         vec[0]->at(1).p = p2;
     }
 
-    shift = orthogonal(p1 - p2, vec[1]->centre() - p2);
+    shift = orthogonal(p1 - p2, vec[1]->center() - p2);
 
     for (size_t i = 1; i < vec.size(); ++i)
     {
         // distances between nodes will be same..
-        shift = normalize(shift) * distance(vec[0]->centre(), vec[i]->centre());
+        shift = normalize(shift) * distance(vec[0]->center(), vec[i]->center());
 
         newpos = p1 + shift;
         p = newpos - vec[i]->at(0).p;
@@ -549,7 +550,7 @@ void compact::set_distance_interior_loop(
     parent = in.vec[0].beg.it;
     child = in.vec[0].end.it;
 
-    actual = distance(parent->centre(), child->centre());
+    actual = distance(parent->center(), child->center());
     l[0] = circle::min_circle_length(in.vec[0].vec.size(), BASES_DISTANCE);
     l[1] = circle::min_circle_length(in.vec[1].vec.size(), BASES_DISTANCE);
     sort(l.begin(), l.end());

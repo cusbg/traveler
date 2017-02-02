@@ -84,14 +84,14 @@ point compact::intervals::get_circle_direction() const
     assert(!vec.empty());
 
     if (type == hairpin)
-        return rna_tree::parent(vec.back().beg.it)->centre();
+        return rna_tree::parent(vec.back().beg.it)->center();
 
     size_t n = 0;
     point psum = {0, 0};
 
     for (const auto& i : vec)
     {
-        psum += i.beg.it->centre();
+        psum += i.beg.it->center();
         ++n;
     }
     psum = psum / n;
