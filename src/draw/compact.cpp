@@ -391,27 +391,47 @@ void compact::init_multibranch(
             }
         };
 
-    circle c;
-    c.p1 = it->at(0).p;
-    c.p2 = it->at(1).p;
-    c.direction = rna_tree::parent(it)->at(0).p;
-    c.centre = centre(c.p1, c.p2);
-    c.compute_sgn();
-    auto points = c.init(get_number_of_places_for_bases(it), BASES_DISTANCE);
+    if (it.number_of_children() == 2) {
+        /*
+         * In case we inserted into a stem (one child is the stem the other is the new branch) we do not want
+         * to put the tho branches on a circle, but rather place the new branch perpendicular to the existing stem.
+         * So we need to move the non-parent part of the existing stem in its current direction (elongation) and then
+         * add insert the new branch perpendicular to it so that it does not intersect much with the rest of the tree.
+         */
+        point p1 = it->at(0).p;
+        point p2 = it->at(0).p;
 
-    int i = 0;
-    for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch)
-    {
-        if (rna_tree::is_leaf(ch))
-        {
-            ch->at(0).p = points[i];
-
-            i += LEAF_POINTS;
+        //Find out which child is new
+        iterator it_existing, it_new;
+        if (it.node->first_child->data.inited_points()) {
+            it_existing = it.node->first_child;
+            it_new = it.node->last_child;
+        } else {
+            it_existing = it.node->last_child;
+            it_new = it.node->first_child;
         }
-        else
-        {
-            rotate_subtree(ch, c.centre, points[i + 1], points[i + 3]);
-            i += PAIRED_POINTS;
+
+
+
+    } else {
+        circle c;
+        c.p1 = it->at(0).p;
+        c.p2 = it->at(1).p;
+        c.direction = rna_tree::parent(it)->at(0).p;
+        c.centre = centre(c.p1, c.p2);
+        c.compute_sgn();
+        auto points = c.init(get_number_of_places_for_bases(it), BASES_DISTANCE);
+
+        int i = 0;
+        for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch) {
+            if (rna_tree::is_leaf(ch)) {
+                ch->at(0).p = points[i];
+
+                i += LEAF_POINTS;
+            } else {
+                rotate_subtree(ch, c.centre, points[i + 1], points[i + 3]);
+                i += PAIRED_POINTS;
+            }
         }
     }
     auto set_label_status =

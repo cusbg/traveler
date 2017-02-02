@@ -73,12 +73,12 @@ public:
 
 public:
     /**
-     * returns sequence RNA
+     * returns RNA sequence
      */
     static std::string get_labels(
                 const iterator& root);
     /**
-     * returns sequence RNA
+     * returns RNA sequence
      */
     std::string get_labels() const;
     /**
@@ -87,7 +87,7 @@ public:
     static std::string get_brackets(
                 const iterator& root);
     /**
-     * returns dot-bracket secondary structure
+     * returns dot-bracketed secondary structure
      */
     std::string get_brackets() const;
 
