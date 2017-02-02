@@ -66,7 +66,7 @@ public:
 
 point operator*(double value, const point& p);
 
-point centre(const point& p1, const point& p2);
+point center(const point &p1, const point &p2);
 
 double distance(const point& p1, const point& p2);
 

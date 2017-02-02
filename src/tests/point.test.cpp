@@ -68,8 +68,8 @@ void test_point::test_basics()
 
 void test_point::test_functions()
 {
-    assert_equals(centre(point_0_1, point_0_3), point_0_2);
-    assert_equals(centre(point_0_m1, point_0_3), point_0_1);
+    assert_equals(center(point_0_1, point_0_3), point_0_2);
+    assert_equals(center(point_0_m1, point_0_3), point_0_1);
     assert_equals(size(point_0_3), 3);
     assert_equals(normalize(point_0_3), point_0_1);
 

@@ -1,7 +1,7 @@
 /*
  * File: compact.cpp
  *
- * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>, 2017 David Hoksza <david.hoksza@mff.cuni.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -356,6 +356,9 @@ void compact::init_multibranch(
     auto rotate_subtree =
         [this](sibling_iterator root, point center, point p1, point p2)
         {
+            //root is the root of the subtree to be rotated
+            //points p1 and p2 are positions of where it should be positioned
+            //center is the center of the parent (of all the branches to be rotated) pair
             if (init_branch_recursive(root, center).bad())
             {
                 rna_tree::for_each_in_subtree(root,
@@ -398,8 +401,6 @@ void compact::init_multibranch(
          * So we need to move the non-parent part of the existing stem in its current direction (elongation) and then
          * add insert the new branch perpendicular to it so that it does not intersect much with the rest of the tree.
          */
-        point p1 = it->at(0).p;
-        point p2 = it->at(0).p;
 
         //Find out which child is new
         iterator it_existing, it_new;
@@ -411,14 +412,27 @@ void compact::init_multibranch(
             it_new = it.node->first_child;
         }
 
+        //Move the existing branch in its current direction so that there is enough space for the new branch
+        //to be located perpendicular to it
+        point p[2] = {it->at(0).p, it->at(1).p};
+        point e[2] = {it_existing->at(0).p, it_existing->at(1).p};
+        point c_parent = center(p[0], p[1]);
+        point points_existing_new[2] = {move_point(p[0], e[0], PAIRS_DISTANCE),
+                                       move_point(p[1], e[1], PAIRS_DISTANCE)};
+        point c_junction = (c_parent + center(points_existing_new[0], points_existing_new[1])) / 2; //center of the new junction
+        rotate_subtree(it_existing, c_junction, points_existing_new[0], points_existing_new[1]);
 
+        //Position the new branch
+        point points_new[2] = {move_point(p[0], p[1], -BASES_DISTANCE),
+                               move_point(points_existing_new[0], points_existing_new[1], -BASES_DISTANCE)};
+        rotate_subtree(it_new, c_junction, points_new[0], points_new[1]);
 
     } else {
         circle c;
         c.p1 = it->at(0).p;
         c.p2 = it->at(1).p;
         c.direction = rna_tree::parent(it)->at(0).p;
-        c.centre = centre(c.p1, c.p2);
+        c.centre = center(c.p1, c.p2);
         c.compute_sgn();
         auto points = c.init(get_number_of_places_for_bases(it), BASES_DISTANCE);
 
@@ -473,7 +487,7 @@ void compact::make_branch_even(
     p2 = vec[0]->at(1).p;
     if (!double_equals(distance(p1, p2), BASES_DISTANCE))
     {
-        p = centre(p1, p2);
+        p = center(p1, p2);
         p1 = move_point(p, p1, PAIRS_DISTANCE / 2);
         p2 = move_point(p, p2, PAIRS_DISTANCE / 2);
 
@@ -681,7 +695,7 @@ void compact::remake(
     c.p1 = i.beg.it->at(i.beg.index).p;
     c.p2 = i.end.it->at(i.end.index).p;
     c.direction = direction;
-    c.centre = centre(c.p1, c.p2);
+    c.centre = center(c.p1, c.p2);
     c.compute_sgn();
 
     reinsert(c.init(i.vec.size(), BASES_DISTANCE), i.vec);

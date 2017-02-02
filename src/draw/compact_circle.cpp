@@ -96,7 +96,7 @@ bool compact::circle::lies_in_segment(
 {
     CIRCLE_POINTS_INITED();
 
-    // angle(p1, centre, p) + angle(p, center, p2) == segment_angle()
+    // angle(p1, center, p) + angle(p, center, p2) == segment_angle()
     if (!double_equals(
             fmod(angle(p1, centre, p) + angle(p, centre, p2) + 360, 360),
             fmod(segment_angle() + 360, 360)) &&

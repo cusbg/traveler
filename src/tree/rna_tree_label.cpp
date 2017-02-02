@@ -202,7 +202,7 @@ point rna_pair_label::center() const
         return point::bad_point();
     }
     if (paired())
-        return ::centre((*this)[0].p, (*this)[1].p);
+        return ::center((*this)[0].p, (*this)[1].p);
     else
         return (*this)[0].p;
 }
