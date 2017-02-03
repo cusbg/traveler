@@ -155,7 +155,15 @@ void compact::init()
         //pokud je to napriklad root, tak se bude vkladat kreslit "nad" strukturu
         if (rna_tree::is_root(par))
         {
+
             init_branch_recursive(it);
+//            auto prev = rna.previous_sibling(it);
+//            auto next = rna.next_sibling(it);
+//            point p1, p2;
+//            prev->paired() ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
+//            p2 = (*next)[0].p;
+
+            //if (prev.)
         }
         else if (!init_branch_recursive(it, p).bad())    // => is good
         {

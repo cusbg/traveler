@@ -136,6 +136,16 @@ public:
     static bool is_valid(
                 const base_iterator& it);
 
+    base_iterator previous_sibling(const base_iterator& it)
+    {
+        return _tree.previous_sibling(it);
+    }
+
+    base_iterator next_sibling(const base_iterator& it)
+    {
+        return _tree.next_sibling(it);
+    }
+
 private:
     static size_t ID;
 
