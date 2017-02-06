@@ -30,6 +30,7 @@
 #include "overlap_checks.hpp"
 #include "rted.hpp"
 #include "gted.hpp"
+#include "overlap_checks.hpp"
 
 #define ARGS_HELP                           {"-h", "--help"}
 #define ARGS_TARGET_STRUCTURE               {"-gs", "--target-structure"}

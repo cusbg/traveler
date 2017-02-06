@@ -22,6 +22,7 @@
 #include "compact.hpp"
 #include "compact_circle.hpp"
 #include "compact_utils.hpp"
+#include "overlap_checks.hpp"
 
 using namespace std;
 
@@ -45,6 +46,7 @@ void compact::run()
     init();
     make();
     update_ends_in_rna(rna);
+    try_reposition_new_root_branches();
     checks();
 
     INFO("END: Computing RNA layout");
@@ -424,7 +426,7 @@ void compact::init_multibranch(
         p2 = move_point(p1, p2, PAIRS_DISTANCE);
 
         point c = center(p1, p2);
-        point direction =  orthogonal(p1 - p2);
+        point direction =  orthogonal(p2 - p1); //TODO: impement decision whether to use direction or -direction
         p1 = move_point(p1, p1 + direction, BASES_DISTANCE);
         p2 = move_point(p2, p2 + direction, BASES_DISTANCE);
 
@@ -437,6 +439,11 @@ void compact::init_multibranch(
 
         rotate_subtree(it, c, p1, p2);
 
+        //Move the p2 nucleotide and all the following siblings
+        point shift_vector = p2 - p1;
+        for (sibling_iterator s = next; s != it.end(); ++s) {
+            shift_branch(s, p2-p1);
+        }
     }
     else if (it.number_of_children() == 2) {
         /*
@@ -782,6 +789,31 @@ double compact::get_length(
             ERR("All bases should be visualized, but they are not.");
         }
     }
+}
+
+void compact::try_reposition_new_root_branches()
+{
+//    overlap_checks::overlaps overlaps = overlap_checks().run(rna);
+//
+//    sibling_iterator root = rna.begin();
+//    for (sibling_iterator it = root.begin(); it != root.end(); ++it)
+//    {
+//        if (it->paired() && it->status == rna_pair_label::inserted)
+//        {//newly inserted pair (not neccessary whole new branch)
+//            point p[] = {it->at(0).p, it->at(1).p};
+//            iterator next = rna.next_sibling(it);
+//            iterator prev = rna.previous_sibling(it);
+//            assert(next.node != NULL || prev.node != NULL)
+//            point direction_point;
+//            direction_point = next.node != NULL ? next->at(0).p : prev->at(0).p;
+//            orthogonal(p[0] - p[1], direction_point);
+//
+//            shift_branch(it, )
+//
+//        }
+//    }
+
+
 }
 
 

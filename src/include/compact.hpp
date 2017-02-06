@@ -223,6 +223,8 @@ private:
      */
     inline void checks();
 
+    void try_reposition_new_root_branches();
+
 
 private:
     // for debugging:

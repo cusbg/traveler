@@ -56,11 +56,12 @@ overlap_checks::edges overlap_checks::get_edges(
 
     for (++it; it != rna.end_pre_post(); ++it)
     {
-        assert(it->inited_points());
-
-        e.p2 = get_p();
-        vec.push_back(e);
-        e.p1 = e.p2;
+        //assert(it->inited_points());
+        if (it->inited_points()) {
+            e.p2 = get_p();
+            vec.push_back(e);
+            e.p1 = e.p2;
+        }
     }
 
     return vec;
