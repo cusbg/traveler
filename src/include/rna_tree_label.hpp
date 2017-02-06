@@ -103,12 +103,19 @@ public:
     void set_label_strings(
                 const rna_pair_label& other);
 
+    void set_parent_center(
+            const point& center);
+
+    const point & get_parent_center();
+
 public:
     status_type status = untouched;
     std::vector<size_t> remake_ids;
 
 private:
     std::vector<rna_label> labels;
+    point parent_center;
+
 };
 
 #endif /* !RNA_TREE_LABEL_HPP */

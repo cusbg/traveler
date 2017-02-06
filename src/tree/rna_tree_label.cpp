@@ -244,4 +244,16 @@ void rna_pair_label::set_label_strings(
         (*this)[i].label = other[i].label;
 }
 
+void rna_pair_label::set_parent_center(
+        const point& center)
+{
+    parent_center = center;
+
+}
+
+const point & rna_pair_label::get_parent_center()
+{
+    return parent_center;
+}
+
 

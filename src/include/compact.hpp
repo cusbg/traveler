@@ -147,7 +147,8 @@ private:
      * lay out nodes on circle, rotate and shift branches if needed
      */
     void init_multibranch(
-                sibling_iterator parent);
+                sibling_iterator parent,
+                bool root = false);
     // INIT ^^
 
 private:

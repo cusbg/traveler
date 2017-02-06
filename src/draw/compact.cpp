@@ -155,17 +155,10 @@ void compact::init()
         //pokud je to napriklad root, tak se bude vkladat kreslit "nad" strukturu
         if (rna_tree::is_root(par))
         {
-
-            init_branch_recursive(it);
-//            auto prev = rna.previous_sibling(it);
-//            auto next = rna.next_sibling(it);
-//            point p1, p2;
-//            prev->paired() ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
-//            p2 = (*next)[0].p;
-
-            //if (prev.)
+            if (init_branch_recursive(it).bad())
+                init_multibranch(it, true);
         }
-        else if (!init_branch_recursive(it, p).bad())    // => is good
+        else if (!rna_tree::is_root(par) && !init_branch_recursive(it, p).bad())    // => is good
         {
             // init OK
         }
@@ -310,13 +303,16 @@ point compact::init_branch_recursive(
      * Expecting that we are inserting into a branch at a position which does not split (only one non-leaf
      * child). Otherwise, we do not know how to connect that node to the children
      */
-    assert(rna_tree::is_valid(ch));
+    if (!rna_tree::is_valid(ch))
+        return point::bad_point();
 
     p = init_branch_recursive(ch);
 
-    it->at(0).p = ch->at(0).p;
-    it->at(1).p = ch->at(1).p;
-    shift_branch(ch, -p);
+    if (!p.bad()) {
+        it->at(0).p = ch->at(0).p;
+        it->at(1).p = ch->at(1).p;
+        shift_branch(ch, -p);
+    }
 
     return p;
 }
@@ -329,7 +325,14 @@ void compact::init_by_ancestor(
     point p1, p2, vec;
     iterator par = rna_tree::parent(it);
     assert(!rna_tree::is_root(par));
-    vec = normalize(par->center() - rna_tree::parent(par)->center());
+
+    iterator grandpar = rna_tree::parent(par);
+    if (!rna_tree::is_root(grandpar))
+        vec = normalize(par->center() - rna_tree::parent(par)->center());
+    else {
+        assert(!par->get_parent_center().bad())
+        vec = normalize(par->center() - par->get_parent_center());
+    }
         // ^^ direction (parent(par)->par)
     p1 = par->at(0).p + vec;
     p2 = par->at(1).p + vec;
@@ -341,7 +344,7 @@ void compact::init_by_ancestor(
 }
 
 void compact::init_multibranch(
-                sibling_iterator it)
+                sibling_iterator it, bool root)
 {
     APP_DEBUG_FNAME;
 
@@ -402,7 +405,40 @@ void compact::init_multibranch(
             }
         };
 
-    if (it.number_of_children() == 2) {
+    if (root)  {
+        /*
+         * New branch created at the root level and it that case, the iterator is the root of the subtree to be
+         * inserted into the root level. Since we are inserting into root, which is the 5'3' pair which does not need to be base-paired,
+         * but can be far apart in the image (e.g. http://www.rna.ccbb.utexas.edu/RNA/Structures/d.16.e.H.sapiens.pdf),
+         * we need to find an anchor point which will be used for the multibranch (normally we use the parent)
+         */
+
+        auto prev = rna.previous_sibling(it);
+        auto next = rna.next_sibling(it);
+
+        assert(prev->inited_points() && next->inited_points())
+
+        point p1, p2;
+        prev->paired() ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
+        p2 = (*next)[0].p;
+        p2 = move_point(p1, p2, PAIRS_DISTANCE);
+
+        point c = center(p1, p2);
+        point direction =  orthogonal(p1 - p2);
+        p1 = move_point(p1, p1 + direction, BASES_DISTANCE);
+        p2 = move_point(p2, p2 + direction, BASES_DISTANCE);
+
+        /*
+         * We need to remember the parent's center be used later when intializing position for the child of current node.
+         * Normally, the positin is obtain from the parent, but in case of root parent, that is the position between
+         * 5' and 3' end which might be far apart.
+         */
+        it->set_parent_center(c);
+
+        rotate_subtree(it, c, p1, p2);
+
+    }
+    else if (it.number_of_children() == 2) {
         /*
          * In case we inserted into a stem (one child is the stem the other is the new branch) we do not want
          * to put the tho branches on a circle, but rather place the new branch perpendicular to the existing stem.
