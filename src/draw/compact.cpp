@@ -77,6 +77,46 @@ void compact::run()
     recursion(parent);
 }
 
+/* static */ void compact::mirror_branch(
+        iterator root)
+{
+    //First we obtain direction vector of the root's bp (in case of
+    point pr[2] = {root->at(0).p, root->at(1).p};
+    point center_root = center(pr[0], pr[1]);
+    point v = pr[0] - pr[1];
+
+    function<void(iterator)> recursion =
+            [&recursion, &pr](iterator it) {
+
+                if (it->inited_points())
+                    for (size_t i = 0; i < it->size(); ++i) {
+                        //Get the vector between mirror line and point
+                        point p = it->at(i).p;
+                        //double a = angle(p, center_root, center_root + v);
+                        //Rotate the point in the reverse directions
+                        //it->at(i).p += rotate(center_root, -a, distance(p, center_root));
+
+                        //http://stackoverflow.com/questions/3306838/algorithm-for-reflecting-a-point-across-a-line
+                        //first project p on the mirror line
+                        double a = (pr[0].y - pr[1].y) / (pr[0].x - pr[1].x);
+                        double b = pr[0].y - pr[0].x * a;
+//                        point pl(0 + (b * p.x) / (1 + m * m), b + (m * p.x) / (1 + m * m));
+//                        it->at(i).p = 2 * pl - p;
+                        double d = (p.x + (p.y - b)*a)/(1 + a*a);
+                        it->at(i).p = point(2*d - p.x, 2*d*a - p.y + 2*b);
+
+                    }
+
+                sibling_iterator ch;
+
+                for (ch = it.begin(); ch != it.end(); ++ch)
+                    recursion(ch);
+            };
+
+    //Recursively mirror each point with respect to the line defined by the parent's center and direction vector
+    recursion(root);
+}
+
 /* static */ void compact::set_distance(
                 iterator parent,
                 iterator child,
@@ -415,34 +455,33 @@ void compact::init_multibranch(
          * we need to find an anchor point which will be used for the multibranch (normally we use the parent)
          */
 
-        auto prev = rna.previous_sibling(it);
-        auto next = rna.next_sibling(it);
+        iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
+        while (prev.node != NULL && !prev->inited_points()) prev = rna.previous_sibling(prev);
+        while (next.node != NULL && !next->inited_points())  next = rna.next_sibling(next);
 
-        assert(prev->inited_points() && next->inited_points())
+        assert(prev.node != NULL && next.node != NULL && prev->inited_points() && next->inited_points());
 
         point p1, p2;
+
         prev->paired() ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
         p2 = (*next)[0].p;
-        p2 = move_point(p1, p2, PAIRS_DISTANCE);
 
-        point c = center(p1, p2);
-        point direction =  orthogonal(p2 - p1); //TODO: impement decision whether to use direction or -direction
-        p1 = move_point(p1, p1 + direction, BASES_DISTANCE);
-        p2 = move_point(p2, p2 + direction, BASES_DISTANCE);
+        point orig_vector = p2 - p1;
 
-        /*
-         * We need to remember the parent's center be used later when intializing position for the child of current node.
-         * Normally, the positin is obtain from the parent, but in case of root parent, that is the position between
-         * 5' and 3' end which might be far apart.
-         */
-        it->set_parent_center(c);
+        p1 = move_point(p1, p1 + orig_vector, BASES_DISTANCE);
+        p2 = move_point(p1, p1 + orig_vector, PAIRS_DISTANCE);
+
+
+        point c = center(p1, p2) - orthogonal(p2 - p1)*BASES_DISTANCE;
+        //Whether it wouldn't be better to position the center in the opposite orthogonal direction
+        //is checked later in the try_reposition_new_root_branches function
+
 
         rotate_subtree(it, c, p1, p2);
 
         //Move the p2 nucleotide and all the following siblings
-        point shift_vector = p2 - p1;
         for (sibling_iterator s = next; s != it.end(); ++s) {
-            shift_branch(s, p2-p1);
+            shift_branch(s,  normalize(orig_vector) * (BASES_DISTANCE + PAIRS_DISTANCE) );
         }
     }
     else if (it.number_of_children() == 2) {
@@ -793,27 +832,24 @@ double compact::get_length(
 
 void compact::try_reposition_new_root_branches()
 {
-//    overlap_checks::overlaps overlaps = overlap_checks().run(rna);
-//
-//    sibling_iterator root = rna.begin();
-//    for (sibling_iterator it = root.begin(); it != root.end(); ++it)
-//    {
-//        if (it->paired() && it->status == rna_pair_label::inserted)
-//        {//newly inserted pair (not neccessary whole new branch)
-//            point p[] = {it->at(0).p, it->at(1).p};
-//            iterator next = rna.next_sibling(it);
-//            iterator prev = rna.previous_sibling(it);
-//            assert(next.node != NULL || prev.node != NULL)
-//            point direction_point;
-//            direction_point = next.node != NULL ? next->at(0).p : prev->at(0).p;
-//            orthogonal(p[0] - p[1], direction_point);
-//
-//            shift_branch(it, )
-//
-//        }
-//    }
 
+    overlap_checks::overlaps overlaps = overlap_checks().run(rna);
 
+    sibling_iterator root = rna.begin();
+    for (sibling_iterator it = root.begin(); it != root.end(); ++it)
+    {
+        if (it->paired() && it->status == rna_pair_label::inserted)
+        {//newly inserted pair (not neccessary whole new branch)
+
+            //Try to mirror the branch
+            mirror_branch(it);
+            //Get the number of overlaps
+            //TODO: should be optimized to check only intersections in the current branch
+            overlap_checks::overlaps overlaps_aux = overlap_checks().run(rna);
+            //If by mirroring we got more overlaps, mirror back
+            if (overlaps_aux.size() > overlaps.size()) mirror_branch(it);
+        }
+    }
 }
 
 
