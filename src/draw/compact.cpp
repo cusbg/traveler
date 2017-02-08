@@ -476,6 +476,12 @@ void compact::init_multibranch(
         //Whether it wouldn't be better to position the center in the opposite orthogonal direction
         //is checked later in the try_reposition_new_root_branches function
 
+        /*
+         * We need to remember the parent's center be used later when intializing position for the child of current node.
+         * Normally, the positin is obtain from the parent, but in case of root parent, that is the position between
+         * 5' and 3' end which might be far apart.
+         */
+        it->set_parent_center(c);
 
         rotate_subtree(it, c, p1, p2);
 

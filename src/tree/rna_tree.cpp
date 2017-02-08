@@ -108,7 +108,7 @@ void update_ends_in_rna(
     typedef rna_tree::iterator iterator;
 
     iterator root = rna.begin();
-    point p1, p2;
+    point pf, pl;
     iterator f, l;
 
     f = rna_tree::first_child(root);
@@ -120,19 +120,37 @@ void update_ends_in_rna(
         return;
     }
 
-    p1 = f->at(0).p;
-    p2 = l->paired() ? l->at(1).p : l->at(0).p;
+    pf = f->at(0).p;
+    pl = l->paired() ? l->at(1).p : l->at(0).p;
 
-    if (p1.bad() || p2.bad() || p1 == p2)
+    if (pf.bad() || pl.bad() || pf == pl)
     {
         WARN("Cannot initialize rna ends (3', 5'), returning");
         return;
     }
-    point dir = normalize(p2 - p1) * 7;
 
-    root->at(0).p = p1 - dir;
+    if (f == l) {
+        //first base is paired
+        point dir = normalize(pl - pf) * 7;
+        root->at(0).p = pf - dir;
+        root->at(1).p = pl + dir;
+    } else{
+        //using first and first but last siblings to get the position for the 5' and 3' labels
+        iterator f2 = rna.next_sibling(f);
+        iterator l2 = rna.previous_sibling(l);
+
+        point pf2, pl2;
+        pf2 = f2->at(0).p;
+        pl2 = l2->paired() ? l2->at(1).p : l2->at(0).p;
+
+        root->at(0).p = pf - (pf2 - pf);
+        root->at(1).p = pl - (pl2 - pl);
+    }
+
+
+
     root->at(0).label = "5'";
-    root->at(1).p = p2 + dir;
+
     root->at(1).label = "3'";
 
     INFO("RNA ends (3', 5') are updated");
