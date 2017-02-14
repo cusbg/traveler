@@ -197,8 +197,16 @@ void compact::init()
         //pokud je to napriklad root, tak se bude vkladat kreslit "nad" strukturu
         if (rna_tree::is_root(par))
         {
+            /*
+             * init_branch_recursive works in situations when new bps are added at the top of
+             * an existing branch. In such a case, the whole branch is moved in the desired direction
+             * and new items are inserted.
+             */
             if (init_branch_recursive(it).bad())
+            {
+                // In case we are adding a brand new branch or we are adding into a branch which is part of a multibranch loop
                 init_multibranch(it, true);
+            }
         }
         else if (!rna_tree::is_root(par) && !init_branch_recursive(it, p).bad())    // => is good
         {
@@ -455,54 +463,99 @@ void compact::init_multibranch(
          * we need to find an anchor point which will be used for the multibranch (normally we use the parent)
          */
 
-        //iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
-        iterator prev = it, next = it;
-        iterator it_aux;
-        do
+        iterator first_initiated = rna.get_leftest_initiated_descendant(it);
+        iterator last_initiated = rna.get_rightest_initiated_descendant(it);
+
+        if (first_initiated->inited_points() && last_initiated->inited_points())
         {
-            it_aux = rna.previous_sibling(prev);
-            if (it_aux.node == nullptr && prev.node->parent != nullptr) it_aux = rna.parent(prev);
-            prev = it_aux;
+            //inserting into an existing branch which is part of a multibranch loop
+            // THe idea is to keep the rest of the structure and just position
+
+            //Get centers of first bps of all branches rooted in current branch and obtain their center
+            //The center and the connector of the first and last initiated points will be used to obtain position of the
+            //newly inserted residues
+
+//            point c = point(0, 0);
+//            int cnt_branches = 0;
+
+            assert(rna.depth(first_initiated) == rna.depth(last_initiated));
+//            for (sibling_iterator si = sibling_iterator(first_initiated); si != sibling_iterator(last_initiated); si++)
+//            {
+//                if (si->inited_points() && si->paired())
+//                {
+//                    cnt_branches++;
+//                    c += si->center();
+//                }
+//            }
+//            c = c / cnt_branches;
+
+            point p1, p2;
+
+            p1 = (*first_initiated)[0].p;
+            last_initiated->paired() ? p2 = (*last_initiated)[1].p : p2 = (*last_initiated)[0].p;
+
+            point c = center(p1, p2) - orthogonal(p1 - p2) * BASES_DISTANCE;
+            //Whether it wouldn't be better to position the center in the opposite orthogonal direction
+            //is checked later in the try_reposition_new_root_branches function
+
+            /*
+             * We need to remember the parent's center be used later when intializing position for the child of current node.
+             * Normally, the positin is obtain from the parent, but in case of root parent, that is the position between
+             * 5' and 3' end which might be far apart.
+             */
+            it->set_parent_center(c);
+
+            rotate_subtree(it, c, p1, p2);
+
         }
-        while (prev.node != nullptr && !prev->inited_points());
-        do
-        {
-            it_aux = rna.next_sibling(next);
-            if (it_aux.node == nullptr && next.node->parent != nullptr) it_aux = rna.parent(next);
-            next = it_aux;
-        }
-        while (next.node != nullptr && !next->inited_points());
+        else {
+            //inserting a brand new branch
+
+            //iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
+            iterator prev = it, next = it;
+            iterator it_aux;
+            do {
+                it_aux = rna.previous_sibling(prev);
+                if (it_aux.node == nullptr && prev.node->parent != nullptr) it_aux = rna.parent(prev);
+                prev = it_aux;
+            } while (prev.node != nullptr && !prev->inited_points());
+            do {
+                it_aux = rna.next_sibling(next);
+                if (it_aux.node == nullptr && next.node->parent != nullptr) it_aux = rna.parent(next);
+                next = it_aux;
+            } while (next.node != nullptr && !next->inited_points());
 
 
-        assert(prev.node != nullptr && next.node != nullptr && prev->inited_points() && next->inited_points());
+            assert(prev.node != nullptr && next.node != nullptr && prev->inited_points() && next->inited_points());
 
-        point p1, p2;
+            point p1, p2;
 
-        prev->paired() ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
-        p2 = (*next)[0].p;
+            prev->paired() ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
+            p2 = (*next)[0].p;
 
-        point orig_vector = p2 - p1;
+            point orig_vector = p2 - p1;
 
-        p1 = move_point(p1, p1 + orig_vector, BASES_DISTANCE);
-        p2 = move_point(p1, p1 + orig_vector, PAIRS_DISTANCE);
+            p1 = move_point(p1, p1 + orig_vector, BASES_DISTANCE);
+            p2 = move_point(p1, p1 + orig_vector, PAIRS_DISTANCE);
 
 
-        point c = center(p1, p2) - orthogonal(p2 - p1)*BASES_DISTANCE;
-        //Whether it wouldn't be better to position the center in the opposite orthogonal direction
-        //is checked later in the try_reposition_new_root_branches function
+            point c = center(p1, p2) - orthogonal(p2 - p1) * BASES_DISTANCE;
+            //Whether it wouldn't be better to position the center in the opposite orthogonal direction
+            //is checked later in the try_reposition_new_root_branches function
 
-        /*
-         * We need to remember the parent's center be used later when intializing position for the child of current node.
-         * Normally, the positin is obtain from the parent, but in case of root parent, that is the position between
-         * 5' and 3' end which might be far apart.
-         */
-        it->set_parent_center(c);
+            /*
+             * We need to remember the parent's center be used later when intializing position for the child of current node.
+             * Normally, the positin is obtain from the parent, but in case of root parent, that is the position between
+             * 5' and 3' end which might be far apart.
+             */
+            it->set_parent_center(c);
 
-        rotate_subtree(it, c, p1, p2);
+            rotate_subtree(it, c, p1, p2);
 
-        //Move the p2 nucleotide and all the following siblings
-        for (sibling_iterator s = next; s != it.end(); ++s) {
-            shift_branch(s,  normalize(orig_vector) * (BASES_DISTANCE + PAIRS_DISTANCE) );
+            //Move the p2 nucleotide and all the following siblings
+            for (sibling_iterator s = next; s != it.end(); ++s) {
+                shift_branch(s, normalize(orig_vector) * (BASES_DISTANCE + PAIRS_DISTANCE));
+            }
         }
     }
     else if (it.number_of_children() == 2) {

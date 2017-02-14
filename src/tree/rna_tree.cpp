@@ -99,7 +99,7 @@ void rna_tree::update_points(
     update_ends_in_rna(*this);
 }
 
-//zvyraznuje 5' a 3' konec
+//highlights 5' and 3' end
 void update_ends_in_rna(
                 rna_tree& rna)
 {
@@ -272,6 +272,26 @@ bool rna_tree::correct_pairing() const
     }
 
     return true;
+}
+
+/* static */
+rna_tree::iterator rna_tree::get_leftest_initiated_descendant(const rna_tree::iterator& node)
+{
+    APP_DEBUG_FNAME;
+
+    if (node->inited_points()) return node;
+    else if (is_leaf(node)) get_leftest_initiated_descendant(iterator(node.node->next_sibling));
+    else return get_leftest_initiated_descendant(node.begin());
+}
+
+/* static */
+rna_tree::iterator rna_tree::get_rightest_initiated_descendant(const rna_tree::iterator& node)
+{
+    APP_DEBUG_FNAME;
+
+    if (node->inited_points()) return node;
+    else if (is_leaf(node)) get_rightest_initiated_descendant(iterator(node.node->prev_sibling));
+    else return get_rightest_initiated_descendant(rna_tree::iterator(node.node->last_child));
 }
 
 

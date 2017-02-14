@@ -96,6 +96,18 @@ public:
      */
     bool correct_pairing() const;
 
+    /**
+     * Obtains a node and returns first initiated descendant in the most left branch
+     */
+    static iterator get_leftest_initiated_descendant(
+            const iterator& node);
+
+    /**
+     * Obtains a node and returns first initiated descendant in the most right branch
+     */
+    static iterator get_rightest_initiated_descendant(
+            const iterator& node);
+
 public:
     static point base_pair_edge_point(
                 point from,

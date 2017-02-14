@@ -136,6 +136,9 @@ public:
     static bool is_valid(
                 const base_iterator& it);
 
+    int depth(
+            const base_iterator& it);
+
     base_iterator previous_sibling(const base_iterator& it)
     {
         return _tree.previous_sibling(it);

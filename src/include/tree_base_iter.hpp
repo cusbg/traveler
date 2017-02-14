@@ -402,6 +402,12 @@ bool tree_base<label_type>::is_valid(
     return it.node != nullptr;
 }
 
+template <typename label_type>
+int tree_base<label_type>::depth(
+        const base_iterator& it)
+{
+    return _tree.depth(it);
+}
 
 /* static */
 template <typename label_type>
