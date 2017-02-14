@@ -3,9 +3,10 @@
 Visualization of RNA secondary structure using a template visualization (currently [Comparative RNA Web (CRW) Site](http://www.rna.icmb.utexas.edu/) postscripts and [VARNA](http://varna.lri.fr/) SVG formats are supported). The first  version of Traveler was developed by Richard Elias (and still the abosulte majority of the code is his work) and the original repository should be accessible at  https://github.com/rikiel/traveler.asdf
 
 The following image shows what Traveler is good for. 
-  <img src="img/human.pdf" width="30%"/>
-  <img src="img/A.bracteata.pdf" width="30%"/>
-  <img src="img/eab.colored.svg" width="30%"/>
+
+  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/human.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/A_bracteata.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/eab_colored.png" width="30%"/>
 </p>
 
 ## Requirements:
