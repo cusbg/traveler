@@ -456,7 +456,7 @@ void compact::init_multibranch(
          */
 
         //iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
-        iterator prev = it, next = rna.next_sibling(it);
+        iterator prev = it, next = it;
         iterator it_aux;
         do
         {
