@@ -46,7 +46,7 @@ void compact::run()
     init();
     make();
     update_ends_in_rna(rna);
-    try_reposition_new_root_branches();
+    //try_reposition_new_root_branches();
     checks();
 
     INFO("END: Computing RNA layout");
@@ -455,11 +455,26 @@ void compact::init_multibranch(
          * we need to find an anchor point which will be used for the multibranch (normally we use the parent)
          */
 
-        iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
-        while (prev.node != NULL && !prev->inited_points()) prev = rna.previous_sibling(prev);
-        while (next.node != NULL && !next->inited_points())  next = rna.next_sibling(next);
+        //iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
+        iterator prev = it, next = rna.next_sibling(it);
+        iterator it_aux;
+        do
+        {
+            it_aux = rna.previous_sibling(prev);
+            if (it_aux.node == nullptr && prev.node->parent != nullptr) it_aux = rna.parent(prev);
+            prev = it_aux;
+        }
+        while (prev.node != nullptr && !prev->inited_points());
+        do
+        {
+            it_aux = rna.next_sibling(next);
+            if (it_aux.node == nullptr && next.node->parent != nullptr) it_aux = rna.parent(next);
+            next = it_aux;
+        }
+        while (next.node != nullptr && !next->inited_points());
 
-        assert(prev.node != NULL && next.node != NULL && prev->inited_points() && next->inited_points());
+
+        assert(prev.node != nullptr && next.node != nullptr && prev->inited_points() && next->inited_points());
 
         point p1, p2;
 
