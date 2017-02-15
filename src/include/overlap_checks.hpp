@@ -24,8 +24,7 @@
 
 #include <vector>
 #include "point.hpp"
-
-class rna_tree;
+#include "rna_tree.hpp"
 
 class overlap_checks
 {
@@ -51,6 +50,9 @@ public:
      */
     overlaps run(
                 rna_tree& _rna);
+
+    static edges get_edges(const rna_tree::iterator& node);
+    static overlaps get_overlaps(const edges &e1, const edges &e2);
 
 private:
     /**

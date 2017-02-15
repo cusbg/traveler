@@ -468,12 +468,10 @@ void compact::init_multibranch(
 
         if (first_initiated->inited_points() && last_initiated->inited_points())
         {
-            //inserting into an existing branch which is part of a multibranch loop
-            // THe idea is to keep the rest of the structure and just position
+            //Installing a new root into an existing branch in depth 1 which is part of a multibranch loop
 
-            //Get centers of first bps of all branches rooted in current branch and obtain their center
-            //The center and the connector of the first and last initiated points will be used to obtain position of the
-            //newly inserted residues
+            //The idea is to position the new root at the position of the intiated points and rotate the subtree to
+            //accommodate this change
 
 //            point c = point(0, 0);
 //            int cnt_branches = 0;
@@ -924,6 +922,28 @@ void compact::try_reposition_new_root_branches()
             if (overlaps_aux.size() > overlaps.size()) mirror_branch(it);
         }
     }
+    //    sibling_iterator root = rna.begin();
+//
+//    overlap_checks::edges edges_all = overlap_checks::get_edges(root);
+//
+//    for (sibling_iterator it = root.begin(); it != root.end(); ++it)
+//    {
+//        if (it->paired() && it->status == rna_pair_label::inserted)
+//        {//newly inserted pair (not neccessary whole new branch)
+//            overlap_checks::edges edges_branch = overlap_checks::get_edges(it);
+//
+//            overlap_checks::overlaps overlaps1 = overlap_checks::get_overlaps(edges_all,edges_branch);
+//
+//            //Try to mirror the branch
+//            mirror_branch(it);
+//            //Get the number of overlaps
+//            //TODO: should be optimized to check only intersections in the current branch
+//            //overlap_checks::overlaps overlaps_aux = overlap_checks().run(rna);
+//            overlap_checks::overlaps overlaps2 = overlap_checks::get_overlaps(edges_all,edges_branch);
+//            //If by mirroring we got more overlaps, mirror back
+//            if (overlaps2.size() > overlaps1.size()) mirror_branch(it);
+//        }
+//    }
 }
 
 
