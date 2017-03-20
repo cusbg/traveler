@@ -194,6 +194,7 @@ void compact::init()
 
         assert(!p.bad());
 
+
         //pokud je to napriklad root, tak se bude vkladat kreslit "nad" strukturu
         if (rna_tree::is_root(par))
         {
@@ -463,11 +464,19 @@ void compact::init_multibranch(
          * we need to find an anchor point which will be used for the multibranch (normally we use the parent)
          */
 
+
         iterator first_initiated = rna.get_leftest_initiated_descendant(it);
         iterator last_initiated = rna.get_rightest_initiated_descendant(it);
 
-        if (first_initiated->inited_points() && last_initiated->inited_points())
+        printf("%lu %lu\n", first_initiated->id(), last_initiated->id());
+
+
+        //if (last_initiated->id() > 140724454035) exit(1);
+
+        if (first_initiated->inited_points()
+            && last_initiated->inited_points())
         {
+
             //Installing a new root into an existing branch in depth 1 which is part of a multibranch loop
 
             //The idea is to position the new root at the position of the intiated points and rotate the subtree to
@@ -475,6 +484,7 @@ void compact::init_multibranch(
 
 //            point c = point(0, 0);
 //            int cnt_branches = 0;
+
 
             assert(rna.depth(first_initiated) == rna.depth(last_initiated));
 //            for (sibling_iterator si = sibling_iterator(first_initiated); si != sibling_iterator(last_initiated); si++)
@@ -504,7 +514,6 @@ void compact::init_multibranch(
             it->set_parent_center(c);
 
             rotate_subtree(it, c, p1, p2);
-
         }
         else {
             //inserting a brand new branch
@@ -512,6 +521,7 @@ void compact::init_multibranch(
             //iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
             iterator prev = it, next = it;
             iterator it_aux;
+
             do {
                 it_aux = rna.previous_sibling(prev);
                 if (it_aux.node == nullptr && prev.node->parent != nullptr) it_aux = rna.parent(prev);
@@ -523,8 +533,9 @@ void compact::init_multibranch(
                 next = it_aux;
             } while (next.node != nullptr && !next->inited_points());
 
-
             assert(prev.node != nullptr && next.node != nullptr && prev->inited_points() && next->inited_points());
+
+            printf("in9\n");
 
             point p1, p2;
 
@@ -535,7 +546,6 @@ void compact::init_multibranch(
 
             p1 = move_point(p1, p1 + orig_vector, BASES_DISTANCE);
             p2 = move_point(p1, p1 + orig_vector, PAIRS_DISTANCE);
-
 
             point c = center(p1, p2) - orthogonal(p2 - p1) * BASES_DISTANCE;
             //Whether it wouldn't be better to position the center in the opposite orthogonal direction

@@ -280,7 +280,11 @@ rna_tree::iterator rna_tree::get_leftest_initiated_descendant(const rna_tree::it
     APP_DEBUG_FNAME;
 
     if (node->inited_points()) return node;
-    else if (is_leaf(node)) get_leftest_initiated_descendant(iterator(node.node->next_sibling));
+    else if (is_leaf(node))
+    {
+        if (node.node->next_sibling->next_sibling == NULL) return node;
+        else return get_leftest_initiated_descendant(iterator(node.node->next_sibling));
+    }
     else return get_leftest_initiated_descendant(node.begin());
 }
 
@@ -290,7 +294,11 @@ rna_tree::iterator rna_tree::get_rightest_initiated_descendant(const rna_tree::i
     APP_DEBUG_FNAME;
 
     if (node->inited_points()) return node;
-    else if (is_leaf(node)) get_rightest_initiated_descendant(iterator(node.node->prev_sibling));
+    else if (is_leaf(node))
+    {
+        if (node.node->prev_sibling->prev_sibling == NULL) return node;
+        else return get_rightest_initiated_descendant(iterator(node.node->prev_sibling));
+    }
     else return get_rightest_initiated_descendant(rna_tree::iterator(node.node->last_child));
 }
 
