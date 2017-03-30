@@ -46,7 +46,7 @@ void compact::run()
     init();
     make();
     update_ends_in_rna(rna);
-    try_reposition_new_root_branches();
+//    try_reposition_new_root_branches();
     checks();
 
     INFO("END: Computing RNA layout");
@@ -924,7 +924,7 @@ double compact::get_length(
     {
         if (!it->initiated_points())
         {
-            ERR("All bases should be visualized, but they are not.");
+            ERR("Some bases positions were not initialized and therefore not drawn.");
         }
     }
 }
