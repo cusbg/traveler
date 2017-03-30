@@ -37,6 +37,7 @@ overlap_checks::overlaps overlap_checks::run(
 
     edges vec = get_edges(rna);
     overlaps overlaps = run(vec);
+    //overlaps overlaps = get_overlaps(vec, vec);
 
     return overlaps;
 }
@@ -52,12 +53,11 @@ overlap_checks::edges overlap_checks::get_edges(
 #define get_p() it->at(it.label_index()).p
     rna_tree::pre_post_order_iterator it = ++rna.begin_pre_post();
     e.p1 = get_p();
-    rna_tree::iterator par;
 
     for (++it; it != rna.end_pre_post(); ++it)
     {
-        //assert(it->inited_points());
-        if (it->inited_points()) {
+        //assert(it->initiated_points());
+        if (it->initiated_points()) {
             e.p2 = get_p();
             vec.push_back(e);
             e.p1 = e.p2;
@@ -148,5 +148,65 @@ overlap_checks::overlaps overlap_checks::run(
         return p;
     else
         return point::bad_point();
+}
+
+
+/* static */
+overlap_checks::edges overlap_checks::get_edges(const rna_tree::iterator& node)
+{
+    edges vec;
+//    edge e;
+//
+//#define get_p() it->at(it.label_index()).p
+//    rna_tree::pre_post_order_iterator it = rna_tree::pre_post_order_iterator(node, true);
+//    e.p1 = get_p();
+//
+//    for (++it; it != ++rna_tree::pre_post_order_iterator(node, false); ++it)
+//    {
+//        //assert(it->initiated_points());
+//        if (it->initiated_points()) {
+//            e.p2 = get_p();
+//            vec.push_back(e);
+//            e.p1 = e.p2;
+//        }
+//    }
+
+    return vec;
+#undef get_p
+}
+
+/*static*/
+overlap_checks::overlaps overlap_checks::get_overlaps(const overlap_checks::edges &e1,
+                                                      const overlap_checks::edges &e2)
+{
+    APP_DEBUG_FNAME;
+
+    point p;
+    vector<overlapping> vec;
+
+    for (size_t i = 0; i < e1.size(); ++i)
+    {
+        size_t j = (&e1 == &e2 ? i + 2: 0);
+
+        for (; j < e2.size(); ++j)
+        {
+            p = intersection(e1[i], e2[j]);
+
+            if (!p.bad())
+            {
+                auto distances = {
+                        distance(p, e1[i].p1),
+                        distance(p, e1[i].p2),
+                        distance(p, e2[j].p1),
+                        distance(p, e2[j].p2),
+                };
+                double radius = *std::max_element(distances.begin(), distances.end());
+                vec.push_back({p, radius});
+            }
+        }
+    }
+
+    return vec;
+
 }
 

@@ -90,7 +90,7 @@ public:
     /**
      * returns if all points are inited (in pair-bases or single base)
      */
-    bool inited_points() const;
+    bool initiated_points() const;
     /**
      * returns point between bases in pair. If signle pase is present, returns its position
      */

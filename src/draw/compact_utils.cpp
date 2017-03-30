@@ -38,6 +38,13 @@ void compact::intervals::init(
 
     for (ch = parent.begin(); ch != parent.end(); ++ch, ++i)
     {
+        /*
+         * We iterate through each child of the parent node and store in the vector elements
+         * continuous regions between pairs of basepairs. Each such region (interval) then stores in its
+         * vec vector list of the non-paired bases between the edge basepairs defining the region.
+         * In the end, number of items in the vec defines the number branches in the loop starting in the
+         * parent. In the tree representation, this corresponds to number of non-leaf descendants of the parent.
+         */
         bool rmk = remake_child(parent, i);
 
         if (rmk)

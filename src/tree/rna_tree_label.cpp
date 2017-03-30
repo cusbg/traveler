@@ -186,7 +186,7 @@ bool rna_pair_label::paired() const
     return labels.size() == 2;
 }
 
-bool rna_pair_label::inited_points() const
+bool rna_pair_label::initiated_points() const
 {
     for (const auto& lbl : labels)
         if (lbl.p.bad())
@@ -196,7 +196,7 @@ bool rna_pair_label::inited_points() const
 
 point rna_pair_label::center() const
 {
-    if (!inited_points())
+    if (!initiated_points())
     {
         DEBUG("WARNING: Points for rna pair center are not inited");
         return point::bad_point();

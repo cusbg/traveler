@@ -67,7 +67,7 @@ void compact::run()
             for (ch = it.begin(); ch != it.end(); ++ch)
                 out += recursion(ch);
 
-            if (it->inited_points())
+            if (it->initiated_points())
                 for (size_t i = 0; i < it->size(); ++i)
                     it->at(i).p += vector;
 
@@ -88,7 +88,7 @@ void compact::run()
     function<void(iterator)> recursion =
             [&recursion, &pr](iterator it) {
 
-                if (it->inited_points())
+                if (it->initiated_points())
                     for (size_t i = 0; i < it->size(); ++i) {
                         //Get the vector between mirror line and point
                         point p = it->at(i).p;
@@ -165,7 +165,7 @@ void compact::run()
 
     for (pre_post_order_iterator ch = pre_post_order_iterator(it, true); id(ch) <= id(it); ++ch)
     {
-        if (!ch->inited_points())
+        if (!ch->initiated_points())
             continue;
 
         double dist = distance(c.centre, ch->at(ch.label_index()).p);
@@ -185,7 +185,7 @@ void compact::init()
 
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     { //traverse the tree pre-order
-        if (it->inited_points() || !it->paired())
+        if (it->initiated_points() || !it->paired())
             continue;
 
         //For non-initiated points or paired nodes, get their parents
@@ -194,7 +194,6 @@ void compact::init()
 
         assert(!p.bad());
 
-        //pokud je to napriklad root, tak se bude vkladat kreslit "nad" strukturu
         if (rna_tree::is_root(par))
         {
             /*
@@ -256,7 +255,7 @@ void compact::init()
     sibling_iterator ch = get_onlyone_branch(root);
     if (rna_tree::is_valid(ch)
             && !root->remake_ids.empty()
-            && ch->inited_points())
+            && ch->initiated_points())
     {
         root->remake_ids.clear();
 
@@ -297,7 +296,7 @@ point compact::init_branch_recursive(
     point p;
     sibling_iterator ch;
 
-    if (it->inited_points())
+    if (it->initiated_points())
     {
         p = normalize(it->center() - from) * BASES_DISTANCE;
         return p;
@@ -330,11 +329,11 @@ point compact::init_branch_recursive(
     point p;
     sibling_iterator ch;
 
-    if (it->inited_points())
+    if (it->initiated_points())
     {
         for (ch = it.begin(); ch != it.end(); ++ch)
         {
-            if (ch->inited_points())
+            if (ch->initiated_points())
             {
                 p = it->center() - ch->center();
                 return p;
@@ -463,25 +462,27 @@ void compact::init_multibranch(
          * we need to find an anchor point which will be used for the multibranch (normally we use the parent)
          */
 
+
         iterator first_initiated = rna.get_leftest_initiated_descendant(it);
         iterator last_initiated = rna.get_rightest_initiated_descendant(it);
 
-        if (first_initiated->inited_points() && last_initiated->inited_points())
+        if (first_initiated->initiated_points()
+            && last_initiated->initiated_points())
         {
-            //inserting into an existing branch which is part of a multibranch loop
-            // THe idea is to keep the rest of the structure and just position
 
-            //Get centers of first bps of all branches rooted in current branch and obtain their center
-            //The center and the connector of the first and last initiated points will be used to obtain position of the
-            //newly inserted residues
+            //Installing a new root into an existing branch in depth 1 which is part of a multibranch loop
+
+            //The idea is to position the new root at the position of the intiated points and rotate the subtree to
+            //accommodate this change
 
 //            point c = point(0, 0);
 //            int cnt_branches = 0;
 
+
             assert(rna.depth(first_initiated) == rna.depth(last_initiated));
 //            for (sibling_iterator si = sibling_iterator(first_initiated); si != sibling_iterator(last_initiated); si++)
 //            {
-//                if (si->inited_points() && si->paired())
+//                if (si->initiated_points() && si->paired())
 //                {
 //                    cnt_branches++;
 //                    c += si->center();
@@ -507,6 +508,26 @@ void compact::init_multibranch(
 
             rotate_subtree(it, c, p1, p2);
 
+            /*
+             * Now we need to move all the descendants. We will move them in the perpendicular direction to the
+             * new base pair. The orientation is based on the direction of descendants with respect to p1 and p2
+             */
+            point center_of_gravity = point(0,0);
+            int cnt = 0;
+            for (iterator descendant = it.begin(); descendant != it.end(); descendant++) {
+                point aux_center = it->center();
+                if (!aux_center.bad()) {
+                    cnt++;
+                    center_of_gravity += aux_center;
+                }
+            }
+            center_of_gravity = center_of_gravity / cnt;
+            point shift_vector = orthogonal(p1 - p2) * BASES_DISTANCE;
+            if (distance(center_of_gravity , p1 + shift_vector) > distance(center_of_gravity , p1 - shift_vector)) {
+                shift_vector = -shift_vector;
+            }
+
+            for (sibling_iterator sit = it.begin(); sit != it.end(); sit++) shift_branch(sit, shift_vector);
         }
         else {
             //inserting a brand new branch
@@ -514,19 +535,21 @@ void compact::init_multibranch(
             //iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
             iterator prev = it, next = it;
             iterator it_aux;
+
             do {
                 it_aux = rna.previous_sibling(prev);
                 if (it_aux.node == nullptr && prev.node->parent != nullptr) it_aux = rna.parent(prev);
                 prev = it_aux;
-            } while (prev.node != nullptr && !prev->inited_points());
+            } while (prev.node != nullptr && !prev->initiated_points());
             do {
                 it_aux = rna.next_sibling(next);
                 if (it_aux.node == nullptr && next.node->parent != nullptr) it_aux = rna.parent(next);
                 next = it_aux;
-            } while (next.node != nullptr && !next->inited_points());
+            } while (next.node != nullptr && !next->initiated_points());
 
+            assert(prev.node != nullptr && next.node != nullptr && prev->initiated_points() && next->initiated_points());
 
-            assert(prev.node != nullptr && next.node != nullptr && prev->inited_points() && next->inited_points());
+            printf("in9\n");
 
             point p1, p2;
 
@@ -537,7 +560,6 @@ void compact::init_multibranch(
 
             p1 = move_point(p1, p1 + orig_vector, BASES_DISTANCE);
             p2 = move_point(p1, p1 + orig_vector, PAIRS_DISTANCE);
-
 
             point c = center(p1, p2) - orthogonal(p2 - p1) * BASES_DISTANCE;
             //Whether it wouldn't be better to position the center in the opposite orthogonal direction
@@ -568,7 +590,7 @@ void compact::init_multibranch(
 
         //Find out which child is new
         iterator it_existing, it_new;
-        if (it.node->first_child->data.inited_points()) {
+        if (it.node->first_child->data.initiated_points()) {
             it_existing = it.node->first_child;
             it_new = it.node->last_child;
         } else {
@@ -772,7 +794,7 @@ void compact::set_distance_multibranch_loop(
     {
         try {
             if (in.vec[i].vec.size() > MULTIBRANCH_MINIMUM_SPLIT)
-            {
+            { //if the number of unpaired residues between a pair of basepairs is greater than MULTIBRANCH_MINIMUM_SPLIT
                 split(in.vec[i]);
                 in.vec[i].remake = false;
             }
@@ -798,7 +820,7 @@ void compact::split(
     p1.push_back(in.beg.it->at(in.beg.index).p);
     p2.resize(in.vec.size());
     for (const auto& i : in.vec)
-        if (i->inited_points())
+        if (i->initiated_points())
             p1.push_back(i->at(0).p);
     p1.push_back(in.end.it->at(in.end.index).p);
     p = p1[0];
@@ -858,11 +880,14 @@ void compact::remake(
     circle c;
     c.p1 = i.beg.it->at(i.beg.index).p;
     c.p2 = i.end.it->at(i.end.index).p;
+    if (c.p2 == c.p1){
+        c.p2 += direction;
+    }
     c.direction = direction;
     c.centre = center(c.p1, c.p2);
     c.compute_sgn();
 
-    reinsert(c.init(i.vec.size(), BASES_DISTANCE), i.vec);
+    reinsert(c.init(i.vec.size(), BASES_DISTANCE), i.vec); // reinsertion of the bases between pairs of basepairs
 }
 
 double compact::get_length(
@@ -878,7 +903,7 @@ double compact::get_length(
     for (const auto& val : in.vec)
     {
         assert(!val->paired());
-        if (val->inited_points())
+        if (val->initiated_points())
         {
             p2 = val->at(0).p;
             len += distance(p1, p2);
@@ -897,7 +922,7 @@ double compact::get_length(
     // all but root should be inited
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     {
-        if (!it->inited_points())
+        if (!it->initiated_points())
         {
             ERR("All bases should be visualized, but they are not.");
         }
@@ -924,6 +949,28 @@ void compact::try_reposition_new_root_branches()
             if (overlaps_aux.size() > overlaps.size()) mirror_branch(it);
         }
     }
+    //    sibling_iterator root = rna.begin();
+//
+//    overlap_checks::edges edges_all = overlap_checks::get_edges(root);
+//
+//    for (sibling_iterator it = root.begin(); it != root.end(); ++it)
+//    {
+//        if (it->paired() && it->status == rna_pair_label::inserted)
+//        {//newly inserted pair (not neccessary whole new branch)
+//            overlap_checks::edges edges_branch = overlap_checks::get_edges(it);
+//
+//            overlap_checks::overlaps overlaps1 = overlap_checks::get_overlaps(edges_all,edges_branch);
+//
+//            //Try to mirror the branch
+//            mirror_branch(it);
+//            //Get the number of overlaps
+//            //TODO: should be optimized to check only intersections in the current branch
+//            //overlap_checks::overlaps overlaps_aux = overlap_checks().run(rna);
+//            overlap_checks::overlaps overlaps2 = overlap_checks::get_overlaps(edges_all,edges_branch);
+//            //If by mirroring we got more overlaps, mirror back
+//            if (overlaps2.size() > overlaps1.size()) mirror_branch(it);
+//        }
+//    }
 }
 
 

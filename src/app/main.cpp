@@ -21,7 +21,7 @@
 
 
 #include <csignal>
-#include <unistd.h>
+//#include <unistd.h>
 #include <fcntl.h>
 #include <string.h>
 #include <iostream>
@@ -37,75 +37,75 @@ using namespace std;
 static vector<string> args;
 
 // for signal_handler - print args
-static std::ostream& operator<<(
-                std::ostream& out,
-                const std::vector<std::string>& vec)
-{
-    for (const auto& str : vec)
-        out << str << endl;
-    return out;
-}
+//static std::ostream& operator<<(
+//                std::ostream& out,
+//                const std::vector<std::string>& vec)
+//{
+//    for (const auto& str : vec)
+//        out << str << endl;
+//    return out;
+//}
 
-void signal_handler(
-                int signal)
-{
-    ostringstream out;
-    out
-        << endl
-        << endl
-        << logger.message_header(logger::priority::EMERG)
-        << "ERROR: signal "
-        << signal
-        << ":"
-        << strsignal(signal)
-        << " caught, exiting"
-        << endl
-        << "Args:"
-        << endl
-        << args
-        << endl;
+//void signal_handler(
+//                int signal)
+//{
+//    ostringstream out;
+//    out
+//        << endl
+//        << endl
+//        << logger.message_header(logger::priority::EMERG)
+//        << "ERROR: signal "
+//        << signal
+//        << ":"
+//        << strsignal(signal)
+//        << " caught, exiting"
+//        << endl
+//        << "Args:"
+//        << endl
+//        << args
+//        << endl;
+//
+//    vector<int> output_fds = logger.opened_files();
+//    output_fds.push_back(STDERR_FILENO);
+//
+//    for (int fd : output_fds)
+//    {
+//        fcntl(fd, F_SETFD, O_NONBLOCK);
+//        (void)(write(fd, out.str().c_str(), out.str().length()) + 1);
+//        // ^^ ((void) + 1)to prevent warning warn-unused-result
+//    }
+//
+//    exit(ERROR_SIGNAL);
+//}
+//
+//static void set_signal_handler()
+//{
+//    APP_DEBUG_FNAME;
+//    struct sigaction act;
+//    bzero(&act, sizeof(struct sigaction));
+//    act.sa_handler = signal_handler;
+//
+//    auto signals = {
+//        SIGINT,
+//        SIGSEGV,
+//        SIGABRT,
+//        SIGQUIT,
+//        SIGTERM,
+//    };
+//    for (int sig : signals)
+//    {
+//        if (sigaction(sig, &act, NULL) != 0)
+//        {
+//            ERR("Setting signal handler for signal %s:%s failed: %s",
+//                    sig, strsignal(sig), strerror(errno));
+//        }
+//    }
+//}
 
-    vector<int> output_fds = logger.opened_files();
-    output_fds.push_back(STDERR_FILENO);
-
-    for (int fd : output_fds)
-    {
-        fcntl(fd, F_SETFD, O_NONBLOCK);
-        (void)(write(fd, out.str().c_str(), out.str().length()) + 1);
-        // ^^ ((void) + 1)to prevent warning warn-unused-result
-    }
-
-    exit(ERROR_SIGNAL);
-}
-
-static void set_signal_handler()
-{
-    APP_DEBUG_FNAME;
-    struct sigaction act;
-    bzero(&act, sizeof(struct sigaction));
-    act.sa_handler = signal_handler;
-
-    auto signals = {
-        SIGINT,
-        SIGSEGV,
-        SIGABRT,
-        SIGQUIT,
-        SIGTERM,
-    };
-    for (int sig : signals)
-    {
-        if (sigaction(sig, &act, NULL) != 0)
-        {
-            ERR("Setting signal handler for signal %s:%s failed: %s",
-                    sig, strsignal(sig), strerror(errno));
-        }
-    }
-}
-
-static void init()
-{
-    set_signal_handler();
-}
+//static void init()
+//{
+//    set_signal_handler();
+//}
 
 int main(int argc, char** argv)
 {
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
 
     try
     {
-        init();
+        //init();
         app app;
         args = vector<string>(argv, argv + argc);
         app.run(args);
