@@ -466,11 +466,6 @@ void compact::init_multibranch(
         iterator first_initiated = rna.get_leftest_initiated_descendant(it);
         iterator last_initiated = rna.get_rightest_initiated_descendant(it);
 
-        printf("%lu %lu\n", first_initiated->id(), last_initiated->id());
-
-
-        //if (last_initiated->id() > 140724454035) exit(1);
-
         if (first_initiated->initiated_points()
             && last_initiated->initiated_points())
         {
