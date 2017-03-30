@@ -93,7 +93,7 @@ std::string document_writer::get_edge_formatted(
 std::string document_writer::get_label_formatted(
                 rna_tree::pre_post_order_iterator it) const
 {
-    if (!it->inited_points())
+    if (!it->initiated_points())
         return "";
 
     ostringstream out;
@@ -103,7 +103,7 @@ std::string document_writer::get_label_formatted(
 
     if (it->paired() &&
             it.preorder() &&
-            it->inited_points() &&
+            it->initiated_points() &&
             !rna_tree::is_root(it))
     {
         out

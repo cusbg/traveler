@@ -56,8 +56,8 @@ overlap_checks::edges overlap_checks::get_edges(
 
     for (++it; it != rna.end_pre_post(); ++it)
     {
-        //assert(it->inited_points());
-        if (it->inited_points()) {
+        //assert(it->initiated_points());
+        if (it->initiated_points()) {
             e.p2 = get_p();
             vec.push_back(e);
             e.p1 = e.p2;
@@ -163,8 +163,8 @@ overlap_checks::edges overlap_checks::get_edges(const rna_tree::iterator& node)
 //
 //    for (++it; it != ++rna_tree::pre_post_order_iterator(node, false); ++it)
 //    {
-//        //assert(it->inited_points());
-//        if (it->inited_points()) {
+//        //assert(it->initiated_points());
+//        if (it->initiated_points()) {
 //            e.p2 = get_p();
 //            vec.push_back(e);
 //            e.p1 = e.p2;

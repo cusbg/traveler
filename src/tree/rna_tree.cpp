@@ -279,7 +279,7 @@ rna_tree::iterator rna_tree::get_leftest_initiated_descendant(const rna_tree::it
 {
     APP_DEBUG_FNAME;
 
-    if (node->inited_points()) return node;
+    if (node->initiated_points()) return node;
     else if (is_leaf(node))
     {
         if (node.node->next_sibling->next_sibling == NULL) return node;
@@ -293,7 +293,7 @@ rna_tree::iterator rna_tree::get_rightest_initiated_descendant(const rna_tree::i
 {
     APP_DEBUG_FNAME;
 
-    if (node->inited_points()) return node;
+    if (node->initiated_points()) return node;
     else if (is_leaf(node))
     {
         if (node.node->prev_sibling->prev_sibling == NULL) return node;
@@ -337,7 +337,7 @@ void rna_tree::compute_distances()
     dist = 0;
     for (iterator it = begin(); it != end(); ++it)
     {
-        if (!it->inited_points()
+        if (!it->initiated_points()
                 || is_root(it)
                 || is_leaf(it)
                 || !is_valid(get_onlyone_branch(parent(it)))
@@ -355,7 +355,7 @@ void rna_tree::compute_distances()
     dist = 0;
     for (iterator it = begin(); it != end(); ++it)
     {
-        if (!it->inited_points()
+        if (!it->initiated_points()
                 || is_leaf(it))
             continue;
 
@@ -369,7 +369,7 @@ void rna_tree::compute_distances()
     dist = 0;
     for (iterator it = begin(); it != end(); ++it)
     {
-        if (!it->inited_points())
+        if (!it->initiated_points())
             continue;
 
         sibling_iterator end = it.end();
@@ -402,7 +402,7 @@ point rna_tree::top_right_corner(
     point p = { -DBL_MAX, -DBL_MAX };
 
     auto f = [&p] (rna_tree::pre_post_order_iterator it) {
-        if (rna_tree::is_root(it) || !it->inited_points())
+        if (rna_tree::is_root(it) || !it->initiated_points())
             return;
         point o = it->at(it.label_index()).p;
         if (o.x > p.x)
@@ -425,7 +425,7 @@ point rna_tree::bottom_left_corner(
     point p = { DBL_MAX, DBL_MAX };
 
     auto f = [&p] (rna_tree::pre_post_order_iterator it) {
-        if (rna_tree::is_root(it) || !it->inited_points())
+        if (rna_tree::is_root(it) || !it->initiated_points())
             return;
         point o = it->at(it.label_index()).p;
         if (o.x < p.x)

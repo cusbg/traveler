@@ -145,8 +145,6 @@ void compact::circle::compute_sgn()
     CIRCLE_POINTS_INITED();
 
     assert(centre != direction);
-    if (lies_on_line(p1, p2, direction))
-        int x = 1;
     assert(!lies_on_line(p1, p2, direction));
     assert(double_equals(distance(p1, centre), distance(p2, centre)));
     assert(!double_equals(angle(p1, centre, direction), 0)
