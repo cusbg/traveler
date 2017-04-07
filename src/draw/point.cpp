@@ -134,7 +134,7 @@ point point::operator/(double value) const
 point point::operator*(double value) const
 {
     UNARY(*this);
-    assert(!iszero(value) && !std::isnan(x * value) && !std::isnan(y * value));
+    assert(/*!iszero(value) &&*/ !std::isnan(x * value) && !std::isnan(y * value));
 
     return {x * value, y * value};
 }
