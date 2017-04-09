@@ -216,8 +216,8 @@ void rna_pair_label::clear_points()
 void rna_pair_label::set_label_strings(
                 const rna_pair_label& other)
 {
-    //  touched         - uz len tym, ze sme vosli do funkcie
-    //  edited          - ak labels su rozne
+    //  touched         - just by entering the function
+    //  edited          - different labels
     //
 
     if (status != untouched)
