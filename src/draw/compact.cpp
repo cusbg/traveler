@@ -379,15 +379,17 @@ void compact::init_by_ancestor(
     if (!rna_tree::is_root(grandpar))
         vec = normalize(par->center() - rna_tree::parent(par)->center());
     else {
-        if (par->get_parent_center().bad()) {
+        //TODO: Check validity of such solution
+//        if (par->get_parent_center().bad()) {
             /*The parent is root, i.e. 5'3' pair*/
             /*Let's use center of gravity to find out in which direction should the new bp should be inserted*/
             point cog = get_descendatns_center_or_gravity(it);
             //We are inserting a single base-pair with no (initiated) descendants so the direction can be chosen randomly
-            shift_in_direction_of_gravity(it, par->at(0).p, par->at(1).p, cog);
+            point aux_p[2] = {par->at(0).p, par->at(1).p};
+            shift_in_direction_of_gravity(it, aux_p, cog, true);
             return;
-        }
-        else vec = normalize(par->center() - par->get_parent_center());
+//        }
+//        else vec = normalize(par->center() - par->get_parent_center());
     }
         // ^^ direction (parent(par)->par)
     p1 = par->at(0).p + vec;
@@ -415,11 +417,16 @@ point compact::get_descendatns_center_or_gravity(iterator it)
     return cog;
 }
 
-void compact::shift_in_direction_of_gravity(iterator it, point p1, point p2, point cog)
+void compact::shift_in_direction_of_gravity(iterator it, point p[], point cog, bool set_root)
 {
-    point shift_vector = orthogonal(p1 - p2) * BASES_DISTANCE;
-    if (distance(cog , p1 + shift_vector) > distance(cog , p1 - shift_vector)) {
+    point shift_vector = orthogonal(p[0] - p[1]) * PAIRS_DISTANCE;
+    if (distance(cog , p[0] + shift_vector) > distance(cog , p[0] - shift_vector)) {
         shift_vector = -shift_vector;
+    }
+
+    if (set_root) {
+        for (size_t i = 0; i < it->size(); ++i)
+            it->at(i).p = p[i] + shift_vector;
     }
 
     for (sibling_iterator sit = it.begin(); sit != it.end(); sit++) shift_branch(sit, shift_vector);
@@ -495,7 +502,6 @@ void compact::init_multibranch(
          * we need to find an anchor point which will be used for the multibranch (normally we use the parent)
          */
 
-
         iterator first_initiated = rna.get_leftest_initiated_descendant(it);
         iterator last_initiated = rna.get_rightest_initiated_descendant(it);
 
@@ -508,26 +514,45 @@ void compact::init_multibranch(
             //The idea is to position the new root at the position of the intiated points and rotate the subtree to
             //accommodate this change
 
-//            point c = point(0, 0);
-//            int cnt_branches = 0;
-
-
-            assert(rna.depth(first_initiated) == rna.depth(last_initiated));
-//            for (sibling_iterator si = sibling_iterator(first_initiated); si != sibling_iterator(last_initiated); si++)
-//            {
-//                if (si->initiated_points() && si->paired())
-//                {
-//                    cnt_branches++;
-//                    c += si->center();
-//                }
-//            }
-//            c = c / cnt_branches;
 
             point p1, p2;
+            if (rna.depth(first_initiated) == rna.depth(last_initiated))
+            {
+                /*
+                 * If the initiated descendants are on the same level, we interpret the insertion as an insertion
+                 * at a position where something was before, so we simply take that position.
+                 */
+                p1 = (*first_initiated)[0].p;
+                last_initiated->paired() ? p2 = (*last_initiated)[1].p : p2 = (*last_initiated)[0].p;
+            } else
+            {
+                /*
+                 * If the initiated descendants are not on the same level, we need to take the siblings as guides.
+                 */
+                sibling_iterator left, right;
+                left = right = it;
+                left--; right++;
+                while (left.node->prev_sibling && !left->initiated_points()) left--;
+                while (right.node->next_sibling && !right->initiated_points()) right++;
 
-            p1 = (*first_initiated)[0].p;
-            last_initiated->paired() ? p2 = (*last_initiated)[1].p : p2 = (*last_initiated)[0].p;
-
+                p1 = left->at(left->size()-1).p;
+                p2 = right->at(0).p;
+                if (p1.bad())
+                {//no initiated node on the left of "it"
+                    right++;
+                    while (right.node->next_sibling && !right->initiated_points()) right++;
+                    point p_aux = right->at(0).p;
+                    p1 = p2 - normalize(p_aux - p2) * BASES_DISTANCE;
+                }
+                if (p2.bad())
+                {//no initiated node on the right of "it"
+                    left--;
+                    while (left.node->prev_sibling && !left->initiated_points()) left--;
+                    point p_aux = left->at(left->size()-1).p;
+                    p2 = p1 + normalize(p1 - p_aux) * BASES_DISTANCE;
+                }
+            }
+//
             point c = center(p1, p2) - orthogonal(p1 - p2) * BASES_DISTANCE;
             //Whether it wouldn't be better to position the center in the opposite orthogonal direction
             //is checked later in the try_reposition_new_root_branches function
@@ -546,7 +571,8 @@ void compact::init_multibranch(
              * new base pair. The orientation is based on the direction of descendants with respect to p1 and p2
              */
             point cog = get_descendatns_center_or_gravity(it);
-            shift_in_direction_of_gravity(it, p1, p2, cog);
+            point aux_p[2] = {p1, p2};
+            shift_in_direction_of_gravity(it, aux_p, cog);
 
         }
         else {
@@ -569,9 +595,7 @@ void compact::init_multibranch(
 
             assert(prev.node != nullptr && next.node != nullptr && prev->initiated_points() && next->initiated_points());
 
-            printf("in9\n");
-
-            point p1, p2;
+           point p1, p2;
 
             prev->paired() ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
             p2 = (*next)[0].p;

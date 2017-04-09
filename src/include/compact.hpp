@@ -232,7 +232,7 @@ private:
     void try_reposition_new_root_branches();
 
     point get_descendatns_center_or_gravity(iterator it);
-    void shift_in_direction_of_gravity(iterator it, point p1, point p2, point cog);
+    void shift_in_direction_of_gravity(iterator it, point p[], point cog, bool set_root = false);
 
 
 private:
