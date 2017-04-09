@@ -379,8 +379,15 @@ void compact::init_by_ancestor(
     if (!rna_tree::is_root(grandpar))
         vec = normalize(par->center() - rna_tree::parent(par)->center());
     else {
-        assert(!par->get_parent_center().bad())
-        vec = normalize(par->center() - par->get_parent_center());
+        if (par->get_parent_center().bad()) {
+            /*The parent is root, i.e. 5'3' pair*/
+            /*Let's use center of gravity to find out in which direction should the new bp should be inserted*/
+            point cog = get_descendatns_center_or_gravity(it);
+            //We are inserting a single base-pair with no (initiated) descendants so the direction can be chosen randomly
+            shift_in_direction_of_gravity(it, par->at(0).p, par->at(1).p, cog);
+            return;
+        }
+        else vec = normalize(par->center() - par->get_parent_center());
     }
         // ^^ direction (parent(par)->par)
     p1 = par->at(0).p + vec;
@@ -390,6 +397,32 @@ void compact::init_by_ancestor(
     it->at(1).p = p2;
     // ^^ initialize points of `it` to lie next to parent
     // .. that means only initialization, to get direction where child should be
+}
+
+point compact::get_descendatns_center_or_gravity(iterator it)
+{
+    point cog = point(0,0);
+    int cnt = 0;
+    for (iterator descendant = it.begin(); descendant != it.end(); descendant++) {
+        point aux_center = it->center();
+        if (!aux_center.bad()) {
+            cnt++;
+            cog += aux_center;
+        }
+    }
+
+    if (cnt > 0) cog = cog / cnt;
+    return cog;
+}
+
+void compact::shift_in_direction_of_gravity(iterator it, point p1, point p2, point cog)
+{
+    point shift_vector = orthogonal(p1 - p2) * BASES_DISTANCE;
+    if (distance(cog , p1 + shift_vector) > distance(cog , p1 - shift_vector)) {
+        shift_vector = -shift_vector;
+    }
+
+    for (sibling_iterator sit = it.begin(); sit != it.end(); sit++) shift_branch(sit, shift_vector);
 }
 
 void compact::init_multibranch(
@@ -512,22 +545,9 @@ void compact::init_multibranch(
              * Now we need to move all the descendants. We will move them in the perpendicular direction to the
              * new base pair. The orientation is based on the direction of descendants with respect to p1 and p2
              */
-            point center_of_gravity = point(0,0);
-            int cnt = 0;
-            for (iterator descendant = it.begin(); descendant != it.end(); descendant++) {
-                point aux_center = it->center();
-                if (!aux_center.bad()) {
-                    cnt++;
-                    center_of_gravity += aux_center;
-                }
-            }
-            center_of_gravity = center_of_gravity / cnt;
-            point shift_vector = orthogonal(p1 - p2) * BASES_DISTANCE;
-            if (distance(center_of_gravity , p1 + shift_vector) > distance(center_of_gravity , p1 - shift_vector)) {
-                shift_vector = -shift_vector;
-            }
+            point cog = get_descendatns_center_or_gravity(it);
+            shift_in_direction_of_gravity(it, p1, p2, cog);
 
-            for (sibling_iterator sit = it.begin(); sit != it.end(); sit++) shift_branch(sit, shift_vector);
         }
         else {
             //inserting a brand new branch
