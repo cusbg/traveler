@@ -46,7 +46,7 @@ void compact::run()
     init();
     make();
     update_ends_in_rna(rna);
-//    try_reposition_new_root_branches();
+    try_reposition_new_root_branches();
     checks();
 
     INFO("END: Computing RNA layout");
@@ -976,45 +976,42 @@ double compact::get_length(
 void compact::try_reposition_new_root_branches()
 {
 
-    overlap_checks::overlaps overlaps = overlap_checks().run(rna);
-
-    sibling_iterator root = rna.begin();
-    for (sibling_iterator it = root.begin(); it != root.end(); ++it)
-    {
-        if (it->paired() && it->status == rna_pair_label::inserted)
-        {//newly inserted pair (not neccessary whole new branch)
-
-            //Try to mirror the branch
-            mirror_branch(it);
-            //Get the number of overlaps
-            //TODO: should be optimized to check only intersections in the current branch
-            overlap_checks::overlaps overlaps_aux = overlap_checks().run(rna);
-            //If by mirroring we got more overlaps, mirror back
-            if (overlaps_aux.size() > overlaps.size()) mirror_branch(it);
-        }
-    }
-    //    sibling_iterator root = rna.begin();
+//    overlap_checks::overlaps overlaps = overlap_checks().run(rna);
 //
-//    overlap_checks::edges edges_all = overlap_checks::get_edges(root);
-//
+//    sibling_iterator root = rna.begin();
 //    for (sibling_iterator it = root.begin(); it != root.end(); ++it)
 //    {
 //        if (it->paired() && it->status == rna_pair_label::inserted)
 //        {//newly inserted pair (not neccessary whole new branch)
-//            overlap_checks::edges edges_branch = overlap_checks::get_edges(it);
-//
-//            overlap_checks::overlaps overlaps1 = overlap_checks::get_overlaps(edges_all,edges_branch);
 //
 //            //Try to mirror the branch
 //            mirror_branch(it);
 //            //Get the number of overlaps
 //            //TODO: should be optimized to check only intersections in the current branch
-//            //overlap_checks::overlaps overlaps_aux = overlap_checks().run(rna);
-//            overlap_checks::overlaps overlaps2 = overlap_checks::get_overlaps(edges_all,edges_branch);
+//            overlap_checks::overlaps overlaps_aux = overlap_checks().run(rna);
 //            //If by mirroring we got more overlaps, mirror back
-//            if (overlaps2.size() > overlaps1.size()) mirror_branch(it);
+//            if (overlaps_aux.size() > overlaps.size()) mirror_branch(it);
 //        }
 //    }
+    sibling_iterator root = rna.begin();
+
+    overlap_checks::edges edges_all = overlap_checks::get_edges(root);
+
+    for (sibling_iterator it = root.begin(); it != root.end(); ++it)
+    {
+        if (it->paired() && it->status == rna_pair_label::inserted)
+        {//newly inserted pair (not neccessary whole new branch)
+            overlap_checks::edges edges_branch = overlap_checks::get_edges(it);
+
+            overlap_checks::overlaps overlaps1 = overlap_checks::get_overlaps(edges_all,edges_branch);
+
+            //Try to mirror the branch
+            mirror_branch(it);
+            overlap_checks::overlaps overlaps2 = overlap_checks::get_overlaps(edges_all,edges_branch);
+            //If by mirroring we got more overlaps, mirror back
+            if (overlaps2.size() > overlaps1.size()) mirror_branch(it);
+        }
+    }
 }
 
 

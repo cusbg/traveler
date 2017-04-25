@@ -155,21 +155,20 @@ overlap_checks::overlaps overlap_checks::run(
 overlap_checks::edges overlap_checks::get_edges(const rna_tree::iterator& node)
 {
     edges vec;
-//    edge e;
-//
-//#define get_p() it->at(it.label_index()).p
-//    rna_tree::pre_post_order_iterator it = rna_tree::pre_post_order_iterator(node, true);
-//    e.p1 = get_p();
-//
-//    for (++it; it != ++rna_tree::pre_post_order_iterator(node, false); ++it)
-//    {
-//        //assert(it->initiated_points());
-//        if (it->initiated_points()) {
-//            e.p2 = get_p();
-//            vec.push_back(e);
-//            e.p1 = e.p2;
-//        }
-//    }
+    edge e;
+
+#define get_p() it->at(it.label_index()).p
+    rna_tree::pre_post_order_iterator it = rna_tree::pre_post_order_iterator(node, true);
+    e.p1 = get_p();
+
+    for (++it; it != ++rna_tree::pre_post_order_iterator(node, false); ++it)
+    {
+        assert(it->initiated_points());
+
+        e.p2 = get_p();
+        vec.push_back(e);
+        e.p1 = e.p2;
+    }
 
     return vec;
 #undef get_p
