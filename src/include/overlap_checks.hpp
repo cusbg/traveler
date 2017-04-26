@@ -77,7 +77,7 @@ public:
 #endif
     /**
      * find point in which edges are intersecting each other
-     * if no point exist, return point::bad_point
+     * if no such point exists, return point::bad_point
      */
     static point intersection(
                 const edge& e1,

@@ -115,8 +115,13 @@ overlap_checks::overlaps overlap_checks::run(
     double a, c;
     point p;
 
+    if (contains<vector<point>>({e1.p1, e1.p2}, e2.p1))
+        return e2.p1;
+    if (contains<vector<point>>({e1.p1, e1.p2}, e2.p2))
+        return e2.p2;
     assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p1));
     assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p2));
+
 
     c = distance(e1.p1, e2.p1);
 

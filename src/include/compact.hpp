@@ -229,7 +229,18 @@ private:
      */
     inline void checks();
 
+    /*
+     * When inserting new branch into second level, it is not obvious which side they should be oriented.
+     * They should be perpendicular to the neighbouring residues, but that can happen two ways. Here
+     * we try to mirror them and see whether it won't decrease number of overlaps.
+     */
     void try_reposition_new_root_branches();
+
+    /*
+     * Identifies stretches of non-base-paired nts in second level and tries to reposition them to lie on
+     * line connecting the base-pairs on boundaries of that stretch.
+     */
+    void shorten_root_paths();
 
     point get_descendatns_center_or_gravity(iterator it);
     void shift_in_direction_of_gravity(iterator it, point p[], point cog, bool set_root = false);

@@ -28,8 +28,8 @@ using namespace std;
 
 #define MULTIBRANCH_MINIMUM_SPLIT   10
 
-#define PAIRS_DISTANCE rna.get_pair_base_distance()
-#define BASES_DISTANCE rna.get_pairs_distance()
+#define PAIRS_DISTANCE rna.get_pair_base_distance() //distance between bases of a base pair
+#define BASES_DISTANCE rna.get_pairs_distance() //distance between neigbhoring base pairs in a stem
 
 compact::compact(
                 rna_tree& _rna)
@@ -47,6 +47,7 @@ void compact::run()
     make();
     update_ends_in_rna(rna);
     try_reposition_new_root_branches();
+    shorten_root_paths();
     checks();
 
     INFO("END: Computing RNA layout");
@@ -995,23 +996,67 @@ void compact::try_reposition_new_root_branches()
 //    }
     sibling_iterator root = rna.begin();
 
-    overlap_checks::edges edges_all = overlap_checks::get_edges(root);
-
+    overlap_checks::overlaps overlaps1, overlaps2;
     for (sibling_iterator it = root.begin(); it != root.end(); ++it)
     {
         if (it->paired() && it->status == rna_pair_label::inserted)
         {//newly inserted pair (not neccessary whole new branch)
-            overlap_checks::edges edges_branch = overlap_checks::get_edges(it);
-
-            overlap_checks::overlaps overlaps1 = overlap_checks::get_overlaps(edges_all,edges_branch);
+            overlaps1 = overlap_checks::get_overlaps(
+                    overlap_checks::get_edges(root),overlap_checks::get_edges(it));
 
             //Try to mirror the branch
             mirror_branch(it);
-            overlap_checks::overlaps overlaps2 = overlap_checks::get_overlaps(edges_all,edges_branch);
+            overlaps2 = overlap_checks::get_overlaps(
+                    overlap_checks::get_edges(root),overlap_checks::get_edges(it));
+
             //If by mirroring we got more overlaps, mirror back
+//            printf("%i - %i\n", (int)overlaps1.size(), (int)overlaps2.size());
             if (overlaps2.size() > overlaps1.size()) mirror_branch(it);
         }
     }
+}
+
+void compact::shorten_root_paths()
+{
+    return;
+    sibling_iterator root = rna.begin();
+    rna_tree::iterator begin=root.begin();
+
+    //5' and 3' streteches are handled individually, so we need to iterate to first bp
+    while (begin != root.end() && !begin->paired()) begin++;
+    //if multiple nodes are paired, we need to iterate to the last one
+    while (begin != root.end() && begin->paired() ) begin++;
+    if (begin != root.end()) begin--;
+    vector<sibling_iterator> stretch;
+    sibling_iterator it = begin;
+    while (it != root.end())
+    {
+        it++;
+
+        if (!it->paired()) stretch.push_back(it);
+        else
+        {//we arrived at the right end of the stretch so we try to smooth the stretch
+
+            point p1 = begin->at(1).p, p2 = it->at(0).p;
+            double length = distance(p1, p2);
+            if (length / (stretch.size()+1) >= BASES_DISTANCE)
+            {//if a straight line could fit in the space....
+                double dist = length / (stretch.size()+1);
+                point direction = normalize(p2 - p1);
+                sibling_iterator it_aux = begin;
+                for (it_aux++; it_aux != it; it_aux++) {
+                    it_aux->at(0).p = p1 + direction * dist * BASES_DISTANCE;
+                }
+            }
+
+            //and now let's find new stretch beginning (can be either at it position or further down the stream
+            //if there are multiple paired nts next to each other
+            begin = it;
+            while (begin != root.end() && begin->paired() ) begin++;
+            if (begin != root.end()) begin--;
+        }
+    }
+    //The last stretch is not treated since that corresonds to the 3' end which is treated individually
 }
 
 
