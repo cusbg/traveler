@@ -21,6 +21,7 @@
 
 
 #include <iomanip>
+#include <chrono>
 //#include <unistd.h>
 
 #include "logger.hpp"
@@ -96,6 +97,7 @@ void logger::log(
 /* static */ string logger::message_header(
                 priority p)
 {
+	/*
     size_t hour, minute, second, millisecond;
     timespec cputime, clocks;
     std::ostringstream stream;
@@ -103,7 +105,7 @@ void logger::log(
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cputime);
     clock_gettime(CLOCK_REALTIME, &clocks);
     tm c = *localtime(&clocks.tv_sec);
-
+	
     hour = c.tm_hour;
     minute = c.tm_min;
     second = c.tm_sec;
@@ -128,7 +130,12 @@ void logger::log(
         << setfill(' ') << setw(8) << left
         << ("[" + to_string(p) + "]");
 
-    return stream.str();
+	return stream.str();
+	*/
+
+	time_t tt;  std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	return ctime(&tt);
+    
 }
 
 void logger::check_errors()

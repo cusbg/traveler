@@ -25,6 +25,10 @@
 #include <stdexcept>
 #include "mprintf.hpp"
 
+#ifdef _MSC_VER
+#define __PRETTY_FUNCTION__ __FUNCSIG__
+#endif
+
 #define DEFAULT_EXCEPTION_METHODS(ex_name) \
     virtual ~ex_name() noexcept = default; \
     template <typename ...Args> \
