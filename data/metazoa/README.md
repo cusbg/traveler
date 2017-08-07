@@ -6,4 +6,4 @@ PATH_TO_TRAVELER\traveler \
     --template-structure mous.ps mouse.fasta \
     --all human_from_mouse
 ```
-The file experiments.zip contains results for all target-tempalte pairs from the directory. Please not, that these results were obtained with Traveler version 7d8da9a11b794898390e4b57fd2014e2702b5f3f and might differ from layouts which you get with the most up-to-date version.
+The file experiments.zip contains results for all target-tempalte pairs from the directory. Please not, that these results were obtained with Traveler commit 7d8da9a11b794898390e4b57fd2014e2702b5f3f and might differ from layouts which you get with the most up-to-date version.
