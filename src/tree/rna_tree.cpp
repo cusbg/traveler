@@ -136,15 +136,19 @@ void update_ends_in_rna(
         root->at(1).p = pl + dir;
     } else{
         //using first and first but last siblings to get the position for the 5' and 3' labels
+        //when merging, the template can incorporate some uninitiated nodes, so next or previous siblings do not
+        //necessarilly be initiated
         iterator f2 = rna.next_sibling(f);
+        while (f2.node->next_sibling && !f2->initiated_points()) f2++;
         iterator l2 = rna.previous_sibling(l);
+        while (l2.node->prev_sibling && !l2->initiated_points()) l2--;
 
         point pf2, pl2;
         pf2 = f2->at(0).p;
         pl2 = l2->paired() ? l2->at(1).p : l2->at(0).p;
 
-        root->at(0).p = pf - (pf2 - pf);
-        root->at(1).p = pl - (pl2 - pl);
+        pf2.bad() ? root->at(0).p = pf : root->at(0).p = pf - (pf2 - pf);
+        pl2.bad() ? root->at(1).p = pl : root->at(1).p = pl - (pl2 - pl);
     }
 
 

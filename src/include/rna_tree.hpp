@@ -124,10 +124,12 @@ public:
                     rna_tree::iterator root);
 
 public:
+    //distance between neigbhoring base pairs in a stem
     double get_pairs_distance() const
     {
         return distances.pairs_distance;
     }
+    //distance between pairs of a base pair
     double get_pair_base_distance() const
     {
         return distances.pair_base_distance;

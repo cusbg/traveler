@@ -115,8 +115,13 @@ overlap_checks::overlaps overlap_checks::run(
     double a, c;
     point p;
 
+    if (contains<vector<point>>({e1.p1, e1.p2}, e2.p1))
+        return e2.p1;
+    if (contains<vector<point>>({e1.p1, e1.p2}, e2.p2))
+        return e2.p2;
     assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p1));
     assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p2));
+
 
     c = distance(e1.p1, e2.p1);
 
@@ -155,21 +160,20 @@ overlap_checks::overlaps overlap_checks::run(
 overlap_checks::edges overlap_checks::get_edges(const rna_tree::iterator& node)
 {
     edges vec;
-//    edge e;
-//
-//#define get_p() it->at(it.label_index()).p
-//    rna_tree::pre_post_order_iterator it = rna_tree::pre_post_order_iterator(node, true);
-//    e.p1 = get_p();
-//
-//    for (++it; it != ++rna_tree::pre_post_order_iterator(node, false); ++it)
-//    {
-//        //assert(it->initiated_points());
-//        if (it->initiated_points()) {
-//            e.p2 = get_p();
-//            vec.push_back(e);
-//            e.p1 = e.p2;
-//        }
-//    }
+    edge e;
+
+#define get_p() it->at(it.label_index()).p
+    rna_tree::pre_post_order_iterator it = rna_tree::pre_post_order_iterator(node, true);
+    e.p1 = get_p();
+
+    for (++it; it != ++rna_tree::pre_post_order_iterator(node, false); ++it)
+    {
+        assert(it->initiated_points());
+
+        e.p2 = get_p();
+        vec.push_back(e);
+        e.p1 = e.p2;
+    }
 
     return vec;
 #undef get_p

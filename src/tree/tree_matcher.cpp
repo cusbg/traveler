@@ -119,7 +119,7 @@ void matcher::erase()
     }
 }
 
-//mapovani jednoho stromu na druhy
+//Mapping one tree over the other
 void matcher::merge()
 {
     iterator it1, it2;

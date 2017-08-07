@@ -187,6 +187,12 @@ void app::run_drawing(
         //Compact goes through the structure and computes new coordinates where necessary
         compact(templated).run();
 
+//        for (compact::iterator it = ++templated.begin(); it != templated.end(); ++it) {
+//            it->at(0).label += msprintf(" %i", it->id());
+//            int i = 1;
+//
+//        }
+
         save(file, templated, run_overlaps);
     }
     catch (const my_exception& e)
