@@ -191,7 +191,7 @@ break;
     switch (p)
     {
             switchcase(TRACE);
-            switchcase(DEB);
+            switchcase(DEBUG);
             switchcase(INFO);
             switchcase(WARN);
             switchcase(ERROR);

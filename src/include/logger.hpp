@@ -64,7 +64,7 @@ public:
     enum priority : char
     {
         TRACE   = 0,
-        DEB   = 1,
+        DEBUG   = 1,
         INFO    = 2,
         WARN    = 3,
         ERROR   = 4,
@@ -169,7 +169,7 @@ protected:
     
 public:
     LOGGER_FUNCTIONS(trace, TRACE);
-    LOGGER_FUNCTIONS(debug, DEB);
+    LOGGER_FUNCTIONS(debug, DEBUG);
     LOGGER_FUNCTIONS(info,  INFO);
     LOGGER_FUNCTIONS(warn,  WARN);
     LOGGER_FUNCTIONS(error, ERROR);

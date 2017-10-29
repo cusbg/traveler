@@ -22,7 +22,7 @@
 #ifndef TREE_BASE_HPP
 #define TREE_BASE_HPP
 
-#include "tree.hh"
+#include "tree_hh/tree.hh"
 #undef assert
 #include "types.hpp"
 
