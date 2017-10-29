@@ -42,7 +42,6 @@ void node_base::reset_id()
 void node_base::reset_ID()
 {
     INFO("Reseting tree IDs");
-
+    
     ID = 0;
 }
-

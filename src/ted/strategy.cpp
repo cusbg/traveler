@@ -29,59 +29,59 @@ int strategy::to_index() const
 {
     int out;
     bool t1 = is_T1();
-
+    
     if (is_left())
         out = t1 ? RTED_T1_LEFT : RTED_T2_LEFT;
     else if (is_right())
         out = t1 ? RTED_T1_RIGHT : RTED_T2_RIGHT;
     else
         out = t1 ? RTED_T1_HEAVY : RTED_T2_HEAVY;
-
+    
     return out;
 }
 
 strategy::strategy(
-                int index)
-    : strategy(static_cast<rted_strategy>(index))
+                   int index)
+: strategy(static_cast<rted_strategy>(index))
 { }
 
 strategy::strategy(rted_strategy index)
 {
     assert(index >= 0 && index < 6);
-
+    
     if (is_left(index))
         str = left;
     else if (is_right(index))
         str = right;
     else
         str = heavy;
-
+    
     if (is_T1(index))
         tree = T1;
     else
         tree = T2;
-
+    
     inited = true;
 }
 
 strategy::strategy(
-                const std::string& text)
+                   const std::string& text)
 {
     assert(text.size() == 2);
     assert(contains("LRH", text[0]) && contains("12", text[2]));
-
+    
     if (text[0] == 'L')
         str = left;
     if (text[0] == 'R')
         str = right;
     if (text[0] == 'H')
         str = heavy;
-
+    
     if (text[1] == '1')
         tree = T1;
     if (text[1] == '2')
         tree = T2;
-
+    
     inited = true;
 }
 
@@ -153,28 +153,28 @@ bool strategy::is_T2(int index)
 
 
 std::ostream& operator<<(
-                std::ostream& out,
-                strategy str)
+                         std::ostream& out,
+                         strategy str)
 {
     assert(str.inited);
-
+    
     if (str.is_left())
         out << "L";
     else if (str.is_right())
         out << "R";
     else
         out << "H";
-
+    
     if (str.is_T1())
         out << "1";
     else
         out << "2";
-
+    
     return out;
 }
 
 std::ostream& operator<<(
-                std::ostream& out, strategy_table_type strategies)
+                         std::ostream& out, strategy_table_type strategies)
 {
     // do not output root line
     for (size_t i = 0; i < strategies.size(); ++i)
@@ -187,9 +187,8 @@ std::ostream& operator<<(
 }
 
 std::ostream& operator<<(
-                std::ostream& out, rted_strategy str)
+                         std::ostream& out, rted_strategy str)
 {
     out << strategy(str);
     return out;
 }
-

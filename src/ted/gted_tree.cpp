@@ -28,8 +28,8 @@ using namespace std;
 #define insert(from, to)    ((to).insert((to).end(), (from).begin(), (from).end()))
 
 gted_tree::gted_tree(
-                const rna_tree& t)
-    : rna_tree(t)
+                     const rna_tree& t)
+: rna_tree(t)
 {
     init();
 }
@@ -38,35 +38,35 @@ void gted_tree::init()
 {
     APP_DEBUG_FNAME;
     assert(id(begin()) == size() - 1);
-
+    
     size_t s = size();
     post_order_iterator it;
     sibling_iterator ch;
     LRH lrh;
-
+    
     sizes.resize(s, 0);
     leafs.resize(s);
     heavy_children.resize(s);
     keyroots.resize(s);
     subforests.resize(s);
-
+    
     for (it = begin_post(); it != end_post(); ++it)
     {
         // compute sizes
         sizes[id(it)] = 1;
         for (ch = it.begin(); ch != it.end(); ++ch)
             sizes[id(it)] += sizes[id(ch)];
-
+        
         // compute heavy_child
         if (!is_leaf(it))
         {
             iterator h;
             size_t max;
-
+            
             ch = it.begin();
             max = sizes[id(ch)];
             h = ch;
-
+            
             for (; ch != it.end(); ++ch)
                 if (sizes[id(ch)] > max)
                 {
@@ -75,13 +75,13 @@ void gted_tree::init()
                 }
             heavy_child(it) = h;
         }
-
+        
         // compute leafs
         if (is_leaf(it))
         {
             lrh.left =
-                lrh.right =
-                lrh.heavy = it;
+            lrh.right =
+            lrh.heavy = it;
         }
         else
         {
@@ -90,7 +90,7 @@ void gted_tree::init()
             lrh.heavy = leafs[id(heavy_child(it))].heavy;
         }
         leafs[id(it)] = lrh;
-
+        
         // compute keyroots && subforests
         //
         // (iter == keyroot(parent)) <=>
@@ -103,11 +103,11 @@ void gted_tree::init()
             auto &subforest = subforests[id(it)];
             auto &keyroot   = keyroots[id(it)];
             size_t chid = id(ch);
-
+            
             insert(subforests[chid].left,  subforest.left);
             insert(subforests[chid].right, subforest.right);
             insert(subforests[chid].heavy, subforest.heavy);
-
+            
             if (!is_left(ch))
             {
                 keyroot.left.push_back(ch);
@@ -115,7 +115,7 @@ void gted_tree::init()
             }
             else
                 insert(keyroots[chid].left, keyroot.left);
-
+            
             if (!is_right(ch))
             {
                 keyroot.right.push_back(ch);
@@ -123,7 +123,7 @@ void gted_tree::init()
             }
             else
                 insert(keyroots[chid].right, keyroot.right);
-
+            
             if (!is_heavy(ch))
             {
                 keyroot.heavy.push_back(ch);
@@ -133,9 +133,6 @@ void gted_tree::init()
                 insert(keyroots[chid].heavy, keyroot.heavy);
         }
     }
-
+    
     assert(size() == get_size(begin()));
 }
-
-
-

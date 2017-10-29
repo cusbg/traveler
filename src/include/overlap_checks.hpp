@@ -38,22 +38,22 @@ public:
         point centre;
         double radius;
     };
-
+    
     typedef std::vector<edge> edges;
     typedef std::vector<overlapping> overlaps;
-
+    
 public:
     overlap_checks();
-
+    
     /**
      * run overlap checks
      */
     overlaps run(
-                rna_tree& _rna);
-
+                 rna_tree& _rna);
+    
     static edges get_edges(const rna_tree::iterator& node);
     static overlaps get_overlaps(const edges &e1, const edges &e2);
-
+    
 private:
     /**
      * create edges of rna
@@ -64,26 +64,25 @@ private:
      *          => going pre_post_order in tree
      */
     edges get_edges(
-                rna_tree& rna);
-
+                    rna_tree& rna);
+    
     /**
      * run checks for edges
      */
     overlaps run(
-                const edges& e);
-
+                 const edges& e);
+    
 #ifdef TESTS
 public:
 #endif
     /**
      * find point in which edges are intersecting each other
-     * if no such point exists, return point::bad_point
+     * if no point exist, return point::bad_point
      */
     static point intersection(
-                const edge& e1,
-                const edge& e2);
-
+                              const edge& e1,
+                              const edge& e2);
+    
 };
 
 #endif /* !OVERLAP_CHECKS_HPP */
-

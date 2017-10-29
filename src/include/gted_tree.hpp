@@ -38,27 +38,27 @@ public:
     {
         std::vector<iterator> left, right, heavy;
     };
-
+    
 public:
     gted_tree(
-                const rna_tree& t);
-
+              const rna_tree& t);
+    
     /**
      * initialize all table values
      */
     void init();
-
+    
 private:
     inline size_t id(
-                iterator it) const
+                     iterator it) const
     {
         // should be here, because of tree_base::id() function without arguments
         return ::id(it);
     }
-
+    
 public:
     inline void check_same_tree(
-                iterator it) const
+                                iterator it) const
     {
         while (!is_root(it))
             it = parent(it);
@@ -69,80 +69,80 @@ public:
      * returns `it`s heavy child
      */
     inline iterator get_heavy_child(
-                const iterator& it) const
+                                    const iterator& it) const
     {
         check_same_tree(it);
         return heavy_children[id(it)];
     }
-
+    
     /**
      * returns `it`s subtree size
      */
     inline size_t get_size(
-                const iterator& it) const
+                           const iterator& it) const
     {
         check_same_tree(it);
         return sizes[id(it)];
     }
-
+    
     /**
      * returns `it`s leafs (left/right/heavy)
      */
     inline LRH get_leafs(
-                const iterator& it) const
+                         const iterator& it) const
     {
         check_same_tree(it);
         return leafs[id(it)];
     }
-
+    
     /**
      * returns `it`s keyroots
      */
     inline LRH_table get_keyroots(
-                const iterator& it) const
+                                  const iterator& it) const
     {
         check_same_tree(it);
         return keyroots[id(it)];
     }
-
+    
     /**
      * returns `it`s subforests
      */
     inline LRH_table get_subforests(
-                const iterator& it) const
+                                    const iterator& it) const
     {
         check_same_tree(it);
         return subforests[id(it)];
     }
-
+    
     /**
      * returns if `it` is left child
      */
     inline bool is_left(
-                iterator it) const
+                        iterator it) const
     {
         return is_first_child(it);
     }
-
+    
     /**
      * returns if `it` is right child
      */
     inline bool is_right(
-                iterator it) const
+                         iterator it) const
     {
         return is_last_child(it);
     }
-
+    
     /**
      * returns if `it` is heavy child
      */
     inline bool is_heavy(
-                iterator it) const
+                         iterator it) const
     {
         return is_root(it) ||
-            get_heavy_child(parent(it)) == it;
+        get_heavy_child(parent(it)) == it;
     }
-
+    
 private:
     std::vector<iterator> heavy_children;
     std::vector<size_t> sizes;
@@ -152,4 +152,3 @@ private:
 };
 
 #endif /* !GTED_TREE_HPP */
-

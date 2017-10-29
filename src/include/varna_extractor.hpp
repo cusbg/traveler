@@ -31,7 +31,7 @@ class varna_extractor : public extractor
 {
 protected:
     virtual void extract(
-                const std::string& filename);
+                         const std::string& filename);
     virtual std::string get_type() const
     {
         return "varna";
@@ -39,4 +39,3 @@ protected:
 };
 
 #endif /* !VARNA_EXTRACTOR_HPP */
-

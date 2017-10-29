@@ -39,12 +39,12 @@ struct strategy
 {
     strategy() = default;
     strategy(
-                int index);
+             int index);
     strategy(
-                rted_strategy index);
+             rted_strategy index);
     strategy(
-                const std::string& text);
-
+             const std::string& text);
+    
 public:
     int to_index() const;
     bool is_left() const;
@@ -52,27 +52,27 @@ public:
     bool is_heavy() const;
     bool is_T1() const;
     bool is_T2() const;
-
+    
     static bool is_left(
-                int index);
+                        int index);
     static bool is_right(
-                int index);
+                         int index);
     static bool is_heavy(
-                int index);
+                         int index);
     static bool is_T1(
-                int index);
+                      int index);
     static bool is_T2(
-                int index);
-
+                      int index);
+    
     inline operator size_t() const  // cast: '(size_t)strategy'
     {
         return to_index();
     }
-
+    
     friend std::ostream& operator<<(
-                std::ostream& out,
-                strategy str);
-
+                                    std::ostream& out,
+                                    strategy str);
+    
 private:
     enum _strategy
     {
@@ -85,7 +85,7 @@ private:
         T1,
         T2
     };
-
+    
     _strategy   str;
     _tree       tree;
     bool inited = false;
@@ -96,12 +96,11 @@ private:
 typedef std::vector<std::vector<strategy>>  strategy_table_type;
 
 std::ostream& operator<<(
-                std::ostream& out,
-                strategy_table_type strategies);
+                         std::ostream& out,
+                         strategy_table_type strategies);
 
 std::ostream& operator<<(
-                std::ostream& out,
-                rted_strategy str);
+                         std::ostream& out,
+                         rted_strategy str);
 
 #endif /* !STRATEGY_HPP */
-

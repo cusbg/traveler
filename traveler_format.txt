@@ -1,0 +1,15 @@
+Traveler intermmediate format specification
+
+Traveler intermmediate format is XML file with following structure:
+
+- top level tag is <structure>, all other tags are inside of <structure>
+- inside structure tag are these tags:
+	- <point x="x-coordinate" y="y-coordinate" b="base" />
+	- <line fromX="x-coordinate-start-point" fromY="y-coordinate-start-point" toX="x-coordinate-end-point" toY="y-coordinate-end-point" />
+	
+Usage of intermmediate format:
+
+- to generate output in traveler format use option -to or --traveler-out
+- to use template in traveler formate use uption -tf or --traveler-template
+- traveler format output will be generated also when option -a or -all is used
+- for more see -h (--help)

@@ -30,60 +30,60 @@ public:
     double radius() const;
     double segment_angle() const;
     double segment_length() const;
-
+    
     /**
      * return if `p` !NOT! lies in circle segment (p1, direction, p2)
      * => direction == opposite direction of circle segment
      */
     bool lies_in_segment(
-                const point& p) const;
-
+                         const point& p) const;
+    
     /**
      * rotate point p1 with `angle`
      */
     point rotate(
-                double angle) const;
-
+                 double angle) const;
+    
     /**
      * returns `n` points on circle
      */
     std::vector<point> split(
-                size_t n) const;
-
+                             size_t n) const;
+    
 public:
     circle() = default;
-
+    
     /**
      * compute direction of circle
      * (clockwise/counterclockwise)
      */
     void compute_sgn();
-
+    
     /**
      * initialize circle (length) for `n` nodes
      */
     std::vector<point> init(
-                size_t n,
-                double loops_bases_distance);
-
+                            size_t n,
+                            double loops_bases_distance);
+    
 public:
     /**
      * minimal length for `n` nodes
      */
     static double min_circle_length(
-                size_t n,
-                double loops_bases_distance);
-
+                                    size_t n,
+                                    double loops_bases_distance);
+    
 public:
     friend std::ostream& operator<<(
-                std::ostream& out,
-                const circle& c);
-
+                                    std::ostream& out,
+                                    const circle& c);
+    
 public:
     point p1, p2;
     point centre;
     point direction;
-
+    
 private:
     /**
      * sgn =  1 ~> clockwise
@@ -95,4 +95,3 @@ private:
 };
 
 #endif /* !COMPACT_CIRCLE_HPP */
-

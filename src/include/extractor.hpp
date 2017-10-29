@@ -47,25 +47,24 @@ public:
      * returns extractor with `type`, run extraction from file `filename`
      */
     static extractor_ptr get_extractor(
-                const std::string& filename,
-                const std::string& type);
+                                       const std::string& filename,
+                                       const std::string& type);
 protected:
     /**
      * run extraction
      */
     virtual void extract(
-                const std::string& filename) = 0;
+                         const std::string& filename) = 0;
     virtual std::string get_type() const = 0;
     std::regex create_regex(
-                const std::string& pattern);
-
+                            const std::string& pattern);
+    
 private:
     static std::vector<extractor_ptr> get_all_extractors();
-
+    
 public:
     std::string labels;
     std::vector<point> points;
 };
 
 #endif /* !EXTRACTOR_HPP */
-

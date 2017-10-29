@@ -28,21 +28,21 @@ using namespace std;
 
 
 /* static */ logger_end_of_function_priority logger_end_of_function_priority::with_priority(
-                logger::priority new_priority)
+                                                                                            logger::priority new_priority)
 {
     return logger_end_of_function_priority(new_priority);
 }
 
 /* static */ logger_end_of_function_priority logger_end_of_function_priority::with_at_least(
-                logger::priority minimal_priority)
+                                                                                            logger::priority minimal_priority)
 {
     logger::priority p = (logger.get_priority() < minimal_priority) ? minimal_priority : logger.get_priority();
-
+    
     return logger_end_of_function_priority(p);
 }
 
 logger_end_of_function_priority::logger_end_of_function_priority(
-                logger::priority new_priority)
+                                                                 logger::priority new_priority)
 {
     old_priority = logger.get_priority();
     logger.set_priority(new_priority);
@@ -54,8 +54,8 @@ logger_end_of_function_priority::~logger_end_of_function_priority()
 }
 
 print_class_BEG_END_name::print_class_BEG_END_name(
-                const std::string& _fname)
-    : fname(_fname)
+                                                   const std::string& _fname)
+: fname(_fname)
 {
     TRACE("BEG function: %s", fname);
 }

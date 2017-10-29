@@ -32,32 +32,31 @@ class mapping
 {
 public:
     typedef std::vector<size_t> indexes;
-
+    
     struct mapping_pair
     {
         size_t from, to;
-
+        
         bool operator<(
-                    const mapping_pair& other) const;
+                       const mapping_pair& other) const;
     };
-
+    
 public:
     mapping() = default;
-
+    
     /**
      * filter only inserts
      */
     indexes get_to_insert() const;
-
+    
     /**
      * filter only deletes
      */
     indexes get_to_remove() const;
-
+    
 public:
     size_t distance;
     std::vector<mapping_pair> map;
 };
 
 #endif /* !MAPPING_HPP */
-

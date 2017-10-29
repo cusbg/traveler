@@ -35,25 +35,25 @@ template <typename label_type>
 size_t tree_base<label_type>::ID = 0;
 
 
-template <typename label_type> 
+template <typename label_type>
 template <typename labels_array>
 tree_base<label_type>::tree_base(
-                const std::string& _brackets,
-                const labels_array& _labels)
+                                 const std::string& _brackets,
+                                 const labels_array& _labels)
 {
     APP_DEBUG_FNAME;
-
+    
     iterator it;
     size_t i = 0;
-
+    
     if (_brackets.size() != _labels.size())
         throw wrong_argument_exception("Number of brackets != Number of labels");
-
+    
     label_type root = label_type("ROOT_" + std::to_string(_id)) + label_type("");
     _tree.set_head(root);
     _size = 1;  // ROOT
     it = begin();
-
+    
     while(i < _brackets.size())
     {
         char ch = _brackets[i];
@@ -84,7 +84,7 @@ tree_base<label_type>::tree_base(
 
 template <typename label_type>
 bool tree_base<label_type>::operator==(
-                const tree_base<label_type>& other) const
+                                       const tree_base<label_type>& other) const
 {
     return _tree.equal_subtree(_tree.begin(), other._tree.begin());
 }
@@ -106,7 +106,7 @@ size_t tree_base<label_type>::size() const
 /* inline */
 template <typename label_type>
 std::string tree_base<label_type>::print_tree(
-                bool debug_out) const
+                                              bool debug_out) const
 {
     return print_subtree(_tree.begin(), debug_out);
 }
@@ -114,23 +114,23 @@ std::string tree_base<label_type>::print_tree(
 /* static */
 template <typename label_type>
 std::string tree_base<label_type>::print_subtree(
-                const iterator& root,
-                bool debug_out)
+                                                 const iterator& root,
+                                                 bool debug_out)
 {
     std::ostringstream out;
     out
-        << "SUBTREE("
-        << ::label(root)
-        << ":"
-        << ::id(root)
-        << "): \t";
-
+    << "SUBTREE("
+    << ::label(root)
+    << ":"
+    << ::id(root)
+    << "): \t";
+    
     auto f = [&out](const pre_post_order_iterator& iter)
     {
         if (is_leaf(iter))
         {
             out << label(iter);
-
+            
             if (!is_last_child(iter))
                 out << ", ";
         }
@@ -146,12 +146,12 @@ std::string tree_base<label_type>::print_subtree(
             }
         }
     };
-
+    
     for_each_in_subtree(root, f);
-
+    
     if (debug_out)
         DEBUG("%s", out.str());
-
+    
     return out.str();
 }
 
@@ -159,14 +159,14 @@ template <typename label_type>
 void tree_base<label_type>::set_postorder_ids()
 {
     APP_DEBUG_FNAME;
-
+    
     post_order_iterator it;
-
+    
     label_type::reset_ID();
-
+    
     for (it = begin_post(); it != end_post(); ++it)
         it->reset_id();
-
+    
     assert(size() - 1 == ::id(begin()));
 }
 
@@ -177,7 +177,7 @@ bool tree_base<label_type>::is_ordered_postorder() const
     for (post_order_iterator it = begin_post(); it != end_post(); ++it, ++i)
         if (i != ::id(it))
             return false;
-
+    
     return true;
 }
 
@@ -189,7 +189,7 @@ bool tree_base<label_type>::is_ordered_postorder() const
 /* inline */
 template <typename iter>
 size_t id(
-                const iter& it)
+          const iter& it)
 {
     if (it.node == nullptr)
         throw std::invalid_argument("id(iter): NULL iterator");
@@ -200,7 +200,7 @@ size_t id(
 /* inline */
 template <typename iter>
 std::string label(
-                const iter& it)
+                  const iter& it)
 {
     if (it.node == nullptr)
         return "<null>";
@@ -212,8 +212,8 @@ std::string label(
 /* inline */
 template <typename iter>
 inline iter plusplus(
-                iter it,
-                size_t n)
+                     iter it,
+                     size_t n)
 {
     while (n--)
         ++it;
@@ -221,4 +221,3 @@ inline iter plusplus(
 }
 
 #endif /* !TREE_BASE_UTILS_HPP */
-

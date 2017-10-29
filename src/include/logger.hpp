@@ -29,34 +29,34 @@
 class logger
 {
 #define LOGGER_PRIORITY_FUNCTION(_fname, _priority) \
-    template<typename ...Args> \
-    void _fname(const char* msg, const Args& ... args) \
-    { \
-        if (is_ ## _fname ## _enabled()) \
-        { \
-            auto stream = get_stream(_priority); \
-            mprintf(msg, stream, args...); \
-        } \
-    }
-
+template<typename ...Args> \
+void _fname(const char* msg, const Args& ... args) \
+{ \
+if (is_ ## _fname ## _enabled()) \
+{ \
+auto stream = get_stream(_priority); \
+mprintf(msg, stream, args...); \
+} \
+}
+    
 #define LOGGER_ENABLED_PRIORITY_FUNCTION(_fname, _priority) \
-    inline bool is_ ## _fname ## _enabled() const \
-    { \
-        return can_log(priority::_priority); \
-    }
-
+inline bool is_ ## _fname ## _enabled() const \
+{ \
+return can_log(priority::_priority); \
+}
+    
 #define LOGGER_STREAM_FUNCTION(_fname, _priority) \
-    inline logger_stream _fname ##_stream() \
-    { \
-        return get_stream(_priority); \
-    }
-
+inline logger_stream _fname ##_stream() \
+{ \
+return get_stream(_priority); \
+}
+    
 #define LOGGER_FUNCTIONS(_f, _p) \
-    LOGGER_PRIORITY_FUNCTION(_f, _p); \
-    LOGGER_ENABLED_PRIORITY_FUNCTION(_f, _p); \
-    LOGGER_STREAM_FUNCTION(_f, _p);
-
-
+LOGGER_PRIORITY_FUNCTION(_f, _p); \
+LOGGER_ENABLED_PRIORITY_FUNCTION(_f, _p); \
+LOGGER_STREAM_FUNCTION(_f, _p);
+    
+    
 public:
     /**
      * logging priority
@@ -64,53 +64,53 @@ public:
     enum priority : char
     {
         TRACE   = 0,
-        DEBUG   = 1,
+        DEB   = 1,
         INFO    = 2,
         WARN    = 3,
         ERROR   = 4,
         EMERG   = 5,
     };
-
+    
     /**
      * stream object for logging
      */
     class logger_stream
     {
         friend logger;
-
+        
     protected:
         logger_stream(
-                    logger& l,
-                    priority p);
+                      logger& l,
+                      priority p);
     public:
         logger_stream(
-                    const logger_stream& other);
+                      const logger_stream& other);
         ~logger_stream();
-
+        
         void flush();
-
+        
         template<typename T>
         logger_stream& operator<<(
-                    const T& value);
+                                  const T& value);
     private:
         logger& l;
         const priority p;
         std::ostringstream stream;
     };
-
+    
 public:
 #ifdef NO_LOGGING
     logger();
 #endif
     logger(
-                const std::string& filename,
-                priority priority);
+           const std::string& filename,
+           priority priority);
     logger(
-                const std::string& filename,
-                priority priority,
-                const std::vector<FILE*>& streams);
+           const std::string& filename,
+           priority priority,
+           const std::vector<FILE*>& streams);
     ~logger();
-
+    
 public:
     /**
      * returns priority for this logger
@@ -119,78 +119,78 @@ public:
     {
         return p;
     }
-
+    
     /**
      * sets priority for this logger
      */
     inline void set_priority(
-                priority other)
+                             priority other)
     {
         p = other;
     }
-
+    
 protected:
     /**
      * returns header for priority
      */
     static std::string message_header(
-                priority p);
-
+                                      priority p);
+    
     /**
      * print `text` with priority `p`
      */
     void log(
-                priority p,
-                const std::string& text);
-
+             priority p,
+             const std::string& text);
+    
     /**
      * create new stream for this logger with pirority `p`
      */
     inline logger_stream get_stream(
-                priority p)
+                                    priority p)
     {
         return logger_stream(*this, p);
     }
-
+    
     /**
      * check IO errors
      */
     void check_errors();
-
+    
 protected:
     /**
      * returns if priority for new message higher than logger is printing
      */
     inline bool can_log(
-                priority other) const
+                        priority other) const
     {
         return other >= p;
     }
-
+    
 public:
     LOGGER_FUNCTIONS(trace, TRACE);
-    LOGGER_FUNCTIONS(debug, DEBUG);
+    LOGGER_FUNCTIONS(debug, DEB);
     LOGGER_FUNCTIONS(info,  INFO);
     LOGGER_FUNCTIONS(warn,  WARN);
     LOGGER_FUNCTIONS(error, ERROR);
     LOGGER_FUNCTIONS(emerg, EMERG);
-
+    
 public:
     /**
      * returns file descriptors for all opened logging files
      */
     std::vector<int> opened_files() const;
-
+    
 protected:
     priority p;
     std::vector<FILE*> out;
-
+    
 #undef LOGGER_PRIORITY_FUNCTION_BODY
 #undef LOGGER_PRIORITY_FUNCTION
 #undef LOGGER_ENABLED_PRIORITY_FUNCTION
 #undef LOGGER_STREAM_FUNCTION
 #undef LOGGER_FUNCTIONS
-
+    
     friend void signal_handler(int);
 };
 
@@ -203,11 +203,11 @@ extern class logger logger;
 
 template<typename T>
 logger::logger_stream& logger::logger_stream::operator<<(
-                    const T& value)
+                                                         const T& value)
 {
     if (!l.can_log(p))
         return *this;
-
+    
     stream << value;
     return *this;
 }
@@ -216,18 +216,18 @@ logger::logger_stream& logger::logger_stream::operator<<(
 // Define standard macros for using logger
 #ifndef NO_LOGGING
 #define TRACE(...) \
-    if (logger.is_trace_enabled()) \
-        ::logger.trace(__VA_ARGS__)
+if (logger.is_trace_enabled()) \
+::logger.trace(__VA_ARGS__)
 #define DEBUG(...) \
-    if (logger.is_debug_enabled()) \
-        ::logger.debug(__VA_ARGS__)
+if (logger.is_debug_enabled()) \
+::logger.debug(__VA_ARGS__)
 #define INFO(...) \
-    if (logger.is_info_enabled()) \
-        ::logger.info(__VA_ARGS__)
+if (logger.is_info_enabled()) \
+::logger.info(__VA_ARGS__)
 #define WARN(...) \
-    ::logger.warn(__VA_ARGS__)
+::logger.warn(__VA_ARGS__)
 #define ERR(...) \
-    ::logger.error(__VA_ARGS__)
+::logger.error(__VA_ARGS__)
 
 #else
 // no logging
@@ -239,4 +239,3 @@ logger::logger_stream& logger::logger_stream::operator<<(
 #endif
 
 #endif /* !LOGGER_HPP */
-

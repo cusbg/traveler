@@ -32,13 +32,13 @@ struct fasta
     std::string id;
     std::string brackets;
     std::string labels;
-
+    
     friend std::ostream& operator<<(std::ostream& out, fasta f);
 };
 
 
 // TABLE-SAVING FUNCTIONS:
-    
+
 /**
  * save strategy `table` to `filename`
  *  format:
@@ -47,8 +47,8 @@ struct fasta
  *  where m = #rows, n = #cols
  */
 void save_strategy_table(
-                const std::string& filename,
-                const strategy_table_type& table);
+                         const std::string& filename,
+                         const strategy_table_type& table);
 
 /**
  * loads previously saved STR from `filename`
@@ -58,21 +58,21 @@ void save_strategy_table(
  *  where m = #rows, n = #cols
  */
 strategy_table_type load_strategy_table(
-                const std::string& filename);
+                                        const std::string& filename);
 
 void save_tree_distance_table(
-                const std::string& filename,
-                const std::vector<std::vector<size_t>>& table);
+                              const std::string& filename,
+                              const std::vector<std::vector<size_t>>& table);
 
 std::vector<std::vector<size_t>> load_tree_distance_table(
-                const std::string& filename);
+                                                          const std::string& filename);
 
 void save_tree_mapping_table(
-                const std::string& filename,
-                const mapping& map);
+                             const std::string& filename,
+                             const mapping& map);
 
 mapping load_mapping_table(
-                const std::string& filename);
+                           const std::string& filename);
 
 ///
 
@@ -81,14 +81,13 @@ bool exist_file(
                 const std::string& filename);
 
 std::string read_file(
-                const std::string& filename);
+                      const std::string& filename);
 
 void write_file(
                 const std::string& filename,
                 const std::string& text);
 
 fasta read_fasta_file(
-                const std::string& filename);
+                      const std::string& filename);
 
 #endif /* !UTILS_HPP */
-

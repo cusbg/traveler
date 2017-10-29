@@ -33,8 +33,8 @@
 struct rna_label
 {
     bool operator==(
-                const rna_label& other) const;
-
+                    const rna_label& other) const;
+    
     std::string label;
     point p;
 };
@@ -56,32 +56,32 @@ public:
         rotated,
         pair_changed,
     };
-
+    
 public:
     rna_pair_label() = default;
     rna_pair_label(
-                const std::string& s);
+                   const std::string& s);
     bool operator==(
-                const rna_pair_label& other) const;
+                    const rna_pair_label& other) const;
     rna_pair_label operator+(
-                const rna_pair_label& other) const;
-
+                             const rna_pair_label& other) const;
+    
     const rna_label& operator[](
-                size_t index) const;
+                                size_t index) const;
     rna_label& operator[](
-                size_t index);
+                          size_t index);
     const rna_label& at(
-                size_t index) const;
+                        size_t index) const;
     rna_label& at(
-                size_t index);
-
+                  size_t index);
+    
     friend std::ostream& operator<<(
-                std::ostream& out,
-                rna_pair_label lbl);
+                                    std::ostream& out,
+                                    rna_pair_label lbl);
     friend std::ostream& operator<<(
-                std::ostream& out,
-                status_type status);
-
+                                    std::ostream& out,
+                                    status_type status);
+    
     size_t size() const;
     /**
      * returns if this node is base pair
@@ -95,28 +95,27 @@ public:
      * returns point between bases in pair. If signle pase is present, returns its position
      */
     point center() const;
-
+    
     void clear_points();
     /**
      * set bases
      */
     void set_label_strings(
-                const rna_pair_label& other);
-
+                           const rna_pair_label& other);
+    
     void set_parent_center(
-            const point& center);
-
+                           const point& center);
+    
     const point & get_parent_center();
-
+    
 public:
     status_type status = untouched;
     std::vector<size_t> remake_ids;
-
+    
 private:
     std::vector<rna_label> labels;
     point parent_center;
-
+    
 };
 
 #endif /* !RNA_TREE_LABEL_HPP */
-

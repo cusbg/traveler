@@ -25,46 +25,42 @@
 #include <stdexcept>
 #include "mprintf.hpp"
 
-#ifdef _MSC_VER
-#define __PRETTY_FUNCTION__ __FUNCSIG__
-#endif
-
 #define DEFAULT_EXCEPTION_METHODS(ex_name) \
-    virtual ~ex_name() noexcept = default; \
-    template <typename ...Args> \
-    ex_name( \
-            const char* _msg_format, const Args& ... args) \
-        : my_exception(_msg_format, args...) \
-    { } \
-    std::string get_type() const \
-    { \
-        return #ex_name; \
-    }
+virtual ~ex_name() noexcept = default; \
+template <typename ...Args> \
+ex_name( \
+const char* _msg_format, const Args& ... args) \
+: my_exception(_msg_format, args...) \
+{ } \
+std::string get_type() const \
+{ \
+return #ex_name; \
+}
 
 class my_exception : public std::exception
 {
 public:
     virtual const char* what() const noexcept;
     virtual std::string get_type() const = 0;
-
+    
 protected:
     my_exception(
-                const std::string& _msg);
+                 const std::string& _msg);
     virtual ~my_exception() noexcept = default;
-
+    
     template <typename ...Args>
     my_exception(
-                const char* _msg_format, const Args& ... args)
-        : my_exception(msprintf(_msg_format, args...))
+                 const char* _msg_format, const Args& ... args)
+    : my_exception(msprintf(_msg_format, args...))
     { }
     friend std::ostream& operator<<(
-                std::ostream& out,
-                const my_exception& ex)
+                                    std::ostream& out,
+                                    const my_exception& ex)
     {
         out << ex.get_type() << ": " << ex.msg;
         return out;
     }
-
+    
 private:
     std::string msg;
 };
@@ -88,9 +84,9 @@ class io_exception : public my_exception
 {
 public:
     DEFAULT_EXCEPTION_METHODS(io_exception);
-
+    
     io_exception(const std::string& msg)
-        : my_exception(msg)
+    : my_exception(msg)
     { }
 };
 
@@ -99,9 +95,9 @@ class illegal_state_exception : public my_exception
 {
 public:
     DEFAULT_EXCEPTION_METHODS(illegal_state_exception);
-
+    
     illegal_state_exception(const std::string& msg)
-        : my_exception(msg)
+    : my_exception(msg)
     { }
 };
 
@@ -118,15 +114,13 @@ public:
 
 #undef abort
 #define abort() \
-    throw abort_exception("abort() called in function %s; line %s; file %s", __PRETTY_FUNCTION__, __LINE__, __FILE__);
+throw abort_exception("abort() called in function %s; line %s; file %s", __PRETTY_FUNCTION__, __LINE__, __FILE__);
 
 #undef assert
 #define assert(boolean) \
-    { \
-        if (!(boolean)) \
-        { \
-            throw assert_exception("assert(%s) failed; look in function %s; line %s; file %s", #boolean, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
-        } \
-    }
-
-
+{ \
+if (!(boolean)) \
+{ \
+throw assert_exception("assert(%s) failed; look in function %s; line %s; file %s", #boolean, __PRETTY_FUNCTION__, __LINE__, __FILE__); \
+} \
+}

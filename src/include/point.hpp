@@ -29,35 +29,35 @@ struct point
 {
     double x;
     double y;
-
+    
 public:
     point();
     point(double _x, double _y);
     bool operator==(const point& other) const;
-
+    
     point operator+(const point& other) const;
     point operator-(const point& other) const;
     point operator-() const;
     point operator/(const point& other) const;
     point operator/(double value) const;
     point operator*(double value) const;
-
+    
 #define OPERATION_FUNCTION(operation) \
-    point& operator operation ## = (const point& other) \
-    { \
-        *this = *this operation other; \
-        return *this; \
-    }
+point& operator operation ## = (const point& other) \
+{ \
+*this = *this operation other; \
+return *this; \
+}
     // operations +=, -=, /=
     OPERATION_FUNCTION(+);
     OPERATION_FUNCTION(-);
     OPERATION_FUNCTION(/);
 #undef OPERATION_FUNCTION
-
-
+    
+    
     bool bad() const;
     static const point& bad_point();
-
+    
     friend std::ostream& operator<<(std::ostream& out, const point& p);
 };
 
@@ -96,22 +96,21 @@ point abs(const point& p);
 // functions for double comparing
 
 bool double_equals_precision(
-                double val1,
-                double val2,
-                double precision);
+                             double val1,
+                             double val2,
+                             double precision);
 
 bool double_equals(
-                double val1,
-                double val2);
+                   double val1,
+                   double val2);
 
 double radians_to_degrees(
-                double val);
+                          double val);
 
 double degrees_to_radians(
-                double val);
+                          double val);
 
 bool iszero(
-                double val);
+            double val);
 
 #endif /* !POINT_HPP */
-

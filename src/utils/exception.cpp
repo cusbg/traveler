@@ -25,11 +25,10 @@
 using namespace std;
 
 my_exception::my_exception(const std::string& _msg)
-    : msg(_msg)
+: msg(_msg)
 { }
 
 const char* my_exception::what() const noexcept
 {
     return msg.c_str();
 }
-

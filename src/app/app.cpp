@@ -32,6 +32,9 @@
 #include "gted.hpp"
 #include "overlap_checks.hpp"
 
+#define TRAVELER_FORMAT {"-tf", "--traveler-template"}
+#define TRAVELER_OUT {"-to", "--traveler-out"}
+
 #define ARGS_HELP                           {"-h", "--help"}
 #define ARGS_TARGET_STRUCTURE               {"-gs", "--target-structure"}
 #define ARGS_TEMPLATE_STRUCTURE             {"-ts", "--template-structure"}
@@ -55,7 +58,7 @@ struct app::arguments
 {
     rna_tree templated;
     rna_tree matched;
-
+    
     struct
     {
         bool run = false;
@@ -74,79 +77,87 @@ struct app::arguments
         string mapping;
         string file;
     } draw;
-
+    struct
+    {
+        bool run = false;
+    } traveler;
+    
 public:
     /**
      * parse arguments
      */
     static arguments parse(
-                const std::vector<std::string>& args);
-
+                           const std::vector<std::string>& args);
+    
 private:
     arguments() = default;
 };
 
 
 void app::run(
-                std::vector<std::string> args)
+              std::vector<std::string> args)
 {
     APP_DEBUG_FNAME;
-
+    
     args.push_back("");
     run(arguments::parse(args));
 }
 
 
 void app::run(
-                arguments args)
+              arguments args)
 {
+    
+    
     APP_DEBUG_FNAME;
-
+    
     INFO("BEG: APP");
-
+    
     print(args);
-    bool rted = args.all.run || args.ted.run;
-    bool draw = args.all.run || args.draw.run;
+    bool rted = args.all.run || args.ted.run || args.traveler.run;
+    bool draw = args.all.run || args.draw.run|| args.traveler.run;
     bool overlaps = args.all.overlap_checks || args.draw.overlap_checks;
     mapping map;
     string img_out = args.all.file;
-
+    
     map = run_ted(args.templated, args.matched, rted, args.ted.mapping);
-
+    
     if (args.draw.run)
     {
         assert(!args.draw.mapping.empty());
         map = load_mapping_table(args.draw.mapping);
         img_out = args.draw.file;
     }
-
-    run_drawing(args.templated, args.matched, map, draw, overlaps, img_out);
-
+    
+    run_drawing(args.templated, args.matched, map, draw, overlaps, img_out, args.traveler.run);
+    
     INFO("END: APP");
 }
 
 mapping app::run_ted(
-                rna_tree& templated,
-                rna_tree& matched,
-                bool run,
-                const std::string& mapping_file)
+                     rna_tree& templated,
+                     rna_tree& matched,
+                     bool run,
+                     const std::string& mapping_file)
 {
     APP_DEBUG_FNAME;
-
+    
     try
     {
         mapping mapping;
-
+        
         if (run)
         {
+            
+           
             rted r(templated, matched); //Gets a strategy for decomposing a tree
             r.run();
-
+            
             gted g(templated, matched); //Computes mapping and ditstanve based on RTED's strategy (faster than using GTED itself)
             g.run(r.get_strategies());
-
+    
             mapping = g.get_mapping();
-
+            
             if (!mapping_file.empty())
                 save_tree_mapping_table(mapping_file, mapping);
         }
@@ -154,25 +165,27 @@ mapping app::run_ted(
         {
             INFO("skipping rted run, returning default mapping");
         }
-
+        
         return mapping;
     }
     catch (const my_exception& e)
     {
         throw aplication_error("Tree-edit-distance computation failed: %s", e).with(ERROR_TED);
     }
+    
 }
 
 void app::run_drawing(
-                rna_tree& templated,
-                rna_tree& matched,
-                const mapping& mapping,
-                bool run,
-                bool run_overlaps,
-                const std::string& file)
+                      rna_tree& templated,
+                      rna_tree& matched,
+                      const mapping& mapping,
+                      bool run,
+                      bool run_overlaps,
+                      const std::string& file,
+                      bool traveler)
 {
     APP_DEBUG_FNAME;
-
+    
     try
     {
         if (!run)
@@ -180,20 +193,14 @@ void app::run_drawing(
             INFO("skipping draw run");
             return;
         }
-
+        
         //Based on a mapping, matcher returns structure with deleted and inserted nodes
         // which correspond to the target structure
         templated = matcher(templated, matched).run(mapping);
         //Compact goes through the structure and computes new coordinates where necessary
         compact(templated).run();
-
-//        for (compact::iterator it = ++templated.begin(); it != templated.end(); ++it) {
-//            it->at(0).label += msprintf(" %i", it->id());
-//            int i = 1;
-//
-//        }
-
-        save(file, templated, run_overlaps);
+        
+        save(file, templated, run_overlaps, traveler);
     }
     catch (const my_exception& e)
     {
@@ -202,16 +209,24 @@ void app::run_drawing(
 }
 
 void app::save(
-                const std::string& filename,
-                rna_tree& rna,
-                bool overlap)
+               const std::string& filename,
+               rna_tree& rna,
+               bool overlap,
+               bool traveler)
 {
     APP_DEBUG_FNAME;
-
+    
     overlap_checks::overlaps overlaps;
     if (overlap)
         overlaps = overlap_checks().run(rna);
-
+    
+    if(traveler)
+    {
+        auto writer = document_writer::get_traveler_writer();
+        writer -> init(filename, rna.begin());
+        writer -> print(writer -> get_rna_formatted(rna));
+        return;
+    }
     for (bool colored : {true, false})
     {
         for (auto& writer : document_writer::get_writers(colored))
@@ -219,12 +234,12 @@ void app::save(
             string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
             writer->init(file, rna.begin());
             writer->print(writer->get_rna_formatted(rna));
-
+            
             for (const auto& p : overlaps)
                 writer->print(writer->get_circle_formatted(p.centre, p.radius));
         }
     }
-
+    
     if (overlap)
     {
         INFO("Overlaps computed: found %s in rna %s", overlaps.size(), rna.name());
@@ -239,10 +254,10 @@ void app::save(
 
 
 rna_tree app::create_matched(
-                const std::string& fastafile)
+                             const std::string& fastafile)
 {
     APP_DEBUG_FNAME;
-
+    
     try
     {
         fasta f = read_fasta_file(fastafile);
@@ -255,12 +270,12 @@ rna_tree app::create_matched(
 }
 
 rna_tree app::create_templated(
-                const std::string& templatefile,
-                const std::string& templatetype,
-                const std::string& fastafile)
+                               const std::string& templatefile,
+                               const std::string& templatetype,
+                               const std::string& fastafile)
 {
     APP_DEBUG_FNAME;
-
+    
     try
     {
         extractor_ptr doc = extractor::get_extractor(templatefile, templatetype);
@@ -280,13 +295,13 @@ void app::usage(
                 const string& appname)
 {
     LOGGER_PRIORITY_ON_FUNCTION(INFO);
-
+    
     char endl = '\n';
-
+    
     auto get_args = [](vector<string> args)
     {
         assert(!args.empty());
-
+        
         ostringstream out;
         for (const string& a : args)
             out << a << "|";
@@ -294,111 +309,122 @@ void app::usage(
         // delete last '|'
         return str.substr(0, str.size() - 1);
     };
-
+    
     logger.info_stream()
-        << "usage():"
-        << endl
-        << endl
-        << appname
-            << " [" << get_args(ARGS_HELP) << "]"
-            << endl
-        << appname
-            << " [OPTIONS]"
-            << " <" << get_args(ARGS_TARGET_STRUCTURE) << ">"
-                << " DBN_FILE"
-            << " <" << get_args(ARGS_TEMPLATE_STRUCTURE) << ">"
-                << " [" << ARGS_TEMPLATE_STRUCTURE_FILE_TYPE << " FILE_FORMAT]"
-                << " IMAGE_FILE DBN_FILE"
-            << endl
-        << endl
-        << "OPTIONS:" << endl
-        << "\t[" << get_args(ARGS_ALL)
-            << "] [" << ARGS_ALL_OVERLAPS << "] FILE_OUT"
-        << endl
-        << "\t[" << get_args(ARGS_TED) << "] FILE_MAPPING_OUT"
-        << endl
-        << "\t[" << get_args(ARGS_DRAW)
-            << "] [" << ARGS_DRAW_OVERLAPS << "] FILE_MAPPING_IN FILE_OUT"
-        << endl
-        << "\t[" << get_args(ARGS_VERBOSE) << "]"
-        << endl;
+    << "usage():"
+    << endl
+    << endl
+    << appname
+    << " [" << get_args(ARGS_HELP) << "]"
+    << endl
+    << appname
+    << " [OPTIONS]"
+    << " <" << get_args(ARGS_TARGET_STRUCTURE) << ">"
+    << " DBN_FILE"
+    << " <" << get_args(ARGS_TEMPLATE_STRUCTURE) << ">"
+    << " [" << ARGS_TEMPLATE_STRUCTURE_FILE_TYPE << " FILE_FORMAT]"
+    << " IMAGE_FILE DBN_FILE"
+    << endl
+    << appname
+    << " [OPTIONS]"
+    << " <" << get_args(ARGS_TARGET_STRUCTURE) << ">"
+    << " DBN_FILE"
+    << " <" << get_args(TRAVELER_FORMAT) << ">"
+    << " TRAVELER_FILE DBN_FILE"
+    << endl
+    << endl
+    << "OPTIONS:" << endl
+    << "\t[" << get_args(ARGS_ALL)
+    << "] [" << ARGS_ALL_OVERLAPS << "] FILE_OUT"
+    << endl
+    << "\t[" << get_args(ARGS_TED) << "] FILE_MAPPING_OUT"
+    << endl
+    << "\t[" << get_args(ARGS_DRAW)
+    << "] [" << ARGS_DRAW_OVERLAPS << "] FILE_MAPPING_IN FILE_OUT"
+    << endl
+    << "\t[" <<get_args(TRAVELER_OUT) << "] FILE_OUT"
+    << endl
+    << "\t[" << get_args(ARGS_VERBOSE) << "]"
+    << endl;
 }
 
 void app::print(
                 const arguments& args)
 {
     APP_DEBUG_FNAME;
-
+    
     INFO("ARGUMENTS:\n"
-            "templated: %s: %s\n"
-            "matched: %s: %s\n"
-            "all:\n"
-                "\trun=%s\n"
-                "\timage-file=%s\n"
-                "\toverlaps=%s\n"
-            "ted:\n"
-                "\trun=%s\n"
-                "\tmapping-file=%s\n"
-            "draw:\n"
-                "\trun=%s\n"
-                "\toverlaps=%s\n"
-                "\tmapping-file=%s\n"
-                "\timage-file=%s",
-            args.templated.name(), args.templated.print_tree(false),
-            args.matched.name(), args.matched.print_tree(false),
-            args.all.run, args.all.file, args.all.overlap_checks,
-            args.ted.run, args.ted.mapping,
-            args.draw.run, args.draw.overlap_checks, args.draw.mapping, args.draw.file);
+         "templated: %s: %s\n"
+         "matched: %s: %s\n"
+         "all:\n"
+         "\trun=%s\n"
+         "\timage-file=%s\n"
+         "\toverlaps=%s\n"
+         "ted:\n"
+         "\trun=%s\n"
+         "\tmapping-file=%s\n"
+         "draw:\n"
+         "\trun=%s\n"
+         "\toverlaps=%s\n"
+         "\tmapping-file=%s\n"
+         "\timage-file=%s",
+         args.templated.name(), args.templated.print_tree(false),
+         args.matched.name(), args.matched.print_tree(false),
+         args.all.run, args.all.file, args.all.overlap_checks,
+         args.ted.run, args.ted.mapping,
+         args.draw.run, args.draw.overlap_checks, args.draw.mapping, args.draw.file);
+    
+    
 }
 
 
 /* static */ app::arguments app::arguments::parse(
-                const std::vector<std::string>& args)
+                                                  const std::vector<std::string>& args)
 {
     APP_DEBUG_FNAME;
-
+    
     try
     {
         size_t i;
         string arg;
         arguments a;
-
+        
         auto show_usage_and_exit =
-            [&args]()
-            {   
-                app::usage(args.at(0));
-                exit(0);
-            };
+        [&args]()
+        {
+            app::usage(args.at(0));
+            exit(0);
+        };
         auto nextarg =
-            [&args, &i]()
-            {
-                if (i + 1 < args.size())
-                    return args.at(i + 1);
-                else
-                    return args.back();
-            };
+        [&args, &i]()
+        {
+            if (i + 1 < args.size())
+                return args.at(i + 1);
+            else
+                return args.back();
+        };
         auto is_argument =
-            [&arg](const std::vector<std::string>& arguments)
-            {
-                for (const string& a : arguments)
-                    if (a == arg)
-                        return true;
-                return false;
-            };
-
+        [&arg](const std::vector<std::string>& arguments)
+        {
+            for (const string& a : arguments)
+                if (a == arg)
+                    return true;
+            return false;
+        };
+        
         if (args.size() == 2)
         {
             DEBUG("No arguments");
             show_usage_and_exit();
         }
-
-
+        
+        
         for (i = 1; i < args.size(); ++i)
         {
             arg = args.at(i);
             if (arg.empty())
                 continue;
-
+            
             if (is_argument(ARGS_HELP))
             {
                 DEBUG("arg help");
@@ -426,6 +452,25 @@ void app::print(
                 fastafile = args.at(i + 2);
                 a.templated = app::create_templated(templatefile, templatetype, fastafile);
                 i += 2;
+            }
+            else if (is_argument(TRAVELER_FORMAT))
+            {
+                DEBUG("arg traveler format");
+                string templatefile, fastafile;
+                string templatetype = "traveler";
+                
+                templatefile = args.at(i + 1);
+                fastafile = args.at(i + 2);
+                a.templated = app::create_templated(templatefile, templatetype, fastafile);
+                i += 2;
+            }
+            else if(is_argument(TRAVELER_OUT))
+            {
+                DEBUG("arg traveler output");
+                
+                a.traveler.run = true;
+                a.all.file = args.at(i+1);
+                ++i;
             }
             else if (is_argument(ARGS_ALL))
             {
@@ -482,13 +527,13 @@ void app::print(
             else
             {
                 throw wrong_argument_exception("Wrong parameter no.%i: '%s'; try running %s --help for more arguments details",
-                        i, arg, args[0]);
+                                               i, arg, args[0]);
             }
         }
-
+        
         if (a.templated == rna_tree() || a.matched == rna_tree())
             throw wrong_argument_exception("RNA structures are missing, try running %s --help for more arguments details", args[0]);
-
+        
         return a;
     }
     catch (const my_exception& e)
@@ -496,5 +541,3 @@ void app::print(
         throw aplication_error("Error while parsing arguments: %s", e).with(ERROR_ARGUMENTS);
     }
 }
-
-

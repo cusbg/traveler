@@ -31,7 +31,7 @@ class crw_extractor : public extractor
 {
 protected:
     virtual void extract(
-                const std::string& filename);
+                         const std::string& filename);
     virtual std::string get_type() const
     {
         return "crw";
@@ -40,4 +40,3 @@ protected:
 
 
 #endif /* !CRW_EXTRACTOR_HPP */
-
