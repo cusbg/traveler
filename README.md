@@ -94,14 +94,14 @@ Other extractors of RNA structure can be implemented and specified by the FILE\_
 	$ mkdir test
 	$ bin/traveler \
 		--target-structure data/metazoa/mouse.fasta \
-		--template-structure --file-format traveler data/metazoa/human.ps data/metazoa/human.fasta \
+		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
 		--all test/mouse_from_human
 
 ### Example 1b: Visualize mouse 18S rRNA using human 18S rRNA as template using Traveler's XML input format as the template layout.
 	$ mkdir test
 	$ bin/traveler \
 		--target-structure data/metazoa/mouse.fasta \
-		--template-structure data/metazoa/human.xml data/metazoa/human.fasta \
+		--template-structure --file-format traveler data/metazoa/human.xml data/metazoa/human.fasta \
 		--all test/mouse_from_human_xml_input
 
 ### Example 2: Compute TED distance and mapping between human 18S rRNA (template) and mouse 18S rRNA (target).
