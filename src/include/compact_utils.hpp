@@ -32,14 +32,14 @@ struct compact::intervals
         interior_loop,
         multibranch_loop
     };
-
+    
     /**
      * create intervals for `parent`-s children
      */
     void init(
-                iterator parent);
+              iterator parent);
     point get_circle_direction() const;
-
+    
     std::vector<interval> vec;
     rna_structure_type type;
 };
@@ -70,4 +70,3 @@ struct compact::interval
 
 
 #endif /* !COMPACT_UTILS_HPP */
-

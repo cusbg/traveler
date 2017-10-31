@@ -35,10 +35,10 @@ public:
     typedef typename tree_type::post_order_iterator     post_order_iterator;
     typedef typename tree_type::sibling_iterator        sibling_iterator;
     typedef typename tree_type::reverse_post_order_iterator
-                                                        rev_post_order_iterator;
+    rev_post_order_iterator;
     typedef std::vector<std::vector<size_t>>            tree_distance_table_type;
     typedef std::vector<std::vector<size_t>>            forest_distance_table_type;
-
+    
     /**
      * instead of using constants, use this functions
      * for costs of insert/delete/update
@@ -49,23 +49,23 @@ public:
         static size_t ins(iterator it);
         static size_t upd(iterator it1, iterator it2);
     };
-
+    
 public:
     gted(
-                const rna_tree& _t1,
-                const rna_tree& _t2);
-
+         const rna_tree& _t1,
+         const rna_tree& _t2);
+    
     /**
      * run gted
      */
     void run(
-                const strategy_table_type& _str);
-
+             const strategy_table_type& _str);
+    
     /**
      * compute mapping between trees
      */
     mapping get_mapping();
-
+    
 private:
     /**
      * recursive compute distances between subtrees root1/root2
@@ -73,59 +73,59 @@ private:
      * recursive call on decomponed tree's subtrees
      */
     void compute_distance_recursive(
-                iterator root1,
-                iterator root2);
+                                    iterator root1,
+                                    iterator root2);
     /**
      * compute distances on each node root-leaf path
      * with respect to actual strategy
      */
     void single_path_function(
-                iterator root1,
-                iterator root2);
+                              iterator root1,
+                              iterator root2);
     /**
      * compute_distance between all nodes on root-leaf tree paths
      */
     std::vector<std::vector<size_t>> compute_distance(
-                iterator root1,
-                iterator root2);
+                                                      iterator root1,
+                                                      iterator root2);
     /**
      * only left/right paths
      */
     template <typename iterator_type, typename funct_get_begin>
-        std::vector<std::vector<size_t>> compute_distance_LR(
-                iterator root1,
-                iterator root2,
-                tree_type& t1,
-                tree_type& t2,
-                funct_get_begin get_begin);
-
+    std::vector<std::vector<size_t>> compute_distance_LR(
+                                                         iterator root1,
+                                                         iterator root2,
+                                                         tree_type& t1,
+                                                         tree_type& t2,
+                                                         funct_get_begin get_begin);
+    
 private: // functions allowing some checks..
     inline size_t get_tdist(
-                iterator it1,
-                iterator it2);
-
+                            iterator it1,
+                            iterator it2);
+    
     inline void set_tdist(
-                iterator it1,
-                iterator it2,
-                size_t value);
-
+                          iterator it1,
+                          iterator it2,
+                          size_t value);
+    
     inline size_t get_fdist(
-                const forest_distance_table_type& fdist,
-                const iterator& it1,
-                const iterator& it2,
-                size_t id1,
-                size_t id2);
-
+                            const forest_distance_table_type& fdist,
+                            const iterator& it1,
+                            const iterator& it2,
+                            size_t id1,
+                            size_t id2);
+    
     inline void set_fdist(
-                forest_distance_table_type& fdist,
-                const iterator& it1,
-                const iterator& it2,
-                size_t value,
-                size_t id1,
-                size_t id2);
-
+                          forest_distance_table_type& fdist,
+                          const iterator& it1,
+                          const iterator& it2,
+                          size_t value,
+                          size_t id1,
+                          size_t id2);
+    
     inline void check_ids_postorder();
-
+    
 private:
     tree_type t1, t2;
     strategy_table_type STR;
@@ -134,4 +134,3 @@ private:
 };
 
 #endif /* !GTED_HPP */
-

@@ -32,40 +32,39 @@ public:
     virtual ~ps_writer() = default;
 public:
     virtual streampos print(
-                const std::string& text);
+                            const std::string& text);
     virtual void init(
-                const std::string& filename,
-                rna_tree::iterator root);
-
+                      const std::string& filename,
+                      rna_tree::iterator root);
+    
 public:
     virtual std::string get_circle_formatted(
-                point centre,
-                double radius) const;
+                                             point centre,
+                                             double radius) const;
     virtual std::string get_label_formatted(
-                const rna_label& label,
-                const RGB& color) const;
-
+                                            const rna_label& label,
+                                            const RGB& color) const;
+    
 protected:
     virtual std::string get_line_formatted(
-                point from,
-                point to,
-                const RGB& color) const;
-
+                                           point from,
+                                           point to,
+                                           const RGB& color) const;
+    
 private:
     std::string get_text_formatted(
-                point p,
-                const std::string& text) const;
-
+                                   point p,
+                                   const std::string& text) const;
+    
 private:
     std::string get_color_formatted(
-                const RGB& color) const;
+                                    const RGB& color) const;
     std::string get_default_prologue() const;
     std::string get_default_prologue(
-                rna_tree::pre_post_order_iterator root) const;
-
+                                     rna_tree::pre_post_order_iterator root) const;
+    
 private:
     mutable const RGB* last_used = &RGB::BLACK;
 };
 
 #endif /* !PS_WRITER_HPP */
-

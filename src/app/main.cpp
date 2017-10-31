@@ -113,7 +113,7 @@ int main(int argc, char** argv)
     test::run_tests();
     return 0;
 #else
-
+    
     try
     {
         //init();
@@ -136,9 +136,9 @@ int main(int argc, char** argv)
         ERR("Exception caugth: %s", e.what());
         return ERROR_DEFAULT;
     }
-
+    
     return 0;
 #endif
+    
+    
 }
-
-

@@ -30,47 +30,46 @@ using namespace std;
 
 
 void crw_extractor::extract(
-                const std::string& filename)
+                            const std::string& filename)
 {
     APP_DEBUG_FNAME;
-
+    
     labels.clear();
     points.clear();
-
+    
     ifstream in(filename);
-
+    
     regex regexp_base_line = create_regex(
-            msprintf("^\\(%s\\)\\s+%s\\s+%s\\s+lwstring\\s*$",
-                BASE_REGEX, DOUBLE_REGEX, DOUBLE_REGEX));
-
+                                          msprintf("^\\(%s\\)\\s+%s\\s+%s\\s+lwstring\\s*$",
+                                                   BASE_REGEX, DOUBLE_REGEX, DOUBLE_REGEX));
+    
     smatch match;
     string line;
     point p;
     string base;
-
+    
     while (true)
     {
         getline(in, line);
         if (in.fail())
             break;
-
+        
         if (regex_search(line, match, regexp_base_line))
         {
             // is base line
             stringstream str;
-
+            
             str << match[1] << " " << match[2] << " " << match[4];
-
+            
             str
-                >> base
-                >> p.x
-                >> p.y;
-
+            >> base
+            >> p.x
+            >> p.y;
+            
             assert(!str.fail() && str.eof() && base.size() == 1);
-
+            
             labels.push_back(base[0]);
             points.push_back(p);
         }
     }
 }
-

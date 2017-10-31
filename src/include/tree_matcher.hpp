@@ -33,27 +33,27 @@ private:
     typedef rna_tree::post_order_iterator post_order_iterator;
     typedef rna_tree::sibling_iterator sibling_iterator;
     typedef std::vector<size_t> indexes_type;
-
+    
 public:
     matcher(
-                const rna_tree& templated,
-                const rna_tree& other);
+            const rna_tree& templated,
+            const rna_tree& other);
     /**
      * mapps t1 to t2 with mapping `m`
      * t1=templated, t2=other
      *  -> removes nodes i->0, inserts nodes 0->i, changes label i->j
      */
     rna_tree& run(
-                const mapping& m);
-
+                  const mapping& m);
+    
 private:
     /**
      * marks nodes with `status`
      */
     void mark(
-                rna_tree& rna,
-                const indexes_type& postorder_indexes,
-                rna_pair_label::status_type status);
+              rna_tree& rna,
+              const indexes_type& postorder_indexes,
+              rna_pair_label::status_type status);
     /**
      * erase nodes marked as 'deleted'
      */
@@ -71,11 +71,10 @@ private:
      * unique sort of remake_ids
      */
     inline void make_unique(
-                iterator it);
+                            iterator it);
 private:
     rna_tree t1, t2;
     std::vector<size_t> s1, s2;
 };
 
 #endif /* !TREE_MATCHER_HPP */
-

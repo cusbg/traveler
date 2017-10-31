@@ -21,7 +21,6 @@
 
 
 #include <iomanip>
-#include <chrono>
 //#include <unistd.h>
 
 #include "logger.hpp"
@@ -52,23 +51,23 @@ logger::logger()
 
 
 logger::logger(
-                const std::string& filename,
-                priority priority)
-    : logger(filename, priority, {})
+               const std::string& filename,
+               priority priority)
+: logger(filename, priority, {})
 { }
 
 logger::logger(
-                const std::string& filename,
-                priority priority,
-                const std::vector<FILE*>& streams)
+               const std::string& filename,
+               priority priority,
+               const std::vector<FILE*>& streams)
 {
     p = priority;
     out = streams;
     FILE* f = fopen(filename.c_str(), "a");
-
+    
     if (f == nullptr || ferror(f))
         throw io_exception("Cannot open log file %s", filename);
-
+    
     out.push_back(f);
 }
 
@@ -80,12 +79,12 @@ logger::~logger()
 }
 
 void logger::log(
-                priority p,
-                const std::string& text)
+                 priority p,
+                 const std::string& text)
 {
     if (!can_log(p))
         return;
-
+    
     for (FILE* f : out)
     {
         fprintf(f, "%s", text.c_str());
@@ -95,47 +94,41 @@ void logger::log(
 }
 
 /* static */ string logger::message_header(
-                priority p)
+                                           priority p)
 {
-	/*
     size_t hour, minute, second, millisecond;
     timespec cputime, clocks;
     std::ostringstream stream;
-
+    
     clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &cputime);
     clock_gettime(CLOCK_REALTIME, &clocks);
     tm c = *localtime(&clocks.tv_sec);
-	
+    
     hour = c.tm_hour;
     minute = c.tm_min;
     second = c.tm_sec;
     millisecond = clocks.tv_nsec / 1000000LL;
-
+    
     // PATTERN:
     //  21:28 [%PRIORITY%] %MESSAGE%
     //
     stream
-        << setfill('0') << setw(2)
-        << hour
-        << ':'
-        << setfill('0') << setw(2)
-        << minute
-        << ':'
-        << setfill('0') << setw(2)
-        << second
-        << ':'
-        << setfill('0') << setw(3)
-        << millisecond
-        << ' '
-        << setfill(' ') << setw(8) << left
-        << ("[" + to_string(p) + "]");
-
-	return stream.str();
-	*/
-
-	time_t tt;  std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	return ctime(&tt);
+    << setfill('0') << setw(2)
+    << hour
+    << ':'
+    << setfill('0') << setw(2)
+    << minute
+    << ':'
+    << setfill('0') << setw(2)
+    << second
+    << ':'
+    << setfill('0') << setw(3)
+    << millisecond
+    << ' '
+    << setfill(' ') << setw(8) << left
+    << ("[" + to_string(p) + "]");
     
+    return stream.str();
 }
 
 void logger::check_errors()
@@ -158,9 +151,9 @@ std::vector<int> logger::opened_files() const
 
 
 logger::logger_stream::logger_stream(
-                logger& _l,
-                priority _p)
-    : l(_l), p(_p)
+                                     logger& _l,
+                                     priority _p)
+: l(_l), p(_p)
 { }
 
 logger::logger_stream::~logger_stream()
@@ -170,8 +163,8 @@ logger::logger_stream::~logger_stream()
 }
 
 logger::logger_stream::logger_stream(
-        const logger_stream& other)
-    : l(other.l), p(other.p)
+                                     const logger_stream& other)
+: l(other.l), p(other.p)
 {
     stream << other.stream.str();
 }
@@ -188,27 +181,25 @@ void logger::logger_stream::flush()
 
 
 std::ostream& operator<<(
-                    std::ostream& out,
-                    logger::priority p)
+                         std::ostream& out,
+                         logger::priority p)
 {
 #define switchcase(p) \
-    case logger::priority::p: \
-        out << #p; \
-        break;
+case logger::priority::p: \
+out << #p; \
+break;
     switch (p)
     {
-        switchcase(TRACE);
-        switchcase(DEBUG);
-        switchcase(INFO);
-        switchcase(WARN);
-        switchcase(ERROR);
-        switchcase(EMERG);
+            switchcase(TRACE);
+            switchcase(DEBUG);
+            switchcase(INFO);
+            switchcase(WARN);
+            switchcase(ERROR);
+            switchcase(EMERG);
         default:
             abort();
     }
 #undef switchcase
-
+    
     return out;
 }
-
-

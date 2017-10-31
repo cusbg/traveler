@@ -29,50 +29,50 @@ class svg_writer : public document_writer
 private:
     struct properties;
     struct style;
-
+    
 public:
     virtual ~svg_writer() = default;
-
+    
 public:
     virtual void init(
-                const std::string& filename,
-                rna_tree::iterator root);
+                      const std::string& filename,
+                      rna_tree::iterator root);
     virtual streampos print(
-                const std::string& text);
-
+                            const std::string& text);
+    
 public: // formatters
     virtual std::string get_circle_formatted(
-                point centre,
-                double radius) const;
+                                             point centre,
+                                             double radius) const;
     virtual std::string get_label_formatted(
-                const rna_label& label,
-                const RGB& color) const;
-
+                                            const rna_label& label,
+                                            const RGB& color) const;
+    
 protected:
     virtual std::string get_line_formatted(
-                point from,
-                point to,
-                const RGB& color) const;
-
+                                           point from,
+                                           point to,
+                                           const RGB& color) const;
+    
 private:
     std::string get_header_element(
-                rna_tree::iterator root);
+                                   rna_tree::iterator root);
     style get_color_style(
-                const RGB& color) const;
+                          const RGB& color) const;
     properties get_styles(
-                const std::vector<style>& styles) const;
+                          const std::vector<style>& styles) const;
     std::string create_element(
-                const std::string& name,
-                const properties& properties,
-                const std::string& value = "") const;
+                               const std::string& name,
+                               const properties& properties,
+                               const std::string& value = "") const;
     std::string create_style_definitions() const;
-
+    
     properties get_point_formatted(
-                point p,
-                const std::string& prefix,
-                const std::string& postfix,
-                bool should_shift_p = true) const;
-
+                                   point p,
+                                   const std::string& prefix,
+                                   const std::string& postfix,
+                                   bool should_shift_p = true) const;
+    
 private:
     point shift;
     point scale;
@@ -81,4 +81,3 @@ private:
 };
 
 #endif /* !SVG_WRITER_HPP */
-

@@ -30,12 +30,12 @@ public:
     virtual ~node_base() = default;
 protected:
     node_base() = default;
-
+    
 public:
     size_t id() const;
     void reset_id();
     static void reset_ID();
-
+    
 private:
     static size_t ID;
 protected:
@@ -43,4 +43,3 @@ protected:
 };
 
 #endif /* !TREE_BASE_NODE_HPP */
-

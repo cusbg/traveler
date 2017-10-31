@@ -89,9 +89,9 @@ void mprintf(const char* format, Stream& stream, const T& value, const Args& ...
     }
     std::ostringstream error_stream;
     error_stream
-        << "mprintf: invalid number of arguments: +"
-        << (sizeof...(Args) + 1)
-        << " more than expected";
+    << "mprintf: invalid number of arguments: +"
+    << (sizeof...(Args) + 1)
+    << " more than expected";
     throw std::runtime_error(error_stream.str());
 }
 
@@ -108,9 +108,9 @@ void mprintf(const char* format, Stream& stream)
             {
                 std::ostringstream error_stream;
                 error_stream
-                    << "mprintf: invalid format string: missing arguments. Format string ='"
-                    << format
-                    << "'";
+                << "mprintf: invalid format string: missing arguments. Format string ='"
+                << format
+                << "'";
                 throw std::runtime_error(error_stream.str());
             }
         }
@@ -119,4 +119,3 @@ void mprintf(const char* format, Stream& stream)
 }
 
 #endif /* !MPRINTF_HPP */
-

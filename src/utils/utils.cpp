@@ -30,8 +30,8 @@ using namespace std;
 
 template<typename container_type, typename value_container_type>
 bool contains_one_of(
-                const container_type& container,
-                const value_container_type& values)
+                     const container_type& container,
+                     const value_container_type& values)
 {
     for (const auto& val : values)
         if (contains(container, val))
@@ -41,11 +41,11 @@ bool contains_one_of(
 
 
 /* global */ std::string read_file(
-                const std::string& filename)
+                                   const std::string& filename)
 {
     if (!exist_file(filename))
         throw io_exception("read_file(%s) failed, file does not exist", filename);
-
+    
     ifstream in(filename);
     stringstream s;
     s << in.rdbuf();
@@ -53,40 +53,40 @@ bool contains_one_of(
 }
 
 /* global */ bool exist_file(
-                const std::string& filename)
+                             const std::string& filename)
 {
     return ifstream(filename).good();
 }
 
 /* global */ void write_file(
-                const std::string& filename,
-                const std::string& what)
+                             const std::string& filename,
+                             const std::string& what)
 {
     ofstream out(filename);
     out << what;
     out.flush();
-
+    
     if (!exist_file(filename))
         throw io_exception("write_file(%s) failed", filename);
 }
 
 /* global */ fasta read_fasta_file(
-                const std::string& filename)
+                                   const std::string& filename)
 {
     if (!exist_file(filename))
         throw io_exception("read_file(%s) failed, file does not exist", filename);
-
+    
     ifstream in(filename);
     ostringstream labels, brackets;
     string id, line;
-
+    
     while(true)
     {
         char ch;
         in >> ch;
         if (in.fail() || ch != '>')
             throw wrong_argument_exception("starting character of dot-bracket fasta file '>' is missing");
-
+        
         getline(in, id);
         size_t index = id.find_first_of(' ');
         if (index == string::npos)
@@ -94,7 +94,7 @@ bool contains_one_of(
         id = id.substr(0, index);
         break;
     }
-
+    
     while(true)
     {
         getline(in, line);
@@ -102,7 +102,7 @@ bool contains_one_of(
             break;
         if (contains(line, '>'))
             break;
-
+        
         if (contains_one_of(line, "[{(.)}]"))
             brackets << line;
         else
@@ -112,7 +112,7 @@ bool contains_one_of(
     f.id = id;
     f.brackets = brackets.str();
     f.labels = labels.str();
-
+    
     DEBUG("%s", to_cstr(f));
     return f;
 }
@@ -122,33 +122,33 @@ bool contains_one_of(
 
 template <typename table_type, typename table_value_type = size_t, typename file_value_type = size_t>
 table_type load_table(
-                const std::string& filename)
+                      const std::string& filename)
 {
     APP_DEBUG_FNAME;
-
+    
     if (!exist_file(filename))
         throw io_exception("load_table(%s) failed, file does not exist", filename);
-
+    
     std::ifstream in(filename);
     size_t m, n;
     file_value_type val;
-
+    
     table_type table;
-
+    
     in
-        >> m
-        >> n;
-
+    >> m
+    >> n;
+    
     assert(!in.fail());
-
+    
     table.resize(m, typename table_type::value_type(n));
-
+    
     for (size_t i = 0; i < m; ++i)
     {
         for (size_t j = 0; j < n; ++j)
         {
             in >> val;
-
+            
             table[i][j] = table_value_type(val);
         }
     }
@@ -156,7 +156,7 @@ table_type load_table(
     string s;
     in >> s;    // no other words, only EOF
     assert(in.eof());
-
+    
     return table;
 }
 
@@ -167,32 +167,32 @@ void save_table(
 {
     APP_DEBUG_FNAME;
     DEBUG("save: %s", filename);
-
+    
     using std::endl;
-
+    
     std::ofstream out(filename);
     size_t m, n;
-
+    
     m = table.size();
     n = table.at(0).size();
-
+    
     out
-        << m
-        << " "
-        << n
-        << endl;
-
+    << m
+    << " "
+    << n
+    << endl;
+    
     for (size_t i = 0; i < m; ++i)
     {
         for (size_t j = 0; j < n; ++j)
         {
             const table_value_type& val = table[i][j];
-
+            
             out << file_value_type(val) << " ";
         }
         out << endl;
     }
-
+    
     if (out.fail())
         throw io_exception("save_table(%s) failed", filename);
 }
@@ -201,101 +201,101 @@ void save_table(
 
 
 void save_strategy_table(
-                const std::string& filename,
-                const strategy_table_type& table)
+                         const std::string& filename,
+                         const strategy_table_type& table)
 {
     APP_DEBUG_FNAME;
-
+    
     save_table<strategy_table_type, strategy, size_t>(filename, table);
 }
 
 strategy_table_type load_strategy_table(
-                const std::string& filename)
+                                        const std::string& filename)
 {
     APP_DEBUG_FNAME;
-
+    
     return load_table<strategy_table_type, strategy>(filename);
 }
 
 void save_tree_distance_table(
-                const std::string& filename,
-                const std::vector<std::vector<size_t>>& table)
+                              const std::string& filename,
+                              const std::vector<std::vector<size_t>>& table)
 {
     APP_DEBUG_FNAME;
     typedef std::vector<std::vector<size_t>> tree_distance_table_type;
-
+    
     save_table<tree_distance_table_type>(filename, table);
 }
 
 std::vector<std::vector<size_t>> load_tree_distance_table(
-                const std::string& filename)
+                                                          const std::string& filename)
 {
     APP_DEBUG_FNAME;
     typedef std::vector<std::vector<size_t>> tree_distance_table_type;
-
+    
     return load_table<tree_distance_table_type>(filename);
 }
 
 
 
 void save_tree_mapping_table(
-                const std::string& filename,
-                const mapping& map)
+                             const std::string& filename,
+                             const mapping& map)
 {
     APP_DEBUG_FNAME;
-
+    
     DEBUG("save: %s", filename);
     ofstream out(filename);
-
+    
     out
-        << "DISTANCE: "
-        << map.distance
-        << endl;
-
+    << "DISTANCE: "
+    << map.distance
+    << endl;
+    
     for (const auto& m : map.map)
     {
         out
-            << m.from 
-            << " "
-            << m.to
-            << endl;
+        << m.from
+        << " "
+        << m.to
+        << endl;
     }
-
+    
     if (out.fail())
         throw io_exception("save_table(%s) failed", filename);
 }
 
 mapping load_mapping_table(
-                const std::string& filename)
+                           const std::string& filename)
 {
     APP_DEBUG_FNAME;
-
+    
     if (!exist_file(filename))
         throw io_exception("load_file(%s) failed, file does not exist", filename);
-
+    
     string s;
     mapping map;
     mapping::mapping_pair m;
     ifstream in(filename);
-
+    
     in
-        >> s
-        >> map.distance;
-
+    >> s
+    >> map.distance;
+    
     assert(!in.fail());
     assert(s == "DISTANCE:");
-
+    
     while (true)
     {
         in
-            >> m.from
-            >> m.to;
+        >> m.from
+        >> m.to;
         if (in.fail())
             break;
-
+        
         map.map.push_back(m);
     }
-
+    
     return map;
 }
 
@@ -303,20 +303,18 @@ mapping load_mapping_table(
 
 
 std::ostream& operator<<(
-                std::ostream& out,
-                fasta f)
+                         std::ostream& out,
+                         fasta f)
 {
     out
-        << "FASTA:"
-        << endl
-        << ">"
-        << f.id
-        << endl
-        << f.labels
-        << endl
-        << f.brackets;
-
+    << "FASTA:"
+    << endl
+    << ">"
+    << f.id
+    << endl
+    << f.labels
+    << endl
+    << f.brackets;
+    
     return out;
 }
-
-

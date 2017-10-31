@@ -23,6 +23,7 @@
 #include "document_writer.hpp"
 #include "svg_writer.hpp"
 #include "ps_writer.hpp"
+#include "traveler_writer.hpp"
 
 using namespace std;
 
@@ -42,15 +43,15 @@ const RGB RGB::GRAY = RGB(0.8, 0.8, 0.8, "gray");
 const RGB RGB::BROWN = RGB(0.83, 0.41, 0.12, "brown");
 
 RGB::RGB(
-                double _red,
-                double _green,
-                double _blue,
-                const std::string& _name)
-    : red(_red), green(_green), blue(_blue), name(_name)
+         double _red,
+         double _green,
+         double _blue,
+         const std::string& _name)
+: red(_red), green(_green), blue(_blue), name(_name)
 { }
 
 bool RGB::operator==(
-                const RGB& other) const
+                     const RGB& other) const
 {
     return name == other.name;
 }
@@ -58,22 +59,28 @@ bool RGB::operator==(
 
 
 /* static */ image_writers document_writer::get_writers(
-                bool use_colors)
+                                                        bool use_colors)
 {
     image_writers vec;
     vec.emplace_back(new svg_writer());
     vec.emplace_back(new ps_writer());
-
+    vec.emplace_back(new traveler_writer());
+    
     for (const auto& writer : vec)
         writer->use_colors(use_colors);
-
+    
     return vec;
 }
 
+/* static */ unique_ptr<document_writer> document_writer::get_traveler_writer()
+{
+    return unique_ptr<document_writer>(new traveler_writer());
+}
+
 std::string document_writer::get_edge_formatted(
-                point from,
-                point to,
-                bool is_base_pair) const
+                                                point from,
+                                                point to,
+                                                bool is_base_pair) const
 {
     if (from.bad() || to.bad())
     {
@@ -86,52 +93,52 @@ std::string document_writer::get_edge_formatted(
         to = rna_tree::base_pair_edge_point(to, from);
         from = tmp;
     }
-
+    
     return get_line_formatted(from, to, RGB::BLACK);
 }
 
 std::string document_writer::get_label_formatted(
-                rna_tree::pre_post_order_iterator it) const
+                                                 rna_tree::pre_post_order_iterator it) const
 {
     if (!it->initiated_points())
         return "";
-
+    
     ostringstream out;
-
+    
     out
-        << get_label_formatted(it->at(it.label_index()), get_default_color(it->status));
-
+    << get_label_formatted(it->at(it.label_index()), get_default_color(it->status));
+    
     if (it->paired() &&
-            it.preorder() &&
-            it->initiated_points() &&
-            !rna_tree::is_root(it))
+        it.preorder() &&
+        it->initiated_points() &&
+        !rna_tree::is_root(it))
     {
         out
-            << get_edge_formatted(it->at(0).p, it->at(1).p, true);
+        << get_edge_formatted(it->at(0).p, it->at(1).p, true);
     }
-
+    
     return out.str();
 }
 
 const RGB& document_writer::get_default_color(
-                rna_pair_label::status_type status) const
+                                              rna_pair_label::status_type status) const
 {
     if (!colored)
         return RGB::BLACK;
-
+    
     switch (status)
     {
 #define switchcase(status, rgb) \
-        case rna_pair_label::status: \
-            return COLOR_ ## rgb;
-
-        switchcase(deleted, DELETE);
-        switchcase(edited, EDIT);
-        switchcase(inserted, INSERT);
-        switchcase(reinserted, REINSERT);
-        switchcase(rotated, ROTATE);
-        switchcase(touched, DEFAULT);
-        switchcase(untouched, DEFAULT);
+case rna_pair_label::status: \
+return COLOR_ ## rgb;
+            
+            switchcase(deleted, DELETE);
+            switchcase(edited, EDIT);
+            switchcase(inserted, INSERT);
+            switchcase(reinserted, REINSERT);
+            switchcase(rotated, ROTATE);
+            switchcase(touched, DEFAULT);
+            switchcase(untouched, DEFAULT);
         default:
             abort();
 #undef switchcase
@@ -139,14 +146,14 @@ const RGB& document_writer::get_default_color(
 }
 
 void document_writer::print_to_stream(
-                const std::string& text)
+                                      const std::string& text)
 {
     out << text;
     validate_stream();
 }
 
 void document_writer::seek_from_current_pos(
-                off_type offset)
+                                            off_type offset)
 {
     out.seekp(offset, fstream::cur);
     validate_stream();
@@ -159,94 +166,94 @@ void document_writer::validate_stream() const
 }
 
 std::string document_writer::get_rna_subtree_formatted(
-                rna_tree::iterator root) const
+                                                       rna_tree::iterator root) const
 {
     ostringstream out;
-
+    
     auto print =
-        [&out, this](rna_tree::pre_post_order_iterator it)
-        {
-            out << get_label_formatted(it);
-        };
-
+    [&out, this](rna_tree::pre_post_order_iterator it)
+    {
+        out << get_label_formatted(it);
+    };
+    
     rna_tree::for_each_in_subtree(root, print);
-
+    
     return out.str();
 }
 
 std::string document_writer::get_rna_background_formatted(
-                rna_tree::pre_post_order_iterator begin,
-                rna_tree::pre_post_order_iterator end) const
+                                                          rna_tree::pre_post_order_iterator begin,
+                                                          rna_tree::pre_post_order_iterator end) const
 {
     rna_tree::pre_post_order_iterator prev;
     ostringstream out;
-
+    
     while (++rna_tree::pre_post_order_iterator(begin) != end)
     {
         prev = begin++;
-
+        
         point p1 = prev->at(prev.label_index()).p;
         point p2 = begin->at(begin.label_index()).p;
-
+        
         if (p1.bad() || p2.bad())
             continue;
-
+        
         point tmp = rna_tree::base_pair_edge_point(p1, p2);
         p2 = rna_tree::base_pair_edge_point(p2, p1);
         p1 = tmp;
-
+        
         out << get_line_formatted(p1, p2, RGB::GRAY);
     }
-
+    
     return out.str();
 }
 
 std::string document_writer::get_rna_formatted(
-                rna_tree rna) const
+                                               rna_tree rna) const
 {
     return get_rna_subtree_formatted(rna.begin())
-        + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
+    + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
 }
 
 void document_writer::init(
-                const std::string& filename,
-                const std::string& suffix)
+                           const std::string& filename,
+                           const std::string& suffix)
 {
     APP_DEBUG_FNAME;
     assert(!filename.empty());
-
+    
     string file = filename + suffix;
     INFO("Opening document %s for writing RNA", file);
-
+    
     out.close();
-
+    
     // create file & truncate
     out.open(file, ios::out);
     out.close();
-
+    
     // open in normal mode
     out.open(file, ios::out | ios::in);
     out
-        << std::unitbuf
-        << std::scientific;
-
+    << std::unitbuf
+    << std::scientific;
+    
     if (!out.good())
         throw io_exception("Cannot open output file %s for writing.", filename);
     assert(out.good());
 }
 
 void document_writer::seek(
-                streampos pos)
+                           streampos pos)
 {
     out.seekp(pos);
-
+    
     assert(out.good());
 }
 
 void document_writer::seek_end()
 {
     out.seekp(0, out.end);
-
+    
     assert(out.good());
 }
 
@@ -254,36 +261,34 @@ streampos document_writer::get_pos()
 {
     streampos pos = out.tellp();
     assert(pos != -1);
-
+    
     return pos;
 }
 
 size_t document_writer::fill(
-                char ch)
+                             char ch)
 {
     streampos pos, end;
-
+    
     pos = get_pos();
     seek_end();
     end = get_pos();
-
+    
     size_t n = end - pos;
-
+    
     if (n != 0)
     {
         seek(pos);
         out
-            << string(n - 1, ch)
-            << endl;
+        << string(n - 1, ch)
+        << endl;
     }
     seek(pos);
     return n;
 }
 
 void document_writer::use_colors(
-                bool _colored)
+                                 bool _colored)
 {
     colored = _colored;
 }
-
-

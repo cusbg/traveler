@@ -55,10 +55,31 @@ The binaries will be copied into traveler/bin. To navigate there from the src di
 
 #### Note:
 
-Two types of template IMAGE\_FILE are currectly supported by Traveler:
+Three types of template IMAGE\_FILE are currectly supported by Traveler:
 	
 * PostScript (crw) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
 * VARNA (varna) format of SVG images produced by tool [VARNA](http://varna.lri.fr/)
+* Traveler intermediate format
+
+#### Traveler intermediate format:
+
+Intermediate format is simple XML file. It contains ordered list of nucleotides.
+
+##### Example:
+	<structure>
+	<point x="138.3" y="-367" b="U" />
+	<point x="138.3" y="-359" b="A"	/>
+	.
+	.
+	.
+	<point x="278.1 y="-504.6" b="A">
+	</structure>
+
+##### Usage example:
+	mkdir test
+	bin/traveler -gs data/metazoa/mouse.fasta \
+	-ts --file-format traveler data/metazoa/human.xml data/metazoa/human.fasta \
+	-all test/mouse_from_human 
 
 Other extractors of RNA structure can be implemented and specified by the FILE\_FORMAT argument.
 
@@ -102,6 +123,7 @@ Other extractors of RNA structure can be implemented and specified by the FILE\_
 
 #### Note:
 Options --ted and --draw serve for separatation of mapping and visualization since TED computation and on the other hand, Traveler allows for multiple output visualization (coloring, overlaps).
+
  
 ## Support for other input images: How to implement one owns extractor
 Traveler supporst two types of input images - crw and varna. There are three steps that need to done when one wants to support other image types.

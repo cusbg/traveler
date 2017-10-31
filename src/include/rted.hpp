@@ -32,18 +32,18 @@ public:
     typedef typename tree_type::iterator                iterator;
     typedef typename tree_type::post_order_iterator     post_order_iterator;
     typedef typename tree_type::sibling_iterator        sibling_iterator;
-
+    
     typedef std::vector<size_t>                         table_type;
-
+    
 public:
     rted(
-                const tree_type& _t1,
-                const tree_type& _t2);
+         const tree_type& _t1,
+         const tree_type& _t2);
     /**
      * run computations
      */
     void run();
-
+    
 private:
     /**
      * initializes tables to their needed size;
@@ -53,7 +53,7 @@ private:
      *  relevant subforest tables
      */
     void init();
-
+    
     /**
      * upgrade full_decomposition tables
      *
@@ -68,11 +68,11 @@ private:
      * after computing, ALeft[ch1] and ARight[ch1] is not needed
      */
     void compute_full_decomposition(
-                iterator it,
-                table_type& A,
-                table_type& ALeft,
-                table_type& ARight);
-
+                                    iterator it,
+                                    table_type& A,
+                                    table_type& ALeft,
+                                    table_type& ARight);
+    
     /**
      * upgrade relevant_subforests tables of it with respect to left/right path
      *
@@ -82,11 +82,11 @@ private:
      *                  sum(Size[other_children] + F[other_children])
      */
     void compute_relevant_subforrests(
-                iterator it,
-                table_type& FLeft,
-                table_type& FRight,
-                table_type& Size);
-
+                                      iterator it,
+                                      table_type& FLeft,
+                                      table_type& FRight,
+                                      table_type& Size);
+    
     /**
      * update Size table from children:
      *
@@ -94,26 +94,26 @@ private:
      *  where ch are children
      */
     void compute_subtree_size(
-                iterator it,
-                table_type& Size);
-
+                              iterator it,
+                              table_type& Size);
+    
     /**
      * initialize L/R/H_v tables for leaf it1
      *
      * T1_{L,R,H}v[it1_id][it2_id] = 0;
      */
     void init_T1_LRH_v_tables(
-                iterator it1,
-                iterator it2);
-
+                              iterator it1,
+                              iterator it2);
+    
     /**
      * initialize L/R/H_w tables for leaf it
      *
      * T2_{L,R,H}w[it_id] = 0;
      */
     void init_T2_LRH_w_tables(
-                iterator it2);
-
+                              iterator it2);
+    
     /**
      * checks initialization for *LRH* tables
      * and for parents of it-s too,
@@ -121,18 +121,18 @@ private:
      *      -- visiting first_child(parent)
      */
     void first_visit(
-                iterator it1,
-                iterator it2);
-
+                     iterator it1,
+                     iterator it2);
+    
     /**
      * compute C from rted_opt_strategy(F,G) (== lines 7-12)
      * find minimum and stores minimal_path
      * returns c_min
      */
     size_t update_STR_table(
-                iterator it1,
-                iterator it2);
-
+                            iterator it1,
+                            iterator it2);
+    
     /**
      * == ekvivalent to lines 16, 17, 18 in rted_opt_strategy(F,G)
      *
@@ -154,10 +154,10 @@ private:
      *       H_value = T1_Hv[it1_id][it2_id];
      */
     void update_T1_LRH_v_tables(
-                iterator it1,
-                iterator it2,
-                size_t c_min);
-
+                                iterator it1,
+                                iterator it2,
+                                size_t c_min);
+    
     /**
      * == ekvivalent to lines 20, 21, 22 in rted_opt_strategy(F,G)
      *
@@ -169,52 +169,52 @@ private:
      *      ... See update_T1_LRH_v_tables()
      */
     void update_T2_LRH_w_tables(
-                iterator it2,
-                size_t c_min);
-
+                                iterator it2,
+                                size_t c_min);
+    
 private:
     void check_postorder();
-
+    
 public:
     strategy_table_type& get_strategies();
-
+    
 private:
     tree_type
-                t1,
-                t2;
-
+    t1,
+    t2;
+    
     strategy_table_type
-                STR;
-
+    STR;
+    
     //tables for A(Gw), .., F(Gw), ..
     table_type
-                // A == full decomposition
-                T1_A,
-                T2_A,
-
-                // F* = relevant subforests tables
-                T1_FLeft,
-                T1_FRight,
-
-                T2_FLeft,
-                T2_FRight,
-
-                // subtree sizes
-                T1_Size,
-                T2_Size,
-
-                //main loop, {LRH}w
-                T2_Lw,
-                T2_Rw,
-                T2_Hw;
-
+    // A == full decomposition
+    T1_A,
+    T2_A,
+    
+    // F* = relevant subforests tables
+    T1_FLeft,
+    T1_FRight,
+    
+    T2_FLeft,
+    T2_FRight,
+    
+    // subtree sizes
+    T1_Size,
+    T2_Size,
+    
+    //main loop, {LRH}w
+    T2_Lw,
+    T2_Rw,
+    T2_Hw;
+    
     // 2D tables: {LRH}v[v_id][w_id] == value
     std::vector<table_type>
-                T1_Lv,
-                T1_Rv,
-                T1_Hv;
-
-
+    T1_Lv,
+    T1_Rv,
+    T1_Hv;
+    
+    
     struct t2_hw_partial_result {
         // for more details, see functions:
         // update_T2_LRH_w_tables or update_T1_LRH_v_tables
@@ -222,15 +222,14 @@ private:
         size_t c_min;
         size_t H_value;
     };
-    typedef std::vector<t2_hw_partial_result> 
-                partial_result_arr;
-
+    typedef std::vector<t2_hw_partial_result>
+    partial_result_arr;
+    
     partial_result_arr
-                T2_Hw_partials;
+    T2_Hw_partials;
     std::vector<partial_result_arr>
-                T1_Hv_partials;
-
+    T1_Hv_partials;
+    
 };
 
 #endif /* !RTED_HPP */
-

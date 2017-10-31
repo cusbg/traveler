@@ -25,6 +25,7 @@
 #include "extractor.hpp"
 #include "crw_extractor.hpp"
 #include "varna_extractor.hpp"
+#include "our_extractor.hpp"
 #include "types.hpp"
 #include "utils.hpp"
 
@@ -35,9 +36,9 @@ using namespace std;
 struct regex_exception : public my_exception
 {
     regex_exception(const std::regex_error& e)
-        : my_exception(msprintf("%s [error=%s]", ERR_OLD_GCC, e.what()))
+    : my_exception(msprintf("%s [error=%s]", ERR_OLD_GCC, e.what()))
     { }
-
+    
     virtual ~regex_exception() noexcept = default;
     virtual std::string get_type() const
     {
@@ -49,14 +50,14 @@ struct regex_exception : public my_exception
 /* static */ std::vector<extractor_ptr> extractor::get_all_extractors()
 {
     std::vector<extractor_ptr> extractors;
-    for (extractor* e : std::vector<extractor*>({new crw_extractor(), new varna_extractor()}))
+    for (extractor* e : std::vector<extractor*>({new crw_extractor(), new varna_extractor(), new our_extractor()}))
         extractors.push_back(extractor_ptr(e));
     return extractors;
 }
 
 /* static */ extractor_ptr extractor::get_extractor(
-                const std::string& docfile,
-                const std::string& doctype)
+                                                    const std::string& docfile,
+                                                    const std::string& doctype)
 {
     extractor_ptr extractor;
     for (extractor_ptr& e : extractor::get_all_extractors())
@@ -69,23 +70,23 @@ struct regex_exception : public my_exception
     }
     if (extractor.get() == nullptr)
         throw wrong_argument_exception("Document type '%s' is not supported", doctype);
-
+    
     if (!exist_file(docfile))
         throw io_exception("Document '%s' does not exist. Cannot extract RNA structure", docfile);
-
+    
     INFO("Extracting RNA structure from file %s with extractor %s", docfile, extractor->get_type());
     extractor->extract(docfile);
-
+    
     if (extractor->labels.size() != extractor->points.size())
     {
         throw illegal_state_exception("Number of extracted bases does not match number of extracted points");
     }
-
+    
     return extractor;
 }
 
 regex extractor::create_regex(
-                const std::string& pattern)
+                              const std::string& pattern)
 {
     try
     {
@@ -96,4 +97,3 @@ regex extractor::create_regex(
         throw regex_exception(e);
     }
 }
-

@@ -29,31 +29,31 @@
  */
 template <typename label_type>
 class tree_base<label_type>::_pre_post_order_iterator
-    : public tree_base<label_type>::tree_type::iterator_base
+: public tree_base<label_type>::tree_type::iterator_base
 {
 public:
     typedef typename tree_base<
-                        label_type>::tree_type::iterator_base iterator_base;
-
+    label_type>::tree_type::iterator_base iterator_base;
+    
 public:
     _pre_post_order_iterator(
-                const iterator_base&,
-                bool _preorder = true);
+                             const iterator_base&,
+                             bool _preorder = true);
     _pre_post_order_iterator(
-                tree_node_type* nodeptr = nullptr,
-                bool _preorder = true);
+                             tree_node_type* nodeptr = nullptr,
+                             bool _preorder = true);
     _pre_post_order_iterator(
-                const _pre_post_order_iterator& other) = default;
+                             const _pre_post_order_iterator& other) = default;
     
     bool operator==(
-                const _pre_post_order_iterator&) const;
+                    const _pre_post_order_iterator&) const;
     
     _pre_post_order_iterator    operator++(int);
     _pre_post_order_iterator&   operator++();
-
+    
     inline bool preorder() const;
     inline size_t label_index() const;
-
+    
 private:
     bool _preorder;
 };
@@ -63,18 +63,18 @@ private:
  */
 template <typename label_type>
 class tree_base<label_type>::_reverse_post_order_iterator
-    : public tree_base<label_type>::tree_type::iterator_base
+: public tree_base<label_type>::tree_type::iterator_base
 {
 public:
     typedef typename tree_base<
-                        label_type>::tree_type::iterator_base iterator_base;
-
+    label_type>::tree_type::iterator_base iterator_base;
+    
 public:
     _reverse_post_order_iterator(const iterator_base&);
     _reverse_post_order_iterator(tree_node_type* nodeptr = nullptr);
     bool operator==(
-                const iterator_base&) const;
-
+                    const iterator_base&) const;
+    
 public:
     _reverse_post_order_iterator& operator++();
     _reverse_post_order_iterator& operator--();
@@ -86,26 +86,26 @@ public:
 
 template <typename label_type>
 tree_base<label_type>::_pre_post_order_iterator::_pre_post_order_iterator(
-                tree_node_type* nodeptr,
-                bool preorder)
-    : iterator_base(nodeptr),
-    _preorder(preorder)
+                                                                          tree_node_type* nodeptr,
+                                                                          bool preorder)
+: iterator_base(nodeptr),
+_preorder(preorder)
 {}
 
 template <typename label_type>
 tree_base<label_type>::_pre_post_order_iterator::_pre_post_order_iterator(
-                const iterator_base& it,
-                bool preorder)
-    : iterator_base(it.node),
-    _preorder(preorder)
+                                                                          const iterator_base& it,
+                                                                          bool preorder)
+: iterator_base(it.node),
+_preorder(preorder)
 {}
 
 template <typename label_type>
 bool tree_base<label_type>::_pre_post_order_iterator::operator==(
-                const _pre_post_order_iterator& it) const
+                                                                 const _pre_post_order_iterator& it) const
 {
     return it.node == this->node &&
-        it.preorder() == this->preorder();
+    it.preorder() == this->preorder();
 }
 
 template <typename label_type>
@@ -123,7 +123,7 @@ tree_base<label_type>::_pre_post_order_iterator::operator++()
 {
     // if preorder, go unltil i am leaf, then become postorder
     // if postorder and have next sibling, became him, and become preorder
-
+    
     if (_preorder)
     {
         if (is_leaf(*this))
@@ -157,7 +157,7 @@ tree_base<label_type>::_pre_post_order_iterator::operator++()
             _preorder = false;
         }
     }
-
+    
     return *this;
 }
 
@@ -182,19 +182,19 @@ size_t tree_base<label_type>::_pre_post_order_iterator::label_index() const
 //
 template <typename label_type>
 tree_base<label_type>::_reverse_post_order_iterator::_reverse_post_order_iterator(
-                tree_node_type* nodeptr)
-    : iterator_base(nodeptr)
+                                                                                  tree_node_type* nodeptr)
+: iterator_base(nodeptr)
 { }
 
 template <typename label_type>
 tree_base<label_type>::_reverse_post_order_iterator::_reverse_post_order_iterator(
-                const iterator_base& it)
-    : iterator_base(it.node)
+                                                                                  const iterator_base& it)
+: iterator_base(it.node)
 { }
 
 template <typename label_type>
 bool tree_base<label_type>::_reverse_post_order_iterator::operator==(
-                const iterator_base& it) const
+                                                                     const iterator_base& it) const
 {
     return it.node == this->node;
 }
@@ -319,12 +319,12 @@ tree_base<label_type>::end_post() const
 template <typename label_type>
 template <typename iter>
 iter tree_base<label_type>::parent(
-                const iter& it)
+                                   const iter& it)
 {
     static_assert(!std::is_same<iter,
-            tree_base<label_type>::pre_post_order_iterator>::value,
-            "call parent(pre_post_order_iterator) is forbidden");
-
+                  tree_base<label_type>::pre_post_order_iterator>::value,
+                  "call parent(pre_post_order_iterator) is forbidden");
+    
     assert(it.node->parent != nullptr);
     return iter(it.node->parent);
 }
@@ -333,7 +333,7 @@ iter tree_base<label_type>::parent(
 template <typename label_type>
 template <typename iter>
 iter tree_base<label_type>::first_child(
-                const iter& it)
+                                        const iter& it)
 {
     assert(!is_leaf(it));
     return iter(it.node->first_child);
@@ -343,7 +343,7 @@ iter tree_base<label_type>::first_child(
 template <typename label_type>
 template <typename iter>
 iter tree_base<label_type>::last_child(
-                const iter& it)
+                                       const iter& it)
 {
     assert(!is_leaf(it));
     return iter(it.node->last_child);
@@ -352,7 +352,7 @@ iter tree_base<label_type>::last_child(
 /* static */
 template <typename label_type>
 bool tree_base<label_type>::is_first_child(
-                const base_iterator& it)
+                                           const base_iterator& it)
 {
     assert(it.node != nullptr);
     return it.node->prev_sibling == nullptr;
@@ -361,7 +361,7 @@ bool tree_base<label_type>::is_first_child(
 /* static */
 template <typename label_type>
 bool tree_base<label_type>::is_last_child(
-                const base_iterator& it)
+                                          const base_iterator& it)
 {
     assert(it.node != nullptr);
     return it.node->next_sibling == nullptr;
@@ -370,7 +370,7 @@ bool tree_base<label_type>::is_last_child(
 /* static */
 template <typename label_type>
 bool tree_base<label_type>::is_leaf(
-                const base_iterator& it)
+                                    const base_iterator& it)
 {
     assert(it.node != nullptr);
     return it.begin() == it.end();
@@ -379,17 +379,17 @@ bool tree_base<label_type>::is_leaf(
 /* static */
 template <typename label_type>
 bool tree_base<label_type>::is_only_child(
-                const base_iterator& it)
+                                          const base_iterator& it)
 {
     assert(it.node != nullptr);
     return it.node->prev_sibling == nullptr &&
-        it.node->next_sibling == nullptr;
+    it.node->next_sibling == nullptr;
 }
 
 /* static */
 template <typename label_type>
 bool tree_base<label_type>::is_root(
-                const base_iterator& it)
+                                    const base_iterator& it)
 {
     return it.node->parent == nullptr;
 }
@@ -397,14 +397,14 @@ bool tree_base<label_type>::is_root(
 /* static */
 template <typename label_type>
 bool tree_base<label_type>::is_valid(
-                const base_iterator& it)
+                                     const base_iterator& it)
 {
     return it.node != nullptr;
 }
 
 template <typename label_type>
 int tree_base<label_type>::depth(
-        const base_iterator& it)
+                                 const base_iterator& it)
 {
     return _tree.depth(it);
 }
@@ -413,13 +413,13 @@ int tree_base<label_type>::depth(
 template <typename label_type>
 template <typename iterator_type, typename funct>
 funct tree_base<label_type>::for_each_in_subtree(
-                iterator_type root,
-                funct f)
+                                                 iterator_type root,
+                                                 funct f)
 {
     pre_post_order_iterator begin(root, true);
     pre_post_order_iterator end(root, false);
     ++end;
-
+    
     return std::move(for_each(begin, end, f));
 }
 
@@ -427,9 +427,9 @@ funct tree_base<label_type>::for_each_in_subtree(
 template <typename label_type>
 template <typename iterator_type, typename funct>
 funct tree_base<label_type>::for_each(
-                iterator_type begin,
-                iterator_type end,
-                funct f)
+                                      iterator_type begin,
+                                      iterator_type end,
+                                      funct f)
 {
     while (begin != end)
     {
@@ -440,4 +440,3 @@ funct tree_base<label_type>::for_each(
 }
 
 #endif /* !TREE_BASE_ITER_HPP */
-

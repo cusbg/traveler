@@ -25,17 +25,17 @@
 using namespace std;
 
 void compact::intervals::init(
-                iterator parent)
+                              iterator parent)
 {
     assert(!rna_tree::is_leaf(parent));
     DEBUG("init interval for parent %s", label(parent));
-
+    
     sibling_iterator ch;
     size_t i = 0;
-
+    
     vec.assign(1, interval());
     vec.back().beg = {parent, 0};
-
+    
     for (ch = parent.begin(); ch != parent.end(); ++ch, ++i)
     {
         /*
@@ -46,10 +46,10 @@ void compact::intervals::init(
          * parent. In the tree representation, this corresponds to number of non-leaf descendants of the parent.
          */
         bool rmk = remake_child(parent, i);
-
+        
         if (rmk)
             vec.back().remake = true;
-
+        
         if (ch->paired())
         {
             vec.back().end = {ch, 0};
@@ -58,21 +58,21 @@ void compact::intervals::init(
         }
         else
             vec.back().vec.push_back(ch);
-
+        
         if (rmk)
             vec.back().remake = true;
     }
     vec.back().end = {parent, 1};
-
+    
     if (!parent->remake_ids.empty())
         if (*std::max_element(parent->remake_ids.begin(),
-                    parent->remake_ids.end()) >= i)
+                              parent->remake_ids.end()) >= i)
             vec.back().remake = true;
-
+    
     if (is(parent, rna_pair_label::inserted))
         for (auto & i : vec)
             i.remake = true;
-
+    
     switch (vec.size())
     {
 #define typeswitch(t) type = compact::intervals::t; break;
@@ -89,13 +89,13 @@ void compact::intervals::init(
 point compact::intervals::get_circle_direction() const
 {
     assert(!vec.empty());
-
+    
     if (type == hairpin)
         return rna_tree::parent(vec.back().beg.it)->center();
-
+    
     size_t n = 0;
     point psum = {0, 0};
-
+    
     for (const auto& i : vec)
     {
         psum += i.beg.it->center();
@@ -104,4 +104,3 @@ point compact::intervals::get_circle_direction() const
     psum = psum / n;
     return psum;
 }
-

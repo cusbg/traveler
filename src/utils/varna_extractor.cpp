@@ -31,47 +31,46 @@
 using namespace std;
 
 void varna_extractor::extract(
-                const std::string& filename)
+                              const std::string& filename)
 {
     APP_DEBUG_FNAME;
-
+    
     labels.clear();
     points.clear();
-
+    
     ifstream in(filename);
-
+    
     regex regexp_base_line = create_regex(
-            msprintf("^<text.*\\s+x=%s.*\\s+y=%s\\s+.*>%s</text>",
-                property(DOUBLE_REGEX), property(DOUBLE_REGEX), BASE_REGEX));
-
+                                          msprintf("^<text.*\\s+x=%s.*\\s+y=%s\\s+.*>%s</text>",
+                                                   property(DOUBLE_REGEX), property(DOUBLE_REGEX), BASE_REGEX));
+    
     smatch match;
     string line;
     point p;
     string base;
-
+    
     while(true)
     {
         getline(in, line);
         if (in.fail())
             break;
-
+        
         if (regex_search(line, match, regexp_base_line))
         {
             stringstream str;
-
+            
             str << match[1] << " " << match[3] << " " << match[5];
-
+            
             str
-                >> p.x
-                >> p.y
-                >> base;
-
+            >> p.x
+            >> p.y
+            >> base;
+            
             assert(!str.fail() && str.eof() && base.size() == 1);
-
+            
             p.y = -p.y;
             labels.push_back(base[0]);
             points.push_back(p);
         }
     }
 }
-

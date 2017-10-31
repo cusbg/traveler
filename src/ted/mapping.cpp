@@ -29,7 +29,7 @@ using namespace std;
 mapping::indexes mapping::get_to_insert() const
 {
     APP_DEBUG_FNAME;
-
+    
     indexes vec;
     for (auto m : map)
     {
@@ -38,14 +38,14 @@ mapping::indexes mapping::get_to_insert() const
     }
     sort(vec.begin(), vec.end(), less<size_t>());
     LOGGER_PRINT_CONTAINER(vec, "to_insert");
-
+    
     return vec;
 }
 
 mapping::indexes mapping::get_to_remove() const
 {
     APP_DEBUG_FNAME;
-
+    
     indexes vec;
     for (auto m : map)
     {
@@ -54,16 +54,15 @@ mapping::indexes mapping::get_to_remove() const
     }
     sort(vec.begin(), vec.end(), less<size_t>());
     LOGGER_PRINT_CONTAINER(vec, "to_remove");
-
+    
     return vec;
 }
 
 
 bool mapping::mapping_pair::operator<(
-                const mapping_pair& other) const
+                                      const mapping_pair& other) const
 {
     return from < other.from ||
-        (from == other.from &&
-            to < other.to);
+    (from == other.from &&
+     to < other.to);
 }
-

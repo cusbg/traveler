@@ -26,46 +26,46 @@
 using namespace std;
 
 #define set_remake(iter) \
-    rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
+rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
 
 //namapuje stromy na sebe
 matcher::matcher(
-                const rna_tree& templated,
-                const rna_tree& other)
-    : t1(templated), t2(other)
+                 const rna_tree& templated,
+                 const rna_tree& other)
+: t1(templated), t2(other)
 { }
 
 rna_tree& matcher::run(
-                const mapping& map)
+                       const mapping& map)
 {
     INFO("BEG: Transforming trees with mapping function");
-
+    
     //Sizes of the trees after deletion from one and insertion into the other should match
     if (t1.size() - map.get_to_remove().size() != t2.size() - map.get_to_insert().size())
     {
         throw illegal_state_exception("Computed sizes of removing/inserting does not match current trees");
     }
-
+    
     mark(t1, map.get_to_remove(), rna_pair_label::deleted);
     mark(t2, map.get_to_insert(), rna_pair_label::inserted);
-
+    
     erase();
-
+    
     t1.set_postorder_ids();
     t2.set_postorder_ids();
-
+    
     compute_sizes();
-
+    
     merge();
-
+    
     if (!t1.correct_pairing() || !t2.correct_pairing())
     {
         throw illegal_state_exception("Uncorrect tree pairing after transforming template to target tree");
     }
-
+    
     update_ends_in_rna(t1);
     t1.set_postorder_ids();
-
+    
     INFO("END: Transforming trees with mapping function");
     return t1; //Resulting tree which will be used from now on (we are done with T2 at this point)
 }
@@ -73,24 +73,24 @@ rna_tree& matcher::run(
 
 
 void matcher::mark(
-                rna_tree& rna,
-                const indexes_type& postorder_indexes,
-                rna_pair_label::status_type status)
+                   rna_tree& rna,
+                   const indexes_type& postorder_indexes,
+                   rna_pair_label::status_type status)
 {
     post_order_iterator it = rna.begin_post();
     size_t i = 0;
-
+    
     for (size_t index : postorder_indexes)
     {
         --index;    // indexy cislovane od 1
         size_t to_move = index - i;
         it = plusplus(it, to_move);
-
+        
         assert(!rna_tree::is_root(it));
         it->status = status;
         i = index;
     }
-
+    
     rna.print_tree();
 }
 
@@ -98,7 +98,7 @@ void matcher::erase()
 {
     iterator it;
     sibling_iterator ch;
-
+    
     for (it = t1.begin(); it != t1.end(); ++it)
     {
         for (ch = it.begin(); ch != it.end();)
@@ -111,7 +111,7 @@ void matcher::erase()
                  */
                 set_remake(ch);
                 ch = t1.erase(ch);
-
+                
                 continue;
             }
             ++ch;
@@ -119,7 +119,7 @@ void matcher::erase()
     }
 }
 
-//Mapping one tree over the other
+//mapovani jednoho stromu na druhy
 void matcher::merge()
 {
     iterator it1, it2;
@@ -128,14 +128,14 @@ void matcher::merge()
     
     it1 = t1.begin();
     it2 = t2.begin();
-
+    
     it1->set_label_strings(*it2);
-
+    
     while (it1 != t1.end() && it2 != t2.end())
     {
         ch1 = it1.begin();
         ch2 = it2.begin();
-
+        
         while (ch2 != it2.end())
         {
             if (is(ch2, rna_pair_label::inserted))
@@ -145,15 +145,15 @@ void matcher::merge()
                  * as childern of the just inserted node. The reason is that there are more possible ways how to
                  * carry out insertion at a position where siblings exist.
                  */
-
+                
                 steal = 0;
                 ins = ch1;
-
+                
                 if (ch2->paired())
                 {
                     actual = 0;
                     needed = s2.at(id(ch2)); //Taking into account the number of siblings needed in order for the tree to have the required structure
-
+                    
                     while (actual < needed)
                     {
                         actual += s1.at(id(ch1));
@@ -170,19 +170,19 @@ void matcher::merge()
             {
                 ch1->set_label_strings(*ch2);
             }
-
+            
             ++ch2;
             ++ch1;
         }
-
+        
         assert(ch1 == it1.end() && ch2 == it2.end());
-
+        
         make_unique(it1);
-
+        
         ++it1;
         ++it2;
     }
-
+    
     assert(it1 == t1.end() && it2 == t2.end());
     assert(t1 == t2);
 }
@@ -195,44 +195,42 @@ void matcher::compute_sizes()
      * inserted and deleted nodes).
      */
     APP_DEBUG_FNAME;
-
+    
     auto comp_f =
-        [](rna_tree& rna, vector<size_t>& sizes) {
-            post_order_iterator it;
-            sibling_iterator ch;
-
-            sizes.resize(rna.size());
-
-            for (auto it = rna.begin(); it != rna.end(); ++it)
-                assert(id(it) < sizes.size());
-
-            for (it = rna.begin_post(); it != rna.end_post(); ++it)
-            {
-                sizes[id(it)] =
-                    (is(it, rna_pair_label::inserted) ||
-                     is(it, rna_pair_label::deleted)) ? 0 : 1;
-
-                if (!rna_tree::is_leaf(it))
-                    for (ch = it.begin(); ch != it.end(); ++ch)
-                        sizes[id(it)] += sizes[id(ch)];
-            }
-        };
-
+    [](rna_tree& rna, vector<size_t>& sizes) {
+        post_order_iterator it;
+        sibling_iterator ch;
+        
+        sizes.resize(rna.size());
+        
+        for (auto it = rna.begin(); it != rna.end(); ++it)
+            assert(id(it) < sizes.size());
+        
+        for (it = rna.begin_post(); it != rna.end_post(); ++it)
+        {
+            sizes[id(it)] =
+            (is(it, rna_pair_label::inserted) ||
+             is(it, rna_pair_label::deleted)) ? 0 : 1;
+            
+            if (!rna_tree::is_leaf(it))
+                for (ch = it.begin(); ch != it.end(); ++ch)
+                    sizes[id(it)] += sizes[id(ch)];
+        }
+    };
+    
     comp_f(t1, s1);
     comp_f(t2, s2);
-
+    
     assert(s1.at(id(t1.begin())) == s2.at(id(t2.begin())));
-
+    
 }
 
 /* inline */
 void matcher::make_unique(
-                iterator it)
+                          iterator it)
 {
     auto& vec = it->remake_ids;
     sort(vec.begin(), vec.end());
     auto end = unique(vec.begin(), vec.end());
     vec.erase(end, vec.end());
 }
-
-
