@@ -57,13 +57,13 @@ The binaries will be copied into traveler/bin. To navigate there from the src di
 
 Three types of template IMAGE\_FILE are currectly supported by Traveler:
 	
-* PostScript (crw) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php)
+* PostScript (crw) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php) (default)
 * VARNA (varna) format of SVG images produced by tool [VARNA](http://varna.lri.fr/)
 * Traveler intermediate format
 
 #### Traveler intermediate format:
 
-Intermediate format is simple XML file. It contains ordered list of nucleotides.
+Traveler's intermediate format is a simple XML which contains an ordered list of nucleotides (information about lines is not necessary since lines connecting backbone are defined by the order of nucleotides and base pairing lines are defined by the secondary structure).
 
 ##### Example:
 	<structure>
@@ -74,12 +74,6 @@ Intermediate format is simple XML file. It contains ordered list of nucleotides.
 	.
 	<point x="278.1 y="-504.6" b="A">
 	</structure>
-
-##### Usage example:
-	mkdir test
-	bin/traveler -gs data/metazoa/mouse.fasta \
-	-ts --file-format traveler data/metazoa/human.xml data/metazoa/human.fasta \
-	-all test/mouse_from_human 
 
 Other extractors of RNA structure can be implemented and specified by the FILE\_FORMAT argument.
 
@@ -96,12 +90,19 @@ Other extractors of RNA structure can be implemented and specified by the FILE\_
 	other lines are filled with LABELS and BRACKETS in dot-bracket notation of secondary structure pairing
 	match-tree must contain both LABELS and BRACKETS, templated-tree need only BRACKETS
 
-### Example 1: Visualize mouse 18S rRNA using human 18S rRNA as template using CRW ps image as the template layout.
+### Example 1a: Visualize mouse 18S rRNA using human 18S rRNA as template using CRW ps image as the template layout.
 	$ mkdir test
 	$ bin/traveler \
 		--target-structure data/metazoa/mouse.fasta \
-		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
+		--template-structure --file-format traveler data/metazoa/human.ps data/metazoa/human.fasta \
 		--all test/mouse_from_human
+
+### Example 1b: Visualize mouse 18S rRNA using human 18S rRNA as template using Traveler's XML input format as the template layout.
+	$ mkdir test
+	$ bin/traveler \
+		--target-structure data/metazoa/mouse.fasta \
+		--template-structure data/metazoa/human.xml data/metazoa/human.fasta \
+		--all test/mouse_from_human_xml_input
 
 ### Example 2: Compute TED distance and mapping between human 18S rRNA (template) and mouse 18S rRNA (target).
 	$ mkdir test
