@@ -32,9 +32,6 @@
 #include "gted.hpp"
 #include "overlap_checks.hpp"
 
-#define TRAVELER_FORMAT {"-tf", "--traveler-template"}
-#define TRAVELER_OUT {"-to", "--traveler-out"}
-
 #define ARGS_HELP                           {"-h", "--help"}
 #define ARGS_TARGET_STRUCTURE               {"-gs", "--target-structure"}
 #define ARGS_TEMPLATE_STRUCTURE             {"-ts", "--template-structure"}
@@ -115,7 +112,7 @@ void app::run(
     
     print(args);
     bool rted = args.all.run || args.ted.run || args.traveler.run;
-    bool draw = args.all.run || args.draw.run|| args.traveler.run;
+    bool draw = args.all.run || args.draw.run;
     bool overlaps = args.all.overlap_checks || args.draw.overlap_checks;
     mapping map;
     string img_out = args.all.file;
@@ -129,7 +126,7 @@ void app::run(
         img_out = args.draw.file;
     }
     
-    run_drawing(args.templated, args.matched, map, draw, overlaps, img_out, args.traveler.run);
+    run_drawing(args.templated, args.matched, map, draw, overlaps, img_out);
     
     INFO("END: APP");
 }
@@ -181,8 +178,7 @@ void app::run_drawing(
                       const mapping& mapping,
                       bool run,
                       bool run_overlaps,
-                      const std::string& file,
-                      bool traveler)
+                      const std::string& file)
 {
     APP_DEBUG_FNAME;
     
@@ -200,7 +196,7 @@ void app::run_drawing(
         //Compact goes through the structure and computes new coordinates where necessary
         compact(templated).run();
         
-        save(file, templated, run_overlaps, traveler);
+        save(file, templated, run_overlaps);
     }
     catch (const my_exception& e)
     {
@@ -211,8 +207,7 @@ void app::run_drawing(
 void app::save(
                const std::string& filename,
                rna_tree& rna,
-               bool overlap,
-               bool traveler)
+               bool overlap)
 {
     APP_DEBUG_FNAME;
     
@@ -220,13 +215,6 @@ void app::save(
     if (overlap)
         overlaps = overlap_checks().run(rna);
     
-    if(traveler)
-    {
-        auto writer = document_writer::get_traveler_writer();
-        writer -> init(filename, rna.begin());
-        writer -> print(writer -> get_rna_formatted(rna));
-        return;
-    }
     for (bool colored : {true, false})
     {
         for (auto& writer : document_writer::get_writers(colored))
@@ -325,13 +313,6 @@ void app::usage(
     << " [" << ARGS_TEMPLATE_STRUCTURE_FILE_TYPE << " FILE_FORMAT]"
     << " IMAGE_FILE DBN_FILE"
     << endl
-    << appname
-    << " [OPTIONS]"
-    << " <" << get_args(ARGS_TARGET_STRUCTURE) << ">"
-    << " DBN_FILE"
-    << " <" << get_args(TRAVELER_FORMAT) << ">"
-    << " TRAVELER_FILE DBN_FILE"
-    << endl
     << endl
     << "OPTIONS:" << endl
     << "\t[" << get_args(ARGS_ALL)
@@ -341,8 +322,6 @@ void app::usage(
     << endl
     << "\t[" << get_args(ARGS_DRAW)
     << "] [" << ARGS_DRAW_OVERLAPS << "] FILE_MAPPING_IN FILE_OUT"
-    << endl
-    << "\t[" <<get_args(TRAVELER_OUT) << "] FILE_OUT"
     << endl
     << "\t[" << get_args(ARGS_VERBOSE) << "]"
     << endl;
@@ -452,25 +431,6 @@ void app::print(
                 fastafile = args.at(i + 2);
                 a.templated = app::create_templated(templatefile, templatetype, fastafile);
                 i += 2;
-            }
-            else if (is_argument(TRAVELER_FORMAT))
-            {
-                DEBUG("arg traveler format");
-                string templatefile, fastafile;
-                string templatetype = "traveler";
-                
-                templatefile = args.at(i + 1);
-                fastafile = args.at(i + 2);
-                a.templated = app::create_templated(templatefile, templatetype, fastafile);
-                i += 2;
-            }
-            else if(is_argument(TRAVELER_OUT))
-            {
-                DEBUG("arg traveler output");
-                
-                a.traveler.run = true;
-                a.all.file = args.at(i+1);
-                ++i;
             }
             else if (is_argument(ARGS_ALL))
             {

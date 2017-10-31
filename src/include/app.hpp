@@ -76,8 +76,7 @@ private:
                      const mapping& mapping,
                      bool run,
                      bool run_overlaps,
-                     const std::string& file,
-                     bool traveler);
+                     const std::string& file);
     
     /**
      * save both, colored and not colored documents
@@ -85,8 +84,7 @@ private:
     void save(
               const std::string& filename,
               rna_tree& rna,
-              bool overlaps,
-              bool traveler);
+              bool overlaps);
     
 private:
     /**
