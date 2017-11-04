@@ -43,12 +43,18 @@ tree_base<label_type>::tree_base(
 {
     APP_DEBUG_FNAME;
     
+
+    if (_brackets.size() != _labels.size()) {
+        std::ostringstream out;
+        for (int i = 0; i < _labels.size(); ++i) out << _labels[i].at(0).label;
+        throw wrong_argument_exception(
+                std::string("\nNumber of brackets != Number of labels\nBrackets: " + _brackets + "\nLabels:   "+out.str()).c_str());
+    }
+
     iterator it;
     size_t i = 0;
-    
-    if (_brackets.size() != _labels.size())
-        throw wrong_argument_exception("Number of brackets != Number of labels");
-    
+
+
     label_type root = label_type("ROOT_" + std::to_string(_id)) + label_type("");
     _tree.set_head(root);
     _size = 1;  // ROOT
