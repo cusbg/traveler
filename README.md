@@ -72,7 +72,7 @@ Traveler's intermediate format is a simple XML which contains an ordered list of
 	.
 	.
 	.
-	<point x="278.1 y="-504.6" b="A">
+	<point x="278.1 y="-504.6" b="A" />
 	</structure>
 
 Other extractors of RNA structure can be implemented and specified by the FILE\_FORMAT argument.
