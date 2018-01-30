@@ -25,6 +25,24 @@ Use `git clone https://github.com/davidhoksza/traveler` to download project
 
 The binaries will be copied into traveler/bin. To navigate there from the src directory use: `cd ../bin`
 
+## Using with Docker
+
+1. Download the source code and `cd` into the traveler directory.
+
+2. Build an image:
+
+  ```
+  docker build . -t traveler
+  ```
+
+3. Run the container:
+
+  ```
+  docker run -v "$PWD":/data -it traveler
+  ```
+
+The `traveler` executable is available in the PATH, and the current directory is mounted in the container under `/data`.
+
 ## Usage:
 	traveler [-h|--help]
 	traveler [OPTIONS] <STRUCTURES>
