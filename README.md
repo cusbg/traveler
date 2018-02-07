@@ -71,7 +71,7 @@ The `traveler` executable is available in the PATH, and the current directory is
 		* Blue - reinserted bases - happens when traveler needs to redraw simple structures like hairpins (for example due to the change in the number of bases)
 		* Brown - rotated parts - similar situation to reinserted bases, but takes place when redrawing a multibranch loop (in that case all branches need to be rotated to lie on a circle)
 
-#### Note:
+### Note on input layout file format:
 
 Three types of template IMAGE\_FILE are currectly supported by Traveler:
 	
@@ -94,6 +94,10 @@ Traveler's intermediate format is a simple XML which contains an ordered list of
 	</structure>
 
 Other extractors of RNA structure can be implemented and specified by the FILE\_FORMAT argument.
+
+### Note on input sequence-structure file format:
+
+Traveler accepts FASTA-like file format (see *Example 0*) for the description of the template structucture. You can prepare it manually, or, if you are using CRW as the source of templates, you can download the pseudoknot-free version version of the structure in the bpseq format and use it as the input to the bpseq2fasta Python script which can be found in the *Utilities* directory.
 
 ### Example 0 - Varna/DBN file format
 	$ cat data/metazoa/mouse.fasta
