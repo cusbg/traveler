@@ -156,3 +156,8 @@ Traveler supporst two types of input images - crw and varna. There are three ste
 * Add your new extractor to method `extractor.get_all_extractors()`
 
 For more ideas, how it should be implemented, see usage of `crw_extractor` and `varna_extractor`.
+
+## Citation:
+If you use Traveler in your research, please cite:
+* Elias, R., & Hoksza, D. (2017). TRAVeLer: a tool for template-based RNA secondary structure visualization. BMC bioinformatics, 18(1), 487.
+* Eliás, R., & Hoksza, D. (2016). Rna secondary structure visualization using tree edit distance. International Journal of Bioscience, Biochemistry and Bioinformatics, 6(1), 9.
