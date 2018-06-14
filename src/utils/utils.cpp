@@ -103,6 +103,15 @@ bool contains_one_of(
         if (contains(line, '>'))
             break;
         
+      if ( line.size() && line[line.size()-1] == '\r' ) {
+           DEBUG("Removing carriage return\n");
+           line = line.substr( 0, line.size() - 1 );
+        }
+
+        if ( line.size() && line[line.size()-1] == '\n' ) {
+           DEBUG("Removing line feed\n");
+           line = line.substr( 0, line.size() - 1 );
+        }
         if (contains_one_of(line, "[{(.)}]"))
             brackets << line;
         else

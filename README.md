@@ -99,6 +99,12 @@ Other extractors of RNA structure can be implemented and specified by the FILE\_
 
 Traveler accepts FASTA-like file format (see *Example 0*) for the description of the template structucture. You can prepare it manually, or, if you are using CRW as the source of templates, you can download the pseudoknot-free version version of the structure in the bpseq format and use it as the input to the bpseq2fasta Python script which can be found in the *Utilities* directory.
 
+The file needs to contain three lines: moelcule description line (starts with the > symbol), sequence line, structure line. Should you have a sequence in a FASTA file with sequence spanning multiple lines, you can use the following script to obtain single-line sequence:
+
+  ```
+  awk 'BEGIN {ORS=""}!/^>/{print}' sequence.fasta
+  ```
+
 ### Example 0 - Varna/DBN file format
 	$ cat data/metazoa/mouse.fasta
 		>mouse
