@@ -28,6 +28,7 @@
 
 #include <math.h>
 
+#include <functional>
 #include "logger.hpp"
 
 #ifndef M_PI
