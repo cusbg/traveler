@@ -239,7 +239,7 @@ private:
                                     const circle& c);
     
 private:
-    rna_tree &rna;
+    rna_tree &  rna;
 };
 
 #endif /* !COMPACT_HPP */

@@ -457,7 +457,8 @@ void compact::init_multibranch(
     if (root)  {
         /*
          * New branch created at the root level and it that case, the iterator is the root of the subtree to be
-         * inserted into the root level. Since we are inserting into root, which is the 5'3' pair which does not need to be base-paired,
+         * inserted into the root level. Since we are inserting into root, which is a node labeled 5'3' (an artificial node)
+         * that does not need to be base-paired ,
          * but can be far apart in the image (e.g. http://www.rna.ccbb.utexas.edu/RNA/Structures/d.16.e.H.sapiens.pdf),
          * we need to find an anchor point which will be used for the multibranch (normally we use the parent)
          */
@@ -478,8 +479,19 @@ void compact::init_multibranch(
             //            point c = point(0, 0);
             //            int cnt_branches = 0;
             
-            
-            assert(rna.depth(first_initiated) == rna.depth(last_initiated));
+
+            //it can happen that the first initiated and last initiated descendants are not at the same level (see the
+            // image), so the following assert is not valid. However, in such a case it is probable, that the resulting layout
+            //won't be very nice because target and template are probably diverge quite a lot
+            //
+
+            //                      G-G
+            //                  /   |   \
+            //        U(initiated)  U   A-U
+            //                          |   \
+            //                          UC   A (initiated)
+
+            // assert(rna.depth(first_initiated) == rna.depth(last_initiated));
             //            for (sibling_iterator si = sibling_iterator(first_initiated); si != sibling_iterator(last_initiated); si++)
             //            {
             //                if (si->initiated_points() && si->paired())
@@ -496,12 +508,12 @@ void compact::init_multibranch(
             last_initiated->paired() ? p2 = (*last_initiated)[1].p : p2 = (*last_initiated)[0].p;
             
             point c = center(p1, p2) - orthogonal(p1 - p2) * BASES_DISTANCE;
-            //Whether it wouldn't be better to position the center in the opposite orthogonal direction
-            //is checked later in the try_reposition_new_root_branches function
+            //Testing whether it wouldn't be better to position the center in the opposite orthogonal direction
+            //is done later in the try_reposition_new_root_branches function
             
             /*
-             * We need to remember the parent's center be used later when intializing position for the child of current node.
-             * Normally, the positin is obtain from the parent, but in case of root parent, that is the position between
+             * We need to remember the parent's center be used later when initializing position for the child of current node.
+             * Normally, the position is obtain from the parent, but in case of root parent, that is the position between
              * 5' and 3' end which might be far apart.
              */
             it->set_parent_center(c);
