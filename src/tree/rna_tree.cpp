@@ -29,6 +29,9 @@ using namespace std;
 inline static std::vector<rna_pair_label> convert(
                                                   const std::string& labels);
 
+inline static std::vector<rna_pair_label> convert(const std::string& labels, const std::string& brackets);
+
+
 inline static std::string trim(
                                std::string s);
 
@@ -38,7 +41,7 @@ rna_tree::rna_tree(
                    const std::string& _labels,
                    const std::string& _name)
 : tree_base<rna_pair_label>(
-                            trim(_brackets), convert(trim(_labels))), _name(_name)
+                            trim(_brackets), convert(trim(_labels), trim(_brackets))), _name(_name)
 {
     set_postorder_ids();
     distances = {0xBADF00D, 0xBADF00D, 0xBADF00D};
@@ -79,7 +82,34 @@ void rna_tree::set_name(
     return vec;
 }
 
-
+std::vector<rna_pair_label> convert(
+                                    const std::string& labels,
+                                    const std::string& brackets)
+{
+    vector<rna_pair_label> vec;
+    vec.reserve(labels.size());
+    size_t pseudoknot = 1;
+    
+    for (size_t i = 0; i < labels.size(); ++i)
+    {
+        if(brackets[i] == '[' || brackets[i] == '{')
+        {
+            vec.emplace_back(labels.substr(i, 1), pseudoknot);
+            pseudoknot++;
+        }
+        else if(brackets[i] == ']' || brackets[i] == '}')
+        {
+            --pseudoknot;
+            vec.emplace_back(labels.substr(i, 1), pseudoknot);
+        }
+        else
+        {
+            vec.emplace_back(labels.substr(i, 1));
+        }
+    }
+    
+    return vec;
+}
 
 void rna_tree::update_points(
                              const vector<point>& points)
