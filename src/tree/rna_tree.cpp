@@ -153,7 +153,7 @@ void update_ends_in_rna(
     
     root->at(1).label = "3'";
     
-    INFO("RNA ends (3', 5') are updated");
+    INFO("RNA ends (5', 3') updated");
 }
 
 

@@ -28,7 +28,7 @@ using namespace std;
 #define set_remake(iter) \
 rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
 
-//namapuje stromy na sebe
+//maps trees
 matcher::matcher(
                  const rna_tree& templated,
                  const rna_tree& other)
@@ -48,7 +48,8 @@ rna_tree& matcher::run(
     
     mark(t1, map.get_to_remove(), rna_pair_label::deleted);
     mark(t2, map.get_to_insert(), rna_pair_label::inserted);
-    
+
+    //remove nodes from t1 and mark this in parent using set_remake
     erase();
     
     t1.set_postorder_ids();
@@ -63,7 +64,7 @@ rna_tree& matcher::run(
         throw illegal_state_exception("Uncorrect tree pairing after transforming template to target tree");
     }
     
-    update_ends_in_rna(t1);
+//    update_ends_in_rna(t1);
     t1.set_postorder_ids();
     
     INFO("END: Transforming trees with mapping function");
@@ -82,7 +83,7 @@ void matcher::mark(
     
     for (size_t index : postorder_indexes)
     {
-        --index;    // indexy cislovane od 1
+        --index;    // indexed from one
         size_t to_move = index - i;
         it = plusplus(it, to_move);
         
@@ -107,7 +108,7 @@ void matcher::erase()
             {
                 /*
                  * Set Information for the drawing algorithm that descendants will need to be moved
-                 * and siblings (loop) will need to be replaced on the circle
+                 * and siblings (loop) will need to be repositioned on the circle
                  */
                 set_remake(ch);
                 ch = t1.erase(ch);
@@ -142,7 +143,7 @@ void matcher::merge()
             {
                 /*
                  * When inserting into a position with N siblings, steal denotes how many siblings will be taken
-                 * as childern of the just inserted node. The reason is that there are more possible ways how to
+                 * as children of the just inserted node. The reason is that there are more possible ways how to
                  * carry out insertion at a position where siblings exist.
                  */
                 
@@ -191,7 +192,7 @@ void matcher::merge()
 void matcher::compute_sizes()
 {
     /*
-     * Counts the size of every subtree (s1 and s2 vectors) for furhter utilization (does not tak einto account
+     * Counts the size of every subtree (s1 and s2 vectors) for furhter utilization (does not tak into account
      * inserted and deleted nodes).
      */
     APP_DEBUG_FNAME;
