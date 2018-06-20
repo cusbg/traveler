@@ -177,7 +177,8 @@ struct svg_writer::style
 
 /* virtual */ std::string svg_writer::get_label_formatted(
                                                           const rna_label& label,
-                                                          const RGB& color) const
+                                                          const RGB& color,
+                                                          const int ix) const
 {
     properties out;
     
@@ -185,7 +186,7 @@ struct svg_writer::style
     << get_point_formatted(label.p, "", "")
     << property("class", color.get_name());
     
-    return create_element("text", out, label.label);
+    return create_element("text", out, label.label, ix);
 }
 
 
@@ -225,16 +226,27 @@ svg_writer::properties svg_writer::get_point_formatted(
     return out;
 }
 
+//std::string svg_writer::create_element(
+//        const std::string& name,
+//        const properties& properties,
+//        const int ix) const
+//{
+//    return create_element(name, properties, "", ix);
+//
+//}
 std::string svg_writer::create_element(
                                        const std::string& name,
                                        const properties& properties,
-                                       const std::string& value) const
+                                       const std::string& value,
+                                       const int ix) const
 {
-    
+
+    stringstream ss;
+    if (ix >= 0) ss << "<title>" << ix << "</title>";
     if (value.empty())
-        return msprintf("<%s %s/>\n", name, properties);
+        return msprintf("<g>%s<%s %s/></g>\n", ss.str(), name, properties);
     else
-        return msprintf("<%s %s>%s</%s>\n", name, properties, value, name);
+        return msprintf("<g>%s<%s %s>%s</%s></g>\n", ss.str(), name, properties, value, name);
 }
 
 svg_writer::style svg_writer::get_color_style(

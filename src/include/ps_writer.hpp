@@ -43,7 +43,8 @@ public:
                                              double radius) const;
     virtual std::string get_label_formatted(
                                             const rna_label& label,
-                                            const RGB& color) const;
+                                            const RGB& color,
+                                            const int ix) const;
     
 protected:
     virtual std::string get_line_formatted(

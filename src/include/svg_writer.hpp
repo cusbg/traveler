@@ -46,7 +46,8 @@ public: // formatters
                                              double radius) const;
     virtual std::string get_label_formatted(
                                             const rna_label& label,
-                                            const RGB& color) const;
+                                            const RGB& color,
+                                            int ix) const;
     
 protected:
     virtual std::string get_line_formatted(
@@ -64,7 +65,12 @@ private:
     std::string create_element(
                                const std::string& name,
                                const properties& properties,
-                               const std::string& value = "") const;
+                               const std::string& value = "",
+                               const int ix = -1) const;
+//    std::string create_element(
+//            const std::string& name,
+//            const properties& properties,
+//            const int ix) const;
     std::string create_style_definitions() const;
     
     properties get_point_formatted(

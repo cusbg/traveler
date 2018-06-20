@@ -78,10 +78,12 @@ public: // formatters
                                    point to,
                                    bool is_base_pair = true) const;
     std::string get_label_formatted(
-                                    rna_tree::pre_post_order_iterator it) const;
+                                    rna_tree::pre_post_order_iterator it,
+                                    const int ix) const;
     virtual std::string get_label_formatted(
                                             const rna_label& label,
-                                            const RGB& color) const = 0;
+                                            const RGB& color,
+                                            const int ix) const = 0;
     
 public:
     /**

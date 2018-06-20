@@ -150,7 +150,8 @@ std::string ps_writer::get_default_prologue() const
 
 /* virtual */ std::string ps_writer::get_label_formatted(
                                                          const rna_label& label,
-                                                         const RGB& color) const
+                                                         const RGB& color,
+                                                         const int ix) const
 {
     ostringstream out;
     

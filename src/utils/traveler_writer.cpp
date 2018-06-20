@@ -27,7 +27,7 @@ string traveler_writer::get_circle_formatted(point centre, double radius) const
     return "";
 }
 
-string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color) const
+string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color, const int ix) const
 {
     ostringstream out;
     
