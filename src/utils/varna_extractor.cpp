@@ -67,10 +67,11 @@ void varna_extractor::extract(
             >> base;
             
             assert(!str.fail() && str.eof() && base.size() == 1);
-            
-            p.y = -p.y;
+
             labels.push_back(base[0]);
             points.push_back(p);
         }
     }
+
+    mirror_y();
 }

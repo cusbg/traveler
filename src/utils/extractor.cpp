@@ -21,6 +21,7 @@
 
 
 #include <map>
+#include <limits>
 
 #include "extractor.hpp"
 #include "crw_extractor.hpp"
@@ -96,4 +97,23 @@ regex extractor::create_regex(
     {
         throw regex_exception(e);
     }
+}
+
+void extractor::mirror_y(){
+    /*
+     * Traveler first parsed CRW's PS files which have (0,0) coordinate in the
+     * lower left corner. Some extractors might work with different coordinate
+     * systems (such as SVG) which then requires mirroring of the y coordinates.
+     */
+    double min_y = std::numeric_limits<double>::max();
+    double max_y = std::numeric_limits<double>::min();
+    for (auto p: this->points) {
+        if (p.y < min_y) min_y = p.y;
+        if (p.y > max_y) max_y = p.y;
+    }
+    double shift = max_y + min_y;
+    for (auto &p: this->points) {
+        p.y = shift - p.y;
+    }
+
 }

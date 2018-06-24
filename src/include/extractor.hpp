@@ -58,6 +58,8 @@ protected:
     virtual std::string get_type() const = 0;
     std::regex create_regex(
                             const std::string& pattern);
+
+    void mirror_y();
     
 private:
     static std::vector<extractor_ptr> get_all_extractors();

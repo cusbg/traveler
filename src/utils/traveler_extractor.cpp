@@ -30,5 +30,7 @@ void traveler_extractor::extract(const string& filename)
             labels.push_back(base[0]);
         }
     }
+
+    mirror_y();
     
 }
