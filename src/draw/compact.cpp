@@ -223,8 +223,8 @@ void compact::  init()
             }
         }
     }
-    
-    init_even_branches();
+
+    straighten_branches();
     
     auto log = logger.debug_stream();
     log << "Points initialization:\n";
@@ -272,7 +272,7 @@ void compact::  init()
     DEBUG("compact::init() OK");
 }
 
-void compact::init_even_branches()
+void compact::straighten_branches()
 {
     // for nodes in one branch, set them to lie on a straight line
     for (iterator it = rna.begin(); it != rna.end(); ++it)

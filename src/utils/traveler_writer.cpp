@@ -2,7 +2,7 @@
 
 using namespace std;
 
-void traveler_writer::init(const string& filename, rna_tree::iterator root)
+void traveler_writer::init(const string& filename, rna_tree& rna)
 {
     document_writer::init(filename, ".xml");
 }

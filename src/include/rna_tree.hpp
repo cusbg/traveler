@@ -111,7 +111,8 @@ public:
 public:
     static point base_pair_edge_point(
                                       point from,
-                                      point to);
+                                      point to,
+                                      float scaling_ratio = 1);
     /**
      * returns top right corner of tree visualization
      */

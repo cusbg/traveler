@@ -37,6 +37,7 @@ public:
     
     point operator+(const point& other) const;
     point operator-(const point& other) const;
+    point operator*(const point& other) const;
     point operator-() const;
     point operator/(const point& other) const;
     point operator/(double value) const;

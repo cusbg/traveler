@@ -184,6 +184,15 @@ std::string document_writer::get_rna_subtree_formatted(
     return out.str();
 }
 
+double document_writer::get_scaling_ratio() const{
+    return scaling_ratio;
+}
+
+void document_writer::set_scaling_ratio(rna_tree& rna){
+    auto bp_dist = rna.get_pair_base_distance();
+    scaling_ratio = 20 / bp_dist;
+};
+
 std::string document_writer::get_rna_background_formatted(
                                                           rna_tree::pre_post_order_iterator begin,
                                                           rna_tree::pre_post_order_iterator end) const
@@ -200,12 +209,19 @@ std::string document_writer::get_rna_background_formatted(
         
         if (p1.bad() || p2.bad())
             continue;
-        
-        point tmp = rna_tree::base_pair_edge_point(p1, p2);
-        p2 = rna_tree::base_pair_edge_point(p2, p1);
+
+        point diff_orig = p2 - p1;
+
+        point tmp = rna_tree::base_pair_edge_point(p1, p2, get_scaling_ratio());
+        p2 = rna_tree::base_pair_edge_point(p2, p1, get_scaling_ratio());
         p1 = tmp;
-        
-        out << get_line_formatted(p1, p2, RGB::GRAY);
+
+        point diff_edge = p2 - p1;
+
+        point diff = diff_orig * diff_edge;
+
+        //If the edge points cross, then the line should not be drawn at all
+        if (diff.x > 0 && diff.y > 0) out << get_line_formatted(p1, p2, RGB::GRAY);
     }
     
     return out.str();

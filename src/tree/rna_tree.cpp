@@ -463,7 +463,7 @@ point rna_tree::bottom_left_corner(
     size_t pos;
     
     pos = s.find_first_not_of(WHITESPACES);
-    if (pos != s.npos)
+    if (pos != s.npos   )
         s.erase(0, pos);
     pos = s.find_last_not_of(WHITESPACES);
     if (pos != s.npos)
@@ -475,11 +475,11 @@ point rna_tree::bottom_left_corner(
 
 /* static */ point rna_tree::base_pair_edge_point(
                                                   point from,
-                                                  point to)
+                                                  point to,
+                                                  float scaling_ratio)
 {
     assert(!from.bad() && !to.bad());
-    
-    point vec = {3, 3};
-    vec = vec + normalize(to - from) * 4;
-    return from + vec;
+
+
+    return from + normalize(to - from) * 6 / scaling_ratio;
 }

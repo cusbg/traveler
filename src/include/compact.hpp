@@ -116,7 +116,7 @@ private:
     /**
      * make all branches lie on straight line
      */
-    void init_even_branches();
+    void straighten_branches();
     
     /**
      * recursively find inited only-branch node,

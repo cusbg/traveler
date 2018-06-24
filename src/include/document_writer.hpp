@@ -26,9 +26,9 @@
 #include "rna_tree.hpp"
 
 // US letter
-#define LETTER              point({612, 792})
+#define LETTER              point({2*612, 2*792})
 // minimum margin: left + right; top + bottom
-#define MARGIN              point({100, 100})
+#define MARGIN              point({0, 0})
 
 struct RGB;
 class document_writer;
@@ -109,7 +109,7 @@ public:
      */
     virtual void init(
                       const std::string& filename,
-                      rna_tree::iterator root) = 0;
+                      rna_tree& rna) = 0;
     
     /**
      * fill document from actual position to end of file with `ch`-chars
@@ -134,6 +134,8 @@ public:
      * return actual position in stream
      */
     streampos get_pos();
+
+    virtual void set_scaling_ratio(rna_tree& rna);
     
 protected:
     virtual std::string get_line_formatted(
@@ -153,12 +155,17 @@ protected:
      */
     void seek_from_current_pos(
                                off_type offset);
+
+    virtual double get_scaling_ratio() const;
+
 private:
     void validate_stream() const;
     
 private:
     std::ofstream out;
     bool colored = false;
+
+    double scaling_ratio = 1;
 };
 
 
@@ -213,6 +220,7 @@ private:
     const double green;
     const double blue;
     const std::string name;
+
 };
 
 #endif /* !DOCUMENT_WRITER_HPP */

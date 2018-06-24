@@ -195,7 +195,7 @@ void app::run_drawing(
         templated = matcher(templated, matched).run(mapping);
         //Compact goes through the structure and computes new coordinates where necessary
         compact(templated).run();
-        
+
         save(file, templated, run_overlaps);
     }
     catch (const my_exception& e)
@@ -219,8 +219,9 @@ void app::save(
     {
         for (auto& writer : document_writer::get_writers(colored))
         {
+            writer->set_scaling_ratio(rna);
             string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
-            writer->init(file, rna.begin());
+            writer->init(file, rna);
             writer->print(writer->get_rna_formatted(rna));
             
             for (const auto& p : overlaps)

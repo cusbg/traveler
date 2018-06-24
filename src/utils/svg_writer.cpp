@@ -123,27 +123,55 @@ struct svg_writer::style
     }
 };
 
+//double svg_writer::get_scaling_ratio() const{
+//    return scaling_ratio;
+//}
+
 /* virtual */ void svg_writer::init(
                                     const std::string& filename,
-                                    rna_tree::iterator root)
+                                    rna_tree& rna)
 {
     document_writer::init(filename, SVG_FILENAME_EXTENSION);
+
+    rna_tree::iterator root = rna.begin();
     
     tr = rna_tree::top_right_corner(root);
-    bl = rna_tree::bottom_left_corner(root) - MARGIN;
+    bl = rna_tree::bottom_left_corner(root);
     
-    shift = -rna_tree::bottom_left_corner(root) + MARGIN / 2;
-    
-    scale = abs(tr) + abs(bl);
-    scale.x = LETTER.x / scale.x;
-    scale.y = LETTER.y / scale.y;
-    
-    letter.x = LETTER.x / scale.x;
-    letter.y = LETTER.y / scale.y;
-    
+//    shift = -bl + MARGIN / 2;
+////    shift = MARGIN;
+//
+//    scale = abs(tr) - abs(bl);
+//    scale.x = (LETTER.x - MARGIN.x) / scale.x;
+//    scale.y = (LETTER.y  - MARGIN.y) / scale.y;
+//
+//    letter.x = LETTER.x;// / scale.x;
+//    letter.y = LETTER.y; // scale.y;
+
+    margin = point(100,100);
+//    auto bp_dist = rna.get_pair_base_distance();
+//    scaling_ratio = 20 / bp_dist;
+//    scale = point(scaling_ratio , scaling_ratio);
+//    scale = point(8, 8);
+    dimensions = (tr - bl) * get_scaling_ratio() + margin;
+
+
+
+
+
+    letter.x = dimensions.x;// / scale.x;
+    letter.y = dimensions.y; // scale.y;
+
     print(get_header_element(root));
     print(create_style_definitions());
 }
+//
+//void svg_writer::scale_point(point &p) const {
+////    p -= bl;
+//    p.x *= scale.x;
+//    p.y *= scale.y;
+//
+//}
 
 /* virtual */ streampos svg_writer::print(
                                           const std::string& text)
@@ -184,6 +212,8 @@ struct svg_writer::style
     
     out
     << get_point_formatted(label.p, "", "")
+    << property("text-anchor", "middle")
+    << property("alignment-baseline", "middle")
     << property("class", color.get_name());
     
     return create_element("text", out, label.label, ix);
@@ -215,8 +245,10 @@ svg_writer::properties svg_writer::get_point_formatted(
     
     if (should_shift_p)
     {
-        p += shift;
+        //cale_point(p);
+        p = (p - bl) * get_scaling_ratio() + margin/2;
         p.y = letter.y - p.y;
+//        p += shift;
     }
     
     out
@@ -335,10 +367,10 @@ std::string svg_writer::get_header_element(
                                            rna_tree::iterator root)
 {
     ostringstream out;
-    
-    bl = -bl - MARGIN / 2;
-    
-    TRACE("scale %s, bl %s, tr %s", scale, bl, tr);
+
+//    bl = -bl - MARGIN / 2;
+
+    TRACE("scale %s, bl %s, tr %s", get_scaling_ratio(), bl, tr);
     
     out
     << "<svg"

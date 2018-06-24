@@ -107,6 +107,13 @@ point point::operator-(const point& other) const
     return {x - other.x, y - other.y};
 }
 
+point point::operator*(const point& other) const
+{
+    BINARY(*this, other);
+
+    return {x * other.x, y * other.y};
+}
+
 point point::operator-() const
 {
     UNARY(*this);

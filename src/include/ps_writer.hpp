@@ -35,7 +35,7 @@ public:
                             const std::string& text);
     virtual void init(
                       const std::string& filename,
-                      rna_tree::iterator root);
+                      rna_tree& rna);
     
 public:
     virtual std::string get_circle_formatted(

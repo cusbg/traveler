@@ -36,7 +36,7 @@ public:
 public:
     virtual void init(
                       const std::string& filename,
-                      rna_tree::iterator root);
+                      rna_tree& rna);
     virtual streampos print(
                             const std::string& text);
     
@@ -54,6 +54,8 @@ protected:
                                            point from,
                                            point to,
                                            const RGB& color) const;
+
+//    double get_scaling_ratio() const;
     
 private:
     std::string get_header_element(
@@ -78,12 +80,18 @@ private:
                                    const std::string& prefix,
                                    const std::string& postfix,
                                    bool should_shift_p = true) const;
+
+    void scale_point(point &p) const;
     
 private:
+    point dimensions;
+    point margin;
+
     point shift;
-    point scale;
+//    point scale;
     point tr, bl;
     point letter;
+
 };
 
 #endif /* !SVG_WRITER_HPP */
