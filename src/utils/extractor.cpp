@@ -25,7 +25,7 @@
 #include "extractor.hpp"
 #include "crw_extractor.hpp"
 #include "varna_extractor.hpp"
-#include "our_extractor.hpp"
+#include "traveler_extractor.hpp"
 #include "types.hpp"
 #include "utils.hpp"
 
@@ -50,7 +50,7 @@ struct regex_exception : public my_exception
 /* static */ std::vector<extractor_ptr> extractor::get_all_extractors()
 {
     std::vector<extractor_ptr> extractors;
-    for (extractor* e : std::vector<extractor*>({new crw_extractor(), new varna_extractor(), new our_extractor()}))
+    for (extractor* e : std::vector<extractor*>({new crw_extractor(), new varna_extractor(), new traveler_extractor()}))
         extractors.push_back(extractor_ptr(e));
     return extractors;
 }

@@ -1,9 +1,9 @@
-#ifndef our_extractor_hpp
-#define our_extractor_hpp
+#ifndef traveler_extractor_hpp
+#define traveler_extractor_hpp
 
 #include "extractor.hpp"
 
-class our_extractor: public extractor
+class traveler_extractor: public extractor
 {
 protected:
     virtual void extract(
