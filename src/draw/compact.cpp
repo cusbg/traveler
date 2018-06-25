@@ -224,7 +224,7 @@ void compact::  init()
         }
     }
 
-    straighten_branches();
+//    straighten_branches();
     
     auto log = logger.debug_stream();
     log << "Points initialization:\n";
