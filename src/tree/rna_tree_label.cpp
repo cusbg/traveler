@@ -38,8 +38,14 @@ bool rna_label::operator==(
 rna_pair_label::rna_pair_label(
                                const std::string& s)
 {
-    labels.push_back({s, point::bad_point()});
+    labels.push_back({s, point::bad_point(), 0});
 }
+
+rna_pair_label::rna_pair_label(const std::string& s, size_t pseudoknot)
+{
+    labels.push_back({s, point::bad_point(), pseudoknot});
+}
+
 
 const rna_label& rna_pair_label::operator[](
                                             size_t index) const

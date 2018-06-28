@@ -37,6 +37,7 @@ struct rna_label
     
     std::string label;
     point p;
+    size_t pseudoknot;
 };
 
 /**
@@ -61,6 +62,9 @@ public:
     rna_pair_label() = default;
     rna_pair_label(
                    const std::string& s);
+    
+    rna_pair_label(const std::string& s, size_t pseudoknot);
+    
     bool operator==(
                     const rna_pair_label& other) const;
     rna_pair_label operator+(
@@ -111,9 +115,9 @@ public:
 public:
     status_type status = untouched;
     std::vector<size_t> remake_ids;
+    std::vector<rna_label> labels;
     
 private:
-    std::vector<rna_label> labels;
     point parent_center;
     
 };
