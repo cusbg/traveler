@@ -98,7 +98,9 @@ void compact::run()
                 
                 //http://stackoverflow.com/questions/3306838/algorithm-for-reflecting-a-point-across-a-line
                 //first project p on the mirror line
-                double a = (pr[0].y - pr[1].y) / (pr[0].x - pr[1].x);
+                        double xDiff = pr[0].x - pr[1].x;
+                double a = xDiff == 0 ? 0 : (pr[0].y - pr[1].y) / xDiff;
+
                 double b = pr[0].y - pr[0].x * a;
                 //                        point pl(0 + (b * p.x) / (1 + m * m), b + (m * p.x) / (1 + m * m));
                 //                        it->at(i).p = 2 * pl - p;
@@ -468,7 +470,7 @@ void compact::init_multibranch(
         iterator last_initiated = rna.get_rightest_initiated_descendant(it);
         
         if (first_initiated->initiated_points()
-            && last_initiated->initiated_points())
+            && last_initiated->initiated_points() && first_initiated != last_initiated)
         {
             
             //Installing a new root into an existing branch in depth 1 which is part of a multibranch loop
@@ -560,12 +562,10 @@ void compact::init_multibranch(
             } while (next.node != nullptr && !next->initiated_points());
             
             assert(prev.node != nullptr && next.node != nullptr && prev->initiated_points() && next->initiated_points());
-            
-            printf("in9\n");
-            
+
             point p1, p2;
             
-            prev->paired() ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
+            prev->paired() && !rna_tree::is_root(prev) ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
             p2 = (*next)[0].p;
             
             point orig_vector = p2 - p1;
