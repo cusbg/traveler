@@ -112,6 +112,7 @@ double degrees_to_radians(
                           double val);
 
 bool iszero(
-            double val);
+            double val,
+            bool exact_test = true);
 
 #endif /* !POINT_HPP */

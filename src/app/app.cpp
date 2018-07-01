@@ -269,6 +269,8 @@ rna_tree app::create_templated(
     {
         extractor_ptr doc = extractor::get_extractor(templatefile, templatetype);
         fasta f = read_fasta_file(fastafile);
+        doc->adjust_residues_lists(f.brackets.size());
+
         return rna_tree(f.brackets, doc->labels, doc->points, f.id);
     }
     catch (const my_exception& e)

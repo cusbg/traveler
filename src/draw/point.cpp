@@ -339,7 +339,8 @@ double degrees_to_radians(
 }
 
 bool iszero(
-            double val)
+            double val,
+            bool exact_test)
 {
-    return double_equals(val, 0);
+    return exact_test ? val == 0 : double_equals(val, 0);
 }

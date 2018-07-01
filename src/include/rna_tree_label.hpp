@@ -107,6 +107,8 @@ public:
                            const point& center);
     
     const point & get_parent_center();
+
+    void set_p(const point _p, const size_t index);
     
 public:
     status_type status = untouched;

@@ -255,3 +255,7 @@ const point & rna_pair_label::get_parent_center()
 {
     return parent_center;
 }
+
+void rna_pair_label::set_p(const point _p, const size_t index) {
+    this->at(index).p  =_p;
+}

@@ -146,8 +146,8 @@ private:
     /**
      * set branch nodes to lie on straight line
      */
-    void make_branch_even(
-                          sibling_iterator it);
+    void straighten_branch(
+            sibling_iterator it);
     
     /**
      * lay out nodes on circle, rotate and shift branches if needed

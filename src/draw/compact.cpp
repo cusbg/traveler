@@ -69,7 +69,7 @@ void compact::run()
         
         if (it->initiated_points())
             for (size_t i = 0; i < it->size(); ++i)
-                it->at(i).p += vector;
+                it->set_p(it->at(i).p + vector, i);
         
         return out;
     };
@@ -103,7 +103,7 @@ void compact::run()
                 //                        point pl(0 + (b * p.x) / (1 + m * m), b + (m * p.x) / (1 + m * m));
                 //                        it->at(i).p = 2 * pl - p;
                 double d = (p.x + (p.y - b)*a)/(1 + a*a);
-                it->at(i).p = point(2*d - p.x, 2*d*a - p.y + 2*b);
+                it->set_p(point(2*d - p.x, 2*d*a - p.y + 2*b), i);
                 
             }
         
@@ -172,7 +172,7 @@ void compact::run()
         c.p1 = ch->at(ch.label_index()).p;
         c.p2 = move_point(c.centre, c.p2, dist);
         
-        ch->at(ch.label_index()).p = c.rotate(alpha);
+        ch->set_p(c.rotate(alpha), ch.label_index());
     }
 }
 
@@ -264,8 +264,8 @@ void compact::  init()
         {
             point vec = normalize(orthogonal(ch->at(0).p - ch->at(1).p, ch2->center())) * rna.get_pairs_distance();
             
-            ch->at(0).p = ch2->at(0).p - vec;
-            ch->at(1).p = ch2->at(1).p - vec;
+            ch->set_p(ch2->at(0).p - vec, 0);
+            ch->set_p(ch2->at(1).p - vec, 0);
         }
     }
     
@@ -284,7 +284,7 @@ void compact::straighten_branches()
         {
             for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch)
                 if (!rna_tree::is_leaf(ch))
-                    make_branch_even(ch);
+                    straighten_branch(ch);
         }
     }
 }
@@ -312,8 +312,8 @@ point compact::init_branch_recursive(
         assert(ch->paired());
         
         shift_branch(it, p);
-        it->at(0).p = ch->at(0).p - p;
-        it->at(1).p = ch->at(1).p - p;
+        it->set_p(ch->at(0).p - p, 0);
+        it->set_p(ch->at(1).p - p, 1);
         
         return p;
     }
@@ -358,8 +358,8 @@ point compact::init_branch_recursive(
     p = init_branch_recursive(ch);
     
     if (!p.bad()) {
-        it->at(0).p = ch->at(0).p;
-        it->at(1).p = ch->at(1).p;
+        it->set_p(ch->at(0).p, 0);
+        it->set_p(ch->at(1).p, 1);
         shift_branch(ch, -p);
     }
     
@@ -386,8 +386,8 @@ void compact::init_by_ancestor(
     p1 = par->at(0).p + vec;
     p2 = par->at(1).p + vec;
     
-    it->at(0).p = p1;
-    it->at(1).p = p2;
+    it->set_p(p1, 0);
+    it->set_p(p2, 1);
     // ^^ initialize points of `it` to lie next to parent
     // .. that means only initialization, to get direction where child should be
 }
@@ -427,16 +427,16 @@ void compact::init_multibranch(
                                               rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
                                           });
             
-            root->at(0).p = p1;
-            root->at(1).p = p2;
+            root->set_p(p1, 0);
+            root->set_p(p2, 1);
             return;
         }
         
         point rp1 = root->at(0).p;
         point rp2 = root->at(1).p;
         
-        root->at(0).p = p1;
-        root->at(1).p = p2;
+        root->set_p(p1, 0);
+        root->set_p(p2, 1);
         
         double beta = angle(rp1 - rp2) - angle(p1 - p2);
         
@@ -450,7 +450,7 @@ void compact::init_multibranch(
             double radius = distance(from, rp1);
             
             point to = rotate(p1, alpha - beta, radius);
-            it->at(it.label_index()).p = to;
+            it->set_p(to, it.label_index());
         }
     };
     
@@ -637,7 +637,7 @@ void compact::init_multibranch(
         int i = 0;
         for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch) {
             if (rna_tree::is_leaf(ch)) {
-                ch->at(0).p = points[i];
+                ch->set_p(points[i], 0);
                 
                 i += LEAF_POINTS;
             } else {
@@ -659,8 +659,8 @@ void compact::init_multibranch(
     rna_tree::for_each_in_subtree(it, set_label_status);
 }
 
-void compact::make_branch_even(
-                               sibling_iterator it)
+void compact::straighten_branch(
+        sibling_iterator it)
 {
     assert(!rna_tree::is_leaf(it));
     
@@ -689,8 +689,8 @@ void compact::make_branch_even(
         p1 = move_point(p, p1, PAIRS_DISTANCE / 2);
         p2 = move_point(p, p2, PAIRS_DISTANCE / 2);
         
-        vec[0]->at(0).p = p1;
-        vec[0]->at(1).p = p2;
+        vec[0]->set_p(p1, 0);
+        vec[0]->set_p(p2, 1);
     }
     
     shift = orthogonal(p1 - p2, vec[1]->center() - p2);
@@ -720,8 +720,8 @@ void compact::make_branch_even(
             shift_branch(it, p);
         }
         
-        vec[i]->at(0).p = p1 + shift;
-        vec[i]->at(1).p = p2 + shift;
+        vec[i]->set_p(p1 + shift, 0);
+        vec[i]->set_p(p2 + shift, 1);
     }
     
     // shift rest of tree
@@ -860,7 +860,7 @@ void compact::split(
     
     j = 0;
     for (auto val : in.vec)
-        val->at(0).p = p2[j++];
+        val->set_p(p2[j++], 0);
 }
 
 void compact::reinsert(
@@ -877,7 +877,7 @@ void compact::reinsert(
     {
         assert(rna_tree::is_leaf(nodes[i]));
         
-        nodes[i]->at(0).p = points[i];
+        nodes[i]->set_p(points[i], 0);
         if (is(nodes[i], rna_pair_label::touched))
             nodes[i]->status = rna_pair_label::reinserted;
     }

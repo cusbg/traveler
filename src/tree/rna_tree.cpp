@@ -81,6 +81,7 @@ void rna_tree::set_name(
 
 
 
+
 void rna_tree::update_points(
                              const vector<point>& points)
 {
@@ -88,11 +89,21 @@ void rna_tree::update_points(
     
     pre_post_order_iterator it;
     size_t i = 0;
+
+//    point p_min = point(DBL_MAX, DBL_MAX), p_max = point(DBL_MIN, DBL_MIN);
+//    for (point p: points){
+//        if (p.x < p_min.x) p_min.x = p.x;
+//        if (p.y < p_min.y) p_min.y = p.y;
+//        if (p.x > p_max.x) p_max.x = p.x;
+//        if (p.y > p_max.y) p_max.y = p.y;
+//    }
+//    point dim = point(p_max - p_min);
     
     for (it = ++begin_pre_post();
          it != end_pre_post() && i < points.size();
          ++it, ++i)
-        it->at(it.label_index()).p = points[i];
+//        it->set_p((points[i] - p_min) / dim, it.label_index());
+        it->set_p(points[i], it.label_index());
     
     assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
     
@@ -481,5 +492,6 @@ point rna_tree::bottom_left_corner(
     assert(!from.bad() && !to.bad());
 
 
+//    return from;
     return from + normalize(to - from) * 6 / scaling_ratio;
 }

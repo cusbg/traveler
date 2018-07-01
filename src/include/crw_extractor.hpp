@@ -36,6 +36,8 @@ protected:
     {
         return "crw";
     }
+
+    virtual void adjust_residues_lists(const int cnt);
 };
 
 
