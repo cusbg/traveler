@@ -63,6 +63,8 @@ The `traveler` executable is available in the PATH, and the current directory is
 		[-d|--draw] [--overlaps] FILE_MAPPING_IN OUT_PREFIX
 			# use mapping in FILE_MAPPING_IN and outputs layout as both .ps and .svg image to files with prefix OUT_PREFIX
 			# if optional argument --overlaps is present overlaps in the layout are identified and highlighted
+		[-v|--verbose] Prints information about the computation and othere details (such as number of overlaps, 
+		when overlap switch is turned on)
 
 	COLOR CODING:
 		Traveler uses the following color coding of nucleotides:

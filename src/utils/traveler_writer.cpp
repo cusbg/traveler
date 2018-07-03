@@ -9,6 +9,9 @@ void traveler_writer::init(const string& filename, rna_tree& rna)
 
 streampos traveler_writer::print(const string& text)
 {
+    if (text.empty())
+        return -1;
+
     streampos pos = get_pos();
     
     fill();
