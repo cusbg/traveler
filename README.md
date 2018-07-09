@@ -145,8 +145,8 @@ The file needs to contain three lines: moelcule description line (starts with th
 	$ mkdir test
 	$ bin/traveler \
 		--target-structure data/metazoa/mouse.fasta \
-		--template-structure data/metazoa/human.ps data/metazoa/uman.fasta \
-		--draw --overlaps test/mouse_draw-to_human.map test/mouse_draw-to_human
+		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
+		--draw --overlaps test/mouse_from_human.map test/mouse_from_human
 
 	$ # generates 4 files - .svg and .ps files, both with/without colored bases (see COLOR CODING section)
 	$ # checks also if output molecule has overlaps and draws them in output image
