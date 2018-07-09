@@ -36,6 +36,7 @@ struct rna_label
                     const rna_label& other) const;
     
     std::string label;
+    std::string tmp_label; //label used in the template (can be used to store information about the mapped nodes label in the template)
     point p;
 };
 

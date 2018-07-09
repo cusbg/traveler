@@ -206,7 +206,7 @@ struct svg_writer::style
 /* virtual */ std::string svg_writer::get_label_formatted(
                                                           const rna_label& label,
                                                           const RGB& color,
-                                                          const int ix) const
+                                                          const label_info li) const
 {
     properties out;
     
@@ -216,7 +216,7 @@ struct svg_writer::style
     << property("alignment-baseline", "middle")
     << property("class", color.get_name());
     
-    return create_element("text", out, label.label, ix);
+    return create_element("text", out, label.label, li);
 }
 
 
@@ -270,11 +270,14 @@ std::string svg_writer::create_element(
                                        const std::string& name,
                                        const properties& properties,
                                        const std::string& value,
-                                       const int ix) const
+                                       const label_info li) const
 {
 
     stringstream ss;
-    if (ix >= 0) ss << "<title>" << ix << "</title>";
+    //if (ix >= 0) ss << "<title>" << ix << " (lable in template: " <<  << "</title>";
+    if (li.ix >= 0) {
+        ss << "<title>" << li.ix << "(label in template: " << li.tmp_label.c_str() << ") </title>";
+    }
     if (value.empty())
         return msprintf("<g>%s<%s %s/></g>\n", ss.str(), name, properties);
     else

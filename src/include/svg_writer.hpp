@@ -47,7 +47,7 @@ public: // formatters
     virtual std::string get_label_formatted(
                                             const rna_label& label,
                                             const RGB& color,
-                                            int ix) const;
+                                            const label_info li) const;
     
 protected:
     virtual std::string get_line_formatted(
@@ -68,7 +68,7 @@ private:
                                const std::string& name,
                                const properties& properties,
                                const std::string& value = "",
-                               const int ix = -1) const;
+                               const label_info li = {-1, ""}) const;
 //    std::string create_element(
 //            const std::string& name,
 //            const properties& properties,

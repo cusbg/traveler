@@ -36,6 +36,15 @@ class document_writer;
 typedef std::vector<std::unique_ptr<document_writer>> image_writers;
 
 /**
+ * Additional information about the label to be used by a writer.
+ */
+struct label_info
+{
+    int ix;
+    std::string tmp_label; //label used in the template (can be used to store information about the mapped nodes label in the template)
+};
+
+/**
  * class for printing visualization
  */
 class document_writer
@@ -79,11 +88,11 @@ public: // formatters
                                    bool is_base_pair = true) const;
     std::string get_label_formatted(
                                     rna_tree::pre_post_order_iterator it,
-                                    const int ix) const;
+                                    const label_info li) const;
     virtual std::string get_label_formatted(
                                             const rna_label& label,
                                             const RGB& color,
-                                            const int ix) const = 0;
+                                            const label_info li) const = 0;
     
 public:
     /**

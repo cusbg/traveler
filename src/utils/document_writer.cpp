@@ -98,7 +98,7 @@ std::string document_writer::get_edge_formatted(
 }
 
 std::string document_writer::get_label_formatted(
-                                                 rna_tree::pre_post_order_iterator it, int ix) const
+                                                 rna_tree::pre_post_order_iterator it, label_info li) const
 {
     if (!it->initiated_points())
         return "";
@@ -106,7 +106,7 @@ std::string document_writer::get_label_formatted(
     ostringstream out;
     
     out
-    << get_label_formatted(it->at(it.label_index()), get_default_color(it->status), ix);
+    << get_label_formatted(it->at(it.label_index()), get_default_color(it->status), li);
     
     if (it->paired() &&
         it.preorder() &&
@@ -175,7 +175,7 @@ std::string document_writer::get_rna_subtree_formatted(
     auto print =
     [&out, &seq_ix, this](rna_tree::pre_post_order_iterator it)
     {
-        out << get_label_formatted(it, seq_ix);
+        out << get_label_formatted(it, {seq_ix, it->at(it.label_index()).tmp_label});
         seq_ix++;
     };
     

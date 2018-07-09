@@ -38,7 +38,7 @@ bool rna_label::operator==(
 rna_pair_label::rna_pair_label(
                                const std::string& s)
 {
-    labels.push_back({s, point::bad_point()});
+    labels.push_back({s, "", point::bad_point()});
 }
 
 const rna_label& rna_pair_label::operator[](
@@ -216,8 +216,8 @@ void rna_pair_label::clear_points()
 void rna_pair_label::set_label_strings(
                                        const rna_pair_label& other)
 {
-    //  touched         - uz len tym, ze sme vosli do funkcie
-    //  edited          - ak labels su rozne
+    //  touched         - just by entering this method
+    //  edited          - if the labels differ
     //
     
     if (status != untouched)
@@ -240,8 +240,11 @@ void rna_pair_label::set_label_strings(
         status = touched;
     
     size_t n = paired() ? 2 : 1;
-    for (size_t i = 0; i < n; ++i)
+    for (size_t i = 0; i < n; ++i) {
+        (*this)[i].tmp_label = (*this)[i].label;
         (*this)[i].label = other[i].label;
+
+    }
 }
 
 void rna_pair_label::set_parent_center(
