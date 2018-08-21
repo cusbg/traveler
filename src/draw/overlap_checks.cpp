@@ -114,9 +114,23 @@ overlap_checks::overlaps overlap_checks::run(
     double alpha, beta, gamma;
     double a, c;
     point p;
-    
-    assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p1));
-    assert(!contains<vector<point>>({e1.p1, e1.p2}, e2.p2));
+
+    int cnt_ends_meet = 0;
+    if (contains<vector<point>>({e1.p1, e1.p2}, e2.p1)) {
+        p = e2.p1;
+        cnt_ends_meet++;
+    }
+    if (contains<vector<point>>({e1.p1, e1.p2}, e2.p2)) {
+        p = e2.p2;
+        cnt_ends_meet++;
+    }
+
+    if (cnt_ends_meet == 1) {
+        return  p;
+    } else if (cnt_ends_meet  == 2){
+        return point::bad_point();
+    }
+
     
     c = distance(e1.p1, e2.p1);
     
