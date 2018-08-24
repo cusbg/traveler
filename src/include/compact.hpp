@@ -112,6 +112,7 @@ private:
      * (only basic positions initialization)
      */
     void init();
+
     
     /**
      * make all branches lie on straight line

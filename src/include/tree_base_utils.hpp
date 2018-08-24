@@ -55,7 +55,8 @@ tree_base<label_type>::tree_base(
     size_t i = 0;
 
 
-    label_type root = label_type("ROOT_" + std::to_string(_id)) + label_type("");
+    label_type root = label_type(""
+                                 "ROOT_" + std::to_string(_id)) + label_type("");
     _tree.set_head(root);
     _size = 1;  // ROOT
     it = begin();

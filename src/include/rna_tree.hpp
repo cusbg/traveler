@@ -171,6 +171,9 @@ inline bool is(
     return iter->status == s;
 }
 
+/*
+ * highlights 5' and 3' end
+ */
 void update_ends_in_rna(
                         rna_tree& rna);
 

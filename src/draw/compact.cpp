@@ -178,8 +178,92 @@ void compact::run()
     }
 }
 
+/**
+ * Initializes possibly inserted or shifted unpaired residues on the root level, i.e. either trailing 5' or 3' ends
+ * or inner regions.
+ * @param rna
+ */
+void init_root_level_unpaired(rna_tree &  rna){
+    APP_DEBUG_FNAME;
 
-void compact::  init()
+    typedef tree_node_<rna_pair_label> node;
+
+    //obtain 3' unpaired
+    vector<vector<compact::sibling_iterator>> intervals;
+    std::vector<compact::sibling_iterator> interval;
+    compact::sibling_iterator root = rna.begin();
+    for (compact::sibling_iterator it = root.begin(); it != root.end(); ++it) { //traverse the tree pre-order
+        if (it->paired() || it->initiated_points()){
+            if (!interval.empty())
+            {
+                intervals.push_back(std::vector<compact::sibling_iterator>(interval));
+                interval.clear();
+            }
+
+        } else {
+            interval.push_back(it);
+        }
+    }
+    if (!interval.empty()) intervals.push_back(std::vector<compact::sibling_iterator>(interval));
+
+    for (auto interval1: intervals){
+        compact::sibling_iterator s[] = {interval1[0].node->prev_sibling, interval1[interval1.size()-1].node->next_sibling};
+        point p[] = {point(), point()};
+
+        for (int i = 0; i < 2; i++) {
+
+            if (s[i] != nullptr) {
+                // if either previous or following siblings are NULL we are dealing with trailing regions
+                if (!s[i]->paired()) {
+                    p[i] = s[i]->at(0).p;
+                } else {
+                    p[i] = s[i]->at(i).p;
+                }
+            }
+        }
+
+        // if p2 is invalid point interval1 is the 3' trailing region
+        if (p[1].bad()) {
+            //pick previous usable point
+            point p_aux;
+            compact::post_order_iterator it = compact::iterator(interval1[0]);
+            it--; //obtaining last valid sibling which is the same as s[0]
+
+            while (it != root) {
+                it--;
+                if (it->paired()) {
+                    p_aux = it->at(1).p;
+                    break;
+                } else if (!it->at(0).p.bad()) {
+                    p_aux = it->at(0).p;
+                    break;
+                }
+            }
+
+            //now we need to position the nodes from p[0], i.e. p_aux -> p[0] -> new_point -> new_point -> ...
+
+            point shift = normalize(p[0] - p_aux);
+            int i = 0;
+            for (auto const &it_int: interval1) {
+                i++;
+                point new_point = p[0] + shift * i * BASES_DISTANCE;
+                it_int->at(0).p = new_point;
+            }
+
+        }
+        // TODO !!!!!!!!!!
+        // TODO !!!!!!!!!!
+        // TODO !!!!!!!!!!
+        // TODO !!!!!!!!!!
+        // if p1 is invalid point interval1 is the 5' trailing region
+        // if both p1 and p2 are valid points interval1 is an internal interval (between two branches)
+
+
+    }
+}
+
+
+void compact::init()
 {
     APP_DEBUG_FNAME;
     
@@ -254,22 +338,25 @@ void compact::  init()
     // if first node was inserted and it is only one branch - do not remake it
     // because it shares parents (3'5' node) position: 3'-NODE1 <-> NODE2-5'
     sibling_iterator root = rna.begin();
-    sibling_iterator ch = get_onlyone_branch(root);
-    if (rna_tree::is_valid(ch)
-        && !root->remake_ids.empty()
-        && ch->initiated_points())
-    {
-        root->remake_ids.clear();
-        
-        sibling_iterator ch2 = get_onlyone_branch(ch);
-        if (rna_tree::is_valid(ch2))
-        {
-            point vec = normalize(orthogonal(ch->at(0).p - ch->at(1).p, ch2->center())) * rna.get_pairs_distance();
-            
-            ch->set_p(ch2->at(0).p - vec, 0);
-            ch->set_p(ch2->at(1).p - vec, 0);
-        }
-    }
+
+    //TODO CHECK WHETHER THIS IS NOT ACTUALLY NEEDED
+//    sibling_iterator ch = get_onlyone_branch(root);
+//    if (rna_tree::is_valid(ch)
+//        && !root->remake_ids.empty()
+//        && ch->initiated_points())
+//    {
+//        sibling_iterator ch2 = get_onlyone_branch(ch);
+//        if (rna_tree::is_valid(ch2))
+//        {
+//            point vec = normalize(orthogonal(ch->at(0).p - ch->at(1).p, ch2->center())) * rna.get_pairs_distance();
+//
+//            ch->set_p(ch2->at(0).p - vec, 0);
+//            ch->set_p(ch2->at(1).p - vec, 0);
+//        }
+//    }
+
+    init_root_level_unpaired(rna);
+    root->remake_ids.clear();
     
     DEBUG("compact::init() OK");
 }

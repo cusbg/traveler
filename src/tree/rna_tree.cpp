@@ -106,8 +106,10 @@ void rna_tree::update_points(
         it->set_p(points[i], it.label_index());
     
     assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
-    
-    update_ends_in_rna(*this);
+
+
+    //TODO check if this is not actually needed in some cases
+//    update_ends_in_rna(*this);
 }
 
 //highlights 5' and 3' end
@@ -147,15 +149,15 @@ void update_ends_in_rna(
         root->at(1).p = pl + dir;
     } else{
         //using first and first but last siblings to get the position for the 5' and 3' labels
-        iterator f2 = rna.next_sibling(f);
-        iterator l2 = rna.previous_sibling(l);
+        iterator f2 = rna_tree::pre_post_order_iterator(f); f2++;
+        iterator l2 = rna_tree::post_order_iterator(l); l2--;
         
         point pf2, pl2;
         pf2 = f2->at(0).p;
         pl2 = l2->paired() ? l2->at(1).p : l2->at(0).p;
         
-        root->at(0).p = pf - (pf2 - pf);
-        root->at(1).p = pl - (pl2 - pl);
+        root->at(0).p = pf + normalize(pf - pf2) * rna.get_pairs_distance();
+        root->at(1).p = pl + normalize((pl - pl2)) * rna.get_pairs_distance();
     }
     
     
