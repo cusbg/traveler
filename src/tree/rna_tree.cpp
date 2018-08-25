@@ -55,7 +55,7 @@ rna_tree::rna_tree(
 : rna_tree(_brackets, _labels, _name)
 {
     update_points(_points);
-    compute_distances();
+
 }
 
 void rna_tree::set_name(
@@ -107,9 +107,8 @@ void rna_tree::update_points(
     
     assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
 
-
-    //TODO check if this is not actually needed in some cases
-//    set_53_labels(*this);
+    compute_distances();
+    set_53_labels(*this);
 }
 
 //highlights 5' and 3' end
