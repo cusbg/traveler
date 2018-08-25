@@ -45,7 +45,7 @@ void compact::run()
     
     init();
     make();
-    update_ends_in_rna(rna);
+    set_53_labels(rna);
     try_reposition_new_root_branches();
     checks();
     
@@ -178,6 +178,59 @@ void compact::run()
     }
 }
 
+void normalize_nodes(rna_tree& rna, std::vector<compact::sibling_iterator> nodes, bool five_end){
+    for (int i = 1; i < nodes.size(); ++i) {
+        point p0 = i == 1 && !five_end ? nodes[i-1]->at(1).p : nodes[i-1]->at(0).p;
+        point p1 = nodes[i]->at(0).p;
+        double d = distance(p0, p1);
+        point shift_vect = normalize(p1 - p0) * (d-BASES_DISTANCE);
+
+        for (int j  = i; j < nodes.size(); ++j) {
+            nodes[j]->at(0).p -= shift_vect;
+        }
+    }
+}
+
+
+void normalize_3_end(rna_tree &  rna) {
+    APP_DEBUG_FNAME;
+
+    compact::iterator root = rna.begin();
+
+    compact::sibling_iterator it = compact::sibling_iterator(root.begin().range_last());
+    //locate last node with children
+    while(!it->paired() && it != root.begin()) it--;
+
+    std::vector<compact::sibling_iterator> nodes;
+    while (it != root.end()) nodes.push_back(it++);
+    if (nodes.size() < 2) return;
+
+    normalize_nodes(rna, nodes, false);
+}
+
+void normalize_5_end(rna_tree& rna) {
+    APP_DEBUG_FNAME;
+
+    compact::iterator root = rna.begin();
+
+    compact::sibling_iterator it = root.begin();
+    std::vector<compact::sibling_iterator> nodes;
+    while(!it->paired() && it != root.end()) nodes.push_back(it++);
+    nodes.push_back(it);
+    if (nodes.size() < 2) return;
+
+    //reverse the order so that the node go in the direction from the first base pair to the beginning of the structure
+    std::reverse(nodes.begin(), nodes.end());
+
+    normalize_nodes(rna, nodes, true);
+}
+
+
+void normalize_ends(rna_tree& rna){
+    normalize_3_end(rna);
+    normalize_5_end(rna);
+}
+
 /**
  * Initializes possibly inserted or shifted unpaired residues on the root level, i.e. either trailing 5' or 3' ends
  * or inner regions.
@@ -192,8 +245,10 @@ void init_root_level_unpaired(rna_tree &  rna){
     vector<vector<compact::sibling_iterator>> intervals;
     std::vector<compact::sibling_iterator> interval;
     compact::sibling_iterator root = rna.begin();
+    auto rids = root->remake_ids;
     for (compact::sibling_iterator it = root.begin(); it != root.end(); ++it) { //traverse the tree pre-order
-        if (it->paired() || it->initiated_points()){
+        if (it->paired() ||
+                (it->initiated_points() && std::find(rids.begin(), rids.end(), child_index(it)) == rids.end()) ){
             if (!interval.empty())
             {
                 intervals.push_back(std::vector<compact::sibling_iterator>(interval));
@@ -217,18 +272,19 @@ void init_root_level_unpaired(rna_tree &  rna){
                 if (!s[i]->paired()) {
                     p[i] = s[i]->at(0).p;
                 } else {
-                    p[i] = s[i]->at(i).p;
+                    p[i] = s[i]->at(1-i).p;
                 }
             }
         }
 
         // if p2 is invalid point interval1 is the 3' trailing region
         if (p[1].bad()) {
-            //pick previous usable point
-            point p_aux;
-            compact::post_order_iterator it = compact::iterator(interval1[0]);
-            it--; //obtaining last valid sibling which is the same as s[0]
 
+            point p_aux;
+            compact::post_order_iterator it = compact::iterator(interval1.front());
+            it--; //obtaining last valid sibling, i.e. s[0]
+
+            //pick previous usable point
             while (it != root) {
                 it--;
                 if (it->paired()) {
@@ -251,11 +307,37 @@ void init_root_level_unpaired(rna_tree &  rna){
             }
 
         }
-        // TODO !!!!!!!!!!
-        // TODO !!!!!!!!!!
-        // TODO !!!!!!!!!!
-        // TODO !!!!!!!!!!
         // if p1 is invalid point interval1 is the 5' trailing region
+        if (p[0].bad()) {
+            point p_aux;
+            compact::iterator it = compact::iterator(interval1.back());
+            it++; //obtaining first valid sibling, i.e. s[0]
+
+            //pick next usable point
+            while (it != rna.end()) {
+                it++;
+                if (!it->at(0).p.bad()) {
+                    p_aux = it->at(0).p;
+                    break;
+                }
+            }
+
+            //now we need to position the nodes from interval up to point p[1], i.e. new_point -> new_point -> p[0] -> p_aux...
+            point shift = normalize(p_aux - p[1]);
+            for (int i = 0; i < interval1.size(); ++i) {
+                point new_point = p[1] - shift * (interval1.size() - i) * BASES_DISTANCE;
+                interval1[i]->at(0).p = new_point;
+            }
+
+        }
+
+
+
+        // TODO !!!!!!!!!!
+        // TODO !!!!!!!!!!
+        // TODO !!!!!!!!!!
+        // TODO !!!!!!!!!!
+
         // if both p1 and p2 are valid points interval1 is an internal interval (between two branches)
 
 
@@ -356,6 +438,7 @@ void compact::init()
 //    }
 
     init_root_level_unpaired(rna);
+//    normalize_ends(rna);
     root->remake_ids.clear();
     
     DEBUG("compact::init() OK");

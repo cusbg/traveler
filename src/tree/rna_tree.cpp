@@ -109,12 +109,12 @@ void rna_tree::update_points(
 
 
     //TODO check if this is not actually needed in some cases
-//    update_ends_in_rna(*this);
+//    set_53_labels(*this);
 }
 
 //highlights 5' and 3' end
-void update_ends_in_rna(
-                        rna_tree& rna)
+void set_53_labels(
+        rna_tree &rna)
 {
     APP_DEBUG_FNAME;
     

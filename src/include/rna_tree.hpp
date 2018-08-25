@@ -174,8 +174,8 @@ inline bool is(
 /*
  * highlights 5' and 3' end
  */
-void update_ends_in_rna(
-                        rna_tree& rna);
+void set_53_labels(
+        rna_tree &rna);
 
 size_t child_index(
                    rna_tree::sibling_iterator sib);
