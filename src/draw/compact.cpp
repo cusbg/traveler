@@ -231,6 +231,14 @@ void normalize_ends(rna_tree& rna){
     normalize_5_end(rna);
 }
 
+void shift_region(compact::iterator begin, compact::iterator end, point vec)
+{
+    for (compact::iterator it = begin; it != end; ++it) {
+        if (!it->at(0).p.bad()) it->at(0).p += vec;
+        if (it->paired() && !it->at(1).p.bad()) it->at(1).p += vec;
+    }
+}
+
 /**
  * Initializes possibly inserted or shifted unpaired residues on the root level, i.e. either trailing 5' or 3' ends
  * or inner regions.
@@ -277,8 +285,8 @@ void init_root_level_unpaired(rna_tree &  rna){
             }
         }
 
-        // if p2 is invalid point interval1 is the 3' trailing region
         if (p[1].bad()) {
+            // if p2 is invalid point interval1 is the 3' trailing region
 
             point p_aux;
             compact::post_order_iterator it = compact::iterator(interval1.front());
@@ -307,8 +315,9 @@ void init_root_level_unpaired(rna_tree &  rna){
             }
 
         }
-        // if p1 is invalid point interval1 is the 5' trailing region
-        if (p[0].bad()) {
+        else if (p[0].bad()) {
+            // if p1 is invalid point interval1 is the 5' trailing region
+
             point p_aux;
             compact::iterator it = compact::iterator(interval1.back());
             it++; //obtaining first valid sibling, i.e. s[0]
@@ -330,17 +339,48 @@ void init_root_level_unpaired(rna_tree &  rna){
             }
 
         }
+        else {
 
+            // if both p1 and p2 are valid points interval1 is an internal interval (between two branches)
+            point c =  center(p[0],p[1]);
+            point dir = normalize(p[1] - p[0]);
+            bool odd = interval1.size() % 2;
 
+            if (odd) {
+                double ix_c =  floor(interval1.size() / 2);
+                //position the central node
+                interval1[ix_c]->at(0).p = c;
+            }
 
-        // TODO !!!!!!!!!!
-        // TODO !!!!!!!!!!
-        // TODO !!!!!!!!!!
-        // TODO !!!!!!!!!!
+            int ix_center_left = floor(interval1.size() / 2.0 - 1);
+            for (int i = ix_center_left; i>=0; i--) {
+                interval1[i]->at(0).p = c - dir * (ix_center_left - i + 1) * BASES_DISTANCE;
 
-        // if both p1 and p2 are valid points interval1 is an internal interval (between two branches)
+            }
+            int ix_center_right = ceil(interval1.size() / 2.0);
+            for (int i = ix_center_right; i < interval1.size(); i++) {
+                interval1[i]->at(0).p = c + dir * (i - ix_center_right + 1) * BASES_DISTANCE;
+            }
 
+//            for (int i = 0; i < interval1.size(); i++) {
+//                interval1[i]->at(0).label='x';
+//
+//            }
 
+            double dist_original = distance(p[0], p[1]);
+            double dist_new = (interval1.size() + 1) * BASES_DISTANCE;
+            double dist_diff = dist_new - dist_original;
+
+            if (dist_diff > 0) {
+                // We will shift everything left and right from the center only if the region needs to accomodate
+                // new residues. We could also shrink the structure, but that introduces a great danger of clashes
+                // in case of large structures.
+
+                s[0]++;
+                shift_region(rna.begin(), s[0],  - dir * (dist_diff / 2));
+                shift_region(s[1], rna.end(),  dir * (dist_diff / 2));
+            }
+        }
     }
 }
 
@@ -438,7 +478,7 @@ void compact::init()
 //    }
 
     init_root_level_unpaired(rna);
-//    normalize_ends(rna);
+    normalize_ends(rna);
     root->remake_ids.clear();
     
     DEBUG("compact::init() OK");
@@ -1108,7 +1148,7 @@ double compact::get_length(
             if ((i == 0 || (i == 1 && it->paired())) && (it->at(i).p.bad())) {
                 std::stringstream  lbl;
 
-                lbl <<  it->at(i).label << "(id: " << it->id() << ", depth: " << rna.depth(it) << ", status: "<< it->status << ")";
+                lbl <<  it->at(i).label << " (id: " << it->id() << ", depth: " << rna.depth(it) << ", status: "<< it->status << ")";
                 ERR("Base %s was not initialized and therefore not drawn.", lbl.str());
             }
         }

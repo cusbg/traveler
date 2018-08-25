@@ -72,7 +72,7 @@ private:
     static void shift_branch(
                              iterator parent,
                              point vec);
-    
+
     /**
      * mirrors full subtree rooted at `root` using the root's bp as the mirror line
      */
