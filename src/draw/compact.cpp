@@ -1104,9 +1104,13 @@ double compact::get_length(
     // all but root should be inited
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     {
-        if (!it->initiated_points())
-        {
-            ERR("Some bases positions were not initialized and therefore not drawn.");
+        for (int i = 0; i < 2; i++) {
+            if ((i == 0 || (i == 1 && it->paired())) && (it->at(i).p.bad())) {
+                std::stringstream  lbl;
+
+                lbl <<  it->at(i).label << "(id: " << it->id() << ", depth: " << rna.depth(it) << ", status: "<< it->status << ")";
+                ERR("Base %s was not initialized and therefore not drawn.", lbl.str());
+            }
         }
     }
 }
