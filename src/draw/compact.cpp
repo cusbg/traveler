@@ -24,6 +24,8 @@
 #include "compact_utils.hpp"
 #include "overlap_checks.hpp"
 
+#include "iostream"
+
 using namespace std;
 
 #define MULTIBRANCH_MINIMUM_SPLIT   10
@@ -226,9 +228,9 @@ void normalize_5_end(rna_tree& rna) {
 }
 
 
-void normalize_ends(rna_tree& rna){
-    normalize_3_end(rna);
+void normalize_53_ends(rna_tree &rna){
     normalize_5_end(rna);
+    normalize_3_end(rna);
 }
 
 void shift_region(compact::iterator begin, compact::iterator end, point vec)
@@ -253,10 +255,8 @@ void init_root_level_unpaired(rna_tree &  rna){
     vector<vector<compact::sibling_iterator>> intervals;
     std::vector<compact::sibling_iterator> interval;
     compact::sibling_iterator root = rna.begin();
-    auto rids = root->remake_ids;
     for (compact::sibling_iterator it = root.begin(); it != root.end(); ++it) { //traverse the tree pre-order
-        if (it->paired() ||
-                (it->initiated_points() && std::find(rids.begin(), rids.end(), child_index(it)) == rids.end()) ){
+        if (it->paired() || it->initiated_points()){
             if (!interval.empty())
             {
                 intervals.push_back(std::vector<compact::sibling_iterator>(interval));
@@ -384,12 +384,64 @@ void init_root_level_unpaired(rna_tree &  rna){
     }
 }
 
+/**
+ * Deletion of a node (unpaired nt) introduces a gap in the layout. This is taken care of in the case of in non-root
+ * level. This function does contraction for the first level.
+ * @param rna
+ */
+void init_root_level_deleted(rna_tree &  rna) {
+
+    compact::sibling_iterator root = rna.begin();
+
+
+    compact::sibling_iterator it_prev = root.begin();
+    compact::sibling_iterator it = ++compact::sibling_iterator(it_prev);
+    while(it != root.end()) { //traverse the tree pre-order
+        if (!it->paired() ){
+            size_t id0 = it_prev->seq_id_mapped();
+            size_t id1 = it->seq_id_mapped();
+
+            if (id0 != TREE_BASE_NODE_NOT_MAPPED_ID && id1 != TREE_BASE_NODE_NOT_MAPPED_ID && id1 != id0 + 1) {
+                //there was a deletion
+                point p0 = it_prev->paired() ? it_prev->at(1).p : it_prev->at(0).p;
+                point p1 = it->at(0).p;
+                double dist = distance(p1, p0);
+
+                if ( dist > 2*BASES_DISTANCE) {
+                    //lets contract only if the distance after deletion is too big, otherwise it's better not to touch the layout
+                    point dist_vect = normalize(p1 - p0) * (dist/2-BASES_DISTANCE/2);
+
+                    shift_region(root.begin(), it,  dist_vect );
+                    shift_region(it, root.end(),  -dist_vect);
+                }
+            }
+
+        }
+
+        it++; it_prev++;
+    }
+
+}
 
 void compact::init()
 {
     APP_DEBUG_FNAME;
     
     assert(rna.is_ordered_postorder());
+
+//    for (iterator r = rna.begin(); r!= rna.end(); r++) {
+//        stringstream m;
+//        m << r->at(0).label << " " << r->id() << " " << r->_id_mapped;
+//
+//        r->at(0).label  = m.str();
+//    }
+
+//    compact::sibling_iterator it =   rna_tree::last_child(rna.begin());
+//    for (int i = 0; i < 20; i++) {
+//        it--;
+//
+//        std::cout << it->at(0).label << " " << it->at(0).tmp_label << " " << it->status << " " << it->id() << " " << it->seq_id_mapped() << endl;
+//    }
     
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     { //traverse the tree pre-order
@@ -478,7 +530,8 @@ void compact::init()
 //    }
 
     init_root_level_unpaired(rna);
-    normalize_ends(rna);
+    init_root_level_deleted(rna);
+    normalize_53_ends(rna);
     root->remake_ids.clear();
     
     DEBUG("compact::init() OK");

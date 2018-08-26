@@ -166,15 +166,29 @@ template <typename label_type>
 void tree_base<label_type>::set_postorder_ids()
 {
     APP_DEBUG_FNAME;
-    
+
     post_order_iterator it;
-    
+
     label_type::reset_ID();
-    
+
     for (it = begin_post(); it != end_post(); ++it)
         it->reset_id();
-    
+
     assert(size() - 1 == ::id(begin()));
+}
+
+template <typename label_type>
+void tree_base<label_type>::set_pre_postorder_ids()
+{
+    APP_DEBUG_FNAME;
+
+    pre_post_order_iterator it;
+    int i = 0;
+    for (it = begin_pre_post(); it != end_pre_post(); ++it){
+        i++;
+        it->set_seq_id_mapped(i);
+    }
+
 }
 
 template <typename label_type>

@@ -1,0 +1,188 @@
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	width="324.656892"
+	height="391.831530"
+	style="font-size: 8px; stroke: none; font-family: Helvetica; " >
+<g><style type="text/css" >
+<!-- create color definitions -->
+<![CDATA[
+text.red {stroke: rgb(255, 0, 0); }
+text.green {stroke: rgb(0, 255, 0); }
+text.blue {stroke: rgb(0, 0, 255); }
+text.black {stroke: rgb(0, 0, 0); }
+text.gray {stroke: rgb(204, 204, 204); }
+text.brown {stroke: rgb(211.65, 104.55, 30.6); }
+text {stroke: rgb(0, 0, 0); fill: none; }
+circle.red {stroke: rgb(255, 0, 0); fill: none; }
+circle.green {stroke: rgb(0, 255, 0); fill: none; }
+circle.blue {stroke: rgb(0, 0, 255); fill: none; }
+circle.black {stroke: rgb(0, 0, 0); fill: none; }
+circle.gray {stroke: rgb(204, 204, 204); fill: none; }
+circle.brown {stroke: rgb(211.65, 104.55, 30.6); fill: none; }
+circle {stroke: rgb(0, 0, 0); fill: none; }
+line.red {stroke: rgb(255, 0, 0); }
+line.green {stroke: rgb(0, 255, 0); }
+line.blue {stroke: rgb(0, 0, 255); }
+line.black {stroke: rgb(0, 0, 0); }
+line.gray {stroke: rgb(204, 204, 204); }
+line.brown {stroke: rgb(211.65, 104.55, 30.6); }
+line {stroke: rgb(0, 0, 0); fill: none; }]]>
+</style></g>
+<g><title>0(label in template: 5') </title><text x="76.667645" y="66.007253" text-anchor="middle" alignment-baseline="middle" class="green" >5'</text></g>
+<g><title>1(label in template: ) </title><text x="76.667645" y="74.010880" text-anchor="middle" alignment-baseline="middle" class="red" >C</text></g>
+<g><title>2(label in template: ) </title><text x="76.667645" y="82.014507" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>3(label in template: C) </title><text x="76.667645" y="90.018133" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><line x1="70.664944" y1="90.018133" x2="62.661342" y2="90.018133" class="black" /></g>
+<g><title>4(label in template: G) </title><text x="76.667645" y="98.021735" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="70.664944" y1="98.021735" x2="62.661342" y2="98.021735" class="black" /></g>
+<g><title>5(label in template: G) </title><text x="76.667645" y="106.025336" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="70.664944" y1="106.025336" x2="62.661342" y2="106.025336" class="black" /></g>
+<g><title>6(label in template: U) </title><text x="76.667645" y="114.028938" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><line x1="70.664944" y1="114.028938" x2="62.661342" y2="114.028938" class="black" /></g>
+<g><title>7(label in template: G) </title><text x="76.667645" y="122.032540" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="70.664944" y1="122.032540" x2="62.661342" y2="122.032540" class="black" /></g>
+<g><title>8(label in template: G) </title><text x="76.667645" y="130.036141" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="70.664944" y1="130.036141" x2="62.661342" y2="130.036141" class="black" /></g>
+<g><title>9(label in template: U) </title><text x="83.170571" y="132.887424" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><title>10(label in template: U) </title><text x="88.562998" y="137.269396" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><title>11(label in template: U) </title><text x="92.594812" y="142.941949" text-anchor="middle" alignment-baseline="middle" class="green" >A</text></g>
+<g><title>12(label in template: U) </title><text x="94.955875" y="149.484893" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><title>13(label in template: G) </title><text x="95.486113" y="156.418013" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>14(label in template: G) </title><text x="94.175523" y="163.251088" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="94.175523" y1="169.253789" x2="94.175523" y2="177.257391" class="black" /></g>
+<g><title>15(label in template: C) </title><text x="102.179125" y="163.251088" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><line x1="102.179125" y1="169.253789" x2="102.179125" y2="177.257391" class="black" /></g>
+<g><title>16(label in template: G) </title><text x="110.182727" y="163.251088" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="110.182727" y1="169.253789" x2="110.182727" y2="177.257391" class="black" /></g>
+<g><title>17(label in template: A) </title><text x="118.186328" y="163.251088" text-anchor="middle" alignment-baseline="middle" class="green" >G</text></g>
+<g><line x1="118.186328" y1="169.253789" x2="118.186328" y2="177.257391" class="black" /></g>
+<g><title>18(label in template: G) </title><text x="126.189930" y="163.251088" text-anchor="middle" alignment-baseline="middle" class="green" >A</text></g>
+<g><line x1="126.189930" y1="169.253789" x2="126.189930" y2="177.257391" class="black" /></g>
+<g><title>19(label in template: G) </title><text x="134.193531" y="163.251088" text-anchor="middle" alignment-baseline="middle" class="green" >G</text></g>
+<g><line x1="134.193531" y1="169.253789" x2="134.193531" y2="177.257391" class="black" /></g>
+<g><title>20(label in template: G) </title><text x="142.197133" y="163.251088" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="142.197133" y1="169.253789" x2="142.197133" y2="177.257391" class="black" /></g>
+<g><title>21(label in template: G) </title><text x="150.200735" y="163.251088" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="150.200735" y1="169.253789" x2="150.200735" y2="177.257391" class="black" /></g>
+<g><title>22(label in template: G) </title><text x="157.235060" y="160.896713" text-anchor="middle" alignment-baseline="middle" class="blue" >G</text></g>
+<g><title>23(label in template: A) </title><text x="164.456342" y="159.200274" text-anchor="middle" alignment-baseline="middle" class="blue" >A</text></g>
+<g><title>24(label in template: A) </title><text x="171.803183" y="158.176194" text-anchor="middle" alignment-baseline="middle" class="blue" >A</text></g>
+<g><title>25(label in template: A) </title><text x="179.213120" y="157.833180" text-anchor="middle" alignment-baseline="middle" class="blue" >A</text></g>
+<g><title>26(label in template: ) </title><text x="186.623151" y="158.174150" text-anchor="middle" alignment-baseline="middle" class="red" >C</text></g>
+<g><title>27(label in template: ) </title><text x="193.970274" y="159.196203" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>28(label in template: ) </title><text x="201.192024" y="160.890650" text-anchor="middle" alignment-baseline="middle" class="red" >C</text></g>
+<g><title>29(label in template: C) </title><text x="208.226999" y="163.243084" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><line x1="208.226999" y1="169.245785" x2="208.226999" y2="177.149342" class="black" /></g>
+<g><title>30(label in template: C) </title><text x="216.230600" y="163.243084" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><line x1="216.230600" y1="169.245785" x2="216.230600" y2="177.249387" class="black" /></g>
+<g><title>31(label in template: G) </title><text x="224.234202" y="163.243084" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="224.234202" y1="169.245785" x2="224.234202" y2="177.149342" class="black" /></g>
+<g><title>32(label in template: G) </title><text x="232.237804" y="163.243084" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="232.237804" y1="169.245785" x2="232.237804" y2="177.249387" class="black" /></g>
+<g><title>33(label in template: U) </title><text x="237.440145" y="156.540068" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><title>34(label in template: C) </title><text x="244.743431" y="152.238132" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>35(label in template: C) </title><text x="253.247258" y="150.937547" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>36(label in template: C) </title><text x="261.550995" y="152.938447" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>37(label in template: A) </title><text x="268.454101" y="157.740608" text-anchor="middle" alignment-baseline="middle" class="black" >A</text></g>
+<g><title>38(label in template: U) </title><text x="273.056172" y="165.043895" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><title>39(label in template: U) </title><text x="274.656892" y="173.347631" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><title>40(label in template: C) </title><text x="273.056172" y="181.751413" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>41(label in template: C) </title><text x="268.354056" y="188.754564" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>42(label in template: G) </title><text x="261.450950" y="193.756815" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>43(label in template: A) </title><text x="253.147213" y="195.657671" text-anchor="middle" alignment-baseline="middle" class="black" >A</text></g>
+<g><title>44(label in template: A) </title><text x="244.743431" y="194.357086" text-anchor="middle" alignment-baseline="middle" class="black" >A</text></g>
+<g><title>45(label in template: C) </title><text x="237.340100" y="189.955105" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>46(label in template: C) </title><text x="232.237804" y="183.252088" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>47(label in template: C) </title><text x="224.234202" y="183.152043" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>48(label in template: G) </title><text x="216.230600" y="183.252088" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>49(label in template: G) </title><text x="208.226999" y="183.152043" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>50(label in template: A) </title><text x="202.712919" y="187.656220" text-anchor="middle" alignment-baseline="middle" class="green" >U</text></g>
+<g><title>51(label in template: A) </title><text x="196.513610" y="191.157827" text-anchor="middle" alignment-baseline="middle" class="blue" >A</text></g>
+<g><title>52(label in template: A) </title><text x="189.809414" y="193.555000" text-anchor="middle" alignment-baseline="middle" class="green" >G</text></g>
+<g><title>53(label in template: A) </title><text x="182.795360" y="194.778005" text-anchor="middle" alignment-baseline="middle" class="green" >U</text></g>
+<g><title>54(label in template: G) </title><text x="175.675493" y="194.791262" text-anchor="middle" alignment-baseline="middle" class="green" >U</text></g>
+<g><title>55(label in template: ) </title><text x="168.656934" y="193.594388" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>56(label in template: ) </title><text x="161.943857" y="191.222198" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>57(label in template: ) </title><text x="155.731551" y="187.743702" text-anchor="middle" alignment-baseline="middle" class="red" >G</text></g>
+<g><title>58(label in template: C) </title><text x="150.200735" y="183.260092" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>59(label in template: C) </title><text x="142.197133" y="183.260092" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>60(label in template: U) </title><text x="134.193531" y="183.260092" text-anchor="middle" alignment-baseline="middle" class="green" >C</text></g>
+<g><title>61(label in template: C) </title><text x="126.189930" y="183.260092" text-anchor="middle" alignment-baseline="middle" class="green" >U</text></g>
+<g><title>62(label in template: U) </title><text x="118.186328" y="183.260092" text-anchor="middle" alignment-baseline="middle" class="green" >C</text></g>
+<g><title>63(label in template: C) </title><text x="110.182727" y="183.260092" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>64(label in template: A) </title><text x="106.180926" y="190.263243" text-anchor="middle" alignment-baseline="middle" class="black" >A</text></g>
+<g><title>65(label in template: G) </title><text x="102.179125" y="183.260092" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>66(label in template: C) </title><text x="94.175523" y="183.260092" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>67(label in template: G) </title><text x="85.504301" y="197.816535" text-anchor="middle" alignment-baseline="middle" class="blue" >G</text></g>
+<g><title>68(label in template: A) </title><text x="76.667645" y="212.273148" text-anchor="middle" alignment-baseline="middle" class="green" >C</text></g>
+<g><line x1="70.664944" y1="212.273148" x2="62.661342" y2="212.273148" class="black" /></g>
+<g><title>69(label in template: U) </title><text x="76.667645" y="220.276750" text-anchor="middle" alignment-baseline="middle" class="green" >C</text></g>
+<g><line x1="70.664944" y1="220.276750" x2="62.661342" y2="220.276750" class="black" /></g>
+<g><title>70(label in template: ) </title><text x="77.639632" y="225.780126" text-anchor="middle" alignment-baseline="middle" class="red" >G</text></g>
+<g><title>71(label in template: G) </title><text x="76.657640" y="231.281727" text-anchor="middle" alignment-baseline="middle" class="green" >A</text></g>
+<g><line x1="70.654939" y1="231.281727" x2="62.671346" y2="231.281727" class="black" /></g>
+<g><title>72(label in template: G) </title><text x="76.657640" y="239.285328" text-anchor="middle" alignment-baseline="middle" class="green" >U</text></g>
+<g><line x1="70.654939" y1="239.285328" x2="62.671346" y2="239.285328" class="black" /></g>
+<g><title>73(label in template: U) </title><text x="80.993401" y="244.963500" text-anchor="middle" alignment-baseline="middle" class="green" >G</text></g>
+<g><title>74(label in template: A) </title><text x="83.275165" y="251.733582" text-anchor="middle" alignment-baseline="middle" class="green" >G</text></g>
+<g><title>75(label in template: ) </title><text x="83.261026" y="258.877829" text-anchor="middle" alignment-baseline="middle" class="red" >U</text></g>
+<g><title>76(label in template: ) </title><text x="80.952482" y="265.638826" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>77(label in template: C) </title><text x="76.594278" y="271.299790" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><line x1="70.591577" y1="271.299790" x2="62.627994" y2="271.299790" class="black" /></g>
+<g><title>78(label in template: U) </title><text x="76.614287" y="279.303392" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><line x1="70.611586" y1="279.303392" x2="62.648003" y2="279.303392" class="black" /></g>
+<g><title>79(label in template: G) </title><text x="76.644301" y="287.306994" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="70.641600" y1="287.306994" x2="62.627994" y2="287.306994" class="black" /></g>
+<g><title>80(label in template: C) </title><text x="76.664310" y="295.310595" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><line x1="70.661609" y1="295.310595" x2="62.658007" y2="295.310595" class="black" /></g>
+<g><title>81(label in template: A) </title><text x="76.684319" y="303.314197" text-anchor="middle" alignment-baseline="middle" class="black" >A</text></g>
+<g><line x1="70.681618" y1="303.314197" x2="62.678016" y2="303.314197" class="black" /></g>
+<g><title>82(label in template: U) </title><text x="76.624292" y="311.317799" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><line x1="70.621591" y1="311.317799" x2="62.607985" y2="311.317799" class="black" /></g>
+<g><title>83(label in template: G) </title><text x="76.604283" y="319.321400" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="70.601582" y1="319.321400" x2="62.637998" y2="319.321400" class="black" /></g>
+<g><title>84(label in template: G) </title><text x="76.624292" y="327.325002" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><line x1="70.621591" y1="327.325002" x2="62.617989" y2="327.325002" class="black" /></g>
+<g><title>85(label in template: G) </title><text x="76.764355" y="335.778806" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>86(label in template: A) </title><text x="70.851694" y="341.821525" text-anchor="middle" alignment-baseline="middle" class="black" >A</text></g>
+<g><title>87(label in template: G) </title><text x="62.397890" y="341.831530" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>88(label in template: A) </title><text x="56.475225" y="335.798815" text-anchor="middle" alignment-baseline="middle" class="black" >A</text></g>
+<g><title>89(label in template: C) </title><text x="56.615288" y="327.325002" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>90(label in template: U) </title><text x="56.635297" y="319.321400" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><title>91(label in template: G) </title><text x="56.605283" y="311.317799" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>92(label in template: U) </title><text x="56.675315" y="303.314197" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><title>93(label in template: G) </title><text x="56.655306" y="295.310595" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>94(label in template: U) </title><text x="56.625292" y="287.306994" text-anchor="middle" alignment-baseline="middle" class="black" >U</text></g>
+<g><title>95(label in template: G) </title><text x="56.645301" y="279.303392" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>96(label in template: G) </title><text x="56.625292" y="271.299790" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>97(label in template: G) </title><text x="52.285991" y="265.624335" text-anchor="middle" alignment-baseline="middle" class="blue" >G</text></g>
+<g><title>98(label in template: A) </title><text x="50.000000" y="258.855688" text-anchor="middle" alignment-baseline="middle" class="blue" >A</text></g>
+<g><title>99(label in template: ) </title><text x="50.009675" y="251.711442" text-anchor="middle" alignment-baseline="middle" class="red" >G</text></g>
+<g><title>100(label in template: ) </title><text x="52.313989" y="244.949011" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>101(label in template: G) </title><text x="56.668645" y="239.285328" text-anchor="middle" alignment-baseline="middle" class="green" >G</text></g>
+<g><title>102(label in template: A) </title><text x="56.668645" y="231.281727" text-anchor="middle" alignment-baseline="middle" class="green" >U</text></g>
+<g><title>103(label in template: ) </title><text x="55.686653" y="225.780126" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>104(label in template: G) </title><text x="56.658641" y="220.276750" text-anchor="middle" alignment-baseline="middle" class="green" >G</text></g>
+<g><title>105(label in template: U) </title><text x="56.658641" y="212.273148" text-anchor="middle" alignment-baseline="middle" class="green" >G</text></g>
+<g><title>106(label in template: A) </title><text x="56.231969" y="191.715864" text-anchor="middle" alignment-baseline="middle" class="green" >U</text></g>
+<g><title>107(label in template: C) </title><text x="56.089736" y="171.154645" text-anchor="middle" alignment-baseline="middle" class="blue" >C</text></g>
+<g><title>108(label in template: A) </title><text x="56.231969" y="150.593425" text-anchor="middle" alignment-baseline="middle" class="blue" >A</text></g>
+<g><title>109(label in template: C) </title><text x="56.658641" y="130.036141" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>110(label in template: C) </title><text x="56.658641" y="122.032540" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>111(label in template: G) </title><text x="56.658641" y="114.028938" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>112(label in template: C) </title><text x="56.658641" y="106.025336" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>113(label in template: C) </title><text x="56.658641" y="98.021735" text-anchor="middle" alignment-baseline="middle" class="black" >C</text></g>
+<g><title>114(label in template: G) </title><text x="56.658641" y="90.018133" text-anchor="middle" alignment-baseline="middle" class="black" >G</text></g>
+<g><title>115(label in template: U) </title><text x="56.658641" y="82.014507" text-anchor="middle" alignment-baseline="middle" class="green" >G</text></g>
+<g><title>116(label in template: ) </title><text x="56.658641" y="74.010880" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>117(label in template: ) </title><text x="56.658641" y="66.007253" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>118(label in template: ) </title><text x="56.658641" y="58.003627" text-anchor="middle" alignment-baseline="middle" class="red" >C</text></g>
+<g><title>119(label in template: ) </title><text x="56.658641" y="50.000000" text-anchor="middle" alignment-baseline="middle" class="red" >A</text></g>
+<g><title>120(label in template: 3') </title><text x="56.658641" y="41.996373" text-anchor="middle" alignment-baseline="middle" class="green" >3'</text></g>
+<g><line x1="91.104876" y1="188.414810" x2="88.574948" y2="192.661817" class="gray" /></g>
+<g><line x1="82.375070" y1="202.935901" x2="79.796876" y2="207.153782" class="gray" /></g>
+<g><line x1="56.534136" y1="206.274440" x2="56.356474" y2="197.714572" class="gray" /></g>
+<g><line x1="56.190465" y1="185.716008" x2="56.131240" y2="177.154501" class="gray" /></g>
+<g><line x1="56.131240" y1="165.154788" x2="56.190465" y2="156.593281" class="gray" /></g>
+<g><line x1="56.356474" y1="144.594717" x2="56.534136" y2="136.034849" class="gray" /></g>
+</svg>

@@ -180,6 +180,8 @@ void set_53_labels(
 size_t child_index(
                    rna_tree::sibling_iterator sib);
 
+rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index);
+
 /**
  * return only-branch-node if exist, otherwise return non-valid iterator
  */

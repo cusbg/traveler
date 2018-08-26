@@ -87,6 +87,7 @@ public:
     
 public:
     void set_postorder_ids();
+    void set_pre_postorder_ids();
     bool is_ordered_postorder() const;
     
 public:
