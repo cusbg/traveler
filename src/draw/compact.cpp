@@ -407,16 +407,13 @@ void init_root_level_deleted(rna_tree &  rna) {
                 point p1 = it->at(0).p;
                 double dist = distance(p1, p0);
 
-                if ( dist <= 2*BASES_DISTANCE) {
+                if ( dist > 2*BASES_DISTANCE) {
                     //lets contract only if the distance after deletion is too big, otherwise it's better not to touch the layout
-                    continue;
+                    point dist_vect = normalize(p1 - p0) * (dist/2-BASES_DISTANCE/2);
+
+                    shift_region(root.begin(), it,  dist_vect );
+                    shift_region(it, root.end(),  -dist_vect);
                 }
-
-                point dist_vect = normalize(p1 - p0) * (dist/2-BASES_DISTANCE/2);
-
-                shift_region(root.begin(), it,  dist_vect );
-                shift_region(it, root.end(),  -dist_vect);
-
             }
 
         }
@@ -439,12 +436,12 @@ void compact::init()
 //        r->at(0).label  = m.str();
 //    }
 
-    compact::sibling_iterator it =   rna_tree::last_child(rna.begin());
-    for (int i = 0; i < 20; i++) {
-        it--;
-
-        std::cout << it->at(0).label << " " << it->at(0).tmp_label << " " << it->status << " " << it->id() << " " << it->seq_id_mapped() << endl;
-    }
+//    compact::sibling_iterator it =   rna_tree::last_child(rna.begin());
+//    for (int i = 0; i < 20; i++) {
+//        it--;
+//
+//        std::cout << it->at(0).label << " " << it->at(0).tmp_label << " " << it->status << " " << it->id() << " " << it->seq_id_mapped() << endl;
+//    }
     
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     { //traverse the tree pre-order
