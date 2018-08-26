@@ -467,6 +467,14 @@ point rna_tree::bottom_left_corner(
     return n;
 }
 
+rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index) {
+    rna_tree::sibling_iterator it = parent.begin();
+    while (index > 0 && it != parent.end()) {
+        index--; it++;
+    }
+    return it;
+}
+
 
 /* inline, local */ std::string trim(
                                      std::string s)

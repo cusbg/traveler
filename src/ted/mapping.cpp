@@ -59,6 +59,20 @@ mapping::indexes mapping::get_to_remove() const
 }
 
 
+std::vector<mapping::mapping_pair> mapping::get_to_update() const
+{
+    APP_DEBUG_FNAME;
+
+    std::vector<mapping::mapping_pair> vec;
+    for (auto m : map)
+    {
+        if (m.to != 0 && m.from != 0)
+            vec.push_back(m);
+    }
+
+    return vec;
+}
+
 bool mapping::mapping_pair::operator<(
                                       const mapping_pair& other) const
 {

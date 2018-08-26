@@ -39,7 +39,21 @@ rna_tree& matcher::run(
                        const mapping& map)
 {
     INFO("BEG: Transforming trees with mapping function");
-    
+
+//    post_order_iterator it = t1.begin_post();
+//    size_t i = 0;
+//    for (auto mp : map.get_to_update())
+//    {
+//        size_t index = mp.from;
+//        --index;    // indexed from one
+//        size_t to_move = index - i;
+//        it = plusplus(it, to_move);
+//
+////        assert(!rna_tree::is_root(it));
+//        it->_id_mapped = mp.from;
+//        i = index;
+//    }
+
     //Sizes of the trees after deletion from one and insertion into the other should match
     if (t1.size() - map.get_to_remove().size() != t2.size() - map.get_to_insert().size())
     {
@@ -48,6 +62,9 @@ rna_tree& matcher::run(
     
     mark(t1, map.get_to_remove(), rna_pair_label::deleted);
     mark(t2, map.get_to_insert(), rna_pair_label::inserted);
+
+    t1.set_pre_postorder_ids();
+
 
     //remove nodes from t1 and mark this in parent using set_remake
     erase();
