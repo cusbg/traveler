@@ -79,6 +79,18 @@ void compact::run()
     recursion(parent);
 }
 
+//https://www.geeksforgeeks.org/find-mirror-image-point-2-d-plane/
+pair<double, double> mirrorImage(
+        double a, double b, double c,
+        double x1, double y1)
+{
+    double temp = -2 * (a * x1 + b * y1 + c) /
+                  (a * a + b * b);
+    double x = temp * a + x1;
+    double y = temp * b + y1;
+    return make_pair(x, y);
+}
+
 /* static */ void compact::mirror_branch(
                                          iterator root)
 {
@@ -99,20 +111,30 @@ void compact::run()
             for (size_t i = 0; i < it->size(); ++i) {
                 //Get the vector between mirror line and point
                 point p = it->at(i).p;
+
+                //https://bobobobo.wordpress.com/2008/01/07/solving-linear-equations-ax-by-c-0/
+                double a = pr[0].y - pr[1].y;
+                double b = pr[1].x - pr[0].x;
+                double c = pr[0].x*pr[1].y - pr[1].x*pr[0].y;
+
+                auto m = mirrorImage(a, b, c, p.x, p.y);
+                it->set_p(point(m.first, m.second), i);
+
+
                 //double a = angle(p, center_root, center_root + v);
                 //Rotate the point in the reverse directions
                 //it->at(i).p += rotate(center_root, -a, distance(p, center_root));
                 
                 //http://stackoverflow.com/questions/3306838/algorithm-for-reflecting-a-point-across-a-line
                 //first project p on the mirror line
-                double xDiff = pr[1].x - pr[0].x;
-                double a = xDiff == 0 ? 0 : (pr[1].y - pr[0].y) / xDiff;
-
-                double b = pr[0].y - pr[0].x * a;
-                //                        point pl(0 + (b * p.x) / (1 + m * m), b + (m * p.x) / (1 + m * m));
-                //                        it->at(i).p = 2 * pl - p;
-                double d = (p.x + (p.y - b)*a)/(1 + a*a);
-                it->set_p(point(2*d - p.x, 2*d*a - p.y + 2*b), i);
+//                double xDiff = pr[1].x - pr[0].x;
+//                double a = xDiff == 0 ? 0 : (pr[1].y - pr[0].y) / xDiff;
+//
+//                double b = pr[0].y - pr[0].x * a;
+//                //                        point pl(0 + (b * p.x) / (1 + m * m), b + (m * p.x) / (1 + m * m));
+//                //                        it->at(i).p = 2 * pl - p;
+//                double d = (p.x + (p.y - b)*a)/(1 + a*a);
+//                it->set_p(point(2*d - p.x, 2*d*a - p.y + 2*b), i);
                 
             }
         
@@ -1274,6 +1296,8 @@ double compact::get_length(
     }
 }
 
+
+
 void compact::try_reposition_new_root_branches()
 {
     
@@ -1291,7 +1315,7 @@ void compact::try_reposition_new_root_branches()
             //TODO: should be optimized to check only intersections in the current branch
             overlap_checks::overlaps overlaps_aux = overlap_checks().run(rna);
             //If by mirroring we got more overlaps, mirror back
-            if (overlaps_aux.size() > overlaps.size())
+            if (overlaps_aux.size() >= overlaps.size())
                 mirror_branch(it);
         }
     }
