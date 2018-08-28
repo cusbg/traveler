@@ -65,7 +65,7 @@ private:
      */
     edges get_edges(
                     rna_tree& rna);
-    
+
     /**
      * run checks for edges
      */

@@ -126,6 +126,10 @@ bool is_rightest_pair(rna_tree::iterator it) {
     return right_end;
 }
 
+void rotate_node(rna_tree::iterator it, point pivot, double angle) {
+    it->at(0).p = rotate_point_around_pivot(pivot, it->at(0).p, angle);
+    if (it->paired()) it->at(1).p = rotate_point_around_pivot(pivot, it->at(1).p, angle);
+}
 void compact::rotate_branch_by_angle(iterator branch, double angle){
 
     iterator parent = rna_tree::parent(branch);
@@ -133,27 +137,23 @@ void compact::rotate_branch_by_angle(iterator branch, double angle){
     bool left_end = is_leftest_pair(branch);
     bool right_end = is_rightest_pair(branch);
 
+    int cnt_siblings = parent.number_of_children();
+    int ix_branch = child_index(branch);
+
     //if the branch is the most left among siblings, lef's try to rotate only the first residue in the root base pair
     //and the other way around if it's the most right
-    if (left_end) {
+    if (left_end || (!right_end and ix_branch < cnt_siblings/2)) {
+
         point pivot = branch->at(1).p;
 
-        for (post_order_iterator it = parent.begin(); it != branch; it++) {
-            rotate_point_around_pivot(pivot, it->at(0).p, angle);
-            if (it->paired()) rotate_point_around_pivot(pivot, it->at(1).p, angle);
-        }
-    }
+        for (post_order_iterator it = parent.begin(); it != branch; it++) rotate_node(it, pivot, angle);
 
-    if (right_end) {
+    } else{
+
         point pivot = branch->at(0).p;
 
-        for (iterator it = iterator(branch); it != parent.end(); it++) {
-            it->at(0).p = rotate_point_around_pivot(pivot, it->at(0).p, angle);
-            if (it->paired()) it->at(1).p = rotate_point_around_pivot(pivot, it->at(1).p, angle);
-        }
+        for (iterator it = iterator(branch); it != parent.end(); it++) rotate_node(it, pivot, angle);
     }
-
-
 
 }
 
@@ -1368,20 +1368,44 @@ void compact::try_reposition_new_root_branches()
 {
     
     overlap_checks::overlaps overlaps = overlap_checks().run(rna);
+    std::cout << overlaps.size() << std::endl;
+
+    overlap_checks::edges e = overlap_checks::get_edges(rna.begin());
+//    overlap_checks::edges e2 = overlap_checks::get_edges(rna.begin());
+//    overlap_checks::overlaps o2 = overlap_checks::get_overlaps(e1, e2);
+//    std::cout << o2.size() - 2*e1.size();
+
+//    return;
+
+    std::vector<int> angles;
+    for (int i = 0; i<=90; i+=15) angles.push_back(i);
     
     sibling_iterator root = rna.begin();
     for (sibling_iterator it = root.begin(); it != root.end(); ++it)
     {
-        if (it->paired() && it->status == rna_pair_label::inserted)
+        if (it->paired() /*&& it->status == rna_pair_label::inserted*/)
         {
-            int angles[] = {10, 20, 30, 40, 50, 60, 70, 80, 90};
+
             for (auto a: angles) {
 
 
             }
             //Try to mirror the branch
             mirror_branch(it);
+
+//            std::cout << "x" << std::endl;
+//            overlap_checks::edges e1 = overlap_checks::get_edges(it);
+//            overlap_checks::overlaps o1 = overlap_checks::get_overlaps(e, e1);
+//            std::cout << o1.size() - e1.size() << std::endl;
+
 //            rotate_branch_by_angle(it, -45);
+//            set_53_labels(rna);
+//            std::cout << "x" << std::endl;
+//            overlap_checks::edges e2 = overlap_checks::get_edges(it);
+//            overlap_checks::overlaps o2 = overlap_checks::get_overlaps(e, e2);
+//            std::cout << o2.size() << std::endl;
+
+//            break;
             //Get the number of overlaps
             //TODO: should be optimized to check only intersections in the current branch
             overlap_checks::overlaps overlaps_aux = overlap_checks().run(rna);

@@ -68,6 +68,7 @@ overlap_checks::edges overlap_checks::get_edges(
 #undef get_p
 }
 
+
 overlap_checks::overlaps overlap_checks::run(
                                              const edges& e)
 {
@@ -166,25 +167,29 @@ overlap_checks::overlaps overlap_checks::run(
 
 
 /* static */
-overlap_checks::edges overlap_checks::get_edges(const rna_tree::iterator& node)
+overlap_checks::edges overlap_checks::get_edges(const rna_tree::iterator& branch)
 {
+#undef get_p
+    APP_DEBUG_FNAME;
+
     edges vec;
-    //    edge e;
-    //
-    //#define get_p() it->at(it.label_index()).p
-    //    rna_tree::pre_post_order_iterator it = rna_tree::pre_post_order_iterator(node, true);
-    //    e.p1 = get_p();
-    //
-    //    for (++it; it != ++rna_tree::pre_post_order_iterator(node, false); ++it)
-    //    {
-    //        //assert(it->initiated_points());
-    //        if (it->initiated_points()) {
-    //            e.p2 = get_p();
-    //            vec.push_back(e);
-    //            e.p1 = e.p2;
-    //        }
-    //    }
-    
+    edge e;
+
+#define get_p() it->at(it.label_index()).p
+
+    rna_tree::pre_post_order_iterator it = rna_tree::pre_post_order_iterator(branch);
+    e.p1 = get_p();
+
+
+    for (++it; it != ++rna_tree::pre_post_order_iterator(branch, false); ++it)
+    {
+        if (it->initiated_points()) {
+            e.p2 = get_p();
+            vec.push_back(e);
+            e.p1 = e.p2;
+        }
+    }
+
     return vec;
 #undef get_p
 }
@@ -200,9 +205,9 @@ overlap_checks::overlaps overlap_checks::get_overlaps(const overlap_checks::edge
     
     for (size_t i = 0; i < e1.size(); ++i)
     {
-        size_t j = (&e1 == &e2 ? i + 2: 0);
+//        size_t j = (&e1 == &e2 ? i + 2: 0);
         
-        for (; j < e2.size(); ++j)
+        for (size_t j = 0; j < e2.size(); ++j)
         {
             p = intersection(e1[i], e2[j]);
             
