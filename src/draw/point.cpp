@@ -226,6 +226,28 @@ point rotate(const point& centre, double alpha, double radius)
     return out;
 }
 
+point rotate_point_around_pivot(const point& pivot, const point &p, double angle)
+{
+    double rad = M_PI / 180 * angle;
+    float s = sin(rad);
+    float c = cos(rad);
+
+    point r = point(p);
+
+    // translate point back to origin:
+    r.x -= pivot.x;
+    r.y -= pivot.y;
+
+    // rotate point
+    float xnew = r.x * c - r.y * s;
+    float ynew = r.x * s + r.y * c;
+
+    // translate point back:
+    r.x = xnew + pivot.x;
+    r.y = ynew + pivot.y;
+    return r;
+}
+
 point orthogonal(const point& p)
 {
     UNARY(p);

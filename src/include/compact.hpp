@@ -78,6 +78,8 @@ private:
      */
     static void mirror_branch(
                               iterator root);
+
+    static void rotate_branch_by_angle(iterator branch, double angle);
     
     /**
      * rotate branch from `parent` arount circle `c` with angle `alpha`

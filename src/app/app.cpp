@@ -172,6 +172,7 @@ mapping app::run_ted(
     
 }
 
+#include "iostream"
 void app::run_drawing(
                       rna_tree& templated,
                       rna_tree& matched,
@@ -181,6 +182,7 @@ void app::run_drawing(
                       const std::string& file)
 {
     APP_DEBUG_FNAME;
+
     
     try
     {
@@ -194,7 +196,7 @@ void app::run_drawing(
         // which correspond to the target structure
         templated = matcher(templated, matched).run(mapping);
         //Compact goes through the structure and computes new coordinates where necessary
-        compact(templated).run();
+            compact(templated).run();
 
         save(file, templated, run_overlaps);
     }

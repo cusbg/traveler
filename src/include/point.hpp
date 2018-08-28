@@ -81,6 +81,8 @@ double angle(const point& p1, const point& centre, const point& p2);
 
 point rotate(const point& centre, double alpha, double radius);
 
+point rotate_point_around_pivot(const point& pivot, const point &p, double angle);
+
 point orthogonal(const point& p);
 
 point orthogonal(const point& p, const point& direction);

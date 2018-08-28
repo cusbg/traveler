@@ -91,6 +91,72 @@ pair<double, double> mirrorImage(
     return make_pair(x, y);
 }
 
+bool is_leftest_pair(rna_tree::iterator it) {
+
+    rna_tree::iterator parent = rna_tree::parent(it);
+    rna_tree::sibling_iterator its = rna_tree::sibling_iterator(it);
+
+    bool left_end = true;
+    while(its != parent.begin()) {
+        its--;
+        if (its->paired()) {
+            left_end = false;
+            break;
+        }
+    }
+    if (its->paired()) left_end = false;
+
+    return left_end;
+}
+
+bool is_rightest_pair(rna_tree::iterator it) {
+
+    rna_tree::iterator parent = rna_tree::parent(it);
+    rna_tree::sibling_iterator its = ++rna_tree::sibling_iterator(it);
+
+    bool right_end = true;
+    while(its != parent.end()) {
+        its++;
+        if (its->paired()) {
+            right_end = false;
+            break;
+        }
+    }
+
+    return right_end;
+}
+
+void compact::rotate_branch_by_angle(iterator branch, double angle){
+
+    iterator parent = rna_tree::parent(branch);
+
+    bool left_end = is_leftest_pair(branch);
+    bool right_end = is_rightest_pair(branch);
+
+    //if the branch is the most left among siblings, lef's try to rotate only the first residue in the root base pair
+    //and the other way around if it's the most right
+    if (left_end) {
+        point pivot = branch->at(1).p;
+
+        for (post_order_iterator it = parent.begin(); it != branch; it++) {
+            rotate_point_around_pivot(pivot, it->at(0).p, angle);
+            if (it->paired()) rotate_point_around_pivot(pivot, it->at(1).p, angle);
+        }
+    }
+
+    if (right_end) {
+        point pivot = branch->at(0).p;
+
+        for (iterator it = iterator(branch); it != parent.end(); it++) {
+            it->at(0).p = rotate_point_around_pivot(pivot, it->at(0).p, angle);
+            if (it->paired()) it->at(1).p = rotate_point_around_pivot(pivot, it->at(1).p, angle);
+        }
+    }
+
+
+
+}
+
 /* static */ void compact::mirror_branch(
                                          iterator root)
 {
@@ -1307,10 +1373,15 @@ void compact::try_reposition_new_root_branches()
     for (sibling_iterator it = root.begin(); it != root.end(); ++it)
     {
         if (it->paired() && it->status == rna_pair_label::inserted)
-        {//newly inserted pair (not neccessary whole new branch)
-            
+        {
+            int angles[] = {10, 20, 30, 40, 50, 60, 70, 80, 90};
+            for (auto a: angles) {
+
+
+            }
             //Try to mirror the branch
             mirror_branch(it);
+//            rotate_branch_by_angle(it, -45);
             //Get the number of overlaps
             //TODO: should be optimized to check only intersections in the current branch
             overlap_checks::overlaps overlaps_aux = overlap_checks().run(rna);
