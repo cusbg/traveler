@@ -77,9 +77,9 @@ The `traveler` executable is available in the PATH, and the current directory is
 
 Three types of template IMAGE\_FILE are currectly supported by Traveler:
 	
-* PostScript (crw) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php) (default)
-* VARNA (varna) format of SVG images produced by tool [VARNA](http://varna.lri.fr/)
-* Traveler intermediate format
+* crw: PostScript from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php) (default)
+* varna: VARNA format of SVG images produced by tool [VARNA](http://varna.lri.fr/)
+* traveler: Traveler intermediate format
 
 #### Traveler intermediate format:
 
