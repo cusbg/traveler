@@ -1355,16 +1355,19 @@ std::vector<int> get_ixs_of_distinct_edges(overlap_checks::edges es1, overlap_ch
     return ixs;
 }
 
-void try_reposition_branch(rna_tree::sibling_iterator it, rna_tree::sibling_iterator root, vector<int> angles, int zero_angle_ix) {
+void try_reposition_branch(rna_tree::sibling_iterator it, rna_tree::sibling_iterator root, rna_tree rna, vector<int> angles, int zero_angle_ix) {
 
     overlap_checks::edges e = overlap_checks::get_edges(root);
     overlap_checks::edges e_it_before = overlap_checks::get_edges(it);
 
     vector<int> ixs_only_e = get_ixs_of_distinct_edges(e, e_it_before);
 
-    int cnt_overlaps_min = overlap_checks::get_overlaps(e, e_it_before, ixs_only_e).size();
+//    int cnt_overlaps_it = overlap_checks::get_overlaps(e, e_it_before, ixs_only_e).size();
+//    if (cnt_overlaps_it == 0) return;
 
-    if (cnt_overlaps_min == 0) return;
+    int cnt_overlaps_min = overlap_checks().run(rna).size();
+    int cnt_overlaps_init = cnt_overlaps_min;
+
 
     int ix_angle_min = zero_angle_ix, ix_mirror_min = 0, ix_mirror = 0, ix_angle = 0;
     for (int ix_mirror = 0; ix_mirror < 2; ix_mirror++)
@@ -1376,16 +1379,17 @@ void try_reposition_branch(rna_tree::sibling_iterator it, rna_tree::sibling_iter
 
             rotate_branch_by_angle(it, angles[ix_angle]);
 
-            overlap_checks::edges e_it_after = overlap_checks::get_edges(it);
-            int cnt_overlaps = overlap_checks::get_overlaps(e, e_it_after, ixs_only_e).size();
+//            overlap_checks::edges e_it_after = overlap_checks::get_edges(it);
+//            int cnt_overlaps = overlap_checks::get_overlaps(e, e_it_after, ixs_only_e).size();
+            int cnt_overlaps = overlap_checks().run(rna).size();
 
             if (cnt_overlaps < cnt_overlaps_min) {
                 cnt_overlaps_min = cnt_overlaps;
                 ix_angle_min = ix_angle;
                 ix_mirror_min = ix_mirror;
-            } else {
-                rotate_branch_by_angle(it, -angles[ix_angle]);
             }
+
+            rotate_branch_by_angle(it, -angles[ix_angle]);
 
             if (cnt_overlaps_min == 0) break;
 
@@ -1393,11 +1397,15 @@ void try_reposition_branch(rna_tree::sibling_iterator it, rna_tree::sibling_iter
 
         if (cnt_overlaps_min == 0) break;
     }
+    if (ix_mirror == 1) mirror_branch(it);
 
-    if (cnt_overlaps_min > 0) {
-        if (ix_mirror_min != ix_mirror) mirror_branch(it);
-        if (ix_angle_min != ix_angle) rotate_branch_by_angle(it, angles[ix_angle]);
-    }
+    //now we should be in the state where we were at the beginning of the function
+
+//    if (cnt_overlaps_min < cnt_overlaps_init)
+//    {
+//        if (ix_mirror_min == 1) mirror_branch(it);
+//        rotate_branch_by_angle(it, angles[ix_angle_min]);
+//    }
 }
 void compact::try_reposition_new_root_branches() {
 
@@ -1425,7 +1433,8 @@ void compact::try_reposition_new_root_branches() {
             int ix = alt == 0 ? i : branches.size() - 1 - i;
             if (alt == 1 and ix <= i) break;
             auto it = branches[ix];
-            try_reposition_branch(it, root, angles, zero_angle_ix);
+            try_reposition_branch(it, root, rna, angles, zero_angle_ix);
+            set_53_labels(rna);
         }
     }
 
