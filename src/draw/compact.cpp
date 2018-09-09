@@ -48,7 +48,7 @@ void compact::run()
     init();
     make();
     set_53_labels(rna);
-    try_reposition_new_root_branches();
+    //try_reposition_new_root_branches();
     checks();
     
     INFO("END: Computing RNA layout");
