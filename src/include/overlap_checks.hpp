@@ -32,6 +32,13 @@ public:
     struct edge
     {
         point p1, p2;
+        size_t id1, id2;
+
+        inline bool share_point(const edge& e2) {
+            return (!(this->p1 == e2.p1) != !(this->p2 == e2.p2)) //XOR
+                    || (!(this->p2 == e2.p1) != !(this->p1 == e2.p2));
+        }
+
     };
     struct overlapping
     {
@@ -52,7 +59,8 @@ public:
                  rna_tree& _rna);
     
     static edges get_edges(const rna_tree::iterator& node);
-    static overlaps get_overlaps(const edges &e1, const edges &e2);
+    static overlaps get_overlaps(const edges &es1, const edges &es2,
+            const std::vector<int> &es1_filter= std::vector<int>(), const std::vector<int> &es2_filter= std::vector<int>());
     
 private:
     /**
@@ -84,5 +92,8 @@ public:
                               const edge& e2);
     
 };
+
+bool operator==(const overlap_checks::edge& e1, const overlap_checks::edge& e2);
+
 
 #endif /* !OVERLAP_CHECKS_HPP */

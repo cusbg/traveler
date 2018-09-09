@@ -73,13 +73,13 @@ private:
                              iterator parent,
                              point vec);
 
-    /**
-     * mirrors full subtree rooted at `root` using the root's bp as the mirror line
-     */
-    static void mirror_branch(
-                              iterator root);
-
-    static void rotate_branch_by_angle(iterator branch, double angle);
+//    /**
+//     * mirrors full subtree rooted at `root` using the root's bp as the mirror line
+//     */
+//    static void mirror_branch(
+//                              iterator root);
+//
+//    static void rotate_branch_by_angle(iterator branch, double angle);
     
     /**
      * rotate branch from `parent` arount circle `c` with angle `alpha`

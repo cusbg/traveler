@@ -25,6 +25,7 @@
 using namespace std;
 
 
+
 overlap_checks::overlap_checks()
 { }
 
@@ -51,21 +52,27 @@ overlap_checks::edges overlap_checks::get_edges(
     edge e;
     
 #define get_p() it->at(it.label_index()).p
+#define get_id() it->id()
+
     rna_tree::pre_post_order_iterator it = ++rna.begin_pre_post();
     e.p1 = get_p();
+    e.id1 = get_id();
     
     for (++it; it != rna.end_pre_post(); ++it)
     {
         //assert(it->initiated_points());
         if (it->initiated_points()) {
             e.p2 = get_p();
+            e.id2 = get_id();
             vec.push_back(e);
             e.p1 = e.p2;
+            e.id1 = e.id2;
         }
     }
-    
+
     return vec;
 #undef get_p
+#undef get_id
 }
 
 
@@ -85,6 +92,8 @@ overlap_checks::overlaps overlap_checks::run(
         for (size_t j = i + 2; j < e.size(); ++j)
         {
             e2 = e[j];
+
+            if (e1 == e2 || e1.share_point(e2)) continue;
             
             p = intersection(e1, e2);
             
@@ -176,48 +185,63 @@ overlap_checks::edges overlap_checks::get_edges(const rna_tree::iterator& branch
     edge e;
 
 #define get_p() it->at(it.label_index()).p
+#define get_id() it->id()
 
     rna_tree::pre_post_order_iterator it = rna_tree::pre_post_order_iterator(branch);
     e.p1 = get_p();
-
+    e.id1 = get_id();
 
     for (++it; it != ++rna_tree::pre_post_order_iterator(branch, false); ++it)
     {
         if (it->initiated_points()) {
             e.p2 = get_p();
+            e.id2 = get_id();
             vec.push_back(e);
             e.p1 = e.p2;
+            e.id1 = e.id2;
         }
     }
 
     return vec;
 #undef get_p
+#undef get_id
 }
 
 /*static*/
-overlap_checks::overlaps overlap_checks::get_overlaps(const overlap_checks::edges &e1,
-                                                      const overlap_checks::edges &e2)
+overlap_checks::overlaps overlap_checks::get_overlaps(const overlap_checks::edges &es1,
+                                                      const overlap_checks::edges &es2,
+                                                      const vector<int> &es1_filter,
+                                                      const vector<int> &es2_filter)
 {
     APP_DEBUG_FNAME;
     
     point p;
     vector<overlapping> vec;
+
+    std::vector<int> ixs1(es1_filter), ixs2(es2_filter);
+    if (es1_filter.size() == 0) for (int i = 0; i< es1.size(); i++) ixs1.push_back(i);
+    if (es2_filter.size() == 0) for (int i = 0; i< es2.size(); i++) ixs2.push_back(i);
+
     
-    for (size_t i = 0; i < e1.size(); ++i)
+    for (size_t i = 0; i < ixs1.size(); ++i)
     {
-//        size_t j = (&e1 == &e2 ? i + 2: 0);
+        overlap_checks::edge e1 = es1[ixs1[i]];
         
-        for (size_t j = 0; j < e2.size(); ++j)
+        for (size_t j = 0; j < ixs2.size(); ++j)
         {
-            p = intersection(e1[i], e2[j]);
-            
+            overlap_checks::edge e2 = es2[ixs2[j]];
+
+            p = intersection(e1, e2);
+
+            if (e1 == e2 || e1.share_point(e2)) continue;
+
             if (!p.bad())
             {
                 auto distances = {
-                    distance(p, e1[i].p1),
-                    distance(p, e1[i].p2),
-                    distance(p, e2[j].p1),
-                    distance(p, e2[j].p2),
+                    distance(p, e1.p1),
+                    distance(p, e1.p2),
+                    distance(p, e2.p1),
+                    distance(p, e2.p2),
                 };
                 double radius = *std::max_element(distances.begin(), distances.end());
                 vec.push_back({p, radius});
@@ -228,3 +252,8 @@ overlap_checks::overlaps overlap_checks::get_overlaps(const overlap_checks::edge
     return vec;
     
 }
+
+bool operator==(const overlap_checks::edge& e1, const overlap_checks::edge& e2) {
+    return (e1.id1 == e2.id1 && e1.id2 == e2.id2) || (e1.id2 == e2.id1 && e1.id1 == e2.id2);
+}
+
