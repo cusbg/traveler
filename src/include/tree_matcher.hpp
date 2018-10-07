@@ -54,6 +54,7 @@ private:
               rna_tree& rna,
               const indexes_type& postorder_indexes,
               rna_pair_label::status_type status);
+
     /**
      * erase nodes marked as 'deleted'
      */

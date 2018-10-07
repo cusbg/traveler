@@ -1163,7 +1163,11 @@ void compact::make()
     {
         if (!to_remake_children(it))
             continue;
-        
+
+        if (it.number_of_children() == 0) {
+            it->at(0).label=string("X");
+            it->at(1).label=string("Y");
+        }
         in.init(it);
         set_distances(in);
         for (auto& i : in.vec)
