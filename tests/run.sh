@@ -16,6 +16,6 @@ do
     
     echo "`date`: Working on ${TGT} using ${TMP} as a template"
     
-    echo ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure ${TMP_DIR}${TMP}.ps ${TMP_DIR}/${TMP}.fasta --ted ${OUT_DIR}${TGT}.map
-    echo ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure ${TMP_DIR}${TMP}.ps ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
+    ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure ${TMP_DIR}${TMP}.ps ${TMP_DIR}/${TMP}.fasta --ted ${OUT_DIR}${TGT}.map
+    ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure ${TMP_DIR}${TMP}.ps ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
 done
