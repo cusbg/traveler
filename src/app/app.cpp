@@ -175,7 +175,7 @@ mapping app::run_ted(
 #include "iostream"
 void app::run_drawing(
                       rna_tree& templated,
-                      rna_tree& matched,
+                      rna_tree& matched, //target
                       const mapping& mapping,
                       bool run,
                       bool run_overlaps,

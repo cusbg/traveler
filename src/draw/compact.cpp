@@ -1055,7 +1055,8 @@ void compact::init_multibranch(
         
         int i = 0;
         for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch) {
-            if (rna_tree::is_leaf(ch)) {
+            //if (rna_tree::is_leaf(ch)) {
+            if (!ch->paired()) {
                 ch->set_p(points[i], 0);
                 
                 i += LEAF_POINTS;
@@ -1163,7 +1164,11 @@ void compact::make()
     {
         if (!to_remake_children(it))
             continue;
-        
+
+//        if (it.number_of_children() == 0) {
+//            it->at(0).label=string("X");
+//            it->at(1).label=string("Y");
+//        }
         in.init(it);
         set_distances(in);
         for (auto& i : in.vec)

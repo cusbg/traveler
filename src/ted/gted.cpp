@@ -212,7 +212,7 @@ get_fdist(fdist, iter1, iter2, id1, id2)
             
             vec[0] = get_fdist(prev(1), it2) + costs::del(it1); // delete `it1`
             vec[1] = get_fdist(it1, prev(2)) + costs::del(it2); // delete `it2`
-            
+
             // modify iff both it-s are subtree roots
             if (b)
                 vec[2] = get_fdist(prev(1), prev(2)) + costs::upd(it1, it2); // modify `it1` ~> `it2`
@@ -222,7 +222,7 @@ get_fdist(fdist, iter1, iter2, id1, id2)
                 //
                 iterator_type prev_root1 = get_begin_leaf(t1, it1);
                 iterator_type prev_root2 = get_begin_leaf(t2, it2);
-                
+
                 if (prev_root1 != beg1)
                     --prev_root1;
                 else
@@ -231,13 +231,13 @@ get_fdist(fdist, iter1, iter2, id1, id2)
                     --prev_root2;
                 else
                     prev_root2 = empty;
-                
+
                 vec[2] = get_tdist(it1, it2) + get_fdist(prev_root1, prev_root2);
                 // ^^ if (prev_root != empty) =>
                 // prev_root is in sibling branch of it
                 // and we computed this subtree yet
             }
-            
+
             min = *min_element(vec.begin(), vec.end());
             
             set_fdist(it1, it2, min);
@@ -530,7 +530,7 @@ get_fdist(fdist, iter1, iter2, id1, id2)
                                      iterator it2)
 {
     // if one of them is root, but second is not (update root to unrooted node)
-    if (rna_tree::is_root(it1) != rna_tree::is_root(it2))
+    if (rna_tree::is_root(it1) != rna_tree::is_root(it2) || it1->paired() != it2->paired())
         return GTED_COST_ROOT;
     else
         return GTED_COST_MODIFY;
