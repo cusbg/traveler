@@ -738,6 +738,8 @@ void compact::init_by_ancestor(
         vec = normalize(par->center() - rna_tree::parent(par)->center());
     else {
         assert(!par->get_parent_center().bad())
+//        if (par->get_parent_center().bad())
+//            int i = 1;
         vec = normalize(par->center() - par->get_parent_center());
     }
     // ^^ direction (parent(par)->par)
