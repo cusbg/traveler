@@ -727,6 +727,7 @@ point compact::init_branch_recursive(
 void compact::init_by_ancestor(
                                sibling_iterator it)
 {
+    assert(it->paired());
     assert(rna_tree::is_valid(get_onlyone_branch(rna_tree::parent(it))));   // => 1 branch
     
     point p1, p2, vec;
@@ -737,9 +738,25 @@ void compact::init_by_ancestor(
     if (!rna_tree::is_root(grandpar))
         vec = normalize(par->center() - rna_tree::parent(par)->center());
     else {
-        assert(!par->get_parent_center().bad())
-//        if (par->get_parent_center().bad())
-//            int i = 1;
+//        assert(!par->get_parent_center().bad())
+        if (par->get_parent_center().bad()) {
+
+            point par_center = par->center();
+            assert(!par_center.bad());
+
+            point vec1 = normalize(orthogonal(par->at(1).p - par->at(0).p)) * PAIRS_DISTANCE;
+            point vec2 = -vec1;
+
+            point first_initiated = rna.get_leftest_initiated_descendant(it)->at(0).p;
+            point par_vec;
+            if (distance(par_center + vec1, first_initiated) < distance(par_center + vec2, first_initiated)) {
+                par_vec = vec1;
+            } else {
+                par_vec = vec2;
+            }
+            par->set_parent_center(par_center - par_vec);
+        }
+
         vec = normalize(par->center() - par->get_parent_center());
     }
     // ^^ direction (parent(par)->par)
