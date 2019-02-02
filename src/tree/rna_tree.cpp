@@ -504,3 +504,29 @@ rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index) {
 //    return from;
     return from + normalize(to - from) * 6 / scaling_ratio;
 }
+
+rectangle get_children_bounding_box(rna_tree::iterator node){
+
+    rectangle bb;
+    for (auto it = node.begin(); it != node.end(); it++){
+        if (!bb.initiated()) {
+            bb = it->get_bounding_box();
+        } else {
+            bb = bb + it->get_bounding_box();
+        }
+    }
+    return bb;
+
+}
+
+void rna_tree::compute_bounding_boxes(){
+    for (post_order_iterator it = this->begin_post(); it != this.end_post(); ++it){
+        assert(it->initiated_points());
+        if (!it->paired()) {
+            it->set_bounding_box(rectangle(it->at(0).p, it->at(0).p));
+        } else {
+            rectangle bb = get_children_bounding_box(it) + it->at(0).p + it->at(1).p;
+            it->set_bounding_box(bb);
+        }
+    }
+}

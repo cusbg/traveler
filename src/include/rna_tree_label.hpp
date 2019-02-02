@@ -26,6 +26,7 @@
 
 #include "tree_base_node.hpp"
 #include "point.hpp"
+#include "rectangle.hpp"
 
 /**
  * object representing one base
@@ -110,6 +111,14 @@ public:
     const point & get_parent_center();
 
     void set_p(const point _p, const size_t index);
+
+    void set_bounding_box(rectangle _bb) {
+        bb = _bb;
+    }
+
+    rectangle get_bounding_box(){
+        return bb;
+    }
     
 public:
     status_type status = untouched;
@@ -118,6 +127,8 @@ public:
 private:
     std::vector<rna_label> labels;
     point parent_center;
+    rectangle bb;
+
     
 };
 
