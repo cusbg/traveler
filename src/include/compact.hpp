@@ -233,6 +233,8 @@ private:
     inline void checks();
     
     void try_reposition_new_root_branches();
+
+    void reposition_branches();
     
     
 private:

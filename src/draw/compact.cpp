@@ -48,7 +48,8 @@ void compact::run()
     init();
     make();
     set_53_labels(rna);
-    try_reposition_new_root_branches();
+//    try_reposition_new_root_branches();
+//    reposition_branches();
     checks();
     
     INFO("END: Computing RNA layout");
@@ -131,7 +132,7 @@ void rotate_node(rna_tree::iterator it, point pivot, double angle) {
     if (it->paired()) it->at(1).p = rotate_point_around_pivot(pivot, it->at(1).p, angle);
 }
 
-void rotate_branch_by_angle(rna_tree::iterator branch, double angle){
+void rotate_branch_by_angle(rna_tree &rna, rna_tree::iterator branch, double angle){
 
     rna_tree::iterator parent = rna_tree::parent(branch);
 
@@ -143,18 +144,28 @@ void rotate_branch_by_angle(rna_tree::iterator branch, double angle){
 
     //if the branch is the most left among siblings, lef's try to rotate only the first residue in the root base pair
     //and the other way around if it's the most right
-    if (left_end || (!right_end and ix_branch < cnt_siblings/2)) {
+//    if (left_end || (!right_end and ix_branch < cnt_siblings/2)) {
+    if (left_end) {
 
         point pivot = branch->at(1).p;
 
-        for (rna_tree::post_order_iterator it = parent.begin(); it != branch; it++) rotate_node(it, pivot, angle);
+        for (rna_tree::post_order_iterator it = parent.begin(); it != branch; it++)
+            rotate_node(it, pivot, angle);
 
-    } else{
+    } else if (right_end){
 
         point pivot = branch->at(0).p;
 
-        for (rna_tree::iterator it = rna_tree::iterator(branch); it != parent.end(); it++) rotate_node(it, pivot, angle);
+        for (rna_tree::iterator it = rna_tree::iterator(branch); it != parent.end(); it++)
+            rotate_node(it, pivot, angle);
+    } else {
+        point pivot = (branch->at(0).p + branch->at(1).p)/2;
+        for (rna_tree::iterator it = branch.begin(); it != branch.end(); it++)
+            rotate_node(it, pivot, angle);
+
     }
+
+    rna.update_bounding_boxes();
 
 }
 
@@ -1377,7 +1388,7 @@ void try_reposition_branch(rna_tree::sibling_iterator it, rna_tree::sibling_iter
         for (; ix_angle < angles.size(); ix_angle++) {
             if (ix_mirror == 0 && angles[ix_angle] == 0) continue;
 
-            rotate_branch_by_angle(it, angles[ix_angle]);
+            rotate_branch_by_angle(rna, it, angles[ix_angle]);
 
 //            overlap_checks::edges e_it_after = overlap_checks::get_edges(it);
 //            int cnt_overlaps = overlap_checks::get_overlaps(e, e_it_after, ixs_only_e).size();
@@ -1389,7 +1400,7 @@ void try_reposition_branch(rna_tree::sibling_iterator it, rna_tree::sibling_iter
                 ix_mirror_min = ix_mirror;
             }
 
-            rotate_branch_by_angle(it, -angles[ix_angle]);
+            rotate_branch_by_angle(rna, it, -angles[ix_angle]);
 
             if (cnt_overlaps_min == 0) break;
 
@@ -1438,5 +1449,110 @@ void compact::try_reposition_new_root_branches() {
         }
     }
 
-    return;
+}
+
+/// Checks how many residues in the subtree of it2 (including it2) are present in the bounding object covered by it1.
+/// \param it1
+/// \param it2
+/// \return
+int count_overlaps(const rna_tree::iterator it1, const rna_tree::iterator it2){
+
+    int sum = 0;
+
+    if (it1->id() != it2->id() && (it1->get_bounding_object().intersects(it2->get_bounding_object())))
+    {
+        if (rna_tree::is_leaf(it2)){
+            it1->get_bounding_object().intersects(it2->get_bounding_object());
+            sum += 1;
+        } else{
+            for (auto ch = it2.begin(); ch != it2.end(); ++ch){
+                sum += count_overlaps(it1, ch);
+            }
+        }
+    }
+
+    return sum;
+}
+
+void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator root) {
+
+    std::vector<int> angles;
+    int ix_zero_angle = -1;
+    int ix = 0;
+    for (int i = -45; i <= 45; i += 45) {
+        angles.push_back(i);
+        if (i == 0) ix_zero_angle = ix;
+        ix++;
+    }
+
+
+    int cnt_overlaps_init = count_overlaps(it, root);
+    int cnt_overlaps_min = cnt_overlaps_init;
+
+
+//    if (cnt_overlaps_min <40) return;
+
+    int ix_angle_min = ix_zero_angle, ix_mirror_min = 0, ix_mirror = 0;
+
+    for (; ix_mirror < 2; ix_mirror++)
+    {
+        int ix_angle = 0;
+        if (ix_mirror == 1) mirror_branch(it);
+
+        for (; ix_angle < angles.size(); ix_angle++) {
+            if (ix_mirror == 0 && angles[ix_angle] == 0) continue;
+
+            rotate_branch_by_angle(rna, it, angles[ix_angle]);
+
+            int cnt_overlaps = count_overlaps(it, root);
+
+            // if the number of overlaps is minimum, prefer zero rotation (that could happen in multiple
+            // mirrored angles lead to zero (or other minimum number) overlaps)
+            if (cnt_overlaps < cnt_overlaps_min || (cnt_overlaps == cnt_overlaps_min && ix_angle == ix_zero_angle)) {
+                cnt_overlaps_min = cnt_overlaps;
+                ix_angle_min = ix_angle;
+                ix_mirror_min = ix_mirror;
+            }
+
+            rotate_branch_by_angle(rna, it, -angles[ix_angle]);
+//            return;
+
+//            if (cnt_overlaps_min == 0) break;
+
+        }
+
+        if (cnt_overlaps_min == 0) break;
+    }
+    if (ix_mirror >= 1) mirror_branch(it);
+
+    //now we should be in the state where we were at the beginning of the function
+
+    if (cnt_overlaps_min < cnt_overlaps_init)
+    {
+        if (ix_mirror_min == 1) mirror_branch(it);
+        rotate_branch_by_angle(rna, it, angles[ix_angle_min]);
+        rna.update_bounding_boxes();
+    }
+}
+
+
+bool is_repositionable(const rna_tree::iterator it) {
+
+    return !rna_tree::is_root(it) && !rna_tree::is_leaf(it) && rna_tree::is_root(rna_tree::parent(it));
+//    return !rna_tree::is_leaf(it) && (rna_tree::is_root(rna_tree::parent(it)) || rna_tree::parent(it).number_of_children() == 2);
+
+}
+
+
+void compact::reposition_branches() {
+
+    rna.update_bounding_boxes();
+
+    for (auto it = rna.begin_post(); it != rna.end_post(); ++it){
+        if (is_repositionable(it)) {
+            reposition_branch(rna, it, rna.begin());
+        }
+    }
+
+    set_53_labels(rna);
 }

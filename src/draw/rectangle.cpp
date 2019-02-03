@@ -25,28 +25,27 @@
 using namespace std;
 
 
-
 rectangle::rectangle()
 : top_left(point::bad_point()), bottom_right(point::bad_point())
 {
 }
 
-point::point(point _top_left, point _bottom_right)
+rectangle::rectangle(point _top_left, point _bottom_right)
 :top_left(_top_left), bottom_right(_bottom_right)
 { }
 
 rectangle rectangle::operator+(const rectangle& other) const
 {
     return rectangle(
-            point(min(top_left.x, other.top_left.x), min(top_left.y, other.top_left.y)),
-            point(max(bottom_right.x, other.bottom_right.x), max(bottom_right.y, other.bottom_right.y)))
+            point(min(top_left.x, other.top_left.x), max(top_left.y, other.top_left.y)),
+            point(max(bottom_right.x, other.bottom_right.x), min(bottom_right.y, other.bottom_right.y)));
 }
 
 rectangle rectangle::operator+(const point& other) const
 {
     return rectangle(
-            point(min(top_left.x, other.x), min(top_left.y, other.y)),
-            point(max(bottom_right.x, other.x), max(bottom_right.y, other.y)))
+            point(min(top_left.x, other.x), max(top_left.y, other.y)),
+            point(max(bottom_right.x, other.x), min(bottom_right.y, other.y)));
 }
 
 rectangle& rectangle::operator=(const rectangle& other){
@@ -55,6 +54,28 @@ rectangle& rectangle::operator=(const rectangle& other){
     return *this;
 
 }
+
+bool rectangle::intersects(const rectangle& rect) const{
+    // If one rectangle is on left side of other
+
+    if ((rect.has(top_left) && rect.has(bottom_right)) || (has(rect.top_left) && has(rect.bottom_right)))
+        return true;
+
+    if (bottom_right.x < rect.top_left.x || top_left.x > rect.bottom_right.x)
+        return false;
+
+    // If one rectangle is above other
+    if (top_left.y < rect.bottom_right.y || bottom_right.y > rect.top_left.y)
+        return false;
+
+    return true;
+}
+
+bool rectangle::has(const point& point) const{
+    return top_left.x <= point.x && point.x  <= bottom_right.x
+           && top_left.y >= point.y && point.y >= bottom_right.y;
+}
+
 
 bool rectangle::initiated() const {
     return !top_left.bad() && !bottom_right.bad();

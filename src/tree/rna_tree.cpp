@@ -510,23 +510,23 @@ rectangle get_children_bounding_box(rna_tree::iterator node){
     rectangle bb;
     for (auto it = node.begin(); it != node.end(); it++){
         if (!bb.initiated()) {
-            bb = it->get_bounding_box();
+            bb = it->get_bounding_object();
         } else {
-            bb = bb + it->get_bounding_box();
+            bb = bb + it->get_bounding_object();
         }
     }
     return bb;
 
 }
 
-void rna_tree::compute_bounding_boxes(){
-    for (post_order_iterator it = this->begin_post(); it != this.end_post(); ++it){
+void rna_tree::update_bounding_boxes(){
+    for (post_order_iterator it = this->begin_post(); it != this->end_post(); ++it){
         assert(it->initiated_points());
         if (!it->paired()) {
-            it->set_bounding_box(rectangle(it->at(0).p, it->at(0).p));
+            it->set_bounding_object(rectangle(it->at(0).p, it->at(0).p));
         } else {
             rectangle bb = get_children_bounding_box(it) + it->at(0).p + it->at(1).p;
-            it->set_bounding_box(bb);
+            it->set_bounding_object(bb);
         }
     }
 }

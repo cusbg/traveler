@@ -35,11 +35,21 @@ public:
     rectangle(point top_left, point bottom_right);
 
 
-    rectangle&operator=(const rectangle& other);
+    rectangle& operator=(const rectangle& other);
     rectangle operator+(const point& other) const;
     rectangle operator+(const rectangle& other) const;
+//    bool operator&&(const rectangle& other) const;
+//    bool operator&&(const point& other) const;
+
+    bool intersects(const rectangle& rect) const;
+    bool has(const point& point) const;
+
 
     bool initiated() const;
+
+    bool includes(const rectangle& other) const;
+
+
 
 };
 
