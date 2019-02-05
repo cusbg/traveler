@@ -505,28 +505,56 @@ rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index) {
     return from + normalize(to - from) * 6 / scaling_ratio;
 }
 
-rectangle get_children_bounding_box(rna_tree::iterator node){
+vector<rectangle> get_non_leaf_children_bounding_objects(rna_tree::iterator node){
 
-    rectangle bb;
-    for (auto it = node.begin(); it != node.end(); it++){
-        if (!bb.initiated()) {
-            bb = it->get_bounding_object();
-        } else {
-            bb = bb + it->get_bounding_object();
+    vector<rectangle> bo;
+    for (auto it = node.begin(); it != node.end(); it++) {
+        if (!rna_tree::is_leaf(it)) {
+            auto aux = it->get_bounding_objects();
+            bo.insert(bo.end(), aux.begin(), aux.end());
         }
     }
-    return bb;
+    return bo;
+}
 
+rectangle get_loop_bounding_object(rna_tree::iterator node){
+
+    rectangle bo;
+    for (auto it = node.begin(); it != node.end(); it++) {
+        if (it->paired()) {
+            bo += rectangle(it->at(0).p, it->at(1).p);
+        } else {
+            bo += rectangle(it->at(0).p, it->at(0).p);
+        }
+    }
+
+    return bo;
 }
 
 void rna_tree::update_bounding_boxes(){
     for (post_order_iterator it = this->begin_post(); it != this->end_post(); ++it){
         assert(it->initiated_points());
-        if (!it->paired()) {
-            it->set_bounding_object(rectangle(it->at(0).p, it->at(0).p));
+        if (rna_tree::is_leaf(it)) {
+            //for a leaf, the bounding object is the list itself
+            if (it->paired()) {
+                //it can happen that the hairpin does not have a loop
+                it->set_bounding_objects(rectangle(it->at(0).p, it->at(1).p));
+            } else {
+                it->set_bounding_objects(rectangle(it->at(0).p, it->at(0).p));
+            }
         } else {
-            rectangle bb = get_children_bounding_box(it) + it->at(0).p + it->at(1).p;
-            it->set_bounding_object(bb);
+            if (it.number_of_children() == 1) {
+                //the current node is continuation of a stem
+                vector<rectangle> bo =  it.begin()->get_bounding_objects();
+                bo[0] += rectangle(it->at(0).p, it->at(1).p);
+                it->set_bounding_objects(bo);
+            } else {
+                //the current node is the beginning of a (possibly multibranch) loop
+                it->set_bounding_objects(rectangle(it->at(0).p, it->at(1).p));
+                it->add_bounding_objects(get_loop_bounding_object(it));
+                // add boundin objects of the stems which begin in the current loop
+                it->add_bounding_objects(get_non_leaf_children_bounding_objects(it));
+            }
         }
     }
 }

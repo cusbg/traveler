@@ -49,7 +49,7 @@ void compact::run()
     make();
     set_53_labels(rna);
 //    try_reposition_new_root_branches();
-//    reposition_branches();
+    reposition_branches();
     checks();
     
     INFO("END: Computing RNA layout");
@@ -1451,6 +1451,18 @@ void compact::try_reposition_new_root_branches() {
 
 }
 
+bool bo_overlap(vector<rectangle> vr1, vector<rectangle> vr2) {
+    for (rectangle r1: vr1) {
+        for (rectangle r2: vr2){
+            if (r1.intersects(r2)){
+                return true;
+            }
+        }
+
+    }
+    return false;
+}
+
 /// Checks how many residues in the subtree of it2 (including it2) are present in the bounding object covered by it1.
 /// \param it1
 /// \param it2
@@ -1459,10 +1471,9 @@ int count_overlaps(const rna_tree::iterator it1, const rna_tree::iterator it2){
 
     int sum = 0;
 
-    if (it1->id() != it2->id() && (it1->get_bounding_object().intersects(it2->get_bounding_object())))
+    if (it1->id() != it2->id() && bo_overlap(it1->get_bounding_objects(), it2->get_bounding_objects()))
     {
         if (rna_tree::is_leaf(it2)){
-            it1->get_bounding_object().intersects(it2->get_bounding_object());
             sum += 1;
         } else{
             for (auto ch = it2.begin(); ch != it2.end(); ++ch){
@@ -1490,7 +1501,7 @@ void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator 
     int cnt_overlaps_min = cnt_overlaps_init;
 
 
-//    if (cnt_overlaps_min <40) return;
+//    if (cnt_overlaps_min <30) return;
 
     int ix_angle_min = ix_zero_angle, ix_mirror_min = 0, ix_mirror = 0;
 
@@ -1535,11 +1546,21 @@ void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator 
     }
 }
 
+int number_of_non_leaf_children(rna_tree::iterator it) {
+    int sum = 0;
+    for (auto i = it.begin(); i != it.end(); ++i){
+        if (!rna_tree::is_leaf(i)){
+            sum++;
+        }
+    }
+    return sum;
+
+}
 
 bool is_repositionable(const rna_tree::iterator it) {
 
     return !rna_tree::is_root(it) && !rna_tree::is_leaf(it) && rna_tree::is_root(rna_tree::parent(it));
-//    return !rna_tree::is_leaf(it) && (rna_tree::is_root(rna_tree::parent(it)) || rna_tree::parent(it).number_of_children() == 2);
+//    return !rna_tree::is_root(it) && !rna_tree::is_leaf(it) && number_of_non_leaf_children(rna_tree::iterator(it.node->parent)) >1;
 
 }
 

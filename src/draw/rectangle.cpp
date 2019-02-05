@@ -36,17 +36,55 @@ rectangle::rectangle(point _top_left, point _bottom_right)
 
 rectangle rectangle::operator+(const rectangle& other) const
 {
-    return rectangle(
-            point(min(top_left.x, other.top_left.x), max(top_left.y, other.top_left.y)),
-            point(max(bottom_right.x, other.bottom_right.x), min(bottom_right.y, other.bottom_right.y)));
+    if (this->initiated()) {
+        return rectangle(
+                point(min(top_left.x, other.top_left.x), max(top_left.y, other.top_left.y)),
+                point(max(bottom_right.x, other.bottom_right.x), min(bottom_right.y, other.bottom_right.y)));
+    } else {
+        return rectangle(other.top_left, other.bottom_right);
+    }
 }
 
 rectangle rectangle::operator+(const point& other) const
 {
-    return rectangle(
-            point(min(top_left.x, other.x), max(top_left.y, other.y)),
-            point(max(bottom_right.x, other.x), min(bottom_right.y, other.y)));
+    if (this->initiated()) {
+        return rectangle(
+                point(min(top_left.x, other.x), max(top_left.y, other.y)),
+                point(max(bottom_right.x, other.x), min(bottom_right.y, other.y)));
+    } else {
+        return rectangle(
+                point(other.x, other.y),
+                point(other.x, other.y));
+    }
 }
+
+rectangle& rectangle::operator+=(const point& other)
+{
+    if (this->initiated()) {
+        top_left = point(min(top_left.x, other.x), max(top_left.y, other.y));
+        bottom_right = point(max(bottom_right.x, other.x), min(bottom_right.y, other.y));
+    } else {
+        top_left = point(other.x, other.y);
+        bottom_right = point(other.x, other.y);
+    }
+
+    return *this;
+}
+
+rectangle& rectangle::operator+=(const rectangle& other)
+{
+    if (this->initiated()) {
+        top_left = point(min(top_left.x, other.top_left.x), max(top_left.y, other.top_left.y));
+        bottom_right =  point(max(bottom_right.x, other.bottom_right.x), min(bottom_right.y, other.bottom_right.y));
+    } else {
+        top_left = other.top_left;
+        bottom_right = other.bottom_right;
+    }
+
+    return *this;
+}
+
+
 
 rectangle& rectangle::operator=(const rectangle& other){
     top_left = other.top_left;

@@ -112,12 +112,25 @@ public:
 
     void set_p(const point _p, const size_t index);
 
-    void set_bounding_object(rectangle bo) {
-        bounding_object = bo;
+    void set_bounding_objects(std::vector<rectangle> bo) {
+        bounding_objects = bo;
     }
 
-    rectangle get_bounding_object(){
-        return bounding_object;
+    void set_bounding_objects(rectangle bo) {
+        bounding_objects.clear();
+        add_bounding_objects(bo);
+    }
+
+    void add_bounding_objects(rectangle bo) {
+        bounding_objects.push_back(bo);
+    }
+
+    void add_bounding_objects(std::vector<rectangle> bos) {
+        bounding_objects.insert(bounding_objects.end(), bos.begin(), bos.end());
+    }
+
+    std::vector<rectangle> get_bounding_objects(){
+        return bounding_objects;
     }
     
 public:
@@ -127,7 +140,7 @@ public:
 private:
     std::vector<rna_label> labels;
     point parent_center;
-    rectangle bounding_object;
+    std::vector<rectangle> bounding_objects;
 
     
 };

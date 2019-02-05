@@ -38,6 +38,8 @@ public:
     rectangle& operator=(const rectangle& other);
     rectangle operator+(const point& other) const;
     rectangle operator+(const rectangle& other) const;
+    rectangle& operator+=(const point& other);
+    rectangle& operator+=(const rectangle& other);
 //    bool operator&&(const rectangle& other) const;
 //    bool operator&&(const point& other) const;
 
