@@ -1490,7 +1490,7 @@ void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator 
     std::vector<int> angles;
     int ix_zero_angle = -1;
     int ix = 0;
-    for (int i = -45; i <= 45; i += 45) {
+    for (int i = -90; i <= 90; i += 45) {
         angles.push_back(i);
         if (i == 0) ix_zero_angle = ix;
         ix++;
@@ -1501,11 +1501,16 @@ void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator 
     int cnt_overlaps_min = cnt_overlaps_init;
 
 
-//    if (cnt_overlaps_min <30) return;
+    //Try to rotate only if substantial portion of the tree overlaps
+    if (cnt_overlaps_min < rna.size(it) * 0.1) return;
 
     int ix_angle_min = ix_zero_angle, ix_mirror_min = 0, ix_mirror = 0;
 
-    for (; ix_mirror < 2; ix_mirror++)
+    // Try mirroring only for 1-st level
+    int max_mirror = rna.depth(it) == 1 ? 2 : 1;
+//    printf("%i\n", max_mirror);
+
+    for (; ix_mirror < max_mirror; ix_mirror++)
     {
         int ix_angle = 0;
         if (ix_mirror == 1) mirror_branch(it);
@@ -1559,8 +1564,8 @@ int number_of_non_leaf_children(rna_tree::iterator it) {
 
 bool is_repositionable(const rna_tree::iterator it) {
 
-    return !rna_tree::is_root(it) && !rna_tree::is_leaf(it) && rna_tree::is_root(rna_tree::parent(it));
-//    return !rna_tree::is_root(it) && !rna_tree::is_leaf(it) && number_of_non_leaf_children(rna_tree::iterator(it.node->parent)) >1;
+//    return !rna_tree::is_root(it) && !rna_tree::is_leaf(it) && rna_tree::is_root(rna_tree::parent(it));
+    return !rna_tree::is_root(it) && !rna_tree::is_leaf(it) && number_of_non_leaf_children(rna_tree::iterator(it.node->parent)) >1;
 
 }
 

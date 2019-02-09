@@ -409,6 +409,13 @@ int tree_base<label_type>::depth(
     return _tree.depth(it);
 }
 
+template <typename label_type>
+int tree_base<label_type>::size(
+        const base_iterator& it)
+{
+    return _tree.size(it);
+}
+
 /* static */
 template <typename label_type>
 template <typename iterator_type, typename funct>
