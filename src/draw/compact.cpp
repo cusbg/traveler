@@ -23,6 +23,7 @@
 #include "compact_circle.hpp"
 #include "compact_utils.hpp"
 #include "overlap_checks.hpp"
+#include "tree_base.hpp"
 
 #include "iostream"
 
@@ -151,6 +152,7 @@ void rotate_branch_by_angle(rna_tree &rna, rna_tree::iterator branch, double ang
 
         for (rna_tree::post_order_iterator it = parent.begin(); it != branch; it++)
             rotate_node(it, pivot, angle);
+        rotate_node(branch, pivot, angle);
 
     } else if (right_end){
 
@@ -162,6 +164,7 @@ void rotate_branch_by_angle(rna_tree &rna, rna_tree::iterator branch, double ang
         point pivot = (branch->at(0).p + branch->at(1).p)/2;
         for (rna_tree::iterator it = branch.begin(); it != branch.end(); it++)
             rotate_node(it, pivot, angle);
+        rotate_node(branch, pivot, angle);
 
     }
 
@@ -1485,20 +1488,46 @@ int count_overlaps(const rna_tree::iterator it1, const rna_tree::iterator it2){
     return sum;
 }
 
+point get_branch_orientation(const rna_tree::iterator it) {
+    assert(it->paired())
+
+    typedef tree_base<rna_pair_label> tb;
+
+    tb::iterator it1 = it.begin();
+    for (; it1 != it; ++it1) {
+        if (it1->paired()) break;
+    }
+
+    return it1 != it ? it1->center() - it->center() : point();
+}
+
+bool vec_closer_to_axis(const point vec1, const point vec2){
+    //if minimum of distances to x or y axis of v1 is closer then those of v2, the function returns true
+//    return false;
+
+    if (vec1.bad() || vec2.bad()) return false;
+
+    point vn1 = normalize(vec1), vn2 = normalize(vec2);
+
+    return min(vn1.x, vn1.y) < min(vn2.x, vn2.y);
+
+
+}
+
 void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator root) {
 
     std::vector<int> angles;
     int ix_zero_angle = -1;
-    int ix = 0;
-    for (int i = -90; i <= 90; i += 45) {
-        angles.push_back(i);
-        if (i == 0) ix_zero_angle = ix;
-        ix++;
+
+    for (int angle = -90, ix = 0; angle <= 90; angle += 10, ix++) {
+        angles.push_back(angle);
+        if (angle == 0) ix_zero_angle = ix;
     }
 
 
     int cnt_overlaps_init = count_overlaps(it, root);
     int cnt_overlaps_min = cnt_overlaps_init;
+    point orientation_min = get_branch_orientation(it);
 
 
     //Try to rotate only if substantial portion of the tree overlaps
@@ -1524,10 +1553,14 @@ void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator 
 
             // if the number of overlaps is minimum, prefer zero rotation (that could happen in multiple
             // mirrored angles lead to zero (or other minimum number) overlaps)
-            if (cnt_overlaps < cnt_overlaps_min || (cnt_overlaps == cnt_overlaps_min && ix_angle == ix_zero_angle)) {
+            point orientation = get_branch_orientation(it);
+            if (cnt_overlaps < cnt_overlaps_min ||
+            (cnt_overlaps == cnt_overlaps_min &&
+                    (ix_angle == ix_zero_angle || vec_closer_to_axis(orientation, orientation_min) ))) {
                 cnt_overlaps_min = cnt_overlaps;
                 ix_angle_min = ix_angle;
                 ix_mirror_min = ix_mirror;
+                orientation_min = orientation;
             }
 
             rotate_branch_by_angle(rna, it, -angles[ix_angle]);
