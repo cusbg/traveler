@@ -214,7 +214,7 @@ void app::save(
     APP_DEBUG_FNAME;
     
     overlap_checks::overlaps overlaps;
-    if (overlap)
+//    if (overlap)
         overlaps = overlap_checks().run(rna);
     
     for (bool colored : {true, false})
@@ -230,15 +230,15 @@ void app::save(
                 writer->print(writer->get_circle_formatted(p.centre, p.radius));
         }
     }
-    
-    if (overlap)
-    {
-        INFO("Overlaps computed: found %s in rna %s", overlaps.size(), rna.name());
-    }
-    else
-    {
-        INFO("Overlaps computation was skipped for %s", rna.name());
-    }
+
+//    if (overlap)
+//    {
+        INFO("Overlaps count: %s", overlaps.size());
+//    }
+//    else
+//    {
+//        INFO("Overlaps computation was skipped for %s", rna.name());
+//    }
 }
 
 
