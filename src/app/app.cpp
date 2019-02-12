@@ -225,9 +225,10 @@ void app::save(
             string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
             writer->init(file, rna);
             writer->print(writer->get_rna_formatted(rna));
-            
-            for (const auto& p : overlaps)
-                writer->print(writer->get_circle_formatted(p.centre, p.radius));
+
+            if (overlap)
+                for (const auto& p : overlaps)
+                    writer->print(writer->get_circle_formatted(p.centre, p.radius));
         }
     }
 
