@@ -1,0 +1,89 @@
+cmake_minimum_required(VERSION 3.12)
+project(traveler)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(src/include)
+include_directories(src/include/tests)
+include_directories(src/include/tree_hh)
+
+add_executable(traveler
+        src/app/app.cpp
+        src/app/main.cpp
+        src/draw/compact.cpp
+        src/draw/compact_circle.cpp
+        src/draw/compact_utils.cpp
+        src/draw/overlap_checks.cpp
+        src/draw/point.cpp
+#        src/draw/rectangle.cpp
+        src/include/tests/compact_circle.test.hpp
+        src/include/tests/gted.test.hpp
+        src/include/tests/mprintf.test.hpp
+        src/include/tests/overlap_checks.test.hpp
+        src/include/tests/point.test.hpp
+        src/include/tests/rna_tree.test.hpp
+        src/include/tests/rted.test.hpp
+        src/include/tests/test.test.hpp
+        src/include/tests/utils.test.hpp
+        src/include/tree_hh/tree.hh
+        src/include/app.hpp
+        src/include/compact.hpp
+        src/include/compact_circle.hpp
+        src/include/compact_utils.hpp
+        src/include/crw_extractor.hpp
+        src/include/document_writer.hpp
+        src/include/exception.hpp
+        src/include/extractor.hpp
+        src/include/gted.hpp
+        src/include/gted_tree.hpp
+        src/include/logger.hpp
+        src/include/mapping.hpp
+        src/include/mprintf.hpp
+        src/include/overlap_checks.hpp
+        src/include/point.hpp
+        src/include/ps_writer.hpp
+        src/include/rna_tree.hpp
+        src/include/rna_tree_label.hpp
+        src/include/rted.hpp
+        src/include/strategy.hpp
+        src/include/svg_writer.hpp
+        src/include/traveler_extractor.hpp
+        src/include/traveler_writer.hpp
+        src/include/tree_base.hpp
+        src/include/tree_base_iter.hpp
+        src/include/tree_base_node.hpp
+        src/include/tree_base_utils.hpp
+        src/include/tree_matcher.hpp
+        src/include/types.hpp
+        src/include/utils.hpp
+        src/include/varna_extractor.hpp
+        src/ted/gted.cpp
+        src/ted/gted_tree.cpp
+        src/ted/mapping.cpp
+        src/ted/rted.cpp
+        src/ted/strategy.cpp
+        src/tests/compact_circle.test.cpp
+        src/tests/gted.test.cpp
+        src/tests/mprintf.test.cpp
+        src/tests/overlap_checks.test.cpp
+        src/tests/point.test.cpp
+        src/tests/rna_tree.test.cpp
+        src/tests/rted.test.cpp
+        src/tests/test.test.cpp
+        src/tests/utils.test.cpp
+        src/tree/rna_tree.cpp
+        src/tree/rna_tree_label.cpp
+        src/tree/tree_base_node.cpp
+        src/tree/tree_matcher.cpp
+        src/utils/crw_extractor.cpp
+        src/utils/document_writer.cpp
+        src/utils/exception.cpp
+        src/utils/extractor.cpp
+        src/utils/logger.cpp
+        src/utils/ps_writer.cpp
+        src/utils/svg_writer.cpp
+        src/utils/traveler_extractor.cpp
+        src/utils/traveler_writer.cpp
+        src/utils/types.cpp
+        src/utils/utils.cpp
+        src/utils/varna_extractor.cpp)
