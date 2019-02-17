@@ -231,6 +231,8 @@ private:
      * check all nodes are inited
      */
     inline void checks();
+
+    void beautify();
     
     void try_reposition_new_root_branches();
 

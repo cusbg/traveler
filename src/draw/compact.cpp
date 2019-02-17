@@ -50,7 +50,8 @@ void compact::run()
     make();
     set_53_labels(rna);
 //    try_reposition_new_root_branches();
-    reposition_branches();
+//    reposition_branches();
+    beautify();
     checks();
     
     INFO("END: Computing RNA layout");
@@ -1531,7 +1532,7 @@ void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator 
 
 
     //Try to rotate only if substantial portion of the tree overlaps
-    if (cnt_overlaps_min < rna.size(it) * 0.1) return;
+    if (cnt_overlaps_min < rna.size(it) * 0.2) return;
 
     int ix_angle_min = ix_zero_angle, ix_mirror_min = 0, ix_mirror = 0;
 
@@ -1614,4 +1615,10 @@ void compact::reposition_branches() {
     }
 
     set_53_labels(rna);
+}
+
+void compact::beautify(){
+//    straighten_branches();
+    reposition_branches();
+
 }
