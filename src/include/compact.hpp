@@ -237,6 +237,8 @@ private:
     void try_reposition_new_root_branches();
 
     void reposition_branches();
+
+    void pull_neighbors_together();
     
     
 private:

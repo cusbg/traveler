@@ -15,7 +15,7 @@ add_executable(traveler
         src/draw/compact_utils.cpp
         src/draw/overlap_checks.cpp
         src/draw/point.cpp
-#        src/draw/rectangle.cpp
+        src/draw/rectangle.cpp
         src/include/tests/compact_circle.test.hpp
         src/include/tests/gted.test.hpp
         src/include/tests/mprintf.test.hpp

@@ -136,7 +136,7 @@ public:
         return distances.loops_bases_distance;
     }
 
-    void update_bounding_boxes();
+    void update_bounding_boxes(bool leafs_have_size = false);
 
 private:
     /**

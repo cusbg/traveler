@@ -52,6 +52,7 @@ void compact::run()
 //    try_reposition_new_root_branches();
 //    reposition_branches();
     beautify();
+    set_53_labels(rna);
     checks();
     
     INFO("END: Computing RNA layout");
@@ -462,49 +463,10 @@ void init_root_level_unpaired(rna_tree &  rna){
 
                 s[0]++;
                 shift_region(rna.begin(), s[0],  - dir * (dist_diff / 2));
-                shift_region(s[1], rna.end(),  dir * (dist_diff / 2));
+                shift_region( s[1], rna.end(),  dir * (dist_diff / 2));
             }
         }
     }
-}
-
-/**
- * Deletion of a node (unpaired nt) introduces a gap in the layout. This is taken care of in the case of in non-root
- * level. This function does contraction for the first level.
- * @param rna
- */
-void init_root_level_deleted(rna_tree &  rna) {
-
-    compact::sibling_iterator root = rna.begin();
-
-
-    compact::sibling_iterator it_prev = root.begin();
-    compact::sibling_iterator it = ++compact::sibling_iterator(it_prev);
-    while(it != root.end()) { //traverse the tree pre-order
-        if (!it->paired() ){
-            size_t id0 = it_prev->seq_id_mapped();
-            size_t id1 = it->seq_id_mapped();
-
-            if (id0 != TREE_BASE_NODE_NOT_MAPPED_ID && id1 != TREE_BASE_NODE_NOT_MAPPED_ID && id1 != id0 + 1) {
-                //there was a deletion
-                point p0 = it_prev->paired() ? it_prev->at(1).p : it_prev->at(0).p;
-                point p1 = it->at(0).p;
-                double dist = distance(p1, p0);
-
-                if ( dist > 2*BASES_DISTANCE) {
-                    //lets contract only if the distance after deletion is too big, otherwise it's better not to touch the layout
-                    point dist_vect = normalize(p1 - p0) * (dist/2-BASES_DISTANCE/2);
-
-                    shift_region(root.begin(), it,  dist_vect );
-                    shift_region(it, root.end(),  -dist_vect);
-                }
-            }
-
-        }
-
-        it++; it_prev++;
-    }
-
 }
 
 void compact::init()
@@ -614,7 +576,7 @@ void compact::init()
 //    }
 
     init_root_level_unpaired(rna);
-    init_root_level_deleted(rna);
+//    init_root_level_deleted(rna);
     normalize_53_ends(rna);
     root->remake_ids.clear();
     
@@ -1475,6 +1437,10 @@ int count_overlaps(const rna_tree::iterator it1, const rna_tree::iterator it2){
 
     int sum = 0;
 
+    if (it2->id() == 1003) {
+        int x = 1;
+    }
+
     if (it1->id() != it2->id() && bo_overlap(it1->get_bounding_objects(), it2->get_bounding_objects()))
     {
         if (rna_tree::is_leaf(it2)){
@@ -1483,6 +1449,20 @@ int count_overlaps(const rna_tree::iterator it1, const rna_tree::iterator it2){
             for (auto ch = it2.begin(); ch != it2.end(); ++ch){
                 sum += count_overlaps(it1, ch);
             }
+        }
+    }
+
+    return sum;
+}
+
+int count_overlaps(const rna_tree::iterator it1_begin, const rna_tree::iterator it1_end,
+        const rna_tree::iterator it2_begin, const rna_tree::iterator it2_end){
+
+    int sum = 0;
+
+    for (auto it1 = it1_begin; it1 != it1_end; ++it1) {
+        for (auto it2 = it2_begin; it2 != it2_end; ++it2) {
+            sum += count_overlaps(it1, it2);
         }
     }
 
@@ -1526,13 +1506,18 @@ void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator 
     }
 
 
+    if (it->id() == 1038) {
+        int x=9;
+    }
+
     int cnt_overlaps_init = count_overlaps(it, root);
     int cnt_overlaps_min = cnt_overlaps_init;
     point orientation_min = get_branch_orientation(it);
 
 
     //Try to rotate only if substantial portion of the tree overlaps
-    if (cnt_overlaps_min < rna.size(it) * 0.2) return;
+
+    if (cnt_overlaps_min < rna.size(it) * 0.1) return;
 
     int ix_angle_min = ix_zero_angle, ix_mirror_min = 0, ix_mirror = 0;
 
@@ -1617,8 +1602,85 @@ void compact::reposition_branches() {
     set_53_labels(rna);
 }
 
+void contract_nodes(compact::iterator it, compact::iterator it2, compact::iterator root) {
+    int cnt_overlaps_init = count_overlaps(rna_tree::parent(it), root);
+}
+
+/**
+ * Deletion of a node (unpaired nt) introduces a gap in the layout. This is taken care of in the case of in non-root
+ * level. This function does contraction for the first level.
+ * @param rna
+ */
+void contract_root_level(rna_tree &  rna) {
+
+
+    rna.update_bounding_boxes(true);
+
+    auto root = rna.begin();
+    auto begin = root.begin();
+    auto end = root.end();
+
+    auto it_prev = begin;
+    auto it = ++compact::sibling_iterator(it_prev);
+    while(it != end) { //traverse the tree pre-order
+//        if (!it->paired() ){
+            size_t id0 = it_prev->seq_id_mapped();
+            size_t id1 = it->seq_id_mapped();
+
+//            if (id0 != TREE_BASE_NODE_NOT_MAPPED_ID && id1 != TREE_BASE_NODE_NOT_MAPPED_ID && id1 != id0 + 1) {
+                //there was a deletion
+                point p0 = it_prev->paired() ? it_prev->at(1).p : it_prev->at(0).p;
+                point p1 = it->at(0).p;
+                double dist = distance(p1, p0);
+
+                if ( dist > 2*BASES_DISTANCE) {
+
+//                    if (it_prev->at(0).label[0] == 'A' && it->at(0).label[0] == 'U') {
+//                        return;
+//                    }
+
+
+                    //lets contract only if the distance after deletion is too big, otherwise it's better not to touch the layout
+                    point dist_vect = normalize(p1 - p0) * (dist-BASES_DISTANCE);
+
+                    int cnt_overlaps = count_overlaps(begin, it, it, end);
+                    int cnt_lines_overlaps = overlap_checks::get_overlaps( overlap_checks::get_edges(begin, it), overlap_checks::get_edges(it, end)).size();
+
+                    shift_region(begin, it,  dist_vect );
+//                    shift_region(it, end,  -dist_vect);
+
+                    rna.update_bounding_boxes(true);
+
+                    int cnt_overlaps_new = count_overlaps(begin, it, it, end);
+                    int cnt_lines_overlaps_new = overlap_checks::get_overlaps( overlap_checks::get_edges(begin, it), overlap_checks::get_edges(it, end)).size();
+
+                    printf("%i, %i, %i, %i \n", cnt_overlaps, cnt_overlaps_new, cnt_lines_overlaps, cnt_lines_overlaps_new);
+
+                    if (cnt_overlaps_new -2 > cnt_overlaps || cnt_lines_overlaps_new > cnt_lines_overlaps ) {
+                        shift_region(begin, it,  -dist_vect );
+//                        shift_region(it, end,  dist_vect);
+                        rna.update_bounding_boxes(true);
+                    } else {
+//                        return;
+                    }
+
+
+
+                }
+//            }
+
+//        }
+
+        it++; it_prev++;
+    }
+
+    rna.update_bounding_boxes(false);
+
+}
+
 void compact::beautify(){
-//    straighten_branches();
+    contract_root_level(rna);
     reposition_branches();
+    set_53_labels(rna);
 
 }

@@ -25,6 +25,7 @@
 #include <vector>
 #include "point.hpp"
 #include "rna_tree.hpp"
+#include "compact.hpp"
 
 class overlap_checks
 {
@@ -59,8 +60,10 @@ public:
                  rna_tree& _rna);
     
     static edges get_edges(const rna_tree::iterator& node);
-    static overlaps get_overlaps(const edges &es1, const edges &es2,
-            const std::vector<int> &es1_filter= std::vector<int>(), const std::vector<int> &es2_filter= std::vector<int>());
+
+    static edges get_edges(const compact::sibling_iterator& begin, const compact::sibling_iterator& end);
+
+    static overlaps get_overlaps(const edges &es1, const edges &es2);
     
 private:
     /**
@@ -90,6 +93,8 @@ public:
     static point intersection(
                               const edge& e1,
                               const edge& e2);
+
+    static bool intersect(const edge& e1, const edge& e2);
     
 };
 

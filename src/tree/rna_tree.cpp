@@ -26,6 +26,9 @@
 
 using namespace std;
 
+#define PAIRS_DISTANCE get_pair_base_distance()
+#define BASES_DISTANCE get_pairs_distance()
+
 inline static std::vector<rna_pair_label> convert(
                                                   const std::string& labels);
 
@@ -531,7 +534,8 @@ rectangle get_loop_bounding_object(rna_tree::iterator node){
     return bo;
 }
 
-void rna_tree::update_bounding_boxes(){
+void rna_tree::update_bounding_boxes(bool leafs_have_size){
+    float bd = leafs_have_size ? get_pairs_distance()/2: 0;
     for (post_order_iterator it = this->begin_post(); it != this->end_post(); ++it){
         assert(it->initiated_points());
         if (rna_tree::is_leaf(it)) {
@@ -540,7 +544,8 @@ void rna_tree::update_bounding_boxes(){
                 //it can happen that the hairpin does not have a loop
                 it->set_bounding_objects(rectangle(it->at(0).p, it->at(1).p));
             } else {
-                it->set_bounding_objects(rectangle(it->at(0).p, it->at(0).p));
+//                it->set_bounding_objects(rectangle(it->at(0).p, it->at(0).p));
+                it->set_bounding_objects(rectangle(it->at(0).p+point(-bd, bd), it->at(0).p+point(bd, -bd)));
             }
         } else {
             if (it.number_of_children() == 1) {
