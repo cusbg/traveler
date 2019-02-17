@@ -1656,7 +1656,7 @@ void contract_root_level(rna_tree &  rna) {
 
                     printf("%i, %i, %i, %i \n", cnt_overlaps, cnt_overlaps_new, cnt_lines_overlaps, cnt_lines_overlaps_new);
 
-                    if (cnt_overlaps_new -2 > cnt_overlaps || cnt_lines_overlaps_new > cnt_lines_overlaps ) {
+                    if (cnt_overlaps_new > cnt_overlaps || cnt_lines_overlaps_new > cnt_lines_overlaps ) {
                         shift_region(begin, it,  -dist_vect );
 //                        shift_region(it, end,  dist_vect);
                         rna.update_bounding_boxes(true);
