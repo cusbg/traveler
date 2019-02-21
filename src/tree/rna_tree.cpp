@@ -538,6 +538,7 @@ void rna_tree::update_bounding_boxes(bool leafs_have_size){
     float bd = leafs_have_size ? get_pairs_distance()/2: 0;
     for (post_order_iterator it = this->begin_post(); it != this->end_post(); ++it){
         assert(it->initiated_points());
+
         if (rna_tree::is_leaf(it)) {
             //for a leaf, the bounding object is the list itself
             if (it->paired()) {

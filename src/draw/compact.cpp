@@ -1429,6 +1429,15 @@ bool bo_overlap(vector<rectangle> vr1, vector<rectangle> vr2) {
     return false;
 }
 
+bool bo_overlap(vector<rectangle> rs, point line_begin, point line_end) {
+    for (rectangle r: rs) {
+        if (r.intersects(line_begin, line_end)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 /// Checks how many residues in the subtree of it2 (including it2) are present in the bounding object covered by it1.
 /// \param it1
 /// \param it2
@@ -1437,15 +1446,28 @@ int count_overlaps(const rna_tree::iterator it1, const rna_tree::iterator it2){
 
     int sum = 0;
 
-    if (it2->id() == 1003) {
-        int x = 1;
-    }
+//    if (it2->id() == 1003) {
+//        int x = 1;
+//    }
 
-    if (it1->id() != it2->id() && bo_overlap(it1->get_bounding_objects(), it2->get_bounding_objects()))
+    if (it1->id() != it2->id())
     {
         if (rna_tree::is_leaf(it2)){
-            sum += 1;
-        } else{
+            if (bo_overlap(it1->get_bounding_objects(), it2->get_bounding_objects())){
+                sum += 1;
+            }
+            else if (rna_tree::last_child(rna_tree::parent(it2)) != it2){
+                auto next = it2.node->next_sibling;
+                point p_next = next->data.at(0).p;
+                bool intersects_it1 = p_next == it1->at(0).p;
+                if (it1->paired()) {
+                    intersects_it1 = intersects_it1 || p_next == it1->at(1).p;
+                }
+                if ( !intersects_it1 && bo_overlap(it1->get_bounding_objects(), it2->at(0).p, p_next)){
+                    sum +=1;
+                }
+            }
+        } else if (bo_overlap(it1->get_bounding_objects(), it2->get_bounding_objects())){
             for (auto ch = it2.begin(); ch != it2.end(); ++ch){
                 sum += count_overlaps(it1, ch);
             }
@@ -1613,8 +1635,7 @@ void contract_nodes(compact::iterator it, compact::iterator it2, compact::iterat
  */
 void contract_root_level(rna_tree &  rna) {
 
-
-    rna.update_bounding_boxes(true);
+    rna.update_bounding_boxes();
 
     auto root = rna.begin();
     auto begin = root.begin();
@@ -1633,7 +1654,7 @@ void contract_root_level(rna_tree &  rna) {
                 point p1 = it->at(0).p;
                 double dist = distance(p1, p0);
 
-                if ( dist > 2*BASES_DISTANCE) {
+                if ( dist > 3*BASES_DISTANCE) {
 
 //                    if (it_prev->at(0).label[0] == 'A' && it->at(0).label[0] == 'U') {
 //                        return;
@@ -1644,22 +1665,22 @@ void contract_root_level(rna_tree &  rna) {
                     point dist_vect = normalize(p1 - p0) * (dist-BASES_DISTANCE);
 
                     int cnt_overlaps = count_overlaps(begin, it, it, end);
-                    int cnt_lines_overlaps = overlap_checks::get_overlaps( overlap_checks::get_edges(begin, it), overlap_checks::get_edges(it, end)).size();
+//                    int cnt_lines_overlaps = overlap_checks::get_overlaps( overlap_checks::get_edges(begin, it), overlap_checks::get_edges(it, end)).size();
 
                     shift_region(begin, it,  dist_vect );
 //                    shift_region(it, end,  -dist_vect);
 
-                    rna.update_bounding_boxes(true);
+                    rna.update_bounding_boxes();
 
                     int cnt_overlaps_new = count_overlaps(begin, it, it, end);
-                    int cnt_lines_overlaps_new = overlap_checks::get_overlaps( overlap_checks::get_edges(begin, it), overlap_checks::get_edges(it, end)).size();
+//                    int cnt_lines_overlaps_new = overlap_checks::get_overlaps( overlap_checks::get_edges(begin, it), overlap_checks::get_edges(it, end)).size();
 
-                    printf("%i, %i, %i, %i \n", cnt_overlaps, cnt_overlaps_new, cnt_lines_overlaps, cnt_lines_overlaps_new);
+//                    printf("%i, %i, %i, %i \n", cnt_overlaps, cnt_overlaps_new, cnt_lines_overlaps, cnt_lines_overlaps_new);
 
-                    if (/*cnt_overlaps_new > cnt_overlaps ||*/ cnt_lines_overlaps_new > cnt_lines_overlaps ) {
+                    if (cnt_overlaps_new > cnt_overlaps /*|| cnt_lines_overlaps_new > cnt_lines_overlaps */ ) {
                         shift_region(begin, it,  -dist_vect );
 //                        shift_region(it, end,  dist_vect);
-                        rna.update_bounding_boxes(true);
+                        rna.update_bounding_boxes();
                     } else {
 //                        return;
                     }
@@ -1674,13 +1695,19 @@ void contract_root_level(rna_tree &  rna) {
         it++; it_prev++;
     }
 
-    rna.update_bounding_boxes(false);
 
 }
 
 void compact::beautify(){
-    contract_root_level(rna);
-    reposition_branches();
+
+    //TODO: number of iterations needs to be parametrized
+    for (int i = 0; i < 3; ++i ){
+        contract_root_level(rna);
+        reposition_branches();
+
+    }
+
+
     set_53_labels(rna);
 
 }

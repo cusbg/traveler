@@ -32,7 +32,12 @@ struct rectangle
     
 public:
     rectangle();
-    rectangle(point top_left, point bottom_right);
+    rectangle(point p1, point p2);
+
+    point get_top_left () const {return top_left;};
+    point get_top_right() const {return point(bottom_right.x, top_left.y);};
+    point get_bottom_left() const { return  point(top_left.x, bottom_right.y); };
+    point get_bottom_right() const { return bottom_right;};
 
 
     rectangle& operator=(const rectangle& other);
@@ -44,6 +49,7 @@ public:
 //    bool operator&&(const point& other) const;
 
     bool intersects(const rectangle& rect) const;
+    bool intersects(const point& p1, const point& p2) const;
     bool has(const point& point) const;
 
 
