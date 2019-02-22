@@ -282,6 +282,7 @@ bool rna_tree::correct_pairing() const
     for (iterator it = begin(); it != end(); ++it)
     {
         // if is leaf and is paired..
+//        if (is_leaf(it) == it->paired())
         if (is_leaf(it) == it->paired())
             return false;
     }

@@ -103,7 +103,9 @@ public:
      * set bases
      */
     void set_label_strings(
-                           const rna_pair_label& other);
+                           const rna_pair_label& other,
+                           const int cnt_children,
+                           const int other_cnt_children);
     
     void set_parent_center(
                            const point& center);

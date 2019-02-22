@@ -75,11 +75,13 @@ rna_tree& matcher::run(
     compute_sizes();
     
     merge();
-    
-    if (!t1.correct_pairing() || !t2.correct_pairing())
-    {
-        throw illegal_state_exception("Uncorrect tree pairing after transforming template to target tree");
-    }
+
+    // The following check is not valid since we can have a leaf node which is base paired in case of
+    // stems with no loop. Last bp of such a stem is paired and also a leaf
+//    if (!t1.correct_pairing() || !t2.correct_pairing())
+//    {
+//        throw illegal_state_exception("Uncorrect tree pairing after transforming template to target tree");
+//    }
     
 //    set_53_labels(t1);
     t1.set_postorder_ids();
@@ -137,7 +139,8 @@ void matcher::erase()
     }
 }
 
-//mapovani jednoho stromu na druhy
+// t1 has already removed nodes which should be removed based on the mapping
+// here we insert to t1 from t2
 void matcher::merge()
 {
     iterator it1, it2;
@@ -147,7 +150,7 @@ void matcher::merge()
     it1 = t1.begin();
     it2 = t2.begin();
     
-    it1->set_label_strings(*it2);
+    it1->set_label_strings(*it2, it1.number_of_children(), it2.number_of_children());
     
     while (it1 != t1.end() && it2 != t2.end())
     {
@@ -167,8 +170,7 @@ void matcher::merge()
                 steal = 0;
                 ins = ch1;
                 
-                if (ch2->paired())
-                {
+                if (ch2->paired()) {
                     actual = 0;
                     needed = s2.at(id(ch2)); //Taking into account the number of siblings needed in order for the tree to have the required structure
                     
@@ -186,7 +188,7 @@ void matcher::merge()
             }
             else
             {
-                ch1->set_label_strings(*ch2);
+                ch1->set_label_strings(*ch2, ch1.number_of_children(), ch2.number_of_children());
             }
             
             ++ch2;
@@ -209,7 +211,7 @@ void matcher::merge()
 void matcher::compute_sizes()
 {
     /*
-     * Counts the size of every subtree (s1 and s2 vectors) for furhter utilization (does not tak into account
+     * Counts the size of every subtree (s1 and s2 vectors) for further use (does not take into account
      * inserted and deleted nodes).
      */
     APP_DEBUG_FNAME;
