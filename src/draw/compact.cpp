@@ -1491,17 +1491,21 @@ int count_overlaps(const rna_tree::iterator it1_begin, const rna_tree::iterator 
     return sum;
 }
 
-point get_branch_orientation(const rna_tree::iterator it) {
+point get_branch_orientation(const rna_tree::post_order_iterator it) {
     assert(it->paired())
 
     typedef tree_base<rna_pair_label> tb;
 
     tb::iterator it1 = it.begin();
-    for (; it1 != it; ++it1) {
-        if (it1->paired()) break;
+    bool assigned = false;
+    for (; it1 != it && it1 != it.end(); ++it1) {
+        if (it1->paired()) {
+            assigned = true;
+            break;
+        }
     }
 
-    return it1 != it ? it1->center() - it->center() : point();
+    return assigned ? it1->center() - it->center() : point();
 }
 
 bool vec_closer_to_axis(const point vec1, const point vec2){
@@ -1517,7 +1521,7 @@ bool vec_closer_to_axis(const point vec1, const point vec2){
 
 }
 
-void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator root) {
+void reposition_branch(rna_tree &rna, rna_tree::post_order_iterator it, rna_tree::iterator root) {
 
     std::vector<int> angles;
     int ix_zero_angle = -1;
@@ -1527,11 +1531,6 @@ void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator 
         if (angle == 0) ix_zero_angle = ix;
     }
 
-
-    if (it->id() == 1038) {
-        int x=9;
-    }
-
     int cnt_overlaps_init = count_overlaps(it, root);
     int cnt_overlaps_min = cnt_overlaps_init;
     point orientation_min = get_branch_orientation(it);
@@ -1539,7 +1538,7 @@ void reposition_branch(rna_tree &rna, rna_tree::iterator it, rna_tree::iterator 
 
     //Try to rotate only if substantial portion of the tree overlaps
 
-    if (cnt_overlaps_min < rna.size(it) * 0.1) return;
+    if (cnt_overlaps_min < rna.size(it) * 0.2) return;
 
     int ix_angle_min = ix_zero_angle, ix_mirror_min = 0, ix_mirror = 0;
 
