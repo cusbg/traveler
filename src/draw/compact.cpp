@@ -875,8 +875,7 @@ void compact::init_multibranch(
             iterator root = rna.begin();
 
             //iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
-            sibling_iterator prev = --sibling_iterator(it), next = ++sibling_iterator(it);
-
+            sibling_iterator prev = sibling_iterator(it), next = sibling_iterator(it); //the iterator itself is not initalized so either it will change to its neighbor in the first iteration of hte following while, it will stop if it is either first or last sibling
             while(prev != root.begin() && !prev->initiated_points()) prev--;
             while(next != root.end() && !next->initiated_points()) next++;
 
