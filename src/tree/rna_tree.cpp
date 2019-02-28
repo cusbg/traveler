@@ -353,7 +353,8 @@ void rna_tree::compute_distances()
             || is_root(it)
             || is_leaf(it)
             || !is_valid(get_onlyone_branch(parent(it)))
-            || !rna_tree::is_only_child(it))
+            || !rna_tree::is_only_child(it)
+            || parent(it)->center().bad()) //can happen when the parent of a base pair is the 3'5'
             continue;
         
         dist += distance(parent(it)->center(), it->center());
