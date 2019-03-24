@@ -172,9 +172,6 @@ point center(const point &p1, const point &p2)
 
 double distance(const point& p1, const point& p2)
 {
-    if ((p2).bad() || (p1).bad()) {
-        int x = 1;
-    }
     BINARY(p1, p2);
 
 
