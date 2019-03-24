@@ -212,8 +212,8 @@ struct svg_writer::style
     
     out
     << get_point_formatted(label.p, "", "")
-    << property("text-anchor", "middle")
-    << property("alignment-baseline", "middle")
+//    << property("text-anchor", "middle")
+//    << property("baseline-shift", "-50%")
     << property("class", color.get_name());
     
     return create_element("text", out, label.label, li);
@@ -355,8 +355,14 @@ std::string svg_writer::create_style_definitions() const
         << element.name
         << " {"
         << get_color_style(RGB::BLACK)
-        << style("fill", "none")
-        << "}";
+        << style("fill", "none");
+
+        if (element.name == "text"){
+            out << style("text-anchor", "middle");
+            out << style("baseline-shift", "sub");
+
+        }
+        out << "}";
     }
     
     out

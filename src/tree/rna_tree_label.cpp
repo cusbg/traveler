@@ -176,7 +176,7 @@ std::ostream& operator<<(
 
 size_t rna_pair_label::size() const
 {
-    return (size_t)paired() + 1;
+    return (size_t)labels.size();
 }
 
 bool rna_pair_label::paired() const

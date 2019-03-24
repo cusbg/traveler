@@ -27,7 +27,6 @@ using namespace std;
 void compact::intervals::init(
                               iterator parent)
 {
-
     DEBUG("init interval for parent %s", label(parent));
 
     if (rna_tree::is_leaf(parent)) return;

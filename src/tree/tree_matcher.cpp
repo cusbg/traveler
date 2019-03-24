@@ -31,7 +31,7 @@ rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
 //maps trees
 matcher::matcher(
                  const rna_tree& templated,
-                 const rna_tree& other)
+                 const rna_tree& other /*target*/)
 : t1(templated), t2(other)
 { }
 
@@ -59,9 +59,11 @@ rna_tree& matcher::run(
     {
         throw illegal_state_exception("Computed sizes of removing/inserting does not match current trees");
     }
+
+
     
-    mark(t1, map.get_to_remove(), rna_pair_label::deleted);
-    mark(t2, map.get_to_insert(), rna_pair_label::inserted);
+    mark(t1, map.get_to_remove(), rna_pair_label::deleted); //t1 is template -> remove superfluous nodes
+    mark(t2, map.get_to_insert(), rna_pair_label::inserted); //t2 is target -> add nodes which are missing in template
 
     t1.set_pre_postorder_ids();
 
@@ -73,7 +75,10 @@ rna_tree& matcher::run(
     t2.set_postorder_ids();
     
     compute_sizes();
-    
+
+    //template (t1) has already deleted nodes which are not supposed to be in target(t2)
+    //now we need to add nodes into template which are in target but not in template and rename the nodes which were mapped
+    //after that, t1 will be the structure which we need (basically target with position from template)
     merge();
 
     // The following check is not valid since we can have a leaf node which is base paired in case of
@@ -89,8 +94,6 @@ rna_tree& matcher::run(
     INFO("END: Transforming trees with mapping function");
     return t1; //Resulting tree which will be used from now on (we are done with T2 at this point)
 }
-
-
 
 void matcher::mark(
                    rna_tree& rna,
@@ -156,7 +159,7 @@ void matcher::merge()
     {
         ch1 = it1.begin();
         ch2 = it2.begin();
-        
+
         while (ch2 != it2.end())
         {
             if (is(ch2, rna_pair_label::inserted))

@@ -188,4 +188,7 @@ rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index);
 rna_tree::sibling_iterator get_onlyone_branch(
                                               rna_tree::sibling_iterator it);
 
+rna_tree::sibling_iterator get_first_initiated_pair_descendant(
+        rna_tree::sibling_iterator it);
+
 #endif /* !RNA_TREE_HPP */

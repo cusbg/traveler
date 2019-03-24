@@ -56,6 +56,7 @@ public:
     
 private:
     bool _preorder;
+    bool _paired_leaf = false;
 };
 
 /**
@@ -123,39 +124,55 @@ tree_base<label_type>::_pre_post_order_iterator::operator++()
 {
     // if preorder, go unltil i am leaf, then become postorder
     // if postorder and have next sibling, became him, and become preorder
-    
-    if (_preorder)
-    {
-        if (is_leaf(*this))
+
+    if (!_paired_leaf) {
+        if (_preorder)
         {
-            _preorder = false;
-            ++*this;
+            if (is_leaf(*this))
+            {
+                _preorder = false;
+                ++*this;
+            }
+            else
+            {
+                iterator i = *this;
+                ++i;
+                *this = i;
+                _preorder = true;
+            }
         }
         else
         {
-            iterator i = *this;
-            ++i;
-            *this = i;
-            _preorder = true;
+            if (this->node->next_sibling != nullptr)
+            {
+                *this = base_iterator(this->node->next_sibling);
+                if (!is_leaf(*this))
+                    _preorder = true;
+                else
+                    _preorder = false;
+            }
+            else
+            {
+                post_order_iterator i = *this;
+                ++i;
+                *this = i;
+                _preorder = false;
+            }
         }
     }
-    else
-    {
-        if (this->node->next_sibling != nullptr)
-        {
-            *this = base_iterator(this->node->next_sibling);
-            if (!is_leaf(*this))
-                _preorder = true;
-            else
-                _preorder = false;
-        }
-        else
-        {
-            post_order_iterator i = *this;
-            ++i;
-            *this = i;
+
+
+    if (is_leaf(*this) && (*this)->size() > 1) {
+        if (_paired_leaf) {
+            _paired_leaf = false;
             _preorder = false;
         }
+
+        else {
+            _preorder = true;
+            _paired_leaf = true;
+        }
+
     }
     
     return *this;
@@ -173,6 +190,7 @@ template <typename label_type>
 size_t tree_base<label_type>::_pre_post_order_iterator::label_index() const
 {
     if (this->preorder() || !(*this)->paired())
+//    if (this->preorder() || this->number_of_children() == 1 )
         return 0;
     return 1;
 }
