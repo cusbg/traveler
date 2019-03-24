@@ -70,8 +70,8 @@ public:
      */
     void set_name(
                   const std::string& name);
-    
-public:
+
+
     /**
      * returns RNA sequence
      */
@@ -107,8 +107,7 @@ public:
      */
     static iterator get_rightest_initiated_descendant(
                                                       const iterator& node);
-    
-public:
+
     static point base_pair_edge_point(
                                       point from,
                                       point to,
@@ -123,8 +122,7 @@ public:
      */
     static point bottom_left_corner(
                                     rna_tree::iterator root);
-    
-public:
+
     double get_pairs_distance() const
     {
         return distances.pairs_distance;
@@ -137,7 +135,9 @@ public:
     {
         return distances.loops_bases_distance;
     }
-    
+
+    void update_bounding_boxes(bool leafs_have_size = false);
+
 private:
     /**
      * Compute distances between pairs and distances between unpaired bases in loops

@@ -26,6 +26,7 @@
 
 #include "tree_base_node.hpp"
 #include "point.hpp"
+#include "rectangle.hpp"
 
 /**
  * object representing one base
@@ -102,7 +103,9 @@ public:
      * set bases
      */
     void set_label_strings(
-                           const rna_pair_label& other);
+                           const rna_pair_label& other,
+                           const int cnt_children,
+                           const int other_cnt_children);
     
     void set_parent_center(
                            const point& center);
@@ -110,6 +113,27 @@ public:
     const point & get_parent_center();
 
     void set_p(const point _p, const size_t index);
+
+    void set_bounding_objects(std::vector<rectangle> bo) {
+        bounding_objects = bo;
+    }
+
+    void set_bounding_objects(rectangle bo) {
+        bounding_objects.clear();
+        add_bounding_objects(bo);
+    }
+
+    void add_bounding_objects(rectangle bo) {
+        bounding_objects.push_back(bo);
+    }
+
+    void add_bounding_objects(std::vector<rectangle> bos) {
+        bounding_objects.insert(bounding_objects.end(), bos.begin(), bos.end());
+    }
+
+    std::vector<rectangle> get_bounding_objects(){
+        return bounding_objects;
+    }
     
 public:
     status_type status = untouched;
@@ -118,6 +142,8 @@ public:
 private:
     std::vector<rna_label> labels;
     point parent_center;
+    std::vector<rectangle> bounding_objects;
+
     
 };
 
