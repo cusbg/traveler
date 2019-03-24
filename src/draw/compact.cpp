@@ -911,7 +911,13 @@ void compact::init_multibranch(
                     iterator next_next = ++sibling_iterator(next);
                     while(next_next != root.end() && !next_next->initiated_points()) next_next++;
                     assert(next_next->initiated_points())
-                    p2 = next_next->at(0).p;
+                    if (next_next == root.end() ) {
+                        //if prev is the first residue, then there is not previous residue, and the position of 5' will be used instead
+                        p2 = rna_tree::parent(prev)->at(1).p;
+                    } else {
+                        p2 = next_next->at(1).p;
+                    }
+
                 }
 
                 //get position for the bases of the root of the inserted hairpin
