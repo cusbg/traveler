@@ -488,6 +488,7 @@ void compact::init()
 //
 //        std::cout << it->at(0).label << " " << it->at(0).tmp_label << " " << it->status << " " << it->id() << " " << it->seq_id_mapped() << endl;
 //    }
+
     
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     { //traverse the tree pre-order
@@ -531,6 +532,7 @@ void compact::init()
     }
 
 //    straighten_branches();
+
     
     auto log = logger.debug_stream();
     log << "Points initialization:\n";
@@ -896,11 +898,37 @@ void compact::init_multibranch(
             //iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
             sibling_iterator prev = sibling_iterator(it), next = sibling_iterator(it); //the iterator itself is not initalized so either it will change to its neighbor in the first iteration of hte following while, it will stop if it is either first or last sibling
             while(prev != root.begin() && !prev->initiated_points()) prev--;
-            while(next != root.end() && !next->initiated_points()) next++;
+            while(next != root.node->last_child && !next->initiated_points()) next++;
 
-            assert(prev->initiated_points() || next->initiated_points())
+//            assert(prev->initiated_points() || next->initiated_points())
 
-            if (!prev->initiated_points()) {
+            if (!prev->initiated_points() && !next->initiated_points()){
+                // There is not initiated point in the first level, so we will use coordinates of 5' and first initiated
+                // node in the subtree
+
+                p1 = root->at(0).p;
+                p2 = first_initiated->at(0).p;
+
+                point orig_vector = p2 - p1;
+
+                p1 = move_point(p1, p1 + orig_vector, BASES_DISTANCE);
+                p2 = move_point(p1, p1 + orthogonal(orig_vector), PAIRS_DISTANCE);
+
+                point c = center(p1, p2) - (p2 - p1) * BASES_DISTANCE;
+                //Whether it wouldn't be better to position the center in the opposite orthogonal direction
+                //is checked later in the try_reposition_new_root_branches function
+
+                /*
+                 * We need to remember the parent's center be used later when intializing position for the child of current node.
+                 * Normally, the positin is obtain from the parent, but in case of root parent, that is the position between
+                 * 5' and 3' end which might be far apart.
+                 */
+                it->set_parent_center(c);
+
+                rotate_subtree(it, c, p1, p2);
+
+
+            } else if (!prev->initiated_points()) {
                 // branch inserted at 5' end there exists no initiated point before it
                 p1 = next->at(0).p;
                 //if he next node is paired than position of first and second nucleotie are enough
@@ -960,8 +988,6 @@ void compact::init_multibranch(
                 rotate_subtree(it, c, new_pos1, new_pos2);
 
             } else {
-                point p1, p2;
-
                 prev->paired() && !rna_tree::is_root(prev) ? p1 = (*prev)[1].p : p1 = (*prev)[0].p;
                 p2 = (*next)[0].p;
 
