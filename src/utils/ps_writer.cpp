@@ -33,13 +33,13 @@ using namespace std;
 
 void ps_writer::init(
                      const std::string& filename,
-                     rna_tree::iterator root)
+                     rna_tree& rna)
 {
     APP_DEBUG_FNAME;
     
     document_writer::init(filename, PS_FILENAME_EXTENSION);
-    
-    print(get_default_prologue(root));
+
+    print(get_default_prologue(rna.begin()));
 }
 
 std::string ps_writer::get_default_prologue(
@@ -129,12 +129,15 @@ std::string ps_writer::get_default_prologue() const
     
     if (from.bad() || to.bad())
         return "";
+    from = from * get_scaling_ratio();
+    to = to * get_scaling_ratio();
     
     string color_beg, color_end;
     
     out << get_color_formatted(color);
+
     
-    for (double coordinates : {from.x, from.y, to.x, to.y})
+    for (double coordinates : {from.x , from.y, to.x, to.y})
     {
         out
         << std::left
@@ -150,13 +153,14 @@ std::string ps_writer::get_default_prologue() const
 
 /* virtual */ std::string ps_writer::get_label_formatted(
                                                          const rna_label& label,
-                                                         const RGB& color) const
+                                                         const RGB& color,
+                                                         const label_info li) const
 {
     ostringstream out;
     
     out
     << get_color_formatted(color)
-    << get_text_formatted(label.p, label.label);
+    << get_text_formatted(label.p * get_scaling_ratio(), label.label);
     
     return out.str();
 }

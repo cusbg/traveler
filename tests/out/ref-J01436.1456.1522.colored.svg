@@ -1,0 +1,144 @@
+<svg
+	xmlns="http://www.w3.org/2000/svg"
+	width="273.511752"
+	height="329.021093"
+	style="font-size: 8px; stroke: none; font-family: Helvetica; " >
+<g><style type="text/css" >
+<!-- create color definitions -->
+<![CDATA[
+text.red {stroke: rgb(255, 0, 0); }
+text.green {stroke: rgb(0, 255, 0); }
+text.blue {stroke: rgb(0, 0, 255); }
+text.black {stroke: rgb(0, 0, 0); }
+text.gray {stroke: rgb(204, 204, 204); }
+text.brown {stroke: rgb(211.65, 104.55, 30.6); }
+text {stroke: rgb(0, 0, 0); fill: none; text-anchor: middle; baseline-shift: sub; }
+circle.red {stroke: rgb(255, 0, 0); fill: none; }
+circle.green {stroke: rgb(0, 255, 0); fill: none; }
+circle.blue {stroke: rgb(0, 0, 255); fill: none; }
+circle.black {stroke: rgb(0, 0, 0); fill: none; }
+circle.gray {stroke: rgb(204, 204, 204); fill: none; }
+circle.brown {stroke: rgb(211.65, 104.55, 30.6); fill: none; }
+circle {stroke: rgb(0, 0, 0); fill: none; }
+line.red {stroke: rgb(255, 0, 0); }
+line.green {stroke: rgb(0, 255, 0); }
+line.blue {stroke: rgb(0, 0, 255); }
+line.black {stroke: rgb(0, 0, 0); }
+line.gray {stroke: rgb(204, 204, 204); }
+line.brown {stroke: rgb(211.65, 104.55, 30.6); }
+line {stroke: rgb(0, 0, 0); fill: none; }]]>
+</style></g>
+<g><title>0(label in template: 5') </title><text x="99.632889" y="280.247818" class="green" >5'</text></g>
+<g><title>1(label in template: ) </title><text x="111.879294" y="279.021093" class="red" >G</text></g>
+<g><line x1="115.553215" y1="278.653076" x2="128.105781" y2="277.395683" class="black" /></g>
+<g><title>2(label in template: ) </title><text x="124.125699" y="277.794368" class="red" >U</text></g>
+<g><line x1="127.799620" y1="277.426351" x2="140.352186" y2="276.168958" class="black" /></g>
+<g><title>3(label in template: U) </title><text x="122.022771" y="258.314489" class="green" >C</text></g>
+<g><title>4(label in template: G) </title><text x="119.919843" y="238.834609" class="green" >C</text></g>
+<g><title>5(label in template: U) </title><text x="117.816915" y="219.354729" class="green" >C</text></g>
+<g><title>6(label in template: A) </title><text x="115.713987" y="199.874850" class="green" >G</text></g>
+<g><title>7(label in template: G) </title><text x="102.190637" y="187.406460" class="green" >A</text></g>
+<g><title>8(label in template: U) </title><text x="83.612756" y="181.181480" class="brown" >U</text></g>
+<g><title>9(label in template: G) </title><text x="64.583434" y="177.638957" class="green" >A</text></g>
+<g><title>10(label in template: G) </title><text x="50.000000" y="166.178356" class="brown" >G</text></g>
+<g><title>11(label in template: U) </title><text x="50.811291" y="147.796834" class="brown" >U</text></g>
+<g><title>12(label in template: A) </title><text x="66.267816" y="137.706403" class="brown" >A</text></g>
+<g><title>13(label in template: U) </title><text x="83.968724" y="143.042939" class="brown" >U</text></g>
+<g><title>14(label in template: ) </title><text x="98.438221" y="129.832274" class="red" >A</text></g>
+<g><title>15(label in template: A) </title><text x="112.907719" y="116.621609" class="brown" >A</text></g>
+<g><line x1="116.533658" y1="115.924688" x2="128.922284" y2="113.543539" class="black" /></g>
+<g><title>16(label in template: G) </title><text x="110.584647" y="104.535145" class="green" >A</text></g>
+<g><line x1="114.210586" y1="103.838223" x2="126.599212" y2="101.457075" class="black" /></g>
+<g><title>17(label in template: ) </title><text x="106.891380" y="98.038550" class="red" >A</text></g>
+<g><title>18(label in template: A) </title><text x="107.913114" y="90.635710" class="brown" >A</text></g>
+<g><line x1="111.539054" y1="89.938789" x2="123.927680" y2="87.557640" class="black" /></g>
+<g><title>19(label in template: U) </title><text x="98.676559" y="84.701663" class="brown" >U</text></g>
+<g><title>20(label in template: U) </title><text x="93.697598" y="74.917144" class="brown" >U</text></g>
+<g><title>21(label in template: C) </title><text x="94.337529" y="63.957337" class="green" >A</text></g>
+<g><title>22(label in template: C) </title><text x="100.421388" y="54.818764" class="brown" >C</text></g>
+<g><title>23(label in template: C) </title><text x="110.285789" y="50.000000" class="green" >U</text></g>
+<g><title>24(label in template: A) </title><text x="121.233704" y="50.818544" class="green" >C</text></g>
+<g><title>25(label in template: U) </title><text x="130.271866" y="57.050599" class="brown" >U</text></g>
+<g><title>26(label in template: ) </title><text x="134.929151" y="66.992257" class="red" >G</text></g>
+<g><title>27(label in template: ) </title><text x="133.932211" y="77.925371" class="red" >G</text></g>
+<g><title>28(label in template: U) </title><text x="127.553619" y="86.860719" class="brown" >U</text></g>
+<g><title>29(label in template: ) </title><text x="131.246886" y="93.357314" class="red" >C</text></g>
+<g><title>30(label in template: C) </title><text x="130.225152" y="100.760153" class="green" >U</text></g>
+<g><title>31(label in template: U) </title><text x="132.548224" y="112.846618" class="brown" >U</text></g>
+<g><title>32(label in template: G) </title><text x="134.670897" y="117.829286" class="brown" >G</text></g>
+<g><title>33(label in template: A) </title><text x="136.793570" y="122.811955" class="green" >U</text></g>
+<g><title>34(label in template: C) </title><text x="138.916244" y="127.794624" class="green" >A</text></g>
+<g><title>35(label in template: ) </title><text x="141.038917" y="132.777293" class="red" >A</text></g>
+<g><title>36(label in template: ) </title><text x="143.161590" y="137.759962" class="red" >A</text></g>
+<g><title>37(label in template: ) </title><text x="145.284264" y="142.742631" class="red" >C</text></g>
+<g><title>38(label in template: ) </title><text x="147.406937" y="147.725300" class="red" >C</text></g>
+<g><title>39(label in template: ) </title><text x="149.529610" y="152.707969" class="red" >A</text></g>
+<g><title>40(label in template: ) </title><text x="153.471240" y="156.398105" class="red" >A</text></g>
+<g><title>41(label in template: ) </title><text x="157.478327" y="160.041728" class="red" >A</text></g>
+<g><title>42(label in template: ) </title><text x="159.887033" y="164.882834" class="red" >A</text></g>
+<g><title>43(label in template: ) </title><text x="162.257849" y="169.752327" class="red" >A</text></g>
+<g><title>44(label in template: ) </title><text x="162.677391" y="175.147591" class="red" >U</text></g>
+<g><title>45(label in template: C) </title><text x="163.074075" y="180.549014" class="green" >G</text></g>
+<g><line x1="161.386341" y1="183.833019" x2="155.619914" y2="195.053369" class="black" /></g>
+<g><title>46(label in template: C) </title><text x="174.020758" y="186.174796" class="green" >A</text></g>
+<g><line x1="172.333024" y1="189.458801" x2="166.566597" y2="200.679151" class="black" /></g>
+<g><title>47(label in template: G) </title><text x="184.967441" y="191.800578" class="green" >A</text></g>
+<g><line x1="183.279706" y1="195.084583" x2="177.513280" y2="206.304933" class="black" /></g>
+<g><title>48(label in template: G) </title><text x="195.914124" y="197.426360" class="brown" >G</text></g>
+<g><line x1="194.226389" y1="200.710365" x2="188.459963" y2="211.930715" class="black" /></g>
+<g><title>49(label in template: G) </title><text x="206.860807" y="203.052142" class="green" >A</text></g>
+<g><line x1="205.173072" y1="206.336147" x2="199.406646" y2="217.556497" class="black" /></g>
+<g><title>50(label in template: U) </title><text x="217.040870" y="204.231571" class="green" >G</text></g>
+<g><title>51(label in template: U) </title><text x="223.511752" y="212.178421" class="brown" >U</text></g>
+<g><title>52(label in template: C) </title><text x="222.604033" y="222.386299" class="brown" >C</text></g>
+<g><title>53(label in template: G) </title><text x="214.832451" y="229.066661" class="green" >A</text></g>
+<g><title>54(label in template: A) </title><text x="204.604008" y="228.431298" class="green" >G</text></g>
+<g><title>55(label in template: C) </title><text x="197.718911" y="220.840502" class="green" >U</text></g>
+<g><title>56(label in template: C) </title><text x="186.772228" y="215.214720" class="brown" >C</text></g>
+<g><title>57(label in template: C) </title><text x="175.825545" y="209.588938" class="green" >U</text></g>
+<g><title>58(label in template: G) </title><text x="164.878862" y="203.963156" class="green" >U</text></g>
+<g><title>59(label in template: G) </title><text x="153.932179" y="198.337374" class="green" >C</text></g>
+<g><title>60(label in template: A) </title><text x="152.741192" y="211.302365" class="green" >U</text></g>
+<g><title>61(label in template: C) </title><text x="151.365786" y="224.249090" class="brown" >C</text></g>
+<g><title>62(label in template: C) </title><text x="149.806240" y="237.174927" class="green" >A</text></g>
+<g><title>63(label in template: A) </title><text x="148.062870" y="250.077256" class="green" >G</text></g>
+<g><title>64(label in template: ) </title><text x="146.136029" y="262.953463" class="red" >G</text></g>
+<g><title>65(label in template: ) </title><text x="144.026107" y="275.800940" class="red" >A</text></g>
+<g><title>66(label in template: ) </title><text x="131.779702" y="277.027665" class="red" >C</text></g>
+<g><title>67(label in template: ) </title><text x="119.533297" y="278.254390" class="red" >A</text></g>
+<g><title>68(label in template: 3') </title><text x="108.864436" y="284.390732" class="green" >3'</text></g>
+<g><line x1="105.603011" y1="279.649790" x2="105.909172" y2="279.619122" class="gray" /></g>
+<g><line x1="117.849416" y1="278.423065" x2="118.155577" y2="278.392397" class="gray" /></g>
+<g><line x1="123.481718" y1="271.829028" x2="122.666752" y2="264.279829" class="gray" /></g>
+<g><line x1="121.378789" y1="252.349148" x2="120.563824" y2="244.799949" class="gray" /></g>
+<g><line x1="119.275861" y1="232.869269" x2="118.460896" y2="225.320070" class="gray" /></g>
+<g><line x1="117.172933" y1="213.389389" x2="116.357968" y2="205.840190" class="gray" /></g>
+<g><line x1="111.302777" y1="195.807759" x2="106.601847" y2="191.473550" class="gray" /></g>
+<g><line x1="96.501516" y1="185.500179" x2="89.301877" y2="183.087761" class="gray" /></g>
+<g><line x1="77.714098" y1="180.083379" x2="70.482092" y2="178.737059" class="gray" /></g>
+<g><line x1="59.865868" y1="173.931590" x2="54.717566" y2="169.885723" class="gray" /></g>
+<g><line x1="50.264560" y1="160.184191" x2="50.546731" y2="153.790998" class="gray" /></g>
+<g><line x1="55.835453" y1="144.516927" x2="61.243654" y2="140.986309" class="gray" /></g>
+<g><line x1="72.012422" y1="139.438308" x2="78.224117" y2="141.311033" class="gray" /></g>
+<g><line x1="88.399730" y1="138.997425" x2="94.007215" y2="133.877787" class="gray" /></g>
+<g><line x1="102.869228" y1="125.786761" x2="108.476712" y2="120.667123" class="gray" /></g>
+<g><line x1="111.775221" y1="110.729458" x2="111.717144" y2="110.427296" class="gray" /></g>
+<g><line x1="131.357649" y1="106.652304" x2="131.415726" y2="106.954466" class="gray" /></g>
+<g><line x1="168.410583" y1="183.291583" x2="168.684250" y2="183.432228" class="gray" /></g>
+<g><line x1="179.357266" y1="188.917365" x2="179.630933" y2="189.058010" class="gray" /></g>
+<g><line x1="190.303949" y1="194.543147" x2="190.577616" y2="194.683792" class="gray" /></g>
+<g><line x1="201.250632" y1="200.168929" x2="201.524299" y2="200.309574" class="gray" /></g>
+<g><line x1="192.382403" y1="218.097934" x2="192.108736" y2="217.957289" class="gray" /></g>
+<g><line x1="181.435720" y1="212.472152" x2="181.162053" y2="212.331507" class="gray" /></g>
+<g><line x1="170.489038" y1="206.846370" x2="170.215370" y2="206.705725" class="gray" /></g>
+<g><line x1="159.542355" y1="201.220588" x2="159.268687" y2="201.079943" class="gray" /></g>
+<g><line x1="153.383320" y1="204.312217" x2="153.290052" y2="205.327522" class="gray" /></g>
+<g><line x1="152.107344" y1="217.268790" x2="151.999634" y2="218.282664" class="gray" /></g>
+<g><line x1="150.647078" y1="230.205889" x2="150.524948" y2="231.218127" class="gray" /></g>
+<g><line x1="149.002817" y1="243.120892" x2="148.866292" y2="244.131290" class="gray" /></g>
+<g><line x1="147.174896" y1="256.011183" x2="147.024002" y2="257.019535" class="gray" /></g>
+<g><line x1="145.163683" y1="268.874151" x2="144.998453" y2="269.880252" class="gray" /></g>
+<g><line x1="138.055985" y1="276.398968" x2="137.749824" y2="276.429637" class="gray" /></g>
+<g><line x1="125.809580" y1="277.625694" x2="125.503419" y2="277.656362" class="gray" /></g>
+<g><line x1="114.332228" y1="281.245857" x2="114.065506" y2="281.399266" class="gray" /></g>
+</svg>

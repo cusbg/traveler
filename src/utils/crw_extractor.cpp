@@ -73,3 +73,15 @@ void crw_extractor::extract(
         }
     }
 }
+
+void crw_extractor::adjust_residues_lists(const int cnt){
+
+    int sz = labels.size();
+
+    assert(sz == points.size())
+
+    if (cnt < sz) {
+        labels.erase(0, sz - cnt);
+        points.erase(points.begin(), points.begin() + sz - cnt);
+    }
+}

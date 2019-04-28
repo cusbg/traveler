@@ -145,7 +145,16 @@ void compact::circle::compute_sgn()
     CIRCLE_POINTS_INITED();
     
     assert(centre != direction);
-    assert(!lies_on_line(p1, p2, direction));
+//    assert(!lies_on_line(p1, p2, direction));
+    if (lies_on_line(p1, p2, direction)){
+        //in some edge cases it can indeed happen that the segments lie on a line
+        // TODO: this might require improvement, because it can lead to strange results (the J01436.1456.1522 example in tests)
+        p1.x += 1;
+        p1.y += 1;
+        p2.x -= 1;
+        p2.y -= 1;
+
+    }
     assert(double_equals(distance(p1, centre), distance(p2, centre)));
     assert(!double_equals(angle(p1, centre, direction), 0)
            && !double_equals(angle(p1, centre, direction), 180));

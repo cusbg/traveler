@@ -28,10 +28,10 @@ using namespace std;
 #define set_remake(iter) \
 rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
 
-//namapuje stromy na sebe
+//maps trees
 matcher::matcher(
                  const rna_tree& templated,
-                 const rna_tree& other)
+                 const rna_tree& other /*target*/)
 : t1(templated), t2(other)
 { }
 
@@ -39,38 +39,61 @@ rna_tree& matcher::run(
                        const mapping& map)
 {
     INFO("BEG: Transforming trees with mapping function");
-    
+
+//    post_order_iterator it = t1.begin_post();
+//    size_t i = 0;
+//    for (auto mp : map.get_to_update())
+//    {
+//        size_t index = mp.from;
+//        --index;    // indexed from one
+//        size_t to_move = index - i;
+//        it = plusplus(it, to_move);
+//
+////        assert(!rna_tree::is_root(it));
+//        it->_id_mapped = mp.from;
+//        i = index;
+//    }
+
     //Sizes of the trees after deletion from one and insertion into the other should match
     if (t1.size() - map.get_to_remove().size() != t2.size() - map.get_to_insert().size())
     {
         throw illegal_state_exception("Computed sizes of removing/inserting does not match current trees");
     }
+
+
     
-    mark(t1, map.get_to_remove(), rna_pair_label::deleted);
-    mark(t2, map.get_to_insert(), rna_pair_label::inserted);
-    
+    mark(t1, map.get_to_remove(), rna_pair_label::deleted); //t1 is template -> remove superfluous nodes
+    mark(t2, map.get_to_insert(), rna_pair_label::inserted); //t2 is target -> add nodes which are missing in template
+
+    t1.set_pre_postorder_ids();
+
+
+    //remove nodes from t1 and mark this in parent using set_remake
     erase();
     
     t1.set_postorder_ids();
     t2.set_postorder_ids();
     
     compute_sizes();
-    
+
+    //template (t1) has already deleted nodes which are not supposed to be in target(t2)
+    //now we need to add nodes into template which are in target but not in template and rename the nodes which were mapped
+    //after that, t1 will be the structure which we need (basically target with position from template)
     merge();
+
+    // The following check is not valid since we can have a leaf node which is base paired in case of
+    // stems with no loop. Last bp of such a stem is paired and also a leaf
+//    if (!t1.correct_pairing() || !t2.correct_pairing())
+//    {
+//        throw illegal_state_exception("Uncorrect tree pairing after transforming template to target tree");
+//    }
     
-    if (!t1.correct_pairing() || !t2.correct_pairing())
-    {
-        throw illegal_state_exception("Uncorrect tree pairing after transforming template to target tree");
-    }
-    
-    update_ends_in_rna(t1);
+//    set_53_labels(t1);
     t1.set_postorder_ids();
     
     INFO("END: Transforming trees with mapping function");
     return t1; //Resulting tree which will be used from now on (we are done with T2 at this point)
 }
-
-
 
 void matcher::mark(
                    rna_tree& rna,
@@ -82,7 +105,7 @@ void matcher::mark(
     
     for (size_t index : postorder_indexes)
     {
-        --index;    // indexy cislovane od 1
+        --index;    // indexed from one
         size_t to_move = index - i;
         it = plusplus(it, to_move);
         
@@ -107,7 +130,7 @@ void matcher::erase()
             {
                 /*
                  * Set Information for the drawing algorithm that descendants will need to be moved
-                 * and siblings (loop) will need to be replaced on the circle
+                 * and siblings (loop) will need to be repositioned on the circle
                  */
                 set_remake(ch);
                 ch = t1.erase(ch);
@@ -119,7 +142,8 @@ void matcher::erase()
     }
 }
 
-//mapovani jednoho stromu na druhy
+// t1 has already removed nodes which should be removed based on the mapping
+// here we insert to t1 from t2
 void matcher::merge()
 {
     iterator it1, it2;
@@ -129,28 +153,27 @@ void matcher::merge()
     it1 = t1.begin();
     it2 = t2.begin();
     
-    it1->set_label_strings(*it2);
+    it1->set_label_strings(*it2, it1.number_of_children(), it2.number_of_children());
     
     while (it1 != t1.end() && it2 != t2.end())
     {
         ch1 = it1.begin();
         ch2 = it2.begin();
-        
+
         while (ch2 != it2.end())
         {
             if (is(ch2, rna_pair_label::inserted))
             {
                 /*
                  * When inserting into a position with N siblings, steal denotes how many siblings will be taken
-                 * as childern of the just inserted node. The reason is that there are more possible ways how to
+                 * as children of the just inserted node. The reason is that there are more possible ways how to
                  * carry out insertion at a position where siblings exist.
                  */
                 
                 steal = 0;
                 ins = ch1;
                 
-                if (ch2->paired())
-                {
+                if (ch2->paired()) {
                     actual = 0;
                     needed = s2.at(id(ch2)); //Taking into account the number of siblings needed in order for the tree to have the required structure
                     
@@ -168,7 +191,7 @@ void matcher::merge()
             }
             else
             {
-                ch1->set_label_strings(*ch2);
+                ch1->set_label_strings(*ch2, ch1.number_of_children(), ch2.number_of_children());
             }
             
             ++ch2;
@@ -191,7 +214,7 @@ void matcher::merge()
 void matcher::compute_sizes()
 {
     /*
-     * Counts the size of every subtree (s1 and s2 vectors) for furhter utilization (does not tak einto account
+     * Counts the size of every subtree (s1 and s2 vectors) for further use (does not take into account
      * inserted and deleted nodes).
      */
     APP_DEBUG_FNAME;

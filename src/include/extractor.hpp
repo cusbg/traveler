@@ -29,7 +29,7 @@
 
 #include "point.hpp"
 
-#define BASE_REGEX      "([A-Z])"
+#define BASE_REGEX      "([A-Za-z])"
 #define DOUBLE_REGEX    "(-?[0-9]+(\\.[0-9]+)?)"
 
 
@@ -58,6 +58,8 @@ protected:
     virtual std::string get_type() const = 0;
     std::regex create_regex(
                             const std::string& pattern);
+
+    void mirror_y();
     
 private:
     static std::vector<extractor_ptr> get_all_extractors();
@@ -65,6 +67,11 @@ private:
 public:
     std::string labels;
     std::vector<point> points;
+
+    /* gives the extractor the possibility to adjust list of residues which were
+     * extracted. This can be used by the CRW extractor to remove residues which
+     * matched the regex, but are part of metadata and not the data themselves*/
+    virtual void adjust_residues_lists(const int cnt){};
 };
 
 #endif /* !EXTRACTOR_HPP */

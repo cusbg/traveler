@@ -72,12 +72,14 @@ private:
     static void shift_branch(
                              iterator parent,
                              point vec);
-    
-    /**
-     * mirrors full subtree rooted at `root` using the root's bp as the mirror line
-     */
-    static void mirror_branch(
-                              iterator root);
+
+//    /**
+//     * mirrors full subtree rooted at `root` using the root's bp as the mirror line
+//     */
+//    static void mirror_branch(
+//                              iterator root);
+//
+//    static void rotate_branch_by_angle(iterator branch, double angle);
     
     /**
      * rotate branch from `parent` arount circle `c` with angle `alpha`
@@ -112,11 +114,12 @@ private:
      * (only basic positions initialization)
      */
     void init();
+
     
     /**
      * make all branches lie on straight line
      */
-    void init_even_branches();
+    void straighten_branches();
     
     /**
      * recursively find inited only-branch node,
@@ -146,8 +149,8 @@ private:
     /**
      * set branch nodes to lie on straight line
      */
-    void make_branch_even(
-                          sibling_iterator it);
+    void straighten_branch(
+            sibling_iterator it);
     
     /**
      * lay out nodes on circle, rotate and shift branches if needed
@@ -228,8 +231,14 @@ private:
      * check all nodes are inited
      */
     inline void checks();
+
+    void beautify();
     
     void try_reposition_new_root_branches();
+
+    void reposition_branches();
+
+    void pull_neighbors_together();
     
     
 private:

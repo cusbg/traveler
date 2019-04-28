@@ -172,15 +172,17 @@ mapping app::run_ted(
     
 }
 
+#include "iostream"
 void app::run_drawing(
                       rna_tree& templated,
-                      rna_tree& matched,
+                      rna_tree& matched, //target
                       const mapping& mapping,
                       bool run,
                       bool run_overlaps,
                       const std::string& file)
 {
     APP_DEBUG_FNAME;
+
     
     try
     {
@@ -194,8 +196,8 @@ void app::run_drawing(
         // which correspond to the target structure
         templated = matcher(templated, matched).run(mapping);
         //Compact goes through the structure and computes new coordinates where necessary
-        compact(templated).run();
-        
+            compact(templated).run();
+
         save(file, templated, run_overlaps);
     }
     catch (const my_exception& e)
@@ -212,30 +214,32 @@ void app::save(
     APP_DEBUG_FNAME;
     
     overlap_checks::overlaps overlaps;
-    if (overlap)
+//    if (overlap)
         overlaps = overlap_checks().run(rna);
     
     for (bool colored : {true, false})
     {
         for (auto& writer : document_writer::get_writers(colored))
         {
+            writer->set_scaling_ratio(rna);
             string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
-            writer->init(file, rna.begin());
+            writer->init(file, rna);
             writer->print(writer->get_rna_formatted(rna));
-            
-            for (const auto& p : overlaps)
-                writer->print(writer->get_circle_formatted(p.centre, p.radius));
+
+            if (overlap)
+                for (const auto& p : overlaps)
+                    writer->print(writer->get_circle_formatted(p.centre, p.radius));
         }
     }
-    
-    if (overlap)
-    {
-        INFO("Overlaps computed: found %s in rna %s", overlaps.size(), rna.name());
-    }
-    else
-    {
-        INFO("Overlaps computation was skipped for %s", rna.name());
-    }
+
+//    if (overlap)
+//    {
+        INFO("Overlaps count: %s", overlaps.size());
+//    }
+//    else
+//    {
+//        INFO("Overlaps computation was skipped for %s", rna.name());
+//    }
 }
 
 
@@ -268,6 +272,8 @@ rna_tree app::create_templated(
     {
         extractor_ptr doc = extractor::get_extractor(templatefile, templatetype);
         fasta f = read_fasta_file(fastafile);
+        doc->adjust_residues_lists(f.brackets.size());
+
         return rna_tree(f.brackets, doc->labels, doc->points, f.id);
     }
     catch (const my_exception& e)

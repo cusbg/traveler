@@ -1,10 +1,10 @@
 #include <fstream>
-#include "our_extractor.hpp"
+#include "traveler_extractor.hpp"
 #include "types.hpp"
 
 using namespace std;
 
-void our_extractor::extract(const string& filename)
+void traveler_extractor::extract(const string& filename)
 {
     points.clear();
     labels.clear();
@@ -30,5 +30,7 @@ void our_extractor::extract(const string& filename)
             labels.push_back(base[0]);
         }
     }
+
+    mirror_y();
     
 }

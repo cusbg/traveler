@@ -38,7 +38,7 @@ bool rna_label::operator==(
 rna_pair_label::rna_pair_label(
                                const std::string& s)
 {
-    labels.push_back({s, point::bad_point(), 0});
+    labels.push_back({s, "", point::bad_point(), 0});
 }
 
 rna_pair_label::rna_pair_label(const std::string& s, size_t pseudoknot)
@@ -182,11 +182,12 @@ std::ostream& operator<<(
 
 size_t rna_pair_label::size() const
 {
-    return (size_t)paired() + 1;
+    return (size_t)labels.size();
 }
 
 bool rna_pair_label::paired() const
 {
+
     assert(labels.size() == 1 || labels.size() == 2);
     
     return labels.size() == 2;
@@ -220,10 +221,12 @@ void rna_pair_label::clear_points()
 }
 
 void rna_pair_label::set_label_strings(
-                                       const rna_pair_label& other)
+                                       const rna_pair_label& other,
+                                       const int cnt_children,
+                                       const int other_cnt_children)
 {
-    //  touched         - uz len tym, ze sme vosli do funkcie
-    //  edited          - ak labels su rozne
+    //  touched         - just by entering this method
+    //  edited          - if the labels differ
     //
     
     if (status != untouched)
@@ -233,7 +236,10 @@ void rna_pair_label::set_label_strings(
     }
     else if (paired() != other.paired())
     {
-        throw illegal_state_exception("Setting bases failed, not compatible nodes: %s-%s",
+        if (cnt_children > 0 || other_cnt_children > 0)
+        // It can happen that we have a base-paired leaf (stem without a loop) mapped onto a leaf and then we
+        // have paired node mapped onto a non-paired node
+            throw illegal_state_exception("Setting bases failed, not compatible nodes: %s-%s",
                                       *this, other);
     }
     
@@ -245,9 +251,17 @@ void rna_pair_label::set_label_strings(
     else
         status = touched;
     
-    size_t n = paired() ? 2 : 1;
-    for (size_t i = 0; i < n; ++i)
-        (*this)[i].label = other[i].label;
+    size_t n = other.paired() ? 2 : 1;
+    for (size_t i = 0; i < n; ++i) {
+        if (i >= 1 && !this->paired()) {
+            //situation when paired node (last bp in a stem with no loop) is mapped on non-paired node
+            (*this).labels.push_back(other[i]);
+        } else {
+            (*this)[i].tmp_label = (*this)[i].label;
+            (*this)[i].label = other[i].label;
+        }
+
+    }
 }
 
 void rna_pair_label::set_parent_center(
@@ -260,4 +274,8 @@ void rna_pair_label::set_parent_center(
 const point & rna_pair_label::get_parent_center()
 {
     return parent_center;
+}
+
+void rna_pair_label::set_p(const point _p, const size_t index) {
+    this->at(index).p  =_p;
 }

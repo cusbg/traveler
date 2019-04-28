@@ -38,6 +38,16 @@ void node_base::reset_id()
     _id = ID++;
 }
 
+size_t node_base::seq_id_mapped()
+{
+    return _seq_id_mapped;
+}
+
+void node_base::set_seq_id_mapped(size_t id)
+{
+    _seq_id_mapped = id;
+}
+
 /* static */
 void node_base::reset_ID()
 {

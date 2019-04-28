@@ -21,11 +21,12 @@
 
 
 #include <map>
+#include <limits>
 
 #include "extractor.hpp"
 #include "crw_extractor.hpp"
 #include "varna_extractor.hpp"
-#include "our_extractor.hpp"
+#include "traveler_extractor.hpp"
 #include "types.hpp"
 #include "utils.hpp"
 
@@ -50,7 +51,7 @@ struct regex_exception : public my_exception
 /* static */ std::vector<extractor_ptr> extractor::get_all_extractors()
 {
     std::vector<extractor_ptr> extractors;
-    for (extractor* e : std::vector<extractor*>({new crw_extractor(), new varna_extractor(), new our_extractor()}))
+    for (extractor* e : std::vector<extractor*>({new crw_extractor(), new varna_extractor(), new traveler_extractor()}))
         extractors.push_back(extractor_ptr(e));
     return extractors;
 }
@@ -97,3 +98,23 @@ regex extractor::create_regex(
         throw regex_exception(e);
     }
 }
+
+void extractor::mirror_y(){
+    /*
+     * Traveler first parsed CRW's PS files which have (0,0) coordinate in the
+     * lower left corner. Some extractors might work with different coordinate
+     * systems (such as SVG) which then requires mirroring of the y coordinates.
+     */
+    double min_y = std::numeric_limits<double>::max();
+    double max_y = std::numeric_limits<double>::min();
+    for (auto p: this->points) {
+        if (p.y < min_y) min_y = p.y;
+        if (p.y > max_y) max_y = p.y;
+    }
+    double shift = max_y + min_y;
+    for (auto &p: this->points) {
+        p.y = shift - p.y;
+    }
+
+}
+

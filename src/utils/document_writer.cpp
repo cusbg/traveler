@@ -98,7 +98,7 @@ std::string document_writer::get_edge_formatted(
 }
 
 std::string document_writer::get_label_formatted(
-                                                 rna_tree::pre_post_order_iterator it) const
+                                                 rna_tree::pre_post_order_iterator it, label_info li) const
 {
     if (!it->initiated_points())
         return "";
@@ -106,7 +106,7 @@ std::string document_writer::get_label_formatted(
     ostringstream out;
     
     out
-    << get_label_formatted(it->at(it.label_index()), get_default_color(it->status));
+    << get_label_formatted(it->at(it.label_index()), get_default_color(it->status), li);
     
     if (it->paired() &&
         it.preorder() &&
@@ -116,7 +116,8 @@ std::string document_writer::get_label_formatted(
         out
         << get_edge_formatted(it->at(0).p, it->at(1).p, true);
     }
-    
+
+    auto x = out.str();
     return out.str();
 }
 
@@ -169,17 +170,28 @@ std::string document_writer::get_rna_subtree_formatted(
                                                        rna_tree::iterator root) const
 {
     ostringstream out;
-    
+
+    int seq_ix = 0;
     auto print =
-    [&out, this](rna_tree::pre_post_order_iterator it)
+    [&out, &seq_ix, this](rna_tree::pre_post_order_iterator it)
     {
-        out << get_label_formatted(it);
+        out << get_label_formatted(it, {seq_ix, it->at(it.label_index()).tmp_label});
+        seq_ix++;
     };
     
     rna_tree::for_each_in_subtree(root, print);
     
     return out.str();
 }
+
+double document_writer::get_scaling_ratio() const{
+    return scaling_ratio;
+}
+
+void document_writer::set_scaling_ratio(rna_tree& rna){
+    auto bp_dist = rna.get_pair_base_distance();
+    scaling_ratio = 20 / bp_dist;
+};
 
 std::string document_writer::get_rna_background_formatted(
                                                           rna_tree::pre_post_order_iterator begin,
@@ -197,12 +209,19 @@ std::string document_writer::get_rna_background_formatted(
         
         if (p1.bad() || p2.bad())
             continue;
-        
-        point tmp = rna_tree::base_pair_edge_point(p1, p2);
-        p2 = rna_tree::base_pair_edge_point(p2, p1);
+
+        point diff_orig = p2 - p1;
+
+        point tmp = rna_tree::base_pair_edge_point(p1, p2, get_scaling_ratio());
+        p2 = rna_tree::base_pair_edge_point(p2, p1, get_scaling_ratio());
         p1 = tmp;
-        
-        out << get_line_formatted(p1, p2, RGB::GRAY);
+
+        point diff_edge = p2 - p1;
+
+        point diff = diff_orig * diff_edge;
+
+        //If the edge points cross, then the line should not be drawn at all
+        if (diff.x > 0 && diff.y > 0) out << get_line_formatted(p1, p2, RGB::GRAY);
     }
     
     return out.str();

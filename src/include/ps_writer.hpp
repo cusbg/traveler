@@ -35,7 +35,7 @@ public:
                             const std::string& text);
     virtual void init(
                       const std::string& filename,
-                      rna_tree::iterator root);
+                      rna_tree& rna);
     
 public:
     virtual std::string get_circle_formatted(
@@ -43,7 +43,8 @@ public:
                                              double radius) const;
     virtual std::string get_label_formatted(
                                             const rna_label& label,
-                                            const RGB& color) const;
+                                            const RGB& color,
+                                            const label_info li) const;
     
 protected:
     virtual std::string get_line_formatted(

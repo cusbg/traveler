@@ -87,6 +87,7 @@ public:
     
 public:
     void set_postorder_ids();
+    void set_pre_postorder_ids();
     bool is_ordered_postorder() const;
     
 public:
@@ -138,6 +139,9 @@ public:
     
     int depth(
               const base_iterator& it);
+
+    int size(
+            const base_iterator& it);
     
     base_iterator previous_sibling(const base_iterator& it)
     {

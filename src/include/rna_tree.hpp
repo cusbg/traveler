@@ -70,8 +70,8 @@ public:
      */
     void set_name(
                   const std::string& name);
-    
-public:
+
+
     /**
      * returns RNA sequence
      */
@@ -107,11 +107,11 @@ public:
      */
     static iterator get_rightest_initiated_descendant(
                                                       const iterator& node);
-    
-public:
+
     static point base_pair_edge_point(
                                       point from,
-                                      point to);
+                                      point to,
+                                      float scaling_ratio = 1);
     /**
      * returns top right corner of tree visualization
      */
@@ -122,8 +122,7 @@ public:
      */
     static point bottom_left_corner(
                                     rna_tree::iterator root);
-    
-public:
+
     double get_pairs_distance() const
     {
         return distances.pairs_distance;
@@ -136,7 +135,9 @@ public:
     {
         return distances.loops_bases_distance;
     }
-    
+
+    void update_bounding_boxes(bool leafs_have_size = false);
+
 private:
     /**
      * Compute distances between pairs and distances between unpaired bases in loops
@@ -170,16 +171,24 @@ inline bool is(
     return iter->status == s;
 }
 
-void update_ends_in_rna(
-                        rna_tree& rna);
+/*
+ * highlights 5' and 3' end
+ */
+void set_53_labels(
+        rna_tree &rna);
 
 size_t child_index(
                    rna_tree::sibling_iterator sib);
+
+rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index);
 
 /**
  * return only-branch-node if exist, otherwise return non-valid iterator
  */
 rna_tree::sibling_iterator get_onlyone_branch(
                                               rna_tree::sibling_iterator it);
+
+rna_tree::sibling_iterator get_first_initiated_pair_descendant(
+        rna_tree::sibling_iterator it);
 
 #endif /* !RNA_TREE_HPP */

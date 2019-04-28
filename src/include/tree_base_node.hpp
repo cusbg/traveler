@@ -1,7 +1,7 @@
 /*
  * File: tree_base_node.hpp
  *
- * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>, 2018 David Hoksza <david.hoksza@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,9 +24,12 @@
 
 #include <cstddef>
 
+#define TREE_BASE_NODE_NOT_MAPPED_ID 0
+
 class node_base
 {
 public:
+
     virtual ~node_base() = default;
 protected:
     node_base() = default;
@@ -34,12 +37,15 @@ protected:
 public:
     size_t id() const;
     void reset_id();
+    size_t seq_id_mapped();
+    void set_seq_id_mapped(size_t id);
     static void reset_ID();
-    
+
 private:
     static size_t ID;
 protected:
     size_t _id = ID++;
+    size_t _seq_id_mapped = TREE_BASE_NODE_NOT_MAPPED_ID; //used to store sequence position of the matched residue (if any) in template
 };
 
 #endif /* !TREE_BASE_NODE_HPP */

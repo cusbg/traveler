@@ -95,6 +95,7 @@ std::ostream& operator<<(std::ostream& out, const point& p)
 
 point point::operator+(const point& other) const
 {
+    assert(!(this->bad() || other.bad()))
     BINARY(*this, other);
     
     return {x + other.x, y + other.y};
@@ -105,6 +106,13 @@ point point::operator-(const point& other) const
     BINARY(*this, other);
     
     return {x - other.x, y - other.y};
+}
+
+point point::operator*(const point& other) const
+{
+    BINARY(*this, other);
+
+    return {x * other.x, y * other.y};
 }
 
 point point::operator-() const
@@ -134,7 +142,8 @@ point point::operator/(double value) const
 point point::operator*(double value) const
 {
     UNARY(*this);
-    assert(!iszero(value) && !std::isnan(x * value) && !std::isnan(y * value));
+//    assert(!iszero(value) && !std::isnan(x * value) && !std::isnan(y * value));
+    assert(!std::isnan(x * value) && !std::isnan(y * value));
     
     return {x * value, y * value};
 }
@@ -164,7 +173,8 @@ point center(const point &p1, const point &p2)
 double distance(const point& p1, const point& p2)
 {
     BINARY(p1, p2);
-    
+
+
     return size(p2 - p1);
 }
 
@@ -178,7 +188,6 @@ double size(const point& vector)
 point normalize(const point& p)
 {
     UNARY(p);
-    
     assert(size(p) != 0);
     return p / size(p);
 }
@@ -217,6 +226,28 @@ point rotate(const point& centre, double alpha, double radius)
     });
     
     return out;
+}
+
+point rotate_point_around_pivot(const point& pivot, const point &p, double angle)
+{
+    double rad = M_PI / 180 * angle;
+    float s = sin(rad);
+    float c = cos(rad);
+
+    point r = point(p);
+
+    // translate point back to origin:
+    r.x -= pivot.x;
+    r.y -= pivot.y;
+
+    // rotate point
+    float xnew = r.x * c - r.y * s;
+    float ynew = r.x * s + r.y * c;
+
+    // translate point back:
+    r.x = xnew + pivot.x;
+    r.y = ynew + pivot.y;
+    return r;
 }
 
 point orthogonal(const point& p)
@@ -332,7 +363,8 @@ double degrees_to_radians(
 }
 
 bool iszero(
-            double val)
+            double val,
+            bool exact_test)
 {
-    return double_equals(val, 0);
+    return exact_test ? val == 0 : double_equals(val, 0);
 }

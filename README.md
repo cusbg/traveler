@@ -63,6 +63,8 @@ The `traveler` executable is available in the PATH, and the current directory is
 		[-d|--draw] [--overlaps] FILE_MAPPING_IN OUT_PREFIX
 			# use mapping in FILE_MAPPING_IN and outputs layout as both .ps and .svg image to files with prefix OUT_PREFIX
 			# if optional argument --overlaps is present overlaps in the layout are identified and highlighted
+		[-v|--verbose] Prints information about the computation and othere details (such as number of overlaps, 
+		when overlap switch is turned on)
 
 	COLOR CODING:
 		Traveler uses the following color coding of nucleotides:
@@ -75,9 +77,9 @@ The `traveler` executable is available in the PATH, and the current directory is
 
 Three types of template IMAGE\_FILE are currectly supported by Traveler:
 	
-* PostScript (crw) from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php) (default)
-* VARNA (varna) format of SVG images produced by tool [VARNA](http://varna.lri.fr/)
-* Traveler intermediate format
+* crw: PostScript from [CRW](http://www.rna.icmb.utexas.edu/DAT/3A/Summary/index.php) (default)
+* varna: VARNA format of SVG images produced by tool [VARNA](http://varna.lri.fr/)
+* traveler: Traveler intermediate format
 
 #### Traveler intermediate format:
 
@@ -143,8 +145,8 @@ The file needs to contain three lines: moelcule description line (starts with th
 	$ mkdir test
 	$ bin/traveler \
 		--target-structure data/metazoa/mouse.fasta \
-		--template-structure data/metazoa/human.ps data/metazoa/uman.fasta \
-		--draw --overlaps test/mouse_draw-to_human.map test/mouse_draw-to_human
+		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
+		--draw --overlaps test/mouse_from_human.map test/mouse_from_human
 
 	$ # generates 4 files - .svg and .ps files, both with/without colored bases (see COLOR CODING section)
 	$ # checks also if output molecule has overlaps and draws them in output image

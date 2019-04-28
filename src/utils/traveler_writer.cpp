@@ -2,13 +2,16 @@
 
 using namespace std;
 
-void traveler_writer::init(const string& filename, rna_tree::iterator root)
+void traveler_writer::init(const string& filename, rna_tree& rna)
 {
     document_writer::init(filename, ".xml");
 }
 
 streampos traveler_writer::print(const string& text)
 {
+    if (text.empty())
+        return -1;
+
     streampos pos = get_pos();
     
     fill();
@@ -27,7 +30,7 @@ string traveler_writer::get_circle_formatted(point centre, double radius) const
     return "";
 }
 
-string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color) const
+string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color, const label_info li) const
 {
     ostringstream out;
     

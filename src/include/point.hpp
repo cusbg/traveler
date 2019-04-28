@@ -37,6 +37,7 @@ public:
     
     point operator+(const point& other) const;
     point operator-(const point& other) const;
+    point operator*(const point& other) const;
     point operator-() const;
     point operator/(const point& other) const;
     point operator/(double value) const;
@@ -80,6 +81,8 @@ double angle(const point& p1, const point& centre, const point& p2);
 
 point rotate(const point& centre, double alpha, double radius);
 
+point rotate_point_around_pivot(const point& pivot, const point &p, double angle);
+
 point orthogonal(const point& p);
 
 point orthogonal(const point& p, const point& direction);
@@ -111,6 +114,7 @@ double degrees_to_radians(
                           double val);
 
 bool iszero(
-            double val);
+            double val,
+            bool exact_test = true);
 
 #endif /* !POINT_HPP */

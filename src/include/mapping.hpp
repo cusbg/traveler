@@ -53,6 +53,8 @@ public:
      * filter only deletes
      */
     indexes get_to_remove() const;
+
+    std::vector<mapping_pair> get_to_update() const;
     
 public:
     size_t distance;

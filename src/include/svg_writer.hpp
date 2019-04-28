@@ -36,7 +36,7 @@ public:
 public:
     virtual void init(
                       const std::string& filename,
-                      rna_tree::iterator root);
+                      rna_tree& rna);
     virtual streampos print(
                             const std::string& text);
     
@@ -46,13 +46,16 @@ public: // formatters
                                              double radius) const;
     virtual std::string get_label_formatted(
                                             const rna_label& label,
-                                            const RGB& color) const;
+                                            const RGB& color,
+                                            const label_info li) const;
     
 protected:
     virtual std::string get_line_formatted(
                                            point from,
                                            point to,
                                            const RGB& color) const;
+
+//    double get_scaling_ratio() const;
     
 private:
     std::string get_header_element(
@@ -64,7 +67,12 @@ private:
     std::string create_element(
                                const std::string& name,
                                const properties& properties,
-                               const std::string& value = "") const;
+                               const std::string& value = "",
+                               const label_info li = {-1, ""}) const;
+//    std::string create_element(
+//            const std::string& name,
+//            const properties& properties,
+//            const int ix) const;
     std::string create_style_definitions() const;
     
     properties get_point_formatted(
@@ -72,12 +80,18 @@ private:
                                    const std::string& prefix,
                                    const std::string& postfix,
                                    bool should_shift_p = true) const;
+
+    void scale_point(point &p) const;
     
 private:
+    point dimensions;
+    point margin;
+
     point shift;
-    point scale;
+//    point scale;
     point tr, bl;
     point letter;
+
 };
 
 #endif /* !SVG_WRITER_HPP */

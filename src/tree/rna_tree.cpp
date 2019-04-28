@@ -26,6 +26,9 @@
 
 using namespace std;
 
+#define PAIRS_DISTANCE get_pair_base_distance()
+#define BASES_DISTANCE get_pairs_distance()
+
 inline static std::vector<rna_pair_label> convert(
                                                   const std::string& labels);
 
@@ -58,7 +61,7 @@ rna_tree::rna_tree(
 : rna_tree(_brackets, _labels, _name)
 {
     update_points(_points);
-    compute_distances();
+
 }
 
 void rna_tree::set_name(
@@ -111,6 +114,7 @@ std::vector<rna_pair_label> convert(
     return vec;
 }
 
+
 void rna_tree::update_points(
                              const vector<point>& points)
 {
@@ -118,20 +122,31 @@ void rna_tree::update_points(
     
     pre_post_order_iterator it;
     size_t i = 0;
+
+//    point p_min = point(DBL_MAX, DBL_MAX), p_max = point(DBL_MIN, DBL_MIN);
+//    for (point p: points){
+//        if (p.x < p_min.x) p_min.x = p.x;
+//        if (p.y < p_min.y) p_min.y = p.y;
+//        if (p.x > p_max.x) p_max.x = p.x;
+//        if (p.y > p_max.y) p_max.y = p.y;
+//    }
+//    point dim = point(p_max - p_min);
     
     for (it = ++begin_pre_post();
          it != end_pre_post() && i < points.size();
          ++it, ++i)
-        it->at(it.label_index()).p = points[i];
+//        it->set_p((points[i] - p_min) / dim, it.label_index());
+        it->set_p(points[i], it.label_index());
     
     assert(i == points.size() && ++pre_post_order_iterator(it) == end_pre_post());
-    
-    update_ends_in_rna(*this);
+
+    compute_distances();
+    set_53_labels(*this);
 }
 
 //highlights 5' and 3' end
-void update_ends_in_rna(
-                        rna_tree& rna)
+void set_53_labels(
+        rna_tree &rna)
 {
     APP_DEBUG_FNAME;
     
@@ -166,15 +181,15 @@ void update_ends_in_rna(
         root->at(1).p = pl + dir;
     } else{
         //using first and first but last siblings to get the position for the 5' and 3' labels
-        iterator f2 = rna.next_sibling(f);
-        iterator l2 = rna.previous_sibling(l);
+        iterator f2 = rna_tree::pre_post_order_iterator(f); f2++;
+        iterator l2 = rna_tree::post_order_iterator(l); l2--;
         
         point pf2, pl2;
         pf2 = f2->at(0).p;
         pl2 = l2->paired() ? l2->at(1).p : l2->at(0).p;
         
-        root->at(0).p = pf - (pf2 - pf);
-        root->at(1).p = pl - (pl2 - pl);
+        root->at(0).p = pf + normalize(pf - pf2) * rna.get_pairs_distance();
+        root->at(1).p = pl + normalize((pl - pl2)) * rna.get_pairs_distance();
     }
     
     
@@ -183,7 +198,7 @@ void update_ends_in_rna(
     
     root->at(1).label = "3'";
     
-    INFO("RNA ends (3', 5') are updated");
+    INFO("RNA ends (5', 3') updated");
 }
 
 
@@ -297,6 +312,7 @@ bool rna_tree::correct_pairing() const
     for (iterator it = begin(); it != end(); ++it)
     {
         // if is leaf and is paired..
+//        if (is_leaf(it) == it->paired())
         if (is_leaf(it) == it->paired())
             return false;
     }
@@ -371,7 +387,8 @@ void rna_tree::compute_distances()
             || is_root(it)
             || is_leaf(it)
             || !is_valid(get_onlyone_branch(parent(it)))
-            || !rna_tree::is_only_child(it))
+            || !rna_tree::is_only_child(it)
+            || parent(it)->center().bad()) //can happen when the parent of a base pair is the 3'5'
             continue;
         
         dist += distance(parent(it)->center(), it->center());
@@ -485,6 +502,14 @@ point rna_tree::bottom_left_corner(
     return n;
 }
 
+rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index) {
+    rna_tree::sibling_iterator it = parent.begin();
+    while (index > 0 && it != parent.end()) {
+        index--; it++;
+    }
+    return it;
+}
+
 
 /* inline, local */ std::string trim(
                                      std::string s)
@@ -493,7 +518,7 @@ point rna_tree::bottom_left_corner(
     size_t pos;
     
     pos = s.find_first_not_of(WHITESPACES);
-    if (pos != s.npos)
+    if (pos != s.npos   )
         s.erase(0, pos);
     pos = s.find_last_not_of(WHITESPACES);
     if (pos != s.npos)
@@ -505,11 +530,69 @@ point rna_tree::bottom_left_corner(
 
 /* static */ point rna_tree::base_pair_edge_point(
                                                   point from,
-                                                  point to)
+                                                  point to,
+                                                  float scaling_ratio)
 {
     assert(!from.bad() && !to.bad());
-    
-    point vec = {3, 3};
-    vec = vec + normalize(to - from) * 4;
-    return from + vec;
+
+
+//    return from;
+    return from + normalize(to - from) * 6 / scaling_ratio;
+}
+
+vector<rectangle> get_non_leaf_children_bounding_objects(rna_tree::iterator node){
+
+    vector<rectangle> bo;
+    for (auto it = node.begin(); it != node.end(); it++) {
+        if (!rna_tree::is_leaf(it)) {
+            auto aux = it->get_bounding_objects();
+            bo.insert(bo.end(), aux.begin(), aux.end());
+        }
+    }
+    return bo;
+}
+
+rectangle get_loop_bounding_object(rna_tree::iterator node){
+
+    rectangle bo;
+    for (auto it = node.begin(); it != node.end(); it++) {
+        if (it->paired()) {
+            bo += rectangle(it->at(0).p, it->at(1).p);
+        } else {
+            bo += rectangle(it->at(0).p, it->at(0).p);
+        }
+    }
+
+    return bo;
+}
+
+void rna_tree::update_bounding_boxes(bool leafs_have_size){
+    float bd = leafs_have_size ? get_pairs_distance()/2: 0;
+    for (post_order_iterator it = this->begin_post(); it != this->end_post(); ++it){
+        assert(it->initiated_points());
+
+        if (rna_tree::is_leaf(it)) {
+            //for a leaf, the bounding object is the list itself
+            if (it->paired()) {
+                //it can happen that the hairpin does not have a loop
+                it->set_bounding_objects(rectangle(it->at(0).p, it->at(1).p));
+            } else {
+//                it->set_bounding_objects(rectangle(it->at(0).p, it->at(0).p));
+                it->set_bounding_objects(rectangle(it->at(0).p+point(-bd, bd), it->at(0).p+point(bd, -bd)));
+            }
+        } else {
+            if (it.number_of_children() == 1) {
+                //the current node is continuation of a stem
+                vector<rectangle> bo =  it.begin()->get_bounding_objects();
+                bo[0] += rectangle(it->at(0).p, it->at(1).p);
+                it->set_bounding_objects(bo);
+            } else {
+                //the current node is the beginning of a (possibly multibranch) loop
+                it->set_bounding_objects(rectangle(it->at(0).p, it->at(1).p));
+                it->add_bounding_objects(get_loop_bounding_object(it));
+                // add boundin objects of the stems which begin in the current loop
+                it->add_bounding_objects(get_non_leaf_children_bounding_objects(it));
+            }
+        }
+    }
 }
