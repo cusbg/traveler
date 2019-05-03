@@ -803,8 +803,8 @@ void compact::init_multibranch(
         point p2 = last_initiated->paired() ? last_initiated->at(1).p : last_initiated->at(0).p;
 
         if (first_initiated->initiated_points()
-            && last_initiated->initiated_points() && first_initiated != last_initiated &&
-            distance(p1, p2) < 2 * PAIRS_DISTANCE)
+            && last_initiated->initiated_points() && first_initiated != last_initiated /*&&
+            distance(p1, p2) < 2 * PAIRS_DISTANCE*/)
         {
             
             //Installing a new root into an existing branch in depth 1 which is part of a multibranch loop
@@ -896,7 +896,7 @@ void compact::init_multibranch(
             iterator root = rna.begin();
 
             //iterator prev = rna.previous_sibling(it), next = rna.next_sibling(it);
-            sibling_iterator prev = sibling_iterator(it), next = sibling_iterator(it); //the iterator itself is not initalized so either it will change to its neighbor in the first iteration of hte following while, it will stop if it is either first or last sibling
+            sibling_iterator prev = sibling_iterator(it), next = sibling_iterator(it); //the iterator itself is not initalized so either it will change to its neighbor in the first iteration in the following while cycle, it will stop if it is either first or last sibling
             while(prev != root.begin() && !prev->initiated_points()) prev--;
             while(next != root.node->last_child && !next->initiated_points()) next++;
 
@@ -929,7 +929,7 @@ void compact::init_multibranch(
 
 
             } else if (!prev->initiated_points()) {
-                // branch inserted at 5' end there exists no initiated point before it
+                // branch inserted at 5' and there exists no initiated point before it
                 p1 = next->at(0).p;
                 //if he next node is paired than position of first and second nucleotie are enough
                 // to get the position of the new branch (although it should also be slightly rotated otherwise
@@ -940,10 +940,10 @@ void compact::init_multibranch(
                     while(next_next != root.end() && !next_next->initiated_points()) next_next++;
                     assert(next_next->initiated_points())
                     if (next_next == root.end() ) {
-                        //if prev is the first residue, then there is not previous residue, and the position of 5' will be used instead
+                        //if prev is the first residue, then there is no residue before it, the position of 5' will be used instead
                         p2 = rna_tree::parent(prev)->at(1).p;
                     } else {
-                        p2 = next_next->at(1).p;
+                        p2 = next_next->at(0).p;
                     }
 
                 }
