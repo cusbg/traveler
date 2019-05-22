@@ -252,8 +252,8 @@ svg_writer::properties svg_writer::get_point_formatted(
     }
     
     out
-    << property(msprintf("%sx%s", prefix, postfix), msprintf("%fpt", p.x))
-    << property(msprintf("%sy%s", prefix, postfix), msprintf("%fpt", p.y));
+    << property(msprintf("%sx%s", prefix, postfix), msprintf("%f", p.x))
+    << property(msprintf("%sy%s", prefix, postfix), msprintf("%f", p.y));
     
     return out;
 }
@@ -385,9 +385,9 @@ std::string svg_writer::get_header_element(
     out
     << "<svg"
     << "\n\t" << property("xmlns", "http://www.w3.org/2000/svg")
-    << "\n\t" << property("width", msprintf("%fpt", letter.x))
-    << "\n\t" << property("height", msprintf("%fpt", letter.y))
-    << "\n\t" << get_styles({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
+    << "\n\t" << property("width", msprintf("%f", letter.x))
+    << "\n\t" << property("height", msprintf("%f", letter.y))
+    << "\n\t" << get_styles({{"font-size",  "7px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
     << ">"
     << endl;
     
