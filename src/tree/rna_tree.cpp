@@ -505,9 +505,12 @@ rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index) {
 {
     assert(!from.bad() && !to.bad());
 
-
+    // Fhe following works for SVG where the from and to points correspond to middle bottom positions and the font
+    // size is 8px. Moreover the coordinate frame is based on PS and thus starts from bottom left.
 //    return from;
-    return from + normalize(to - from) * 6 / scaling_ratio;
+    return from + point(0,0.5) + normalize(to - from) * 4 ;
+//    return from + normalize(to - from) * 6 / scaling_ratio;
+//    return from + normalize(to - from) * 8;
 }
 
 vector<rectangle> get_non_leaf_children_bounding_objects(rna_tree::iterator node){

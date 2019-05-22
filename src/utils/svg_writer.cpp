@@ -153,7 +153,7 @@ struct svg_writer::style
 //    scaling_ratio = 20 / bp_dist;
 //    scale = point(scaling_ratio , scaling_ratio);
 //    scale = point(8, 8);
-    dimensions = (tr - bl) * get_scaling_ratio() + margin;
+    dimensions = (tr - bl) /** get_scaling_ratio()*/ + margin;
 
 
 
@@ -252,8 +252,8 @@ svg_writer::properties svg_writer::get_point_formatted(
     }
     
     out
-    << property(msprintf("%sx%s", prefix, postfix), p.x)
-    << property(msprintf("%sy%s", prefix, postfix), p.y);
+    << property(msprintf("%sx%s", prefix, postfix), msprintf("%fpt", p.x))
+    << property(msprintf("%sy%s", prefix, postfix), msprintf("%fpt", p.y));
     
     return out;
 }
@@ -359,7 +359,8 @@ std::string svg_writer::create_style_definitions() const
 
         if (element.name == "text"){
             out << style("text-anchor", "middle");
-            out << style("baseline-shift", "sub");
+//            out << style("baseline-shift", "sub");
+            out << style("dominant-baseline", "middle");
 
         }
         out << "}";
@@ -384,9 +385,9 @@ std::string svg_writer::get_header_element(
     out
     << "<svg"
     << "\n\t" << property("xmlns", "http://www.w3.org/2000/svg")
-    << "\n\t" << property("width", letter.x)
-    << "\n\t" << property("height", letter.y)
-    << "\n\t" << get_styles({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
+    << "\n\t" << property("width", msprintf("%fpt", letter.x))
+    << "\n\t" << property("height", msprintf("%fpt", letter.y))
+    << "\n\t" << get_styles({{"font-size",  "6pt"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
     << ">"
     << endl;
     
