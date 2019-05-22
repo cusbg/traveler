@@ -387,7 +387,7 @@ std::string svg_writer::get_header_element(
     << "\n\t" << property("xmlns", "http://www.w3.org/2000/svg")
     << "\n\t" << property("width", msprintf("%fpt", letter.x))
     << "\n\t" << property("height", msprintf("%fpt", letter.y))
-    << "\n\t" << get_styles({{"font-size",  "6pt"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
+    << "\n\t" << get_styles({{"font-size",  "8px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
     << ">"
     << endl;
     
