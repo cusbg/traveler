@@ -1508,10 +1508,6 @@ int count_overlaps(const rna_tree::iterator it1, const rna_tree::iterator it2){
 
     int sum = 0;
 
-//    if (it2->id() == 1003) {
-//        int x = 1;
-//    }
-
     if (it1->id() != it2->id())
     {
         if (rna_tree::is_leaf(it2)){
@@ -1530,6 +1526,15 @@ int count_overlaps(const rna_tree::iterator it1, const rna_tree::iterator it2){
                 }
             }
         } else if (bo_overlap(it1->get_bounding_objects(), it2->get_bounding_objects())){
+            //test whether the residues comprising the bp on which the it2 is pointing are intersecting with it1 and then recursively check all its children
+            point p1 = it2->at(0).p;
+            point p2 = it2->at(1).p;
+            if (bo_overlap(it1->get_bounding_objects(), vector<rectangle>{rectangle(p1, p1)})) {
+                sum += 1;
+            }
+            if (bo_overlap(it1->get_bounding_objects(), vector<rectangle>{rectangle(p2, p2)})) {
+                sum += 1;
+            }
             for (auto ch = it2.begin(); ch != it2.end(); ++ch){
                 sum += count_overlaps(it1, ch);
             }
@@ -1641,7 +1646,7 @@ void reposition_branch(rna_tree &rna, rna_tree::post_order_iterator it, rna_tree
 
         if (cnt_overlaps_min == 0) break;
     }
-    if (ix_mirror >= 1) mirror_branch(it);
+    if (ix_mirror >= 1 && max_mirror == 2) mirror_branch(it);
 
     //now we should be in the state where we were at the beginning of the function
 
@@ -1649,7 +1654,6 @@ void reposition_branch(rna_tree &rna, rna_tree::post_order_iterator it, rna_tree
     {
         if (ix_mirror_min == 1) mirror_branch(it);
         rotate_branch_by_angle(rna, it, angles[ix_angle_min]);
-        rna.update_bounding_boxes();
     }
 }
 

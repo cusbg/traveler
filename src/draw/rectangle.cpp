@@ -100,8 +100,8 @@ rectangle& rectangle::operator=(const rectangle& other){
 bool rectangle::intersects(const rectangle& rect) const{
     // If one rectangle is on left side of other
 
-    if ((rect.has(top_left) && rect.has(bottom_right)) || (has(rect.top_left) && has(rect.bottom_right)))
-        return true;
+//    if ((rect.has(top_left) && rect.has(bottom_right)) || (has(rect.top_left) && has(rect.bottom_right)))
+//        return true;
 
     if (bottom_right.x < rect.top_left.x || top_left.x > rect.bottom_right.x)
         return false;
