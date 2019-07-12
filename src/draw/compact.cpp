@@ -803,8 +803,8 @@ void compact::init_multibranch(
         point p2 = last_initiated->paired() ? last_initiated->at(1).p : last_initiated->at(0).p;
 
         if (first_initiated->initiated_points()
-            && last_initiated->initiated_points() && first_initiated != last_initiated /*&&
-            distance(p1, p2) < 2 * PAIRS_DISTANCE*/)
+            && last_initiated->initiated_points() && first_initiated != last_initiated &&
+            distance(p1, p2) < 2 * PAIRS_DISTANCE)
         {
             
             //Installing a new root into an existing branch in depth 1 which is part of a multibranch loop
