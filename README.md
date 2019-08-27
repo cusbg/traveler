@@ -4,6 +4,13 @@ Visualization of RNA secondary structure using a template visualization (current
 
 The following three images show what Traveler is good for. The first image is the visualization of 18S human rRNA from CRW, follows the correct visualization of Amblyospora bracteata's (AB) 18s rRNA (as downloaded from CRW) and the third image shows how Traveler visualizes the AB's 18s when given its secondary structure together with human rRNA secondary structure and visualization in postscript as a template.
 
+```
+bin/traveler \
+	--target-structure data/fungi/d.16.e.A.bracteata.fasta \
+	--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
+	--all test/ab_from_human
+```
+
 <div>
   <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/human.png" width="33%"/>
   <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/A_bracteata.png" width="33%"/>
