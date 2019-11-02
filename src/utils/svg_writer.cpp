@@ -285,11 +285,12 @@ std::string svg_writer::create_element(
 }
 
 svg_writer::style svg_writer::get_color_style(
-                                              const RGB& color) const
+        const std::string& feature,
+        const RGB& color) const
 {
 #define rgb_value(value)    (255.0 * value)
     string text = msprintf("rgb(%s, %s, %s)", rgb_value(color.get_red()), rgb_value(color.get_green()), rgb_value(color.get_blue()));
-    return {"stroke", text};
+    return {feature, text};
 #undef rgb_value
 }
 
@@ -330,6 +331,13 @@ std::string svg_writer::create_style_definitions() const
     
     for (const auto& element : elements)
     {
+        string feature_name;
+        if (element.name == "text") {
+            feature_name = "fill";
+        } else {
+            feature_name = "stroke";
+        }
+
         for (const RGB& rgb : RGB::get_all())
         {
             out
@@ -338,7 +346,7 @@ std::string svg_writer::create_style_definitions() const
             << "."
             << rgb.get_name()
             << " {"
-            << get_color_style(rgb);
+            << get_color_style(feature_name, rgb);
             
             for (const style& s : element.styles)
             {
@@ -354,8 +362,8 @@ std::string svg_writer::create_style_definitions() const
         << endl
         << element.name
         << " {"
-        << get_color_style(RGB::BLACK)
-        << style("fill", "none");
+        << get_color_style(feature_name, RGB::BLACK);
+//        << style("fill", "none");
 
         if (element.name == "text"){
             out << style("text-anchor", "middle");
@@ -387,7 +395,8 @@ std::string svg_writer::get_header_element(
     << "\n\t" << property("xmlns", "http://www.w3.org/2000/svg")
     << "\n\t" << property("width", msprintf("%f", letter.x))
     << "\n\t" << property("height", msprintf("%f", letter.y))
-    << "\n\t" << get_styles({{"font-size",  "7px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
+//    << "\n\t" << get_styles({{"font-size",  "7px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
+    << "\n\t" << get_styles({{"font-size",  "7px"}, {"font-weight", "bold"}, {"font-family", "Helvetica"}})
     << ">"
     << endl;
     

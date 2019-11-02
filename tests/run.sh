@@ -13,9 +13,9 @@ for((i=0;i<${#TGTS[@]};i++))
 do
     TGT=${TGTS[$i]}
     TMP=${TMPS[$i]}
-    
+
     echo "`date`: Working on ${TGT} using ${TMP} as a template"
-    
+
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure ${TMP_DIR}${TMP}.ps ${TMP_DIR}/${TMP}.fasta --ted ${OUT_DIR}${TGT}.map
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure ${TMP_DIR}${TMP}.ps ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
 done
@@ -27,9 +27,9 @@ for((i=0;i<${#TGTS[@]};i++))
 do
     TGT=${TGTS[$i]}
     TMP=${TMPS[$i]}
-    
+
     echo "`date`: Working on ${TGT} using ${TMP} as a template"
-    
+
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format varna ${TMP_DIR}${TMP}.svg ${TMP_DIR}/${TMP}.fasta --ted ${OUT_DIR}${TGT}.map
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format varna ${TMP_DIR}${TMP}.svg ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
 done

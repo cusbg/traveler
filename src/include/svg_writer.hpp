@@ -61,7 +61,8 @@ private:
     std::string get_header_element(
                                    rna_tree::iterator root);
     style get_color_style(
-                          const RGB& color) const;
+            const std::string& feature,
+            const RGB& color) const;
     properties get_styles(
                           const std::vector<style>& styles) const;
     std::string create_element(
