@@ -1377,108 +1377,6 @@ double compact::get_length(
     }
 }
 
-
-std::vector<int> get_ixs_of_distinct_edges(overlap_checks::edges es1, overlap_checks::edges es2) {
-
-    std::vector<int> ixs;
-    for (int i = 0; i < es1.size(); i++) {
-        bool distinct = true;
-        for (int j = 0; j < es2.size(); j++) {
-            if (es1[i] == es2[j]) {
-                distinct = false;
-                break;
-            }
-        }
-        if (distinct) ixs.push_back(i);
-    }
-    return ixs;
-}
-
-void try_reposition_branch(rna_tree::sibling_iterator it, rna_tree::sibling_iterator root, rna_tree rna, vector<int> angles, int zero_angle_ix) {
-
-    overlap_checks::edges e = overlap_checks::get_edges(root);
-    overlap_checks::edges e_it_before = overlap_checks::get_edges(it);
-
-    vector<int> ixs_only_e = get_ixs_of_distinct_edges(e, e_it_before);
-
-//    int cnt_overlaps_it = overlap_checks::get_overlaps(e, e_it_before, ixs_only_e).size();
-//    if (cnt_overlaps_it == 0) return;
-
-    int cnt_overlaps_min = overlap_checks().run(rna).size();
-    int cnt_overlaps_init = cnt_overlaps_min;
-
-
-    int ix_angle_min = zero_angle_ix, ix_mirror_min = 0, ix_mirror = 0, ix_angle = 0;
-    for (int ix_mirror = 0; ix_mirror < 2; ix_mirror++)
-    {
-        if (ix_mirror == 1) mirror_branch(it);
-
-        for (; ix_angle < angles.size(); ix_angle++) {
-            if (ix_mirror == 0 && angles[ix_angle] == 0) continue;
-
-            rotate_branch_by_angle(rna, it, angles[ix_angle]);
-
-//            overlap_checks::edges e_it_after = overlap_checks::get_edges(it);
-//            int cnt_overlaps = overlap_checks::get_overlaps(e, e_it_after, ixs_only_e).size();
-            int cnt_overlaps = overlap_checks().run(rna).size();
-
-            if (cnt_overlaps < cnt_overlaps_min) {
-                cnt_overlaps_min = cnt_overlaps;
-                ix_angle_min = ix_angle;
-                ix_mirror_min = ix_mirror;
-            }
-
-            rotate_branch_by_angle(rna, it, -angles[ix_angle]);
-
-            if (cnt_overlaps_min == 0) break;
-
-        }
-
-        if (cnt_overlaps_min == 0) break;
-    }
-    if (ix_mirror == 1) mirror_branch(it);
-
-    //now we should be in the state where we were at the beginning of the function
-
-//    if (cnt_overlaps_min < cnt_overlaps_init)
-//    {
-//        if (ix_mirror_min == 1) mirror_branch(it);
-//        rotate_branch_by_angle(it, angles[ix_angle_min]);
-//    }
-}
-void compact::try_reposition_new_root_branches() {
-
-    std::vector<int> angles;
-    int zero_angle_ix = -1;
-    int ix = 0;
-    for (int i = -45; i <= 45; i += 15) {
-        angles.push_back(i);
-        if (i == 0) zero_angle_ix = ix;
-        ix++;
-    }
-
-    assert(zero_angle_ix > 0);
-
-
-    sibling_iterator root = rna.begin();
-//    for (sibling_iterator it = --root.end(); it != root.begin(); --it)
-    vector<sibling_iterator> branches;
-    for (sibling_iterator it = root.begin(); it != root.end(); ++it) {
-        if (it->paired()) branches.push_back(it);
-    }
-
-    for (int i = 0; i <= ceil(branches.size()/2); i++) {
-        for (int alt = 0; alt<2; alt++) {
-            int ix = alt == 0 ? i : branches.size() - 1 - i;
-            if (alt == 1 and ix <= i) break;
-            auto it = branches[ix];
-            try_reposition_branch(it, root, rna, angles, zero_angle_ix);
-            set_53_labels(rna);
-        }
-    }
-
-}
-
 bool bo_overlap(vector<rectangle> vr1, vector<rectangle> vr2) {
     for (rectangle r1: vr1) {
         for (rectangle r2: vr2){
@@ -1695,7 +1593,7 @@ void contract_nodes(compact::iterator it, compact::iterator it2, compact::iterat
 
 /**
  * Deletion of a node (unpaired nt) introduces a gap in the layout. This is taken care of in the case of in non-root
- * level. This function does contraction for the first level.
+ * level. This function does the contraction for the first level.
  * @param rna
  */
 void contract_root_level(rna_tree &  rna) {
@@ -1725,7 +1623,6 @@ void contract_root_level(rna_tree &  rna) {
 //                        return;
 //                    }
 
-
                     //lets contract only if the distance after deletion is too big, otherwise it's better not to touch the layout
                     point dist_vect = normalize(p1 - p0) * (dist-BASES_DISTANCE);
 
@@ -1749,9 +1646,6 @@ void contract_root_level(rna_tree &  rna) {
                     } else {
 //                        return;
                     }
-
-
-
                 }
 //            }
 
@@ -1759,8 +1653,6 @@ void contract_root_level(rna_tree &  rna) {
 
         it++; it_prev++;
     }
-
-
 }
 
 void compact::beautify(){
@@ -1772,7 +1664,108 @@ void compact::beautify(){
 
     }
 
-
     set_53_labels(rna);
-
 }
+
+
+
+//std::vector<int> get_ixs_of_distinct_edges(overlap_checks::edges es1, overlap_checks::edges es2) {
+//
+//    std::vector<int> ixs;
+//    for (int i = 0; i < es1.size(); i++) {
+//        bool distinct = true;
+//        for (int j = 0; j < es2.size(); j++) {
+//            if (es1[i] == es2[j]) {
+//                distinct = false;
+//                break;
+//            }
+//        }
+//        if (distinct) ixs.push_back(i);
+//    }
+//    return ixs;
+//}
+
+//void try_reposition_branch(rna_tree::sibling_iterator it, rna_tree::sibling_iterator root, rna_tree rna, vector<int> angles, int zero_angle_ix) {
+//
+//    overlap_checks::edges e = overlap_checks::get_edges(root);
+//    overlap_checks::edges e_it_before = overlap_checks::get_edges(it);
+//
+//    vector<int> ixs_only_e = get_ixs_of_distinct_edges(e, e_it_before);
+//
+////    int cnt_overlaps_it = overlap_checks::get_overlaps(e, e_it_before, ixs_only_e).size();
+////    if (cnt_overlaps_it == 0) return;
+//
+//    int cnt_overlaps_min = overlap_checks().run(rna).size();
+//    int cnt_overlaps_init = cnt_overlaps_min;
+//
+//
+//    int ix_angle_min = zero_angle_ix, ix_mirror_min = 0, ix_mirror = 0, ix_angle = 0;
+//    for (int ix_mirror = 0; ix_mirror < 2; ix_mirror++)
+//    {
+//        if (ix_mirror == 1) mirror_branch(it);
+//
+//        for (; ix_angle < angles.size(); ix_angle++) {
+//            if (ix_mirror == 0 && angles[ix_angle] == 0) continue;
+//
+//            rotate_branch_by_angle(rna, it, angles[ix_angle]);
+//
+////            overlap_checks::edges e_it_after = overlap_checks::get_edges(it);
+////            int cnt_overlaps = overlap_checks::get_overlaps(e, e_it_after, ixs_only_e).size();
+//            int cnt_overlaps = overlap_checks().run(rna).size();
+//
+//            if (cnt_overlaps < cnt_overlaps_min) {
+//                cnt_overlaps_min = cnt_overlaps;
+//                ix_angle_min = ix_angle;
+//                ix_mirror_min = ix_mirror;
+//            }
+//
+//            rotate_branch_by_angle(rna, it, -angles[ix_angle]);
+//
+//            if (cnt_overlaps_min == 0) break;
+//
+//        }
+//
+//        if (cnt_overlaps_min == 0) break;
+//    }
+//    if (ix_mirror == 1) mirror_branch(it);
+//
+//    //now we should be in the state where we were at the beginning of the function
+//
+////    if (cnt_overlaps_min < cnt_overlaps_init)
+////    {
+////        if (ix_mirror_min == 1) mirror_branch(it);
+////        rotate_branch_by_angle(it, angles[ix_angle_min]);
+////    }
+//}
+//void compact::try_reposition_new_root_branches() {
+//
+//    std::vector<int> angles;
+//    int zero_angle_ix = -1;
+//    int ix = 0;
+//    for (int i = -45; i <= 45; i += 15) {
+//        angles.push_back(i);
+//        if (i == 0) zero_angle_ix = ix;
+//        ix++;
+//    }
+//
+//    assert(zero_angle_ix > 0);
+//
+//
+//    sibling_iterator root = rna.begin();
+////    for (sibling_iterator it = --root.end(); it != root.begin(); --it)
+//    vector<sibling_iterator> branches;
+//    for (sibling_iterator it = root.begin(); it != root.end(); ++it) {
+//        if (it->paired()) branches.push_back(it);
+//    }
+//
+//    for (int i = 0; i <= ceil(branches.size()/2); i++) {
+//        for (int alt = 0; alt<2; alt++) {
+//            int ix = alt == 0 ? i : branches.size() - 1 - i;
+//            if (alt == 1 and ix <= i) break;
+//            auto it = branches[ix];
+//            try_reposition_branch(it, root, rna, angles, zero_angle_ix);
+//            set_53_labels(rna);
+//        }
+//    }
+//
+//}
