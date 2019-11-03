@@ -63,7 +63,7 @@ private:
      * merge t1 with t2,
      * inserts nodes marked as 'inserted' from t2->t1, rename other
      */
-    void merge();
+    void merge(const mapping &map);
     /**
      * compute subtree sizes for each node in trees
      */

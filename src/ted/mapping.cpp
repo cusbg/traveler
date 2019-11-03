@@ -73,6 +73,21 @@ std::vector<mapping::mapping_pair> mapping::get_to_update() const
     return vec;
 }
 
+std::map<size_t , size_t> mapping::get_target_template_map() const
+{
+    APP_DEBUG_FNAME;
+
+    std::map<size_t , size_t> tgt_tmp_map;
+
+    for (auto m : map)
+    {
+        if (m.to != 0)
+            tgt_tmp_map.insert(std::make_pair(m.to, m.from));
+    }
+
+    return tgt_tmp_map;
+}
+
 bool mapping::mapping_pair::operator<(
                                       const mapping_pair& other) const
 {

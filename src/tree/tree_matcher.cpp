@@ -65,8 +65,14 @@ rna_tree& matcher::run(
     mark(t1, map.get_to_remove(), rna_pair_label::deleted); //t1 is template -> remove superfluous nodes
     mark(t2, map.get_to_insert(), rna_pair_label::inserted); //t2 is target -> add nodes which are missing in template
 
-    t1.set_pre_postorder_ids();
-
+    // T1 is a template which has removed and inserted nodes so it now fits the structure of target. To this tree
+    // we will now add target-template position mapping
+    auto tgt_tmp_map = map.get_target_template_map();
+    size_t i = 1;
+    for (rna_tree::pre_post_order_iterator it = t1.begin_pre_post(); it != t1.end_pre_post(); ++it, i++){
+        auto ix_tmp = tgt_tmp_map[i];
+        it->at(it.label_index()).tmp_ix = ix_tmp;
+    }
 
     //remove nodes from t1 and mark this in parent using set_remake
     erase();
@@ -79,7 +85,7 @@ rna_tree& matcher::run(
     //template (t1) has already deleted nodes which are not supposed to be in target(t2)
     //now we need to add nodes into template which are in target but not in template and rename the nodes which were mapped
     //after that, t1 will be the structure which we need (basically target with position from template)
-    merge();
+    merge(map);
 
     // The following check is not valid since we can have a leaf node which is base paired in case of
     // stems with no loop. Last bp of such a stem is paired and also a leaf
@@ -144,7 +150,7 @@ void matcher::erase()
 
 // t1 has already removed nodes which should be removed based on the mapping
 // here we insert to t1 from t2
-void matcher::merge()
+void matcher::merge(const mapping &map)
 {
     iterator it1, it2;
     sibling_iterator ch1, ch2, ins;

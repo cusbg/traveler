@@ -175,7 +175,7 @@ std::string document_writer::get_rna_subtree_formatted(
     auto print =
     [&out, &seq_ix, this](rna_tree::pre_post_order_iterator it)
     {
-        out << get_label_formatted(it, {seq_ix, it->at(it.label_index()).tmp_label});
+        out << get_label_formatted(it, {seq_ix, it->at(it.label_index()).tmp_label, it->at(it.label_index()).tmp_ix});
         seq_ix++;
     };
     

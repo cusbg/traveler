@@ -177,19 +177,19 @@ void tree_base<label_type>::set_postorder_ids()
     assert(size() - 1 == ::id(begin()));
 }
 
-template <typename label_type>
-void tree_base<label_type>::set_pre_postorder_ids()
-{
-    APP_DEBUG_FNAME;
-
-    pre_post_order_iterator it;
-    int i = 0;
-    for (it = begin_pre_post(); it != end_pre_post(); ++it){
-        i++;
-        it->set_seq_id_mapped(i);
-    }
-
-}
+//template <typename label_type>
+//void tree_base<label_type>::set_pre_postorder_ids(const mapping& mapping)
+//{
+//    APP_DEBUG_FNAME;
+//
+//    pre_post_order_iterator it;
+//    int i = 0;
+//    for (it = begin_pre_post(); it != end_pre_post(); ++it){
+//        i++;
+////        it->set_seq_id_mapped(i);
+//    }
+//
+//}
 
 template <typename label_type>
 bool tree_base<label_type>::is_ordered_postorder() const

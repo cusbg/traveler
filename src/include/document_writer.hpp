@@ -42,6 +42,7 @@ struct label_info
 {
     int ix;
     std::string tmp_label; //label used in the template (can be used to store information about the mapped nodes label in the template)
+    int tmp_ix; //position of the nucleotide in the template
 };
 
 /**

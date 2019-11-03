@@ -69,7 +69,7 @@ private:
                                const std::string& name,
                                const properties& properties,
                                const std::string& value = "",
-                               const label_info li = {-1, ""}) const;
+                               const label_info li = {-1, "", 0}) const;
 //    std::string create_element(
 //            const std::string& name,
 //            const properties& properties,

@@ -23,6 +23,7 @@
 #define MAPPING_HPP
 
 #include <vector>
+#include <map>
 #include <cstddef> // size_t
 
 /**
@@ -35,6 +36,7 @@ public:
     
     struct mapping_pair
     {
+        // "from" represents template an "to" represents target
         size_t from, to;
         
         bool operator<(
@@ -55,7 +57,9 @@ public:
     indexes get_to_remove() const;
 
     std::vector<mapping_pair> get_to_update() const;
-    
+
+    std::map<size_t , size_t> get_target_template_map() const;
+
 public:
     size_t distance;
     std::vector<mapping_pair> map;

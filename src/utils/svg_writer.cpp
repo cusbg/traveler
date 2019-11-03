@@ -276,7 +276,12 @@ std::string svg_writer::create_element(
     stringstream ss;
     //if (ix >= 0) ss << "<title>" << ix << " (lable in template: " <<  << "</title>";
     if (li.ix >= 0) {
-        ss << "<title>" << li.ix << "(label in template: " << li.tmp_label.c_str() << ") </title>";
+        ss << "<title>" << li.ix;
+        if (li.tmp_ix > 0) {
+            ss << " (position.label in template: " << li.tmp_ix << "." << li.tmp_label.c_str() << ")";
+
+        }
+        ss << "</title>";
     }
     if (value.empty())
         return msprintf("<g>%s<%s %s/></g>\n", ss.str(), name, properties);

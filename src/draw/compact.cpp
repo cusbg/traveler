@@ -52,7 +52,7 @@ void compact::run()
 //    try_reposition_new_root_branches();
 //    reposition_branches();
     beautify();
-    set_53_labels(rna);
+//    set_53_labels(rna);
     checks();
     
     INFO("END: Computing RNA layout");
@@ -1608,20 +1608,16 @@ void contract_root_level(rna_tree &  rna) {
     auto it = ++compact::sibling_iterator(it_prev);
     while(it != end) { //traverse the tree pre-order
 //        if (!it->paired() ){
-            size_t id0 = it_prev->seq_id_mapped();
-            size_t id1 = it->seq_id_mapped();
+            size_t id0 = it_prev->at(0).tmp_ix;
+            size_t id1 = it->at(0).tmp_ix;
 
-//            if (id0 != TREE_BASE_NODE_NOT_MAPPED_ID && id1 != TREE_BASE_NODE_NOT_MAPPED_ID && id1 != id0 + 1) {
+            if (id0 != 0 && id1 != 0 && id1 != id0 + 1) {
                 //there was a deletion
                 point p0 = it_prev->paired() ? it_prev->at(1).p : it_prev->at(0).p;
                 point p1 = it->at(0).p;
                 double dist = distance(p1, p0);
 
                 if ( dist > 3*BASES_DISTANCE) {
-
-//                    if (it_prev->at(0).label[0] == 'A' && it->at(0).label[0] == 'U') {
-//                        return;
-//                    }
 
                     //lets contract only if the distance after deletion is too big, otherwise it's better not to touch the layout
                     point dist_vect = normalize(p1 - p0) * (dist-BASES_DISTANCE);
@@ -1649,7 +1645,7 @@ void contract_root_level(rna_tree &  rna) {
                 }
 //            }
 
-//        }
+        }
 
         it++; it_prev++;
     }
@@ -1657,12 +1653,13 @@ void contract_root_level(rna_tree &  rna) {
 
 void compact::beautify(){
 
+    contract_root_level(rna);
     //TODO: number of iterations needs to be parametrized
-    for (int i = 0; i < 3; ++i ){
-        contract_root_level(rna);
-        reposition_branches();
-
-    }
+//    for (int i = 0; i < 3; ++i ){
+//        contract_root_level(rna);
+//        reposition_branches();
+//
+//    }
 
     set_53_labels(rna);
 }
