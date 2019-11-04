@@ -76,6 +76,7 @@ private:
                      const mapping& mapping,
                      bool run,
                      bool run_overlaps,
+                     bool rotate_branches,
                      const std::string& file);
     
     /**

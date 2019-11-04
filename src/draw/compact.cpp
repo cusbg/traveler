@@ -40,7 +40,7 @@ compact::compact(
 { }
 
 
-void compact::run()
+void compact::run(bool rotate_branches)
 {
     APP_DEBUG_FNAME;
     
@@ -49,10 +49,7 @@ void compact::run()
     init();
     make();
     set_53_labels(rna);
-//    try_reposition_new_root_branches();
-//    reposition_branches();
-    beautify();
-//    set_53_labels(rna);
+    beautify(rotate_branches);
     checks();
     
     INFO("END: Computing RNA layout");
@@ -1651,17 +1648,21 @@ void contract_root_level(rna_tree &  rna) {
     }
 }
 
-void compact::beautify(){
+void compact::beautify(bool rotate_branches){
 
-    contract_root_level(rna);
-    //TODO: number of iterations needs to be parametrized
-//    for (int i = 0; i < 3; ++i ){
-//        contract_root_level(rna);
-//        reposition_branches();
-//
-//    }
+    INFO("BEGIN: beautification");
+    if (!rotate_branches) {
+        contract_root_level(rna);
+    } else {
+        //TODO: number of iterations needs to be parametrized
+        for (int i = 0; i < 3; ++i) {
+            contract_root_level(rna);
+            reposition_branches();
+        }
+    }
 
     set_53_labels(rna);
+    INFO("END: beautification");
 }
 
 

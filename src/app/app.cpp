@@ -41,6 +41,7 @@
 #define ARGS_TED                            {"-t", "--ted"}
 #define ARGS_DRAW                           {"-d", "--draw"}
 #define ARGS_DRAW_OVERLAPS                  "--overlaps"
+#define ARGS_ROTATE_BRANCHES                {"-r", "--rotate"}
 #define ARGS_VERBOSE                        {"-v", "--verbose"}
 #define ARGS_DEBUG                          {"--debug"}
 
@@ -55,6 +56,7 @@ struct app::arguments
 {
     rna_tree templated;
     rna_tree matched;
+    bool rotate_branches = false;
     
     struct
     {
@@ -78,6 +80,7 @@ struct app::arguments
     {
         bool run = false;
     } traveler;
+
     
 public:
     /**
@@ -126,7 +129,7 @@ void app::run(
         img_out = args.draw.file;
     }
     
-    run_drawing(args.templated, args.matched, map, draw, overlaps, img_out);
+    run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out);
     
     INFO("END: APP");
 }
@@ -179,6 +182,7 @@ void app::run_drawing(
                       const mapping& mapping,
                       bool run,
                       bool run_overlaps,
+                      bool rotate_branches,
                       const std::string& file)
 {
     APP_DEBUG_FNAME;
@@ -196,7 +200,7 @@ void app::run_drawing(
         // which correspond to the target structure
         templated = matcher(templated, matched).run(mapping);
         //Compact goes through the structure and computes new coordinates where necessary
-            compact(templated).run();
+            compact(templated).run(rotate_branches);
 
         save(file, templated, run_overlaps);
     }
@@ -330,6 +334,8 @@ void app::usage(
     << "] [" << ARGS_DRAW_OVERLAPS << "] FILE_MAPPING_IN FILE_OUT"
     << endl
     << "\t[" << get_args(ARGS_VERBOSE) << "]"
+    << endl
+    << "\t[" << get_args(ARGS_ROTATE_BRANCHES) << "]"
     << endl;
 }
 
@@ -352,12 +358,14 @@ void app::print(
          "\trun=%s\n"
          "\toverlaps=%s\n"
          "\tmapping-file=%s\n"
-         "\timage-file=%s",
+         "\timage-file=%s"
+         "\rotate=%s\n",
          args.templated.name(), args.templated.print_tree(false),
          args.matched.name(), args.matched.print_tree(false),
          args.all.run, args.all.file, args.all.overlap_checks,
          args.ted.run, args.ted.mapping,
-         args.draw.run, args.draw.overlap_checks, args.draw.mapping, args.draw.file);
+         args.draw.run, args.draw.overlap_checks, args.draw.mapping, args.draw.file,
+         args.rotate_branches);
     
     
 }
@@ -479,6 +487,11 @@ void app::print(
                 a.draw.mapping = args.at(i + 1);
                 a.draw.file = args.at(i + 2);
                 i += 2;
+            }
+            else if (is_argument(ARGS_ROTATE_BRANCHES))
+            {
+                a.rotate_branches = true;
+
             }
             else if (is_argument(ARGS_VERBOSE))
             {

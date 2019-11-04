@@ -33,3 +33,17 @@ do
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format varna ${TMP_DIR}${TMP}.svg ${TMP_DIR}/${TMP}.fasta --ted ${OUT_DIR}${TGT}.map
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format varna ${TMP_DIR}${TMP}.svg ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
 done
+
+TGTS=( URS00008E3949_44689-DD_28S_3D )
+TMPS=( DD_28S_3D )
+
+for((i=0;i<${#TGTS[@]};i++))
+do
+    TGT=${TGTS[$i]}
+    TMP=${TMPS[$i]}
+
+    echo "`date`: Working on ${TGT} using ${TMP} as a template"
+
+    ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format traveler ${TMP_DIR}${TMP}.tr ${TMP_DIR}/${TMP}.fasta --ted ${OUT_DIR}${TGT}.map
+    ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format traveler ${TMP_DIR}${TMP}.tr ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
+done

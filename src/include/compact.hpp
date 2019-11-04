@@ -50,7 +50,7 @@ public:
      * After run all nodes will be initialized
      * and layout can be visualized
      */
-    void run();
+    void run(bool rotate_branches);
     
 private:
     /**
@@ -232,13 +232,13 @@ private:
      */
     inline void checks();
 
-    void beautify();
+    void beautify(bool rotate_branches);
     
-    void try_reposition_new_root_branches();
+//    void try_reposition_new_root_branches();
 
     void reposition_branches();
 
-    void pull_neighbors_together();
+//    void pull_neighbors_together();
     
     
 private:
