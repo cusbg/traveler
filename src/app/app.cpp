@@ -54,8 +54,8 @@ using namespace std;
 
 struct app::arguments
 {
-    rna_tree templated;
-    rna_tree matched;
+    rna_tree templated; // template
+    rna_tree matched; // target
     bool rotate_branches = false;
     
     struct

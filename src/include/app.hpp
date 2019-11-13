@@ -59,7 +59,7 @@ private:
     
     /**
      * run tree-edit-distance algorithm
-     * returns mapping between templated and matched tree
+     * returns mapping between templated (template) and matched (target) tree
      */
     mapping run_ted(
                     rna_tree& templated,
