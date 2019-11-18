@@ -40,9 +40,9 @@ typedef std::vector<std::unique_ptr<document_writer>> image_writers;
  */
 struct label_info
 {
-    int ix;
+    int ix = -1;
     std::string tmp_label; //label used in the template (can be used to store information about the mapped nodes label in the template)
-    int tmp_ix; //position of the nucleotide in the template
+    int tmp_ix = -1; //position of the nucleotide in the template
 };
 
 /**
@@ -87,6 +87,11 @@ public: // formatters
                                    point from,
                                    point to,
                                    bool is_base_pair = true) const;
+    std::string get_numbering_formatted(
+            rna_tree::pre_post_order_iterator it,
+            const int ix,
+            const float label_offset) const;
+
     std::string get_label_formatted(
                                     rna_tree::pre_post_order_iterator it,
                                     const label_info li) const;
@@ -105,7 +110,7 @@ public:
     std::string get_rna_formatted(
                                   rna_tree rna) const;
     std::string get_rna_subtree_formatted(
-                                          rna_tree::iterator root) const;
+                                          rna_tree &rna) const;
     
 public:
     /**
