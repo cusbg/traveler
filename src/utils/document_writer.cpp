@@ -109,7 +109,7 @@ rectangle get_label_bb(point p, int number, float residue_distance){
     while (number != 0) { number /= 10; cnt_digits++; }
 
     // THe following is approximate
-    point dim = point(cnt_digits * residue_distance * 0.8,  residue_distance * 1.5);
+    point dim = point(cnt_digits * residue_distance * 0.6,  residue_distance * 1.5);
 
     return rectangle(p - dim / 2, p + dim /2);
 }
@@ -181,18 +181,24 @@ std::string document_writer::get_numbering_formatted(
         point p2 = it->at(1 - it.label_index()).p;
 
         point v = normalize(p1 - p2);
-        auto p = p1 + v * residue_distance * 2;
+        auto p = p1 + v * residue_distance * 3;
         rectangle bb = get_label_bb(p, ix, residue_distance);
         if (rect_overlaps(bb, pos_residues)) {
 //            p += normalize(v) * residue_distance * 3;
             p = sample_relevant_space(bb, p, v, residue_distance, pos_residues);
+            bb = get_label_bb(p, ix, residue_distance);
         }
 
         rna_label l;
         l.label = msprintf("%s", ix);
         l.p = p;
 
-        out << get_label_formatted(l, RGB::BLACK, {});
+        out << get_label_formatted(l, RGB::GRAY, {});
+
+        point p1_p = normalize(p - p1) ;
+//        float bb_width = abs(bb.get_bottom_right() - bb.get_top_left()).x;
+        point isec = bb.intersection(p1, p);
+        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, RGB::GRAY);
 
     }
 

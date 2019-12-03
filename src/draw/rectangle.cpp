@@ -155,7 +155,7 @@ bool lines_intersect(point p1, point q1, point p2, point q2)
 
     // General case
     if (o1 != o2 && o3 != o4)
-        return false; // colinear
+        return true; // colinear
 
     // Special Cases
     // p1, q1 and p2 are colinear and p2 lies on segment p1q1
@@ -178,6 +178,37 @@ bool rectangle::intersects(const point& p1, const point& p2) const {
             lines_intersect(p1, p2, get_top_right(), get_bottom_right() ) ||
             lines_intersect(p1, p2, get_bottom_right(), get_bottom_left() ) ||
             lines_intersect(p1, p2, get_top_left(), get_bottom_left() );
+}
+
+point lines_intersection_point(point ps1, point pe1, point ps2, point pe2)
+{
+// Get A,B of first line - points : ps1 to pe1
+    double A1 = pe1.y-ps1.y;
+    double B1 = ps1.x-pe1.x;
+    // Get A,B of second line - points : ps2 to pe2
+    double A2 = pe2.y-ps2.y;
+    double B2 = ps2.x-pe2.x;
+
+    // Get delta and check if the lines are parallel
+    double delta = A1*B2 - A2*B1;
+    if(delta == 0) return point();
+
+    // Get C of first and second lines
+    double C2 = A2*ps2.x+B2*ps2.y;
+    double C1 = A1*ps1.x+B1*ps1.y;
+    //invert delta to make division cheaper
+    double invdelta = 1/delta;
+    // now return the Vector2 intersection point
+    return point( (B2*C1 - B1*C2)*invdelta, (A1*C2 - A2*C1)*invdelta );
+}
+
+point rectangle::intersection(const point& p1, const point& p2) const{
+
+    if (lines_intersect(p1, p2, get_top_left(), get_top_right() ) ) return lines_intersection_point (p1, p2, get_top_left(), get_top_right() );
+    if (lines_intersect(p1, p2, get_top_right(), get_bottom_right() ) ) return lines_intersection_point (p1, p2, get_top_right(), get_bottom_right() );
+    if (lines_intersect(p1, p2, get_bottom_right(), get_bottom_left() ) ) return lines_intersection_point (p1, p2, get_bottom_right(), get_bottom_left() );
+    if (lines_intersect(p1, p2, get_top_left(), get_bottom_left() ) ) return lines_intersection_point (p1, p2, get_top_left(), get_bottom_left() );
+
 }
 
 

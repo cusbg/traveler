@@ -50,6 +50,7 @@ public:
 
     bool intersects(const rectangle& rect) const;
     bool intersects(const point& p1, const point& p2) const;
+    point intersection(const point& p1, const point& p2) const;
     bool has(const point& point) const;
 
 
