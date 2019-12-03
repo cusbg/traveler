@@ -97,8 +97,75 @@ std::string document_writer::get_edge_formatted(
     return get_line_formatted(from, to, RGB::BLACK);
 }
 
+bool rect_overlaps(const rectangle &r, const std::vector<point> &points ){
+    for (point p: points) {
+        if (r.has(p)) return true;
+    }
+    return false;
+}
+
+rectangle get_label_bb(point p, int number, float residue_distance){
+    int cnt_digits = 0;
+    while (number != 0) { number /= 10; cnt_digits++; }
+
+    // THe following is approximate
+    point dim = point(cnt_digits * residue_distance * 0.8,  residue_distance * 1.5);
+
+    return rectangle(p - dim / 2, p + dim /2);
+}
+
+point sample_relevant_space(rectangle &r, point &p_start, point &dir, float grid_density, vector<point> &resiue_points){
+
+    point p_min = point(p_start.x, p_start.y), p_max = point(p_start.x, p_start.y);
+    point dir_ortho = orthogonal(dir);
+    vector<point> grid_points;
+
+    auto add_grid_point =
+            [&p_min, &p_max, &grid_points](point p)
+            {
+                p_min.x = min(p_min.x, p.x);
+                p_min.y = min(p_min.y, p.y);
+                p_max.x = max(p_max.x, p.x);
+                p_max.y = max(p_max.y, p.y);
+
+                grid_points.push_back(p);
+            };
+
+    for (int i = 0; i < 10; i++) {
+        point center = p_start + dir * i * grid_density ;
+        add_grid_point(center);
+        for (int j = 1; j <= 10; ++j) {
+            add_grid_point(center + dir_ortho * j * grid_density);
+            add_grid_point(center - dir_ortho * j * grid_density);
+        } 
+    }
+
+    point r_dim = abs(r.get_bottom_right() - r.get_top_left());
+    vector<point> residue_points_in_grid;
+    rectangle grid_rect = rectangle(p_min - r_dim, p_max + r_dim);
+    for (point p: resiue_points){
+        if (grid_rect.has(p)){
+            residue_points_in_grid.push_back(p);
+        }
+    }
+
+
+    for (point p: grid_points) {
+        rectangle r_candidate = rectangle(p - r_dim/2, p + r_dim/2);
+        if (!rect_overlaps(r_candidate, residue_points_in_grid)) {
+            return p;
+        }
+    }
+
+    return p_start;
+
+}
+
 std::string document_writer::get_numbering_formatted(
-        rna_tree::pre_post_order_iterator it, const int ix, const float label_offset) const
+        rna_tree::pre_post_order_iterator it,
+        const int ix,
+        const float residue_distance,
+        std::vector<point> pos_residues) const
 {
     if (ix == 0 || ix % 100 != 0)
         return "";
@@ -113,8 +180,14 @@ std::string document_writer::get_numbering_formatted(
         point p1 = it->at(it.label_index()).p;
         point p2 = it->at(1 - it.label_index()).p;
 
-        point v = p1 - p2;
-        auto p = p1 + normalize(v) * label_offset;
+        point v = normalize(p1 - p2);
+        auto p = p1 + v * residue_distance * 2;
+        rectangle bb = get_label_bb(p, ix, residue_distance);
+        if (rect_overlaps(bb, pos_residues)) {
+//            p += normalize(v) * residue_distance * 3;
+            p = sample_relevant_space(bb, p, v, residue_distance, pos_residues);
+        }
+
         rna_label l;
         l.label = msprintf("%s", ix);
         l.p = p;
@@ -124,8 +197,8 @@ std::string document_writer::get_numbering_formatted(
     }
 
     return out.str();
-
 }
+
 std::string document_writer::get_label_formatted(
                                                  rna_tree::pre_post_order_iterator it, label_info li) const
 {
@@ -195,16 +268,29 @@ void document_writer::validate_stream() const
         throw io_exception("Writing document failed");
 }
 
+vector<point> get_residues_positions(rna_tree &rna){
+
+    vector<point> points;
+    auto extract_point =
+            [&points](rna_tree::pre_post_order_iterator it)
+            {
+                points.push_back(it->at(it.label_index()).p);
+            };
+
+    rna_tree::for_each_in_subtree(rna.begin_pre_post(), extract_point);
+    return points;
+}
+
 std::string document_writer::get_rna_subtree_formatted(
                                                        rna_tree &rna) const
 {
     ostringstream out;
-
+    vector<point> residues_positions = get_residues_positions(rna);
     int seq_ix = 0;
     auto print =
-    [&rna, &out, &seq_ix, this](rna_tree::pre_post_order_iterator it)
+    [&rna, &out, &seq_ix, &residues_positions, this](rna_tree::pre_post_order_iterator it)
     {
-        out << get_numbering_formatted(it, seq_ix, rna.get_pair_base_distance());
+        out << get_numbering_formatted(it, seq_ix, rna.get_pairs_distance(), residues_positions);
         out << get_label_formatted(it, {seq_ix, it->at(it.label_index()).tmp_label, it->at(it.label_index()).tmp_ix});
         seq_ix++;
     };

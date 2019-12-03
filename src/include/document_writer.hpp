@@ -90,7 +90,8 @@ public: // formatters
     std::string get_numbering_formatted(
             rna_tree::pre_post_order_iterator it,
             const int ix,
-            const float label_offset) const;
+            const float residue_distance,
+            const std::vector<point> pos_residues) const;
 
     std::string get_label_formatted(
                                     rna_tree::pre_post_order_iterator it,
