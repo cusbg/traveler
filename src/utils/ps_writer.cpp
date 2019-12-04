@@ -125,29 +125,38 @@ std::string ps_writer::get_default_prologue() const
                                                         point to,
                                                         const RGB& color) const
 {
+
+    return get_line_formatted(from, to, color.get_name());
+}
+
+/* virtual */ std::string ps_writer::get_line_formatted(
+        point from,
+        point to,
+        const std::string& clazz) const
+{
     ostringstream out;
-    
+
     if (from.bad() || to.bad())
         return "";
     from = from * get_scaling_ratio();
     to = to * get_scaling_ratio();
-    
-    string color_beg, color_end;
-    
-    out << get_color_formatted(color);
 
-    
+    string color_beg, color_end;
+
+    out << clazz;
+
+
     for (double coordinates : {from.x , from.y, to.x, to.y})
     {
         out
-        << std::left
-        << std::setw(PS_COLUMNS_WIDTH)
-        << coordinates;
+                << std::left
+                << std::setw(PS_COLUMNS_WIDTH)
+                << coordinates;
     }
     out
-    << " lwline"
-    << endl;
-    
+            << " lwline"
+            << endl;
+
     return out.str();
 }
 
@@ -162,6 +171,22 @@ std::string ps_writer::get_default_prologue() const
     << get_color_formatted(color)
     << get_text_formatted(label.p * get_scaling_ratio(), label.label);
     
+    return out.str();
+}
+
+/* virtual */ std::string ps_writer::get_label_formatted(
+        const rna_label& label,
+        const std::string& clazz,
+        const label_info li) const
+{
+    ostringstream out;
+
+    // TODO: usage of class in PS is not valid and the whole serialization needs to be rewritten to support SVG only,
+    // and this is here only so that the code compiles
+    out
+            << clazz
+            << get_text_formatted(label.p * get_scaling_ratio(), label.label);
+
     return out.str();
 }
 

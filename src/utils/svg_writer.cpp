@@ -208,14 +208,31 @@ struct svg_writer::style
                                                           const RGB& color,
                                                           const label_info li) const
 {
+    return get_label_formatted(label, color.get_name(), li);
+//    properties out;
+//
+//    out
+//    << get_point_formatted(label.p, "", "")
+////    << property("text-anchor", "middle")
+////    << property("baseline-shift", "-50%")
+//    << property("class", color.get_name());
+//
+//    return create_element("text", out, label.label, li);
+}
+
+/* virtual */ std::string svg_writer::get_label_formatted(
+        const rna_label& label,
+        const std::string& clazz,
+        const label_info li) const
+{
     properties out;
-    
+
     out
-    << get_point_formatted(label.p, "", "")
-//    << property("text-anchor", "middle")
-//    << property("baseline-shift", "-50%")
-    << property("class", color.get_name());
-    
+            << get_point_formatted(label.p, "", "")
+            //    << property("text-anchor", "middle")
+            //    << property("baseline-shift", "-50%")
+            << property("class", clazz);
+
     return create_element("text", out, label.label, li);
 }
 
@@ -225,13 +242,22 @@ struct svg_writer::style
                                                          point to,
                                                          const RGB& color) const
 {
+
+    return get_line_formatted(from, to, color.get_name());
+}
+
+/* virtual */ std::string svg_writer::get_line_formatted(
+        point from,
+        point to,
+        const std::string& clazz) const
+{
     properties out;
-    
+
     out
-    << get_point_formatted(from, "", "1")
-    << get_point_formatted(to, "", "2")
-    << property("class", color.get_name());
-    
+            << get_point_formatted(from, "", "1")
+            << get_point_formatted(to, "", "2")
+            << property("class", clazz);
+
     return create_element("line", out);
 }
 

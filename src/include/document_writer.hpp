@@ -100,6 +100,11 @@ public: // formatters
                                             const rna_label& label,
                                             const RGB& color,
                                             const label_info li) const = 0;
+
+    virtual std::string get_label_formatted(
+            const rna_label& label,
+            const std::string& clazz,
+            const label_info li) const = 0;
     
 public:
     /**
@@ -158,6 +163,10 @@ protected:
                                            point from,
                                            point to,
                                            const RGB& color) const = 0;
+    virtual std::string get_line_formatted(
+            point from,
+            point to,
+            const std::string& clazz) const = 0;
     /**
      * flush `text` to output
      */

@@ -32,22 +32,32 @@ string traveler_writer::get_circle_formatted(point centre, double radius) const
 
 string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color, const label_info li) const
 {
+    return get_label_formatted(label, color.get_name(), li);
+}
+
+string traveler_writer::get_label_formatted(const rna_label& label, const std::string& clazz, const label_info li) const
+{
     ostringstream out;
-    
+
     out << "<point x=\"" << label.p.x << "\" y=\"" << label.p.y << "\" b=\"" << label.label << "\"/>"
-    << endl;
-    
+        << endl;
+
     return out.str();
 }
 
 string traveler_writer::get_line_formatted(point from, point to, const RGB& color) const
 {
+    return get_line_formatted(from, to, color.get_name());
+}
+
+string traveler_writer::get_line_formatted(point from, point to, const std::string& clazz) const
+{
     ostringstream out;
-    
+
     if (from.bad() || to.bad()) return "";
-    
+
     out << "<line fromX=\"" << from.x << "\" fromY=\"" << from.y << "\" toX=\"" << to.x << "\" toY=\""
-    << to.y << "\"/>" << endl;
-    
+        << to.y << "\"/>" << endl;
+
     return out.str();
 }

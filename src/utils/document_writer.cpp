@@ -193,12 +193,12 @@ std::string document_writer::get_numbering_formatted(
         l.label = msprintf("%s", ix);
         l.p = p;
 
-        out << get_label_formatted(l, RGB::GRAY, {});
+        out << get_label_formatted(l, "numbering-label", {});
 
         point p1_p = normalize(p - p1) ;
 //        float bb_width = abs(bb.get_bottom_right() - bb.get_top_left()).x;
         point isec = bb.intersection(p1, p);
-        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, RGB::GRAY);
+        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, "numbering-line");
 
     }
 
