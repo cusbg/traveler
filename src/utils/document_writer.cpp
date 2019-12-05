@@ -161,46 +161,71 @@ point sample_relevant_space(rectangle &r, point &p_start, point &dir, float grid
 
 }
 
+point get_loop_center(rna_tree::iterator it) {
+    vector<point> points;
+
+    point center = point(0,0);
+
+    //since it is a start of a loop, it needs to be a base-paired node
+    assert(it->paired());
+    center += it->at(0).p;
+    center += it->at(1).p;
+
+    int cnt  = 2;
+    for (rna_tree::sibling_iterator si = it.begin(); si != it.end(); ++si){
+        center += si->at(0).p;
+        cnt++;
+        if (si->paired()){
+            center += si->at(1).p;
+            cnt++;
+        }
+    }
+
+    return center / cnt;
+}
+
 std::string document_writer::get_numbering_formatted(
         rna_tree::pre_post_order_iterator it,
         const int ix,
         const float residue_distance,
         std::vector<point> pos_residues) const
 {
-    if (ix == 0 || ix % 100 != 0)
+    if (!(ix == 10 || ix == 20 || ix == 30 || (ix > 0 && ix % 50 == 0))) {
         return "";
+    }
 
-    auto it1 = it;
     ostringstream out;
 
-
-    if (rna_tree::is_leaf(it)){
-
-    } else {
-        point p1 = it->at(it.label_index()).p;
+    point v, p1;
+    if (it->paired()){
+        p1 = it->at(it.label_index()).p;
         point p2 = it->at(1 - it.label_index()).p;
-
-        point v = normalize(p1 - p2);
-        auto p = p1 + v * residue_distance * 3;
-        rectangle bb = get_label_bb(p, ix, residue_distance);
-        if (rect_overlaps(bb, pos_residues)) {
-//            p += normalize(v) * residue_distance * 3;
-            p = sample_relevant_space(bb, p, v, residue_distance, pos_residues);
-            bb = get_label_bb(p, ix, residue_distance);
-        }
-
-        rna_label l;
-        l.label = msprintf("%s", ix);
-        l.p = p;
-
-        out << get_label_formatted(l, "numbering-label", {});
-
-        point p1_p = normalize(p - p1) ;
-//        float bb_width = abs(bb.get_bottom_right() - bb.get_top_left()).x;
-        point isec = bb.intersection(p1, p);
-        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, "numbering-line");
-
+        v = normalize(p1 - p2);
+    } else {
+        auto it_parent = rna_tree::parent(rna_tree::iterator(it));
+        point center = get_loop_center(it_parent);
+        p1 = it->at(0).p;
+        v = normalize(p1 - center);
     }
+
+    auto p = p1 + v * residue_distance * 3;
+    rectangle bb = get_label_bb(p, ix, residue_distance);
+    if (rect_overlaps(bb, pos_residues)) {
+//            p += normalize(v) * residue_distance * 3;
+        p = sample_relevant_space(bb, p, v, residue_distance, pos_residues);
+        bb = get_label_bb(p, ix, residue_distance);
+    }
+
+    rna_label l;
+    l.label = msprintf("%s", ix);
+    l.p = p;
+
+    out << get_label_formatted(l, "numbering-label", {});
+
+    point p1_p = normalize(p - p1) ;
+//        float bb_width = abs(bb.get_bottom_right() - bb.get_top_left()).x;
+    point isec = bb.intersection(p1, p);
+    out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, "numbering-line");
 
     return out.str();
 }
