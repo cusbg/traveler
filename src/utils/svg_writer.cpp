@@ -404,10 +404,12 @@ std::string svg_writer::create_style_definitions() const
         }
         out << "}";
     }
+    out << endl;
+
+    out << "text.numbering-label {fill: rgb(204, 204, 204);}" << endl;
+    out << "line.numbering-line {stroke: rgb(204, 204, 204);}" << endl;
     
-    out
-    << "]]>"
-    << endl;
+    out << endl << "]]>" << endl;
     
     return create_element("style", properties(property("type", "text/css")), out.str());
 }
