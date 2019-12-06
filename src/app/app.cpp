@@ -44,6 +44,7 @@
 #define ARGS_ROTATE_BRANCHES                {"-r", "--rotate"}
 #define ARGS_VERBOSE                        {"-v", "--verbose"}
 #define ARGS_DEBUG                          {"--debug"}
+#define ARGS_NUMBERING                       {"-n", "--numbering"}
 
 #define COLORED_FILENAME_EXTENSION          ".colored"
 
@@ -80,6 +81,7 @@ struct app::arguments
     {
         bool run = false;
     } traveler;
+    numbering_def numbering;
 
     
 public:
@@ -91,6 +93,7 @@ public:
     
 private:
     arguments() = default;
+    void fill_default();
 };
 
 
@@ -129,7 +132,7 @@ void app::run(
         img_out = args.draw.file;
     }
     
-    run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out);
+    run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out, args.numbering);
     
     INFO("END: APP");
 }
@@ -183,7 +186,8 @@ void app::run_drawing(
                       bool run,
                       bool run_overlaps,
                       bool rotate_branches,
-                      const std::string& file)
+                      const std::string& file,
+                      const numbering_def& numbering)
 {
     APP_DEBUG_FNAME;
 
@@ -202,7 +206,7 @@ void app::run_drawing(
         //Compact goes through the structure and computes new coordinates where necessary
             compact(templated).run(rotate_branches);
 
-        save(file, templated, run_overlaps);
+        save(file, templated, run_overlaps, numbering);
     }
     catch (const my_exception& e)
     {
@@ -213,7 +217,8 @@ void app::run_drawing(
 void app::save(
                const std::string& filename,
                rna_tree& rna,
-               bool overlap)
+               bool overlap,
+               const numbering_def& numbering)
 {
     APP_DEBUG_FNAME;
     
@@ -228,7 +233,7 @@ void app::save(
             writer->set_scaling_ratio(rna);
             string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
             writer->init(file, rna);
-            writer->print(writer->get_rna_formatted(rna));
+            writer->print(writer->get_rna_formatted(rna, numbering));
 
             if (overlap)
                 for (const auto& p : overlaps)
@@ -370,7 +375,6 @@ void app::print(
     
 }
 
-
 /* static */ app::arguments app::arguments::parse(
                                                   const std::vector<std::string>& args)
 {
@@ -503,6 +507,25 @@ void app::print(
                 logger.set_priority(logger::TRACE);
                 INFO("Enabled trace mode");
             }
+            else if (is_argument(ARGS_NUMBERING)){
+                try {
+                    string definition = args.at(++i);
+                    // The definition is expected to have a list of positions delimited by comma and interval number delimited by dash. E.g.  "10,20,30-50"
+                    size_t pos = definition.find("-");
+                    string s_positions = definition.substr(0, pos);
+                    a.numbering.interval = stoi(definition.substr(pos + 1));
+                    std::string token;
+                    while ((pos = s_positions.find(",")) != std::string::npos) {
+                        token = s_positions.substr(0, pos);
+                        a.numbering.positions.push_back(stoi(token));
+                        s_positions.erase(0, pos + 1);
+                    }
+                } catch (...) {
+                    throw wrong_argument_exception("Unsupported numbering format");
+                };
+
+
+            }
             else
             {
                 throw wrong_argument_exception("Wrong parameter no.%i: '%s'; try running %s --help for more arguments details",
@@ -512,11 +535,23 @@ void app::print(
         
         if (a.templated == rna_tree() || a.matched == rna_tree())
             throw wrong_argument_exception("RNA structures are missing, try running %s --help for more arguments details", args[0]);
-        
+
+        a.fill_default();
+
         return a;
     }
     catch (const my_exception& e)
     {
         throw aplication_error("Error while parsing arguments: %s", e).with(ERROR_ARGUMENTS);
     }
+}
+
+void app::arguments::fill_default() {
+    if (this->numbering.positions.size() == 0) {
+        this->numbering.positions.push_back(10);
+        this->numbering.positions.push_back(20);
+        this->numbering.positions.push_back(30);
+        this->numbering.interval = 50;
+    }
+
 }

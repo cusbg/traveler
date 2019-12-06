@@ -91,7 +91,8 @@ public: // formatters
             rna_tree::pre_post_order_iterator it,
             const int ix,
             const float residue_distance,
-            const std::vector<point> pos_residues) const;
+            const std::vector<point> pos_residues,
+            const numbering_def& numbering) const;
 
     std::string get_label_formatted(
                                     rna_tree::pre_post_order_iterator it,
@@ -114,9 +115,11 @@ public:
                                              rna_tree::pre_post_order_iterator begin,
                                              rna_tree::pre_post_order_iterator end) const;
     std::string get_rna_formatted(
-                                  rna_tree rna) const;
+                                  rna_tree rna,
+                                  const numbering_def& numbering) const;
     std::string get_rna_subtree_formatted(
-                                          rna_tree &rna) const;
+                                          rna_tree &rna,
+                                          const numbering_def& numbering) const;
     
 public:
     /**

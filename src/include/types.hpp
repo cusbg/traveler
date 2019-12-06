@@ -1,7 +1,7 @@
 /*
  * File: types.hpp
  *
- * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>, 2019 David Hoksza <david.hoksza@gmail.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -34,6 +34,7 @@
 #ifndef M_PI
 #    define M_PI 3.14159265358979323846
 #endif
+
 
 inline std::string to_string(
                              bool value)
@@ -134,6 +135,11 @@ stream << (name) << ":\n"; \
 for (auto __value : container) \
 stream << __value << " "; \
 }
+
+struct numbering_def {
+    std::vector<int> positions; //explicit list of position which should show numbers
+    int interval{}; // number telling Traveler to number every residue position which is modulo interval == 0
+};
 
 #endif /* !TYPES_HPP */
 

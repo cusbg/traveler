@@ -188,9 +188,11 @@ std::string document_writer::get_numbering_formatted(
         rna_tree::pre_post_order_iterator it,
         const int ix,
         const float residue_distance,
-        std::vector<point> pos_residues) const
+        std::vector<point> pos_residues,
+        const numbering_def& numbering) const
 {
-    if (!(ix == 10 || ix == 20 || ix == 30 || (ix > 0 && ix % 50 == 0))) {
+    auto  found = std::find (numbering.positions.begin(), numbering.positions.end(), ix);
+    if (!(found != numbering.positions.end() || (ix > 0 && ix % numbering.interval == 0))){
         return "";
     }
 
@@ -313,15 +315,16 @@ vector<point> get_residues_positions(rna_tree &rna){
 }
 
 std::string document_writer::get_rna_subtree_formatted(
-                                                       rna_tree &rna) const
+                                                       rna_tree &rna,
+                                                       const numbering_def& numbering) const
 {
     ostringstream out;
     vector<point> residues_positions = get_residues_positions(rna);
     int seq_ix = 0;
     auto print =
-    [&rna, &out, &seq_ix, &residues_positions, this](rna_tree::pre_post_order_iterator it)
+    [&rna, &out, &seq_ix, &residues_positions, &numbering, this](rna_tree::pre_post_order_iterator it)
     {
-        out << get_numbering_formatted(it, seq_ix, rna.get_pairs_distance(), residues_positions);
+        out << get_numbering_formatted(it, seq_ix, rna.get_pairs_distance(), residues_positions, numbering);
         out << get_label_formatted(it, {seq_ix, it->at(it.label_index()).tmp_label, it->at(it.label_index()).tmp_ix});
         seq_ix++;
     };
@@ -376,9 +379,10 @@ std::string document_writer::get_rna_background_formatted(
 }
 
 std::string document_writer::get_rna_formatted(
-                                               rna_tree rna) const
+                                               rna_tree rna,
+                                               const numbering_def& numbering) const
 {
-    return get_rna_subtree_formatted(rna)
+    return get_rna_subtree_formatted(rna, numbering)
     + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
 }
 

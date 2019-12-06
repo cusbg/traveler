@@ -73,6 +73,11 @@ The `traveler` executable is available in the PATH, and the current directory is
 			# if optional argument --overlaps is present overlaps in the layout are identified and highlighted
 		[-r|--rotate] If switched on, Traveler tries to rotate hairpins to minimize the number of overlaps. In some
 		cases, this can lead to a more convoluted layout and therefore this features is turned off by default.
+		[-n|--numbering] NUMBERING_DEFINITION
+		    # Allows to specify residues which will have number information next to it in the resulting diagram.
+		    # The format allows to specify list of residue indexes and interval so that every residue index which
+		    # is modulo interval == 0 will be labeled. The default value is "10,20,30-50", i.e. residues with indexes
+		    # 10, 20, 30 and every 50th residue will be labeled.
 		[-v|--verbose] Prints information about the computation and othere details (such as number of overlaps,
 		when overlap switch is turned on)
 
