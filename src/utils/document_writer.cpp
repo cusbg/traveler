@@ -104,6 +104,13 @@ bool rect_overlaps(const rectangle &r, const std::vector<point> &points ){
     return false;
 }
 
+bool rect_overlaps(const rectangle &r, const std::vector<pair<point, point>> &lines ){
+    for (auto l: lines) {
+        if (r.intersects(l.first, l.second)) return true;
+    }
+    return false;
+}
+
 rectangle get_label_bb(point p, int number, float residue_distance){
     int cnt_digits = 0;
     while (number != 0) { number /= 10; cnt_digits++; }
@@ -114,7 +121,9 @@ rectangle get_label_bb(point p, int number, float residue_distance){
     return rectangle(p - dim / 2, p + dim /2);
 }
 
-point sample_relevant_space(rectangle &r, point &p_start, point &dir, float grid_density, vector<point> &resiue_points){
+point sample_relevant_space(rectangle &r, point &p_start, point &dir, float grid_density,
+        const vector<point> &resiue_points,
+        const vector<pair<point, point>> &lines){
 
     point p_min = point(p_start.x, p_start.y), p_max = point(p_start.x, p_start.y);
     point dir_ortho = orthogonal(dir);
@@ -149,10 +158,17 @@ point sample_relevant_space(rectangle &r, point &p_start, point &dir, float grid
         }
     }
 
+    vector<pair<point, point>> lines_in_grid;
+    for (auto l: lines){
+        if (grid_rect.has(l.first) || grid_rect.has(l.second)){
+            lines_in_grid.push_back(l);
+        }
+    }
+
 
     for (point p: grid_points) {
         rectangle r_candidate = rectangle(p - r_dim/2, p + r_dim/2);
-        if (!rect_overlaps(r_candidate, residue_points_in_grid)) {
+        if (!rect_overlaps(r_candidate, residue_points_in_grid) && !rect_overlaps(r_candidate, lines_in_grid)) {
             return p;
         }
     }
@@ -189,6 +205,7 @@ std::string document_writer::get_numbering_formatted(
         const int ix,
         const float residue_distance,
         std::vector<point> pos_residues,
+        const std::vector<std::pair<point, point>> lines,
         const numbering_def& numbering) const
 {
     auto  found = std::find (numbering.positions.begin(), numbering.positions.end(), ix);
@@ -212,9 +229,9 @@ std::string document_writer::get_numbering_formatted(
 
     auto p = p1 + v * residue_distance * 3;
     rectangle bb = get_label_bb(p, ix, residue_distance);
-    if (rect_overlaps(bb, pos_residues)) {
+    if (rect_overlaps(bb, pos_residues) or rect_overlaps(bb, lines)) {
 //            p += normalize(v) * residue_distance * 3;
-        p = sample_relevant_space(bb, p, v, residue_distance, pos_residues);
+        p = sample_relevant_space(bb, p, v, residue_distance, pos_residues, lines);
         bb = get_label_bb(p, ix, residue_distance);
     }
 
@@ -222,7 +239,7 @@ std::string document_writer::get_numbering_formatted(
     l.label = msprintf("%s", ix);
     l.p = p;
 
-    out << get_label_formatted(l, "numbering-label", {});
+    out << get_label_formatted(l, "numbering-label", label_info());
 
     point p1_p = normalize(p - p1) ;
 //        float bb_width = abs(bb.get_bottom_right() - bb.get_top_left()).x;
@@ -314,17 +331,34 @@ vector<point> get_residues_positions(rna_tree &rna){
     return points;
 }
 
+vector<pair<point, point>> get_lines(rna_tree &rna){
+
+    vector<pair<point, point>> lines;
+    auto extract_line =
+            [&lines](rna_tree::pre_post_order_iterator it)
+            {
+                if (it->paired()) {
+                    lines.push_back(make_pair(it->at(0).p, it->at(1).p));
+                }
+
+            };
+
+    rna_tree::for_each_in_subtree(rna.begin(), extract_line);
+    return lines;
+}
+
 std::string document_writer::get_rna_subtree_formatted(
                                                        rna_tree &rna,
                                                        const numbering_def& numbering) const
 {
     ostringstream out;
     vector<point> residues_positions = get_residues_positions(rna);
+    vector<pair<point, point>> lines = get_lines(rna);
     int seq_ix = 0;
     auto print =
-    [&rna, &out, &seq_ix, &residues_positions, &numbering, this](rna_tree::pre_post_order_iterator it)
+    [&rna, &out, &seq_ix, &residues_positions, &lines, &numbering, this](rna_tree::pre_post_order_iterator it)
     {
-        out << get_numbering_formatted(it, seq_ix, rna.get_pairs_distance(), residues_positions, numbering);
+        out << get_numbering_formatted(it, seq_ix, rna.get_pairs_distance(), residues_positions, lines, numbering);
         out << get_label_formatted(it, {seq_ix, it->at(it.label_index()).tmp_label, it->at(it.label_index()).tmp_ix});
         seq_ix++;
     };

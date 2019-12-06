@@ -40,9 +40,14 @@ typedef std::vector<std::unique_ptr<document_writer>> image_writers;
  */
 struct label_info
 {
-    int ix = -1;
+    label_info(int ix = -1, std::string tmp_label = "", int tmp_ix = -1){
+        this->ix = ix;
+        this->tmp_label = tmp_label;
+        this->tmp_ix = tmp_ix;
+    }
+    int ix;
     std::string tmp_label; //label used in the template (can be used to store information about the mapped nodes label in the template)
-    int tmp_ix = -1; //position of the nucleotide in the template
+    int tmp_ix; //position of the nucleotide in the template
 };
 
 /**
@@ -92,6 +97,7 @@ public: // formatters
             const int ix,
             const float residue_distance,
             const std::vector<point> pos_residues,
+            const std::vector<std::pair<point, point>> lines,
             const numbering_def& numbering) const;
 
     std::string get_label_formatted(
