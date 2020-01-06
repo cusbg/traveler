@@ -23,6 +23,7 @@ to arrive to the target tree. This mapping is then sent to output and can be imp
 import sys
 import argparse
 import logging
+import copy
 
 from typing import List, Tuple
 
@@ -43,14 +44,19 @@ def read_structures(f) -> List[SequenceStructureMapping]:
     f.readline()
     sq = f.readline()
     f.readline()
+    str_full = f.readline()  # in positions of deletions (relative to template) this structure contains the base pairing information from template unlike str which might contain half pairs
+    f.readline()
     str = f.readline()
-    assert len(sq) == len(str)
+    assert len(sq) == len(str) == len(str_full)
 
     tgt_s_s_m = SequenceStructureMapping()
+    tmp_full_s_s_m = SequenceStructureMapping()
     tmp_s_s_m = SequenceStructureMapping()
+
 
     tgt_s_s_m.sq = sq.replace('-', '')
     tmp_s_s_m.str = str.replace('.', '').replace('~', '')
+    tmp_full_s_s_m.str = copy.deepcopy(tmp_s_s_m)
 
     for i, letter in enumerate(sq):
         if letter != '-':
@@ -59,8 +65,9 @@ def read_structures(f) -> List[SequenceStructureMapping]:
         if not 'a' <= letter <= 'z':
             tgt_s_s_m.sq += letter
             tmp_s_s_m.m.append(i)
+            tmp_full_s_s_m.m.append(i)
 
-    return [tmp_s_s_m, tgt_s_s_m]
+    return [tmp_s_s_m, tgt_s_s_m, tmp_full_s_s_m]
 
 def read_str_ix(s_s_m: SequenceStructureMapping) -> List[List[int]]:
     str_ix = []
@@ -134,7 +141,7 @@ def get_distance(m: List[Tuple[int]]) -> int:
 
 def main():
     with open(args.input, "r") as fr:
-        tgt_s_s_m, tmp_s_s_m = read_structures(fr)
+        tgt_s_s_m, tmp_s_s_m, tmp_full_s_s_m = read_structures(fr)
         tgt_str_ix = read_str_ix(tgt_s_s_m)
         tmp_str_ix = read_str_ix(tmp_s_s_m)
         m = get_mapping(tmp_str_ix, tgt_str_ix)
