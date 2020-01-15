@@ -50,11 +50,14 @@ def read_structures(f) -> List[SequenceStructureMapping]:
     assert len(sq) == len(str) == len(str_full)
 
     tgt_s_s_m = SequenceStructureMapping()
+    tmp_s_s_m = SequenceStructureMapping() # as for sequence, template contains dashes at positions which were deleted in target
     tmp_full_s_s_m = SequenceStructureMapping()
-    tmp_s_s_m = SequenceStructureMapping()
 
 
+
+    # Non-bracked and non-alpha symbols correspond to gaps in sequeence
     tgt_s_s_m.sq = sq.replace('-', '')
+    # . and ~ symbols correspond to insertions with respect to template
     tmp_s_s_m.str = str.replace('.', '').replace('~', '')
     tmp_full_s_s_m.str = copy.deepcopy(tmp_s_s_m)
 
