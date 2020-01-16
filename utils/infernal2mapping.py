@@ -53,26 +53,30 @@ def read_structures(f) -> List[SequenceStructureMapping]:
     tmp_s_s_m = SequenceStructureMapping() # as for sequence, template contains dashes at positions which were deleted in target
     tmp_full_s_s_m = SequenceStructureMapping()
 
-
-
     # Non-bracked and non-alpha symbols correspond to gaps in sequeence
     tgt_s_s_m.sq = sq.replace('-', '')
     # . and ~ symbols correspond to insertions with respect to template
     tmp_s_s_m.str = str.replace('.', '').replace('~', '')
-    tmp_full_s_s_m.str = copy.deepcopy(tmp_s_s_m)
+    tmp_full_s_s_m.str = copy.deepcopy(tmp_s_s_m.str)
 
     for i, letter in enumerate(sq):
         if letter != '-':
             tgt_s_s_m.str += str[i]
             tgt_s_s_m.m.append(i)
         if not 'a' <= letter <= 'z':
-            tgt_s_s_m.sq += letter
+            tmp_s_s_m.sq += letter
             tmp_s_s_m.m.append(i)
             tmp_full_s_s_m.m.append(i)
 
-    return [tmp_s_s_m, tgt_s_s_m, tmp_full_s_s_m]
+    return [sq, tgt_s_s_m, tmp_s_s_m, tmp_full_s_s_m]
 
-def read_str_ix(s_s_m: SequenceStructureMapping) -> List[List[int]]:
+
+def read_str_ix(s_s_m: SequenceStructureMapping, affected_ix: List[int]):
+    """
+    Gives the list of paired positions
+    :param s_s_m:
+    :return:
+    """
     str_ix = []
     stack_normal = [] #(
     stack_curly = [] #{
@@ -80,7 +84,7 @@ def read_str_ix(s_s_m: SequenceStructureMapping) -> List[List[int]]:
     stack_square = [] #[
     str = s_s_m.str
     for ix in range(len(str)):
-        if str[ix] not in '{<([}>)]':
+        if str[ix] not in '{<([}>)]' or s_s_m.m[ix] in affected_ix:
             str_ix.append([s_s_m.m[ix]])
         elif str[ix] in '{<([':
             if str[ix] == '(':
@@ -101,6 +105,8 @@ def read_str_ix(s_s_m: SequenceStructureMapping) -> List[List[int]]:
                 stack = stack_arrow
             elif str[ix] == ']':
                 stack = stack_square
+            if len(stack) == 0:
+                asdf=0
             ix1 = stack.pop()
 
             str_ix.append([ix1, ix]) #for the use case of mapping it does not matter in which order the nodes are sorted
@@ -142,11 +148,39 @@ def get_distance(m: List[Tuple[int]]) -> int:
     return d
 
 
+def get_affected_positions_in_tmp(sq_aln, s_s_m: SequenceStructureMapping, str_ix: List[List[int]]) -> List[int]:
+    """
+    Identifies list of positions in the aligned sequence (containing insertions to both template and target) corresponding
+    to basepairs where at least one of the residues was removed in template and therefore the pairing fell apart.
+    :param sq_aln:
+    :param s_s_m:
+    :param str_ix:
+    :return:
+    """
+
+    affected: List[int] = []
+
+    for p in str_ix:
+        if len(p) == 1:
+            continue
+
+        ix_aln1 = s_s_m.m[p[0]]
+        ix_aln2 = s_s_m.m[p[1]]
+        if sq_aln[ix_aln1] == '-' or sq_aln[ix_aln2] == '-':
+            affected.append(ix_aln1)
+            affected.append(ix_aln2)
+
+
+    return affected
+
+
 def main():
     with open(args.input, "r") as fr:
-        tgt_s_s_m, tmp_s_s_m, tmp_full_s_s_m = read_structures(fr)
-        tgt_str_ix = read_str_ix(tgt_s_s_m)
-        tmp_str_ix = read_str_ix(tmp_s_s_m)
+        sq_aln, tgt_s_s_m, tmp_s_s_m, tmp_full_s_s_m = read_structures(fr)
+        tmp_str_ix = read_str_ix(tmp_full_s_s_m, [])
+        tmp_affected = get_affected_positions_in_tmp(sq_aln=sq_aln, s_s_m=tmp_full_s_s_m, str_ix=tmp_str_ix)
+        tgt_str_ix = read_str_ix(tgt_s_s_m, tmp_affected)
+
         m = get_mapping(tmp_str_ix, tgt_str_ix)
         with (sys.stdout if args.output is None else open(args.output, "w")) as fw:
             fw.write('DISTANCE: {}\n'.format(get_distance(m)))
