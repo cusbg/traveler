@@ -71,6 +71,22 @@ def read_structures(f) -> List[SequenceStructureMapping]:
     return [sq, tgt_s_s_m, tmp_s_s_m, tmp_full_s_s_m]
 
 
+def get_ix(ix_cap: int, str_ix: List[List[int]]) -> int:
+    """
+    Finds in the str_ix, which is a list of non-paired (list length = 1) or base-paired(list length = 2),
+    first index with residue having first residue having value > ix_cap.
+    :param ix_cap:
+    :param str_ix:
+    :return:
+    """
+    max_ix = 0
+    for i, p in enumerate(str_ix):
+        if p[0] > ix_cap:
+            return i
+
+    assert False
+
+
 def read_str_ix(s_s_m: SequenceStructureMapping, affected_ix: List[int]):
     """
     Gives the list of paired positions
@@ -107,7 +123,9 @@ def read_str_ix(s_s_m: SequenceStructureMapping, affected_ix: List[int]):
                 stack = stack_square
             ix1 = stack.pop()
 
-            str_ix.append([ix1, ix]) #for the use case of mapping it does not matter in which order the nodes are sorted
+            ix_str_ix = get_ix(ix_cap=ix1, str_ix=str_ix)
+            str_ix.insert(ix_str_ix, [ix1, ix])
+            # str_ix.append([ix1, ix]) #for the use case of mapping it does not matter in which order the nodes are sorted
             # str_ix = [[ix1, ix]] + str_ix
 
     return str_ix
