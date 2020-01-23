@@ -123,11 +123,12 @@ def find_in_mapping(ixs: List[int], str_ix: List[List[int]]) -> int:
     """
     for i in range(len(str_ix)):
         ixs1 = str_ix[i]
-        if len(ixs) == 1:
+        if len(ixs) == 1 and len(ixs1) == 1:
             if ixs[0] == ixs1[0]:
                 return i
-        else:
-            if ixs[0] == ixs1[0] and ixs[1] == ixs1[1]:
+        elif len(ixs) == 2 and len(ixs1) == 2:
+             if ixs[0] == ixs1[0] and ixs[1] == ixs1[1]:
+                assert (len(ixs) == len(ixs1))
                 return i
     return -1
 
@@ -147,6 +148,7 @@ def get_mapping(tmp_str_ix: List[List[int]], tgt_str_ix: List[List[int]]) -> Lis
     tgt_mapped = []
     for i_tmp in range(len(tmp_str_ix)):
         i_tgt = find_in_mapping(tmp_str_ix[i_tmp], tgt_str_ix)
+        assert(i_tgt == -1 or len(tmp_str_ix[i_tmp]) == len(tgt_str_ix[i_tgt]))
         m.append((i_tmp+1, i_tgt+1))
         tgt_mapped.append(i_tgt)
 
