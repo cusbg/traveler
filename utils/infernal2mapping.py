@@ -85,7 +85,7 @@ def read_str_ix(s_s_m: SequenceStructureMapping, affected_ix: List[int]):
     str = s_s_m.str
     for ix in range(len(str)):
         if str[ix] not in '{<([}>)]' or s_s_m.m[ix] in affected_ix:
-            str_ix.append([s_s_m.m[ix]])
+            str_ix.append([ix])
         elif str[ix] in '{<([':
             if str[ix] == '(':
                 stack = stack_normal
@@ -105,8 +105,6 @@ def read_str_ix(s_s_m: SequenceStructureMapping, affected_ix: List[int]):
                 stack = stack_arrow
             elif str[ix] == ']':
                 stack = stack_square
-            if len(stack) == 0:
-                asdf=0
             ix1 = stack.pop()
 
             str_ix.append([ix1, ix]) #for the use case of mapping it does not matter in which order the nodes are sorted
@@ -115,12 +113,19 @@ def read_str_ix(s_s_m: SequenceStructureMapping, affected_ix: List[int]):
     return str_ix
 
 
-def find_in_mapping(ixs, str_ix: List[List[int]]) -> int:
+def find_in_mapping(ixs: List[int], str_ix: List[List[int]]) -> int:
+    """
+    Find index of the node which contains the ixs (which can be either index of a residue or indexes of two
+    residues if it corresponds to a node holding a base pair.
+    :param ixs:
+    :param str_ix:
+    :return:
+    """
     for i in range(len(str_ix)):
         ixs1 = str_ix[i]
         if len(ixs) == 1:
             if ixs[0] == ixs1[0]:
-                return  i
+                return i
         else:
             if ixs[0] == ixs1[0] and ixs[1] == ixs1[1]:
                 return i
@@ -128,6 +133,16 @@ def find_in_mapping(ixs, str_ix: List[List[int]]) -> int:
 
 
 def get_mapping(tmp_str_ix: List[List[int]], tgt_str_ix: List[List[int]]) -> List[Tuple[int, int]]:
+    """
+    Goes through the nodes of template tree and finds where each of the node is placed in the
+    target tree. This uses the fact that residues are alignment-indexed, i.e. aligned template and target
+    residues have the same index.
+
+    :param tmp_str_ix: Template tree in the form of list of nodes.
+    Each node is either a single-member or two-member array corresponding either to a leave or base pair.
+    :param tgt_str_ix: Target tree.
+    :return:
+    """
     m = []
     tgt_mapped = []
     for i_tmp in range(len(tmp_str_ix)):
@@ -173,6 +188,21 @@ def get_affected_positions_in_tmp(sq_aln, s_s_m: SequenceStructureMapping, str_i
 
     return affected
 
+def convert_to_aln_ix(str_ix: List[List[int]], s_s_m: SequenceStructureMapping) -> List[List[int]]:
+    """
+    Convers strucutre-indexed positions to alignment-indexed position based on structure-alignment position
+    mapping available in the provided sequence-structure mapping.
+    :param str_ix:
+    :param s_s_m:
+    :return:
+    """
+    aln_ix: List[List[int]]= []
+    for p in str_ix:
+        pp = []
+        for ix in p:
+            pp.append(s_s_m.m[ix])
+        aln_ix.append(pp)
+    return aln_ix
 
 def main():
     with open(args.input, "r") as fr:
@@ -181,7 +211,10 @@ def main():
         tmp_affected = get_affected_positions_in_tmp(sq_aln=sq_aln, s_s_m=tmp_full_s_s_m, str_ix=tmp_str_ix)
         tgt_str_ix = read_str_ix(tgt_s_s_m, tmp_affected)
 
-        m = get_mapping(tmp_str_ix, tgt_str_ix)
+        tmp_str_ix_aln = convert_to_aln_ix(tmp_str_ix, tmp_full_s_s_m)
+        tgt_str_ix_aln = convert_to_aln_ix(tgt_str_ix, tgt_s_s_m)
+
+        m = get_mapping(tmp_str_ix_aln, tgt_str_ix_aln)
         with (sys.stdout if args.output is None else open(args.output, "w")) as fw:
             fw.write('DISTANCE: {}\n'.format(get_distance(m)))
             for i1, i2 in m:
