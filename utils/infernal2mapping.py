@@ -123,9 +123,9 @@ def read_str_ix(s_s_m: SequenceStructureMapping, affected_ix: List[int]):
                 stack = stack_square
             ix1 = stack.pop()
 
-            ix_str_ix = get_ix(ix_cap=ix1, str_ix=str_ix)
-            str_ix.insert(ix_str_ix, [ix1, ix])
-            # str_ix.append([ix1, ix]) #for the use case of mapping it does not matter in which order the nodes are sorted
+            # ix_str_ix = get_ix(ix_cap=ix1, str_ix=str_ix)
+            # str_ix.insert(ix_str_ix, [ix1, ix])
+            str_ix.append([ix1, ix]) # the list is sorted in the post order
             # str_ix = [[ix1, ix]] + str_ix
 
     return str_ix
