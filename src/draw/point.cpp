@@ -188,6 +188,7 @@ double size(const point& vector)
 point normalize(const point& p)
 {
     UNARY(p);
+
     assert(size(p) != 0);
     return p / size(p);
 }

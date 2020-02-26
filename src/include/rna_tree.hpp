@@ -138,6 +138,8 @@ public:
 
     void update_bounding_boxes(bool leafs_have_size = false);
 
+    rna_pair_label get_node_by_id(const int id);
+
 private:
     /**
      * Compute distances between pairs and distances between unpaired bases in loops

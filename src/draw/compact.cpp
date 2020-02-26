@@ -51,7 +51,7 @@ void compact::run(bool rotate_branches)
     set_53_labels(rna);
     beautify(rotate_branches);
     checks();
-    
+
     INFO("END: Computing RNA layout");
 }
 

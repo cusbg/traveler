@@ -569,3 +569,12 @@ void rna_tree::update_bounding_boxes(bool leafs_have_size){
         }
     }
 }
+
+rna_pair_label rna_tree::get_node_by_id(const int id) {
+    for (post_order_iterator it = this->begin_post(); it != this->end_post(); ++it) {
+        if (it->id() == id) {
+            return it.node->data;
+        }
+    }
+    assert(false);
+}

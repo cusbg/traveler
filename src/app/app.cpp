@@ -131,7 +131,7 @@ void app::run(
         map = load_mapping_table(args.draw.mapping);
         img_out = args.draw.file;
     }
-    
+
     run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out, args.numbering);
     
     INFO("END: APP");
