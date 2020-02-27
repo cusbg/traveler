@@ -359,7 +359,10 @@ std::string document_writer::get_rna_subtree_formatted(
     [&rna, &out, &seq_ix, &residues_positions, &lines, &numbering, this](rna_tree::pre_post_order_iterator it)
     {
         out << get_numbering_formatted(it, seq_ix, rna.get_pairs_distance(), residues_positions, lines, numbering);
-        out << get_label_formatted(it, {seq_ix, it->at(it.label_index()).tmp_label, it->at(it.label_index()).tmp_ix});
+        out << get_label_formatted(it, {seq_ix,
+                                        it->at(it.label_index()).tmp_label,
+                                        it->at(it.label_index()).tmp_ix,
+                                        it->at(it.label_index()).tmp_numbering_label});
         seq_ix++;
     };
     

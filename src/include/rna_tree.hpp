@@ -140,6 +140,8 @@ public:
 
     rna_pair_label get_node_by_id(const int id);
 
+    void update_numbering_labels(const std::vector<std::string> &numbering_labels);
+
 private:
     /**
      * Compute distances between pairs and distances between unpaired bases in loops

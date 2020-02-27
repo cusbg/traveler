@@ -304,7 +304,13 @@ std::string svg_writer::create_element(
     if (li.ix >= 0) {
         ss << "<title>" << li.ix;
         if (li.tmp_ix > 0) {
-            ss << " (position.label in template: " << li.tmp_ix << "." << li.tmp_label.c_str() << ")";
+
+            ss << " (position.label in template: ";
+            if (!li.tmp_numbering_label.empty())
+                ss << li.tmp_numbering_label;
+            else
+                ss << li.tmp_ix - 1;
+            ss << "." << li.tmp_label.c_str() << ")";
 
         }
         ss << "</title>";

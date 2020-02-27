@@ -11,7 +11,7 @@ void traveler_extractor::extract(const string& filename)
     numbering_labels.clear();
     
     ifstream in(filename);
-    regex base_line("\\s*<point\\s+x=\"(.+)\"\\s+y=\"(.+)\"\\s+b=\"([^\"]+)\"(\\s*numbering-label=\"([^\"])+\")?\\s*/>");
+    regex base_line("\\s*<point\\s+x=\"(.+)\"\\s+y=\"(.+)\"\\s+b=\"([^\"]+)\"(\\s*numbering-label=\"([^\"]+)\")?\\s*/>");
 //    regex base_line("\\s*<point\\s+x=\"(.+)\"\\s+y=\"(.+)\"\\s+b=\"(.+)\"\\s*/>");
     string line;
     smatch match;
@@ -41,5 +41,4 @@ void traveler_extractor::extract(const string& filename)
     }
 
     mirror_y();
-    
 }
