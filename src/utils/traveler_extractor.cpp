@@ -8,6 +8,7 @@ void traveler_extractor::extract(const string& filename)
 {
     points.clear();
     labels.clear();
+    numbering_labels.clear();
     
     ifstream in(filename);
     regex base_line("\\s*<point\\s+x=\"(.+)\"\\s+y=\"(.+)\"\\s+b=\"([^\"]+)\"(\\s*numbering-label=\"([^\"])+\")?\\s*/>");
@@ -16,7 +17,7 @@ void traveler_extractor::extract(const string& filename)
     smatch match;
     point p;
     string base;
-    string ix_label;
+    string numbering_label;
     
     while(getline(in, line))
     {
@@ -25,7 +26,7 @@ void traveler_extractor::extract(const string& filename)
             stringstream s;
             s << match[1] << " " << match[2] << " " << match[3] << " " << match[5];
             if (match[5].matched) {
-            s >> p.x >> p.y >> base >> ix_label;
+            s >> p.x >> p.y >> base >> numbering_label;
             } else {
                 s >> p.x >> p.y >> base;
             }
@@ -35,6 +36,7 @@ void traveler_extractor::extract(const string& filename)
             
             points.push_back(p);
             labels.push_back(base[0]);
+            numbering_labels.push_back(numbering_label);
         }
     }
 

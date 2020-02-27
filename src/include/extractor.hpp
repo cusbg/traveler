@@ -66,7 +66,9 @@ private:
     
 public:
     std::string labels;
+    std::vector<std::string> numbering_labels;
     std::vector<point> points;
+
 
     /* gives the extractor the possibility to adjust list of residues which were
      * extracted. This can be used by the CRW extractor to remove residues which

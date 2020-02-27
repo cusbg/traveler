@@ -39,6 +39,7 @@ struct rna_label
     std::string label;
     std::string tmp_label; //label used in the template (can be used to store information about the mapped nodes label in the template)
     int tmp_ix; //position in template
+//    std::string tmp_ix_label; //is of type string because index can be 21a when provided by the user
     point p;
 };
 
