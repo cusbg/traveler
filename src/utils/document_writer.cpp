@@ -236,15 +236,27 @@ std::string document_writer::get_numbering_formatted(
     }
 
     rna_label l;
-    l.label = msprintf("%s", ix);
-    l.p = p;
+    for (int i = 0; i < 2; ++i) {
+        string label, label_class, line_class;
+        if (i == 0) {
+            label = msprintf("%s", ix);
+            label_class = string("numbering-label sequential");
+            line_class = string("numbering-line sequential");
+        } else {
+            label = msprintf("%s", it->at(it.label_index()).tmp_numbering_label);
+            label_class = string("numbering-label template");
+            line_class = string("numbering-line template");
+        }
 
-    out << get_label_formatted(l, "numbering-label", label_info());
+        l.label = label;
+        l.p = p;
 
-    point p1_p = normalize(p - p1) ;
-//        float bb_width = abs(bb.get_bottom_right() - bb.get_top_left()).x;
-    point isec = bb.intersection(p1, p);
-    out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, "numbering-line");
+        out << get_label_formatted(l, label_class, label_info());
+
+        point p1_p = normalize(p - p1) ;
+        point isec = bb.intersection(p1, p);
+        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, line_class);
+    }
 
     return out.str();
 }
