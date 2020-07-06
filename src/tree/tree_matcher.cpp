@@ -67,11 +67,18 @@ rna_tree& matcher::run(
 
     // T1 is a template which has removed and inserted nodes so it now fits the structure of target. To this tree
     // we will now add target-template position mapping
+
+    //remember mapping between nodes
     auto tgt_tmp_map = map.get_target_template_map();
-    size_t i = 1;
-    for (rna_tree::pre_post_order_iterator it = t1.begin_pre_post(); it != t1.end_pre_post(); ++it, i++){
-        auto ix_tmp = tgt_tmp_map[i];
-        it->at(it.label_index()).tmp_ix = ix_tmp;
+    std::size_t i = 0;
+    for (rna_tree::iterator it = t1.begin(); it != t1.end(); ++it, ++i){
+        it->set_node_ix_in_source(i);
+    }
+
+    //find out which residue in target (sequence-wise) was mapped from which residue (sequence-wise) in template
+    i = 0;
+    for (auto it = t1.begin_pre_post(); it != t1.end_pre_post(); ++it, ++i){
+        it->at(it.label_index()).tmp_ix = i;
     }
 
     //remove nodes from t1 and mark this in parent using set_remake

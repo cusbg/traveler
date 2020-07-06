@@ -59,6 +59,7 @@ public:
     std::vector<mapping_pair> get_to_update() const;
 
     std::map<size_t , size_t> get_target_template_map() const;
+    std::map<size_t , size_t> get_template_target_map() const;
 
 public:
     size_t distance;

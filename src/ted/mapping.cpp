@@ -88,6 +88,21 @@ std::map<size_t , size_t> mapping::get_target_template_map() const
     return tgt_tmp_map;
 }
 
+std::map<size_t , size_t> mapping::get_template_target_map() const
+{
+    APP_DEBUG_FNAME;
+
+    std::map<size_t , size_t> tmp_tgt_map;
+
+    for (auto m : map)
+    {
+        if (m.to != 0)
+            tmp_tgt_map.insert(std::make_pair(m.from, m.to));
+    }
+
+    return tmp_tgt_map;
+}
+
 bool mapping::mapping_pair::operator<(
                                       const mapping_pair& other) const
 {

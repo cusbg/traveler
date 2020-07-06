@@ -38,7 +38,7 @@ bool rna_label::operator==(
 rna_pair_label::rna_pair_label(
                                const std::string& s)
 {
-    labels.push_back({s, "", 0, "", point::bad_point()});
+    labels.push_back({s, "", -1, "", point::bad_point()});
 }
 
 const rna_label& rna_pair_label::operator[](

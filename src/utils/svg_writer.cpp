@@ -300,17 +300,20 @@ std::string svg_writer::create_element(
 {
 
     stringstream ss;
-    //if (ix >= 0) ss << "<title>" << ix << " (lable in template: " <<  << "</title>";
+    //if (ix >= 0) ss << "<title>" << ix << " (label in template: " <<  << "</title>";
     if (li.ix >= 0) {
         ss << "<title>" << li.ix;
-        if (li.tmp_ix > 0) {
+        if (li.tmp_ix >= 0) {
 
             ss << " (position.label in template: ";
             if (!li.tmp_numbering_label.empty())
                 ss << li.tmp_numbering_label;
             else
-                ss << li.tmp_ix - 1;
+                ss << li.tmp_ix;
             ss << "." << li.tmp_label.c_str() << ")";
+
+        } else {
+            ss << " (inserted)";
 
         }
         ss << "</title>";

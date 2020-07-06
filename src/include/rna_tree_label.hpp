@@ -35,6 +35,7 @@ struct rna_label
 {
     bool operator==(
                     const rna_label& other) const;
+
     
     std::string label;
     std::string tmp_label; //label used in the template (can be used to store information about the mapped nodes label in the template)
@@ -136,6 +137,14 @@ public:
     std::vector<rectangle> get_bounding_objects(){
         return bounding_objects;
     }
+
+    int get_node_ix_in_source(){
+        return source_ix;
+    }
+
+    void set_node_ix_in_source(int source_ix){
+        this->source_ix = source_ix;
+    }
     
 public:
     status_type status = untouched;
@@ -145,6 +154,7 @@ private:
     std::vector<rna_label> labels;
     point parent_center;
     std::vector<rectangle> bounding_objects;
+    int source_ix = 0; //node index in the source tree (template)
 
     
 };

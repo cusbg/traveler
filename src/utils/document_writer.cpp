@@ -244,6 +244,10 @@ std::string document_writer::get_numbering_formatted(
             line_class = string("numbering-line sequential");
         } else {
             label = msprintf("%s", it->at(it.label_index()).tmp_numbering_label);
+            if (label.empty()) {
+                //numbering label at an inserted position
+                continue;
+            }
             label_class = string("numbering-label template");
             line_class = string("numbering-line template");
         }
@@ -268,10 +272,10 @@ std::string document_writer::get_label_formatted(
         return "";
     
     ostringstream out;
-    
+
     out
     << get_label_formatted(it->at(it.label_index()), get_default_color(it->status), li);
-    
+
     if (it->paired() &&
         it.preorder() &&
         it->initiated_points() &&
@@ -364,7 +368,7 @@ std::string document_writer::get_rna_subtree_formatted(
                                                        const numbering_def& numbering) const
 {
     ostringstream out;
-    vector<point> residues_positions = get_residues_positions(rna);
+    vector<point> residues_positions = vector<point>();//get_residues_positions(rna);
     vector<pair<point, point>> lines = get_lines(rna);
     int seq_ix = 0;
     auto print =

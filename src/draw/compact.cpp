@@ -1605,8 +1605,8 @@ void contract_root_level(rna_tree &  rna) {
     auto it = ++compact::sibling_iterator(it_prev);
     while(it != end) { //traverse the tree pre-order
 //        if (!it->paired() ){
-            size_t id0 = it_prev->at(0).tmp_ix;
-            size_t id1 = it->at(0).tmp_ix;
+            size_t id0 = it_prev->get_node_ix_in_source();
+            size_t id1 = it->get_node_ix_in_source();
 
             if (id0 != 0 && id1 != 0 && id1 != id0 + 1) {
                 //there was a deletion
