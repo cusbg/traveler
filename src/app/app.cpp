@@ -551,7 +551,7 @@ void app::print(
 void app::arguments::fill_default() {
     if (this->numbering.positions.size() == 0) {
         this->numbering.positions.push_back(10);
-        this->numbering.positions.push_back(22);
+        this->numbering.positions.push_back(20);
         this->numbering.positions.push_back(30);
         this->numbering.interval = 50;
     }
