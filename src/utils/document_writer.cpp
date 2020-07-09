@@ -22,7 +22,7 @@
 
 #include "document_writer.hpp"
 #include "svg_writer.hpp"
-#include "ps_writer.hpp"
+//#include "ps_writer.hpp"
 #include "traveler_writer.hpp"
 
 using namespace std;
@@ -63,7 +63,7 @@ bool RGB::operator==(
 {
     image_writers vec;
     vec.emplace_back(new svg_writer());
-    vec.emplace_back(new ps_writer());
+    // vec.emplace_back(new ps_writer());
     vec.emplace_back(new traveler_writer());
     
     for (const auto& writer : vec)
