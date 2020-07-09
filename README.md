@@ -180,7 +180,108 @@ Traveler supporst two types of input images - crw and varna. There are three ste
 
 For more ideas, how it should be implemented, see usage of `crw_extractor` and `varna_extractor`.
 
+## Custom alignment
+
+As shown in the examples above, the Traveler procedure can be split into two phases - structure mapping phase and
+layout phase. In the mapping phase, both target and template RNA structures are turned into tree representations
+and tree edit distance is employed to find a mapping between the nodes of the two
+trees. The description of how the base-pairing information can be turned to a tree representation
+is described in the Traveler paper. Please note, that the numbering of the nodes
+in the tree is post order. Also, the numbering starts from 0, but the first node
+is dedicated to the 5'3' "pair". So numbering of the "real" residues (either unpaired
+or base-paired nucleotides) starts with 1. The output of the mapping phase is 
+a list of pairs indicating which nodes are mapped onto each other and which need
+to be inserted/deleted. Follows an example of such mapping. Please note that insertions/deletions
+correspond to lines containing 0 either in the first or second position. The first column
+corresponds to the template and the second to the target structure:
+
+```text
+DISTANCE: 4
+0 12
+0 13
+1 1
+2 2
+3 3
+4 4
+5 5
+6 6
+7 7
+8 8
+9 9
+10 10
+11 11
+12 14
+13 15
+14 16
+15 0
+16 17
+17 18
+18 19
+19 20
+20 21
+21 22
+22 23
+23 24
+24 25
+25 26
+26 27
+27 28
+28 29
+29 30
+30 31
+31 32
+32 33
+33 34
+34 35
+35 36
+36 37
+37 0
+38 38
+39 39
+40 40
+41 41
+42 42
+43 43
+44 44
+45 45
+46 46
+47 47
+48 48
+49 49
+50 50
+51 51
+52 52
+53 53
+54 54
+55 55
+56 56
+57 57
+58 58
+59 59
+60 60
+```
+The tree mapping procedure implemented in Traveler might not always lead to optimal mapping. That
+is especially true when you are predicting the secondary structure of the target via homology modeling 
+and you thus know the correct mapping between the target and template. 
+In such case, it might be advantageous
+to provide the mapping manually. That is exactly the case of using Traveler 
+in the [R2DT pipeline](https://github.com/RNAcentral/R2DT) used by 
+[RNAcentral](https://rnacentral.org/)
+where the structure is folded with [Infernal](https://github.com/EddyRivasLab/infernal). In such 
+case one can use the secondary structure produced by Infernal and stored in the Stockholm file format 
+to generate the corresponding sequence and, subsequently, tree mapping. The following example
+ makes use of the scripts from the [Infernal scripts repository](https://github.com/nawrockie/jiffy-infernal-hmmer-scripts):
+
+```shell script
+perl ~/git/jiffy-infernal-hmmer-scripts/ali-pfam-lowercase-rf-gap-columns.pl target.stk > target.indi.pfam.lc.stk
+perl ~/git/jiffy-infernal-hmmer-scripts/ali-pfam-sindi2dot-bracket.pl -l -n -w -a -c target.indi.pfam.lc.stk > target.traveler.afa
+python3 ~/git/traveler/utils/infernal2mapping.py -i target.traveler.afa > target.map
+~/git/traveler/bin/traveler --target-structure target.fasta --template-structure --file-format traveler template.layout template.fasta --draw target.map target
+
+```
+
+
 ## Citation:
 If you use Traveler in your research, please cite:
-* Elias, R., & Hoksza, D. (2017). TRAVeLer: a tool for template-based RNA secondary structure visualization. BMC bioinformatics, 18(1), 487.
+* Elias, R., & Hoksza, D. (2017). TRAVeLer: a tool for template-based RNA secondary structure visualization. BMC Bioinformatics, 18(1), 487.
 * Eliás, R., & Hoksza, D. (2016). Rna secondary structure visualization using tree edit distance. International Journal of Bioscience, Biochemistry and Bioinformatics, 6(1), 9.
