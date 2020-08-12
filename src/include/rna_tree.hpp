@@ -142,6 +142,8 @@ public:
 
     void update_numbering_labels(const std::vector<std::string> &numbering_labels);
 
+    void update_labels_seq_ix();
+
 private:
     /**
      * Compute distances between pairs and distances between unpaired bases in loops

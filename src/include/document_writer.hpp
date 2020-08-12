@@ -93,6 +93,8 @@ public: // formatters
     std::string get_edge_formatted(
                                    point from,
                                    point to,
+                                   int ix_from = -1,
+                                   int ix_to = -1,
                                    bool is_base_pair = true) const;
     std::string get_numbering_formatted(
             rna_tree::pre_post_order_iterator it,
@@ -173,10 +175,16 @@ protected:
     virtual std::string get_line_formatted(
                                            point from,
                                            point to,
+                                           int ix_from,
+                                           int ix_to,
+                                           bool is_base_pair,
                                            const RGB& color) const = 0;
     virtual std::string get_line_formatted(
             point from,
             point to,
+            int ix_from,
+            int ix_to,
+            bool is_base_pair,
             const std::string& clazz) const = 0;
     /**
      * flush `text` to output

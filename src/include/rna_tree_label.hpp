@@ -42,6 +42,7 @@ struct rna_label
     int tmp_ix; //position in template
     std::string tmp_numbering_label; //is of type string because index can be 21a when provided by the user
     point p;
+    int seq_ix; //sequential index of the label. Corresponds to the position of the label as assigned by the pre_post_order iterator
 };
 
 /**

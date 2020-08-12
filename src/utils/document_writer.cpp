@@ -82,7 +82,10 @@ bool RGB::operator==(
 std::string document_writer::get_edge_formatted(
                                                 point from,
                                                 point to,
-                                                bool is_base_pair) const
+                                                const int ix_from,
+                                                const int ix_to,
+                                                bool is_base_pair
+                                                ) const
 {
     if (from.bad() || to.bad())
     {
@@ -96,7 +99,7 @@ std::string document_writer::get_edge_formatted(
         from = tmp;
     }
     
-    return get_line_formatted(from, to, RGB::BLACK);
+    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, RGB::BLACK);
 }
 
 bool rect_overlaps(const rectangle &r, const std::vector<point> &points ){
@@ -261,7 +264,7 @@ std::string document_writer::get_numbering_formatted(
 
         point p1_p = normalize(p - p1) ;
         point isec = bb.intersection(p1, p);
-        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, line_class);
+        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, -1, -1,  false, line_class);
     }
 
     return out.str();
@@ -284,7 +287,7 @@ std::string document_writer::get_label_formatted(
         !rna_tree::is_root(it))
     {
         out
-        << get_edge_formatted(it->at(0).p, it->at(1).p, true);
+        << get_edge_formatted(it->at(0).p, it->at(1).p, it->at(0).seq_ix, it->at(1).seq_ix, true);
     }
 
     auto x = out.str();
@@ -412,7 +415,8 @@ std::string document_writer::get_rna_background_formatted(
         
         point p1 = prev->at(prev.label_index()).p;
         point p2 = begin->at(begin.label_index()).p;
-        
+
+
         if (p1.bad() || p2.bad())
             continue;
 
@@ -426,8 +430,11 @@ std::string document_writer::get_rna_background_formatted(
 
         point diff = diff_orig * diff_edge;
 
+        int ix1 = prev->at(prev.label_index()).seq_ix;
+        int ix2 = prev->at(prev.label_index()).seq_ix;
+
         //If the edge points cross, then the line should not be drawn at all
-        if (diff.x > 0 && diff.y > 0) out << get_line_formatted(p1, p2, RGB::GRAY);
+        if (diff.x > 0 && diff.y > 0) out << get_line_formatted(p1, p2, ix1, ix2, false, RGB::GRAY);
     }
     
     return out.str();
@@ -437,6 +444,7 @@ std::string document_writer::get_rna_formatted(
                                                rna_tree rna,
                                                const numbering_def& numbering) const
 {
+    rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
     return get_rna_subtree_formatted(rna, numbering)
     + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
 }

@@ -240,15 +240,21 @@ struct svg_writer::style
 /* virtual */ std::string svg_writer::get_line_formatted(
                                                          point from,
                                                          point to,
+                                                         int ix_from,
+                                                         int ix_to,
+                                                         bool is_base_pair,
                                                          const RGB& color) const
 {
 
-    return get_line_formatted(from, to, color.get_name());
+    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, color.get_name());
 }
 
 /* virtual */ std::string svg_writer::get_line_formatted(
         point from,
         point to,
+        int ix_from,
+        int ix_to,
+        bool is_base_pair,
         const std::string& clazz) const
 {
     properties out;

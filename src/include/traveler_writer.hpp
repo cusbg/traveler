@@ -36,10 +36,16 @@ protected:
     virtual std::string get_line_formatted(
                                            point from,
                                            point to,
+                                           int ix_from,
+                                           int ix_to,
+                                           bool is_base_pair,
                                            const RGB& color) const;
     virtual std::string get_line_formatted(
             point from,
             point to,
+            int ix_from,
+            int ix_to,
+            bool is_base_pair,
             const std::string& clazz) const;
         
 

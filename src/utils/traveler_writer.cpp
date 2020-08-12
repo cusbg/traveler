@@ -39,25 +39,29 @@ string traveler_writer::get_label_formatted(const rna_label& label, const std::s
 {
     ostringstream out;
 
-    out << "<point x=\"" << label.p.x << "\" y=\"" << label.p.y << "\" b=\"" << label.label << "\"/>"
+    out << "<point x=\"" << label.p.x << "\" y=\"" << label.p.y << "\" b=\"" << label.label << "\" id=\""<< li.ix << "\"/>"
         << endl;
 
     return out.str();
 }
 
-string traveler_writer::get_line_formatted(point from, point to, const RGB& color) const
+string traveler_writer::get_line_formatted(point from, point to, int ix_from, int ix_to, const bool is_base_pair, const RGB& color) const
 {
-    return get_line_formatted(from, to, color.get_name());
+    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, color.get_name());
 }
 
-string traveler_writer::get_line_formatted(point from, point to, const std::string& clazz) const
+string traveler_writer::get_line_formatted(point from, point to, const int ix_from, const int ix_to, const bool is_base_pair, const std::string& clazz) const
 {
     ostringstream out;
 
     if (from.bad() || to.bad()) return "";
 
     out << "<line fromX=\"" << from.x << "\" fromY=\"" << from.y << "\" toX=\"" << to.x << "\" toY=\""
-        << to.y << "\"/>" << endl;
+        << to.y << "\" bp=\"" << int(is_base_pair) << "\"";
+    if (is_base_pair) {
+        out << " fromIx=\"" << ix_from << "\" toIx=\"" << ix_to << "\"";
+    }
+    out << "/>" << endl;
 
     return out.str();
 }

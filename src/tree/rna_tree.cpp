@@ -586,5 +586,12 @@ void rna_tree::update_numbering_labels(const vector<string> &numbering_labels){
     for (int i = 0; it != this->end_pre_post() && i < numbering_labels.size(); ++it, ++i) {
         it->at(it.label_index()).tmp_numbering_label = numbering_labels[i];
     }
+}
+
+void rna_tree::update_labels_seq_ix(){
+    int i = -1; //the first label corresponds to the 5` end (and last is 3`, so the number of labels should be length -1
+    for (pre_post_order_iterator it = this->begin_pre_post(); it != this->end_pre_post(); ++it, ++i) {
+        it->at(it.label_index()).seq_ix = i;
+    }
 
 }
