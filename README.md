@@ -18,7 +18,6 @@ $ bin/traveler \
   <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/eab.colored.png" width="33%"/>
 </div>
 
-</p>
 
 ## Requirements:
 - gcc with support of c++11
@@ -64,12 +63,12 @@ The `traveler` executable is available in the PATH, and the current directory is
 
 	OPTIONS:
 		[-a|--all] [--overlaps] OUT_PREFIX
-			# computes mapping (TED) and outputs target leayout as both .ps and .svg image to files with prefix OUT_PREFIX
+			# computes mapping (TED) and outputs target layout as an .svg image and .xml file to files with prefix OUT_PREFIX
 			# with the optional --overlaps argument, overlaps in the layout are identified and highlited
 		[-t|--ted <FILE_MAPPING_OUT>]
 			# runs mapping (TED) only and saves mapping table to FILE_MAPPING_OUT file
 		[-d|--draw] [--overlaps] FILE_MAPPING_IN OUT_PREFIX
-			# use mapping in FILE_MAPPING_IN and outputs layout as both .ps and .svg image to files with prefix OUT_PREFIX
+			# use mapping in FILE_MAPPING_IN and outputs layout as an .svg image and .xml file to files with prefix OUT_PREFIX
 			# if optional argument --overlaps is present overlaps in the layout are identified and highlighted
 		[-r|--rotate] If switched on, Traveler tries to rotate hairpins to minimize the number of overlaps. In some
 		cases, this can lead to a more convoluted layout and therefore this features is turned off by default.
@@ -163,7 +162,7 @@ The file needs to contain three lines: moelcule description line (starts with th
 		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
 		--draw --overlaps test/mouse_from_human.map test/mouse_from_human
 
-	$ # generates 4 files - .svg and .ps files, both with/without colored bases (see COLOR CODING section)
+	$ # generates 3 files - 2 .svg files (with/without colored bases (see COLOR CODING section)) and 1 .xml file with the basic layout information
 	$ # checks also if output molecule has overlaps and draws them in output image
 
 
