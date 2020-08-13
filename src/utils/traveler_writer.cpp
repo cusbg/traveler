@@ -39,7 +39,8 @@ string traveler_writer::get_label_formatted(const rna_label& label, const std::s
 {
     ostringstream out;
 
-    out << "<point x=\"" << label.p.x << "\" y=\"" << label.p.y << "\" b=\"" << label.label << "\" id=\""<< li.ix << "\"/>"
+    out << "<point x=\"" << label.p.x << "\" y=\"" << label.p.y << "\" b=\"" << label.label
+        << "\" id=\""<< li.ix << "\" nt=\"" << li.is_nt << "\" />"
         << endl;
 
     return out.str();

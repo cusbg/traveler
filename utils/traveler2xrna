@@ -1,0 +1,175 @@
+"""
+Reads Traveler's output layout XML and outputs XRNA XML version of the layout (http://rna.ucsc.edu/rnacenter/xrna/e.coli_5s.xrna.html)
+"""
+
+import sys
+import argparse
+import logging
+import xml.etree.ElementTree as ET
+import os
+
+from typing import List
+
+
+class Residue:
+    def __init__(self, attrs):
+        self.x = float(attrs['x'])
+        self.y = float(attrs['y'])
+        self.label = attrs['b']
+        self.id = attrs['id']
+
+
+class Label:
+    def __init__(self, attrs):
+        self.x = float(attrs['x'])
+        self.y = float(attrs['y'])
+        self.label = attrs['label'] if 'label' in attrs else attrs['b'] # 'b' in case this is the 5' or 3' node
+        self.id = attrs['id']
+        self.x1 = None
+        self.y1 = None
+        self.x2 = None
+        self.y2 = None
+
+    def add_line(self, attrs):
+        self.x1 = float(attrs['fromX'])
+        self.y1 = float(attrs['fromY'])
+        self.x2 = float(attrs['toX'])
+        self.y2 = float(attrs['toY'])
+
+
+class BasePair:
+    def __init__(self, attrs):
+        self.x1 = attrs['fromX']
+        self.y1 = attrs['fromY']
+        self.x2 = attrs['toX']
+        self.y2 = attrs['toY']
+        self.id1 = attrs['fromIx']
+        self.id2 = attrs['toIx']
+
+class Structure:
+    def __init__(self, residues: List[Residue], labels: List[Label], bps: List[BasePair]):
+        self.residues: List[Residue] = residues
+        self.labels: List[Label] = labels
+        self.base_pairs: List[BasePair] = bps
+
+    def get_center(self) -> List:
+        center = [0, 0]
+        for r in self.residues:
+            center[0] += r.x
+            center[1] += r.y
+        return [center[0]/len(self.residues), center[1]/len(self.residues)]
+
+
+def get_structure(xml_root) -> Structure:
+    residues: List[Residue] = []
+    labels: List[Label] = []
+    bps: List[BasePair] = []
+
+    for node in xml_root:
+        attrs = node.attrib
+        if node.tag == 'point':
+            if "'" in attrs['b']:
+                continue
+
+            if int(attrs['nt']) == 1:
+                residues.append(Residue(attrs=attrs))
+            else:
+                labels.append(Label(attrs=attrs))
+        else: #line
+            if attrs['bp'] == '1':
+                bps.append(BasePair(attrs=attrs))
+            else:
+                #it is a line corresponding to the last inserted label
+                labels[-1].add_line(attrs=attrs)
+
+    return Structure(residues=residues, labels=labels, bps=bps)
+
+
+# def get_labels(xml_root):
+#     NotImplemented
+
+
+def read_traveler_xml(f) -> Structure:
+
+    tree = ET.fromstring(f.read())
+
+    # residues = get_residues(tree)
+    # labels = get_labels(tree)
+
+    return get_structure(tree)
+
+
+def convert_to_xrna(name: str, structure: Structure) -> str:
+
+    # Header
+    center = structure.get_center()
+    xrna = "< ComplexDocument Name='{}'/>\n".format(name)
+    xrna += "< SceneNodeGeom CenterX='{}' CenterY='{}' />\n".format(center[0], center[1])
+    xrna += "< Complex Name='{}'>\n".format(name)
+    xrna += "< RNAMolecule Name='{}'>\n".format(name)
+
+    # NucListData
+    xrna += "< NucListData StartNucID='1' DataType='NucChar.XPos.YPos'>\n"
+    for r in structure.residues:
+        xrna += "{} {} {}\n".format(r.label, r.x, r.y)
+    xrna += "< /NucListData>\n"
+
+    #Nuc
+
+    xrna += "< Nuc RefIDs='1-{}' Color='0' FontID='0' FontSize='14' />\n".format(len(structure.residues)+1)
+    xrna += "< Nuc RefIDs='1-{}' IsSchematic='false' SchematicColor='0' SchematicLineWidth='1.5' SchematicBPLineWidth='1.0' />\n".format(len(structure.residues)+1)
+    xrna += "< Nuc RefID='120' FormatType='9' />\n"
+    for l in structure.labels:
+        xrna += "< Nuc RefID='{}'>\n".format(l.id)
+        xrna += "< LabelList>\n"
+        xrna += "\n"
+        xrna += "\n"
+        xrna += "< /LabelList>\n"
+        xrna += "< /Nuc>\n"
+    xrna += "\n"
+    xrna += "\n"
+
+    # Basepair Helixes
+
+    xrna += "< BasePairs nucID='1' length='10' bpNucID='119' />\n"
+    for bp in structure.base_pairs:
+        xrna += "< BasePairs nucID='{}' length='1' bpNucID='{}' />\n".format(bp.id1, bp.id2)
+
+    # Footer
+    xrna += "< /RNAMolecule>\n"
+    xrna += "< /Complex>\n"
+    xrna += "< /ComplexDocument>\n"
+
+    return xrna
+
+
+def main():
+    fn = args.input
+    fname = os.path.basename(fn)
+    fname = os.path.splitext(fname)[0]
+    with open(fn, "r") as fr:
+        structure = read_traveler_xml(f=fr)
+        with (sys.stdout if args.output is None else open(args.output, "w")) as fw:
+            fw.write(convert_to_xrna(structure=structure, name=fname))
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("-i", "--input",
+                        required=True,
+                        metavar='FILE',
+                        help="Traveler layout output XML file")
+    parser.add_argument("-o", "--output",
+                        metavar='FILE',
+                        help="Output file name for the XRNA-formatted layout. "
+                             "If non entered, the standard output will be used.")
+
+    args = parser.parse_args()
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='%(asctime)s [%(levelname)s] %(module)s - %(message)s',
+        datefmt='%H:%M:%S')
+
+    main()

@@ -260,7 +260,10 @@ std::string document_writer::get_numbering_formatted(
         l.label = label;
         l.p = p;
 
-        out << get_label_formatted(l, label_class, label_info());
+        label_info li = label_info();
+        li.ix = ix;
+        li.is_nt = false;
+        out << get_label_formatted(l, label_class, li);
 
         point p1_p = normalize(p - p1) ;
         point isec = bb.intersection(p1, p);

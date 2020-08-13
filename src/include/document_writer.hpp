@@ -40,16 +40,18 @@ typedef std::vector<std::unique_ptr<document_writer>> image_writers;
  */
 struct label_info
 {
-    label_info(int ix = -1, std::string tmp_label = "", int tmp_ix = -1, std::string tmp_numbering_label = ""){
+    label_info(int ix = -1, std::string tmp_label = "", int tmp_ix = -1, std::string tmp_numbering_label = "", bool is_nt = true){
         this->ix = ix;
         this->tmp_label = tmp_label;
         this->tmp_ix = tmp_ix;
         this->tmp_numbering_label = tmp_numbering_label;
+        this->is_nt = is_nt;
     }
     int ix;
     std::string tmp_label; //label used in the template (can be used to store information about the mapped nodes label in the template)
     int tmp_ix = -1; //position of the nucleotide in the template
     std::string tmp_numbering_label; // label of position in template (can be, e.g. 21A)
+    bool is_nt; // whether this is a nucleotide or numbering label
 };
 
 /**
