@@ -40,7 +40,16 @@ string traveler_writer::get_label_formatted(const rna_label& label, const std::s
     ostringstream out;
 
     out << "<point x=\"" << label.p.x << "\" y=\"" << label.p.y << "\" b=\"" << label.label
-        << "\" id=\""<< li.ix << "\" nt=\"" << li.is_nt << "\" />"
+        << "\"";// nt=\"" << li.is_nt << "\"";
+
+    if (li.is_nt == 0) {
+        out << " associatedId=\"" << li.ix <<  "\"";
+
+    } else {
+        out << " id=\"" << li.ix <<  "\"";
+
+    }
+    out << "/>"
         << endl;
 
     return out.str();
@@ -58,9 +67,12 @@ string traveler_writer::get_line_formatted(point from, point to, const int ix_fr
     if (from.bad() || to.bad()) return "";
 
     out << "<line fromX=\"" << from.x << "\" fromY=\"" << from.y << "\" toX=\"" << to.x << "\" toY=\""
-        << to.y << "\" bp=\"" << int(is_base_pair) << "\"";
+        << to.y << "\"";// bp=\"" << int(is_base_pair) << "\"";
     if (is_base_pair) {
         out << " fromIx=\"" << ix_from << "\" toIx=\"" << ix_to << "\"";
+    } else {
+        out << " associatedId=\"" << ix_to << "\"";
+
     }
     out << "/>" << endl;
 
