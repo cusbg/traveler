@@ -206,9 +206,10 @@ struct svg_writer::style
 /* virtual */ std::string svg_writer::get_label_formatted(
                                                           const rna_label& label,
                                                           const RGB& color,
+                                                          const rna_pair_label::status_type status,
                                                           const label_info li) const
 {
-    return get_label_formatted(label, color.get_name(), li);
+    return get_label_formatted(label, color.get_name(), status, li);
 //    properties out;
 //
 //    out
@@ -223,6 +224,7 @@ struct svg_writer::style
 /* virtual */ std::string svg_writer::get_label_formatted(
         const rna_label& label,
         const std::string& clazz,
+        const rna_pair_label::status_type status,
         const label_info li) const
 {
     properties out;
