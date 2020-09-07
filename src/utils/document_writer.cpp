@@ -64,7 +64,7 @@ bool RGB::operator==(
     image_writers vec;
     vec.emplace_back(new svg_writer());
     // vec.emplace_back(new ps_writer());
-    if (!use_colors) {
+    if (use_colors) {
         vec.emplace_back(new traveler_writer());
     }
     
@@ -263,7 +263,7 @@ std::string document_writer::get_numbering_formatted(
         label_info li = label_info();
         li.ix = ix;
         li.is_nt = false;
-        out << get_label_formatted(l, label_class, li);
+        out << get_label_formatted(l, label_class, it->status, li);
 
         point p1_p = normalize(p - p1) ;
         point isec = bb.intersection(p1, p);
@@ -281,8 +281,9 @@ std::string document_writer::get_label_formatted(
     
     ostringstream out;
 
+    //TODO: refactor -  superfluous passing of color and status at the same time
     out
-    << get_label_formatted(it->at(it.label_index()), get_default_color(it->status), li);
+    << get_label_formatted(it->at(it.label_index()), get_default_color(it->status), it->status, li);
 
     if (it->paired() &&
         it.preorder() &&

@@ -30,17 +30,19 @@ string traveler_writer::get_circle_formatted(point centre, double radius) const
     return "";
 }
 
-string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color, const label_info li) const
+string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color, const rna_pair_label::status_type status, const label_info li) const
 {
-    return get_label_formatted(label, color.get_name(), li);
+
+    return get_label_formatted(label, color.get_name(), status, li);
 }
 
-string traveler_writer::get_label_formatted(const rna_label& label, const std::string& clazz, const label_info li) const
+string traveler_writer::get_label_formatted(const rna_label& label, const std::string& clazz, const rna_pair_label::status_type status, const label_info li) const
 {
     ostringstream out;
 
     out << "<point x=\"" << label.p.x << "\" y=\"" << label.p.y << "\" b=\"" << label.label
-        << "\"";// nt=\"" << li.is_nt << "\"";
+        << "\" status=\"" << get_status_name(status) << "\" color=\"" << clazz << "\"";// nt=\"" << li.is_nt << "\"";
+
 
     if (li.is_nt == 0) {
         out << " associatedId=\"" << li.ix <<  "\"";

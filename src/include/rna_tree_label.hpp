@@ -48,6 +48,7 @@ struct rna_label
 /**
  * object representing one node in tree - base or base pair
  */
+
 class rna_pair_label : public node_base
 {
 public:
@@ -159,5 +160,7 @@ private:
 
     
 };
+
+std::string get_status_name(const rna_pair_label::status_type type);
 
 #endif /* !RNA_TREE_LABEL_HPP */
