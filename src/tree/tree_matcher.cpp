@@ -57,7 +57,7 @@ rna_tree& matcher::run(
     //Sizes of the trees after deletion from one and insertion into the other should match
     if (t1.size() - map.get_to_remove().size() != t2.size() - map.get_to_insert().size())
     {
-        throw illegal_state_exception("Computed sizes of removing/inserting does not match current trees");
+        throw illegal_state_exception("Target and template tree sizes after insertions and deletions  do not match");
     }
 
 
