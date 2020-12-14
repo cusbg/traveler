@@ -53,7 +53,7 @@ def read_structures(f) -> List[SequenceStructureMapping]:
     tmp_s_s_m = SequenceStructureMapping() # as for sequence, template contains dashes at positions which were deleted in target
     tmp_full_s_s_m = SequenceStructureMapping()
 
-    # Non-bracked and non-alpha symbols correspond to gaps in sequeence
+    # Non-bracket and non-alpha symbols correspond to gaps in sequence
     tgt_s_s_m.sq = sq.replace('-', '')
     # . and ~ symbols correspond to insertions with respect to template
     tmp_s_s_m.str = str.replace('.', '').replace('~', '')
@@ -63,7 +63,7 @@ def read_structures(f) -> List[SequenceStructureMapping]:
         if letter != '-':
             tgt_s_s_m.str += str[i]
             tgt_s_s_m.m.append(i)
-        if not 'a' <= letter <= 'z':
+        if not 'a' <= letter <= 'z' and letter != 'X':
             tmp_s_s_m.sq += letter
             tmp_s_s_m.m.append(i)
             tmp_full_s_s_m.m.append(i)
