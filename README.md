@@ -13,9 +13,9 @@ $ bin/traveler \
 ```
 
 <div>
-  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/human.png" width="33%"/>
-  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/A_bracteata.png" width="33%"/>
-  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/eab.colored.png" width="33%"/>
+  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/human.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/A_bracteata.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/eab.colored.png" width="30%"/>
 </div>
 
 
