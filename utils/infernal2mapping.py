@@ -3,7 +3,7 @@ Reads INFERNAL mapping which contains one line for sequence and one for the stru
 in upper case nucleotides which are mapped from template to target. Lower case letters denote nucleotides
 which are inserted into target respective to template and "-" denote positions which were deleted with respect
 to template. The structure then contains the corresponding secondary structure, i.e. secondary structure of template
-with added .~ characters corresponding to insertions (these will map the lowercase positions). Removing the positions
+with added .~ characters corresponding to insertions (these will match the lowercase positions). Removing the positions
 corresponding to "-" nucleotides will result to target structure while removing ".~" characters results in the
 template structure.
 
@@ -212,6 +212,7 @@ def convert_to_aln_ix(str_ix: List[List[int]], s_s_m: SequenceStructureMapping) 
     """
     Convers strucutre-indexed positions to alignment-indexed position based on structure-alignment position
     mapping available in the provided sequence-structure mapping.
+
     :param str_ix:
     :param s_s_m:
     :return:

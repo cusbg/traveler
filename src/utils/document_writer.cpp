@@ -170,7 +170,6 @@ point sample_relevant_space(rectangle &r, point &p_start, point &dir, float grid
         }
     }
 
-
     for (point p: grid_points) {
         rectangle r_candidate = rectangle(p - r_dim/2, p + r_dim/2);
         if (!rect_overlaps(r_candidate, residue_points_in_grid) && !rect_overlaps(r_candidate, lines_in_grid)) {
@@ -179,7 +178,6 @@ point sample_relevant_space(rectangle &r, point &p_start, point &dir, float grid
     }
 
     return p_start;
-
 }
 
 point get_loop_center(rna_tree::iterator it) {
