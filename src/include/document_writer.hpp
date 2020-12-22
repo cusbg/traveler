@@ -34,7 +34,6 @@ struct RGB;
 class document_writer;
 
 typedef std::vector<std::unique_ptr<document_writer>> image_writers;
-
 /**
  * Additional information about the label to be used by a writer.
  */
@@ -170,6 +169,7 @@ public:
     streampos get_pos();
 
     virtual void set_scaling_ratio(rna_tree& rna);
+    virtual void set_font_size(double size);
     
 protected:
     virtual std::string get_line_formatted(
@@ -209,7 +209,10 @@ private:
     std::ofstream out;
     bool colored = false;
 
-    double scaling_ratio = 1;
+    document_settings settings;
+
+public:
+    document_settings get_settings() const;
 };
 
 

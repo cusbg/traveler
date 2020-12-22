@@ -22,8 +22,10 @@
 
 #include <cfloat>
 #include <iostream>
+#include <algorithm>
 
 #include "rna_tree.hpp"
+#include "utils.hpp"
 
 using namespace std;
 
@@ -346,11 +348,11 @@ rna_tree::iterator rna_tree::get_rightest_initiated_descendant(const rna_tree::i
 
 void rna_tree::compute_distances()
 {
-    int elements;
+    int cnt;
     double dist;
     
     // compute distances between 2 pairs (CG <-> CG)
-    elements = 0;
+    cnt = 0;
     dist = 0;
     for (iterator it = begin(); it != end(); ++it)
     {
@@ -364,12 +366,12 @@ void rna_tree::compute_distances()
         
         dist += distance(parent(it)->center(), it->center());
         DEBUG("dist=%s", dist);
-        ++elements;
+        ++cnt;
     }
-    distances.pairs_distance = dist / (double)elements;
+    distances.pairs_distance = dist / (double)cnt;
     
     // distance between bases in pair (C <-> G)
-    elements = 0;
+    cnt = 0;
     dist = 0;
     for (iterator it = begin(); it != end(); ++it)
     {
@@ -378,12 +380,12 @@ void rna_tree::compute_distances()
             continue;
         
         dist += distance(it->at(0).p, it->at(1).p);
-        ++elements;
+        ++cnt;
     }
-    distances.pair_base_distance = dist / (double)elements;
+    distances.pair_base_distance = dist / (double)cnt;
     
     // distance between unpaired bases in loops
-    elements = 0;
+    cnt = 0;
     dist = 0;
     for (iterator it = begin(); it != end(); ++it)
     {
@@ -399,16 +401,42 @@ void rna_tree::compute_distances()
                    && is_leaf(ch))
             {
                 dist += distance(prev->center(), ch->center());
-                ++elements;
+                ++cnt;
             }
         }
     }
-    distances.loops_bases_distance = dist / (double)elements;
+    distances.loops_bases_distance = dist / (double)cnt;
+
+    cnt = 0;
+    dist = 0;
+    point p, p_prev;
+    vector<double> dists;
+    for (pre_post_order_iterator it = ++this->begin_pre_post(); it != this->end_pre_post(); ++it, ++cnt){
+        if (it.node->parent == NULL) {
+            //the artificial root
+            continue;
+        }
+        p = it->at(it.label_index()).p;
+        if (cnt) {
+            dists.push_back(distance(p_prev, p));
+            dist += distance(p_prev, p);
+        }
+        p_prev = p;
+
+    }
+    distances.seq_distance_avg = dist/(double)cnt;
+    distances.seq_distance_median = median<double>(dists);
+    distances.seq_distance_min = *std::min_element(dists.begin(), dists.end());
+
+
+    cout << "distances: " << distances.seq_distance_avg << "," << distances.seq_distance_median << "," << distances.seq_distance_min;
     
-    INFO("Distances: pairs %s, pairbase %s, loops %s",
+    INFO("Distances: pairs %s, pairbase %s, loops %s, sequence %s, sequence-median %s",
          distances.pairs_distance,
          distances.pair_base_distance,
-         distances.loops_bases_distance);
+         distances.loops_bases_distance,
+         distances.seq_distance_avg,
+         distances.seq_distance_median);
 }
 
 
@@ -502,14 +530,14 @@ rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index) {
 /* static */ point rna_tree::base_pair_edge_point(
                                                   point from,
                                                   point to,
-                                                  float scaling_ratio)
+                                                  document_settings doc_settings)
 {
     assert(!from.bad() && !to.bad());
 
     // Fhe following works for SVG where the from and to points correspond to middle bottom positions and the font
     // size is 8px. Moreover the coordinate frame is based on PS and thus starts from bottom left.
-//    return from;
-    return from + point(0,1) + normalize(to - from) * 5 ;
+    return from + point(0,doc_settings.font_size * 0.1) + normalize(to - from) * doc_settings.font_size * 2 / 3;
+    return from + point(0,9);// + normalize(to - from) * 4 ;
 //    return from + normalize(to - from) * 6 / scaling_ratio;
 //    return from + normalize(to - from) * 8;
 }

@@ -25,7 +25,16 @@
 #include "tree_base.hpp"
 #include "rna_tree_label.hpp"
 
+
 struct point;
+
+struct document_settings {
+    /*
+     * This should go to document_writer.hpp, but needs some refactoring as that would cause cross-linking.
+     */
+    double scaling_ratio = 1;
+    double font_size = 0;
+};
 
 class rna_tree : public tree_base<rna_pair_label>
 {
@@ -111,7 +120,7 @@ public:
     static point base_pair_edge_point(
                                       point from,
                                       point to,
-                                      float scaling_ratio = 1);
+                                      document_settings doc_settings);
     /**
      * returns top right corner of tree visualization
      */
@@ -136,6 +145,19 @@ public:
         return distances.loops_bases_distance;
     }
 
+    double get_seq_distance_avg() const
+    {
+        return distances.seq_distance_avg;
+    }
+    double get_seq_distance_median() const
+    {
+        return distances.seq_distance_median;
+    }
+    double get_seq_distance_min() const
+    {
+        return distances.seq_distance_min;
+    }
+
     void update_bounding_boxes(bool leafs_have_size = false);
 
     rna_pair_label get_node_by_id(const int id);
@@ -144,7 +166,7 @@ public:
 
     void update_labels_seq_ix();
 
-private:
+public:
     /**
      * Compute distances between pairs and distances between unpaired bases in loops
      * as average distance from rna
@@ -156,17 +178,30 @@ private:
     struct
     {
         /**
-         * distance between paired bases - CG <-> CG
+         * average distance between paired bases - CG <-> CG
          */
         double pairs_distance;
         /**
-         * distance between bases in pair - C <-> G
+         * average distance between bases in a  basepair - C <-> G
          */
         double pair_base_distance;
         /**
-         * distance between unpaired bases in loops
+         * average distance between unpaired bases in loops
          */
         double loops_bases_distance;
+        /**
+         * average distance between sequence-neighboring reisudes
+         */
+        double seq_distance_avg;
+        /**
+         * median distance between sequence-neighboring reisudes
+         */
+        double seq_distance_median;
+        /**
+         * minimum distance between sequence-neighboring reisudes
+         */
+        double seq_distance_min;
+
     } distances;
 };
 

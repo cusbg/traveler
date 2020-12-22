@@ -81,6 +81,15 @@ public:
             *this << p;
         return *this;
     }
+
+    std::string get(std::string key) const {
+        for (const property p : props) {
+            if (p.name == key) {
+                return p.value;
+            }
+        }
+        return NULL;
+    }
     
     friend std::ostream& operator<<(
                                     std::ostream& out,
@@ -162,8 +171,8 @@ struct svg_writer::style
     letter.x = dimensions.x;// / scale.x;
     letter.y = dimensions.y; // scale.y;
 
-    print(get_header_element(root));
-    print(create_style_definitions());
+    print(get_header_element(rna));
+    print(create_style_definitions(rna));
 }
 //
 //void svg_writer::scale_point(point &p) const {
@@ -323,6 +332,9 @@ std::string svg_writer::create_element(
 
         }
         ss << "</title>";
+
+        // ss << "<rect x=\"" <<  std::stof(properties.get("x")) - 8 << "\" y=\"" << std::stof(properties.get("y"))
+        // << "\" width=\"16\" height=\"16\" style=\"fill:red\"/>";
     }
     if (value.empty())
         return msprintf("<g>%s<%s %s/></g>\n", ss.str(), name, properties);
@@ -354,7 +366,7 @@ svg_writer::properties svg_writer::get_styles(
     return properties(property("style", out.str()));
 }
 
-std::string svg_writer::create_style_definitions() const
+std::string svg_writer::create_style_definitions(rna_tree& rna) const
 {
     ostringstream out;
     
@@ -414,7 +426,7 @@ std::string svg_writer::create_style_definitions() const
         if (element.name == "text"){
             out << style("text-anchor", "middle");
 //            out << style("baseline-shift", "sub");
-            out << style("dominant-baseline", "middle");
+            out << style("alignment-baseline", "middle");
 
         }
         out << "}";
@@ -423,6 +435,7 @@ std::string svg_writer::create_style_definitions() const
 
     out << "text.numbering-label {fill: rgb(204, 204, 204);}" << endl;
     out << "line.numbering-line {stroke: rgb(204, 204, 204);}" << endl;
+    out << "text.background {fill: rgb(255, 255, 255);" << endl;
 
     out << ".template {visibility:hidden}";
     
@@ -431,22 +444,24 @@ std::string svg_writer::create_style_definitions() const
     return create_element("style", properties(property("type", "text/css")), out.str());
 }
 
-std::string svg_writer::get_header_element(
-                                           rna_tree::iterator root)
+std::string svg_writer::get_header_element(rna_tree& rna)
 {
     ostringstream out;
 
 //    bl = -bl - MARGIN / 2;
 
     TRACE("scale %s, bl %s, tr %s", get_scaling_ratio(), bl, tr);
-    
+
+    double font_size = rna.get_seq_distance_min();
+    set_font_size(font_size);
+
     out
     << "<svg"
     << "\n\t" << property("xmlns", "http://www.w3.org/2000/svg")
     << "\n\t" << property("width", msprintf("%f", letter.x))
     << "\n\t" << property("height", msprintf("%f", letter.y))
 //    << "\n\t" << get_styles({{"font-size",  "7px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
-    << "\n\t" << get_styles({{"font-size",  "7px"}, {"font-weight", "bold"}, {"font-family", "Helvetica"}})
+    << "\n\t" << get_styles({{"font-size",  to_string(font_size) + "px"}, {"font-weight", "bold"}, {"font-family", "Helvetica"}})
     << ">"
     << endl;
     

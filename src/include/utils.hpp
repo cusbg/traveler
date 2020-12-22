@@ -90,4 +90,8 @@ void write_file(
 fasta read_fasta_file(
                       const std::string& filename);
 
+template<typename T>
+T median(std::vector<T> &v);
+
+
 #endif /* !UTILS_HPP */

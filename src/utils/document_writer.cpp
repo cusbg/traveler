@@ -94,8 +94,8 @@ std::string document_writer::get_edge_formatted(
     }
     if (is_base_pair)
     {
-        point tmp = rna_tree::base_pair_edge_point(from, to);
-        to = rna_tree::base_pair_edge_point(to, from);
+        point tmp = rna_tree::base_pair_edge_point(from, to, get_settings());
+        to = rna_tree::base_pair_edge_point(to, from, get_settings());
         from = tmp;
     }
     
@@ -391,13 +391,19 @@ std::string document_writer::get_rna_subtree_formatted(
 }
 
 double document_writer::get_scaling_ratio() const{
-    return scaling_ratio;
+    return this->settings.scaling_ratio;
 }
 
 void document_writer::set_scaling_ratio(rna_tree& rna){
 //    auto bp_dist = rna.get_pair_base_distance();
 //    scaling_ratio = 20 / bp_dist;
-        scaling_ratio = 1;
+        this->settings.scaling_ratio = 1;
+};
+
+void document_writer::set_font_size(double size){
+//    auto bp_dist = rna.get_pair_base_distance();
+//    scaling_ratio = 20 / bp_dist;
+    this->settings.font_size = size;
 };
 
 std::string document_writer::get_rna_background_formatted(
@@ -420,8 +426,8 @@ std::string document_writer::get_rna_background_formatted(
 
         point diff_orig = p2 - p1;
 
-        point tmp = rna_tree::base_pair_edge_point(p1, p2, get_scaling_ratio());
-        p2 = rna_tree::base_pair_edge_point(p2, p1, get_scaling_ratio());
+        point tmp = rna_tree::base_pair_edge_point(p1, p2, get_settings());
+        p2 = rna_tree::base_pair_edge_point(p2, p1, get_settings());
         p1 = tmp;
 
         point diff_edge = p2 - p1;
@@ -429,10 +435,10 @@ std::string document_writer::get_rna_background_formatted(
         point diff = diff_orig * diff_edge;
 
         int ix1 = prev->at(prev.label_index()).seq_ix;
-        int ix2 = prev->at(prev.label_index()).seq_ix;
+        int ix2 = begin->at(begin.label_index()).seq_ix;
 
         //If the edge points cross, then the line should not be drawn at all
-        if (diff.x > 0 && diff.y > 0) out << get_line_formatted(p1, p2, ix1, ix2, false, RGB::GRAY);
+        if (diff.x >= 0 && diff.y >= 0) out << get_line_formatted(p1, p2, ix1, ix2, false, RGB::GRAY);
     }
     
     return out.str();
@@ -443,8 +449,10 @@ std::string document_writer::get_rna_formatted(
                                                const numbering_def& numbering) const
 {
     rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
-    return get_rna_subtree_formatted(rna, numbering)
-    + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
+    return
+     get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post())
+     +
+             get_rna_subtree_formatted(rna, numbering);
 }
 
 void document_writer::init(
@@ -523,4 +531,8 @@ void document_writer::use_colors(
                                  bool _colored)
 {
     colored = _colored;
+}
+
+document_settings document_writer::get_settings() const{
+    return this->settings;
 }

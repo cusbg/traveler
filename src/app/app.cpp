@@ -221,10 +221,12 @@ void app::save(
                const numbering_def& numbering)
 {
     APP_DEBUG_FNAME;
-    
+
+    rna.compute_distances();
     overlap_checks::overlaps overlaps;
 //    if (overlap)
         overlaps = overlap_checks().run(rna);
+
     
     for (bool colored : {true, false})
     {

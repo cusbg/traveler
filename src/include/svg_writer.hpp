@@ -72,8 +72,7 @@ protected:
 //    double get_scaling_ratio() const;
     
 private:
-    std::string get_header_element(
-                                   rna_tree::iterator root);
+    std::string get_header_element(rna_tree& rna);
     style get_color_style(
             const std::string& feature,
             const RGB& color) const;
@@ -88,7 +87,7 @@ private:
 //            const std::string& name,
 //            const properties& properties,
 //            const int ix) const;
-    std::string create_style_definitions() const;
+    std::string create_style_definitions(rna_tree& rna) const;
     
     properties get_point_formatted(
                                    point p,
