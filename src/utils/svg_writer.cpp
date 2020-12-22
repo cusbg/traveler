@@ -452,7 +452,7 @@ std::string svg_writer::get_header_element(rna_tree& rna)
 
     TRACE("scale %s, bl %s, tr %s", get_scaling_ratio(), bl, tr);
 
-    double font_size = rna.get_seq_distance_min();
+    double font_size = rna.get_seq_distance_median();
     set_font_size(font_size);
 
     out
