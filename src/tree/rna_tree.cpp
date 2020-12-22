@@ -429,7 +429,7 @@ void rna_tree::compute_distances()
     distances.seq_distance_min = *std::min_element(dists.begin(), dists.end());
 
 
-    cout << "distances: " << distances.seq_distance_avg << "," << distances.seq_distance_median << "," << distances.seq_distance_min;
+    // cout << "distances: " << distances.seq_distance_avg << "," << distances.seq_distance_median << "," << distances.seq_distance_min;
     
     INFO("Distances: pairs %s, pairbase %s, loops %s, sequence %s, sequence-median %s",
          distances.pairs_distance,
