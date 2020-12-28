@@ -381,11 +381,13 @@ std::string svg_writer::create_style_definitions(rna_tree& rna) const
         string name;
         vector<style> styles;
     };
-    
+
+    double line_stroke_width = rna.get_seq_distance_median() / 18;
+
     vector<element> elements;
     elements.push_back({"text", {}});
     elements.push_back({"circle", {{"fill", "none"}}});
-    elements.push_back({"line", {}});
+    elements.push_back({"line", {{"stroke-width", line_stroke_width}});
     
     for (const auto& element : elements)
     {
