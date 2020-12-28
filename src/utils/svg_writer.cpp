@@ -387,7 +387,7 @@ std::string svg_writer::create_style_definitions(rna_tree& rna) const
     vector<element> elements;
     elements.push_back({"text", {}});
     elements.push_back({"circle", {{"fill", "none"}}});
-    elements.push_back({"line", {{"stroke-width", line_stroke_width}});
+    elements.push_back({"line", {{"stroke-width", line_stroke_width}}});
     
     for (const auto& element : elements)
     {
