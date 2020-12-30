@@ -248,16 +248,16 @@ void rotate_branch_by_angle(rna_tree &rna, rna_tree::iterator branch, double ang
                                          double alpha)
 {
     assert(!rna_tree::is_leaf(it));
-    
+
     for (pre_post_order_iterator ch = pre_post_order_iterator(it, true); id(ch) <= id(it); ++ch)
     {
         if (!ch->initiated_points())
             continue;
-        
+
         double dist = distance(c.centre, ch->at(ch.label_index()).p);
         c.p1 = ch->at(ch.label_index()).p;
         c.p2 = move_point(c.centre, c.p2, dist);
-        
+
         ch->set_p(c.rotate(alpha), ch.label_index());
     }
 }
@@ -469,7 +469,7 @@ void init_root_level_unpaired(rna_tree &  rna){
 void compact::init()
 {
     APP_DEBUG_FNAME;
-    
+
     assert(rna.is_ordered_postorder());
 
 //    for (iterator r = rna.begin(); r!= rna.end(); r++) {
@@ -486,18 +486,18 @@ void compact::init()
 //        std::cout << it->at(0).label << " " << it->at(0).tmp_label << " " << it->status << " " << it->id() << " " << it->seq_id_mapped() << endl;
 //    }
 
-    
+
     for (iterator it = ++rna.begin(); it != rna.end(); ++it)
     { //traverse the tree pre-order
         if (it->initiated_points() || !it->paired())
             continue;
-        
+
         //For non-initiated points or paired nodes, get their parents
         iterator par = rna_tree::parent(it);
         point p = par->center();
-        
+
         assert(!p.bad());
-        
+
         if (rna_tree::is_root(par))
         {
             /*
@@ -530,7 +530,7 @@ void compact::init()
 
 //    straighten_branches();
 
-    
+
     auto log = logger.debug_stream();
     log << "Points initialization:\n";
     auto f = [&](pre_post_order_iterator it)
@@ -553,7 +553,7 @@ void compact::init()
         }
     };
     rna_tree::for_each_in_subtree(rna.begin_pre_post(), f);
-    
+
     // if first node was inserted and it is only one branch - do not remake it
     // because it shares parents (3'5' node) position: 3'-NODE1 <-> NODE2-5'
     sibling_iterator root = rna.begin();
@@ -578,7 +578,7 @@ void compact::init()
 //    init_root_level_deleted(rna);
     normalize_53_ends(rna);
     root->remake_ids.clear();
-    
+
     DEBUG("compact::init() OK");
 }
 
@@ -605,29 +605,29 @@ point compact::init_branch_recursive(
 {
     point p;
     sibling_iterator ch;
-    
+
     if (it->initiated_points())
     {
         p = normalize(it->center() - from) * BASES_DISTANCE;
         return p;
     }
-    
+
     ch = get_onlyone_branch(it);
     if (!rna_tree::is_valid(ch))
         return point::bad_point();
-    
+
     p = init_branch_recursive(ch, from);
     if (!p.bad())
     {
         assert(ch->paired());
-        
+
         shift_branch(it, p);
         it->set_p(ch->at(0).p - p, 0);
         it->set_p(ch->at(1).p - p, 1);
-        
+
         return p;
     }
-    
+
     return point::bad_point();
 }
 
@@ -635,10 +635,10 @@ point compact::init_branch_recursive(
                                      sibling_iterator it)
 {
     // init for root children
-    
+
     point p;
     sibling_iterator ch;
-    
+
     if (it->initiated_points())
     {
         for (ch = it.begin(); ch != it.end(); ++ch)
@@ -651,7 +651,7 @@ point compact::init_branch_recursive(
         }
         abort();
     }
-    
+
     /*
      * The structure obtained from an image does not need to be a tree with a common root but rather a forrest
      * Eg. homo sapiens's rRNA (http://www.rna.ccbb.utexas.edu/RNA/Structures/d.16.e.H.sapiens.pdf)
@@ -664,15 +664,15 @@ point compact::init_branch_recursive(
      */
     if (!rna_tree::is_valid(ch))
         return point::bad_point();
-    
+
     p = init_branch_recursive(ch);
-    
+
     if (!p.bad()) {
         it->set_p(ch->at(0).p, 0);
         it->set_p(ch->at(1).p, 1);
         shift_branch(ch, -p);
     }
-    
+
     return p;
 }
 
@@ -681,16 +681,19 @@ void compact::init_by_ancestor(
 {
     assert(it->paired());
     assert(rna_tree::is_valid(get_onlyone_branch(rna_tree::parent(it))));   // => 1 branch
-    
+
     point p1, p2, vec;
     iterator par = rna_tree::parent(it);
     assert(!rna_tree::is_root(par));
-    
+
     iterator grandpar = rna_tree::parent(par);
     point par_par_center = par->get_parent_center();
     if (!rna_tree::is_root(grandpar))
-        vec = normalize(par->center() - rna_tree::parent(par)->center());
-
+        if (par_par_center.bad()){
+            vec = normalize(par->center() - rna_tree::parent(par)->center());
+        } else {
+            vec = normalize(par->center() - par_par_center);
+        }
     else {
 //        assert(!par->get_parent_center().bad())
         if (par_par_center.bad()) {
@@ -716,7 +719,7 @@ void compact::init_by_ancestor(
     // ^^ direction (parent(par)->par)
     p1 = par->at(0).p + vec;
     p2 = par->at(1).p + vec;
-    
+
     it->set_p(p1, 0);
     it->set_p(p2, 1);
     // ^^ initialize points of `it` to lie next to parent
@@ -727,10 +730,10 @@ void compact::init_multibranch(
                                sibling_iterator it, bool is_root)
 {
     APP_DEBUG_FNAME;
-    
+
 #define LEAF_POINTS 1
 #define PAIRED_POINTS 5 /* we use only # 1 and 3; # 0,2,4 will be free space */
-    
+
     auto get_number_of_places_for_bases =
     [](sibling_iterator root)
     {
@@ -760,34 +763,34 @@ void compact::init_multibranch(
                                           {
                                               rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
                                           });
-            
+
             root->set_p(p1, 0);
             root->set_p(p2, 1);
             return;
         }
-        
+
         point rp1 = root->at(0).p;
         point rp2 = root->at(1).p;
-        
+
         root->set_p(p1, 0);
         root->set_p(p2, 1);
-        
+
         double beta = angle(rp1 - rp2) - angle(p1 - p2);
-        
+
         for (pre_post_order_iterator it = ++pre_post_order_iterator(root, true); id(it) < id(root); ++it)
         {
             point from = it->at(it.label_index()).p;
             if (from.bad())
                 continue;
-            
+
             double alpha = angle(from - rp1);
             double radius = distance(from, rp1);
-            
+
             point to = rotate(p1, alpha - beta, radius);
             it->set_p(to, it.label_index());
         }
     };
-    
+
     if (is_root)  {
         /*
          * New branch created at the root level and it that case, the iterator is the root of the subtree to be
@@ -796,8 +799,8 @@ void compact::init_multibranch(
          * but can be far apart in the image (e.g. http://www.rna.ccbb.utexas.edu/RNA/Structures/d.16.e.H.sapiens.pdf),
          * we need to find an anchor point which will be used for the multibranch (normally we use the parent)
          */
-        
-        
+
+
         iterator first_initiated = rna.get_leftest_initiated_descendant(it);
         iterator last_initiated = rna.get_rightest_initiated_descendant(it);
 
@@ -808,15 +811,15 @@ void compact::init_multibranch(
             && last_initiated->initiated_points() && first_initiated != last_initiated &&
             distance(p1, p2) < 2 * PAIRS_DISTANCE)
         {
-            
+
             //Installing a new root into an existing branch in depth 1 which is part of a multibranch loop
-            
+
             //The idea is to position the new root at the position of the intiated points and rotate the subtree to
             //accommodate this change
-            
+
             //            point c = point(0, 0);
             //            int cnt_branches = 0;
-            
+
 
             //it can happen that the first initiated and last initiated descendants are not at the same level (see the
             // image), so the following assert is not valid. However, in such a case it is probable, that the resulting layout
@@ -839,7 +842,7 @@ void compact::init_multibranch(
             //                }
             //            }
             //            c = c / cnt_branches;
-            
+
 
 //            p1 = (*first_initiated)[0].p;
 //            last_initiated->paired() ? p2 = (*last_initiated)[1].p : p2 = (*last_initiated)[0].p;
@@ -847,16 +850,16 @@ void compact::init_multibranch(
             point c = center(p1, p2) - orthogonal(p1 - p2) * BASES_DISTANCE;
             //Testing whether it wouldn't be better to position the center in the opposite orthogonal direction
             //is done later in the try_reposition_new_root_branches function
-            
+
             /*
              * We need to remember the parent's center be used later when initializing position for the child of current node.
              * Normally, the position is obtained from the parent, but in case of root parent, that is the position between
              * 5' and 3' end which might be far apart.
              */
             it->set_parent_center(c);
-            
+
             rotate_subtree(it, c, p1, p2);
-            
+
             /*
              * Now we need to move all the descendants. We will move them in the perpendicular direction to the
              * new base pair. The orientation is based on the direction of descendants with respect to p1 and p2
@@ -875,7 +878,7 @@ void compact::init_multibranch(
             if (distance(center_of_gravity , p1 + shift_vector) > distance(center_of_gravity , p1 - shift_vector)) {
                 shift_vector = -shift_vector;
             }
-            
+
             for (sibling_iterator sit = it.begin(); sit != it.end(); sit++) shift_branch(sit, shift_vector);
         }
         else {
@@ -971,7 +974,7 @@ void compact::init_multibranch(
                     if (prev.node->prev_sibling == NULL) {
                         //if prev is the first residue, then there is not previous residue, and the position of 5' will be used instead
                         p2 = rna_tree::parent(prev)->at(1).p;
-                        
+
                     } else {
                         iterator prev_prev = --sibling_iterator(prev);
                         while(prev_prev != root.begin() && !prev_prev->initiated_points()) prev_prev--;
@@ -1028,7 +1031,7 @@ void compact::init_multibranch(
          * So we need to move the non-parent part of the existing stem in its current direction (elongation) and then
          * add insert the new branch perpendicular to it so that it does not intersect much with the rest of the tree.
          */
-        
+
         //Find out which child is new
         iterator it_existing, it_new;
         if (it.node->first_child->data.initiated_points()) {
@@ -1038,7 +1041,7 @@ void compact::init_multibranch(
             it_existing = it.node->last_child;
             it_new = it.node->first_child;
         }
-        
+
         //Move the existing branch in its current direction so that there is enough space for the new branch
         //to be located perpendicular to it
         point p[2] = {it->at(0).p, it->at(1).p};
@@ -1048,7 +1051,7 @@ void compact::init_multibranch(
             move_point(p[1], e[1], PAIRS_DISTANCE)};
         point c_junction = (c_parent + center(points_existing_new[0], points_existing_new[1])) / 2; //center of the new junction
         rotate_subtree(it_existing, c_junction, points_existing_new[0], points_existing_new[1]);
-        
+
         //Position the new branch either left or right of the existing branch
         if (it_existing == it.node->last_child) {
             point points_new[2] = {move_point(p[0], p[1], -BASES_DISTANCE),
