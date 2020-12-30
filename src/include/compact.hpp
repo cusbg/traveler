@@ -96,7 +96,7 @@ private:
      *      for example branch or other leaf-node was inserted/deleted
      */
     static bool remake_child(
-                             iterator parent,
+                             iterator node,
                              size_t n);
     
     /**
@@ -105,7 +105,7 @@ private:
      *      (ins/del children)
      */
     static bool to_remake_children(
-                                   iterator parent);
+                                   iterator node);
     
 private:
     // INIT functions:
