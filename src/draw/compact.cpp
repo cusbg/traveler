@@ -227,19 +227,19 @@ void rotate_branch_by_angle(rna_tree &rna, rna_tree::iterator branch, double ang
 }
 
 /* static */ bool compact::remake_child(
-                                        iterator parent,
+                                        iterator node,
                                         size_t n)
 {
-    return is(parent, rna_pair_label::inserted) ||
-    contains(parent->remake_ids, n);
+    return is(node, rna_pair_label::inserted) ||
+    contains(node->remake_ids, n);
 }
 
 /* static */ bool compact::to_remake_children(
-                                              iterator parent)
+                                              iterator node)
 {
-    return parent->paired() &&
-    (!parent->remake_ids.empty() ||
-     is(parent, rna_pair_label::inserted));
+    return node->paired() &&
+    (!node->remake_ids.empty() ||
+     is(node, rna_pair_label::inserted));
 }
 
 /* static */ void compact::rotate_branch(
@@ -687,11 +687,13 @@ void compact::init_by_ancestor(
     assert(!rna_tree::is_root(par));
     
     iterator grandpar = rna_tree::parent(par);
+    point par_par_center = par->get_parent_center();
     if (!rna_tree::is_root(grandpar))
         vec = normalize(par->center() - rna_tree::parent(par)->center());
+
     else {
 //        assert(!par->get_parent_center().bad())
-        if (par->get_parent_center().bad()) {
+        if (par_par_center.bad()) {
 
             point par_center = par->center();
             assert(!par_center.bad());
@@ -748,6 +750,9 @@ void compact::init_multibranch(
         //root is the root of the subtree to be rotated
         //points p1 and p2 are positions of where it should be positioned
         //center is the center of the parent (of all the branches to be rotated) pair
+
+        //this function actually only sets position for the root and rotates the existing nodes and the rest
+        //are added to the remake_ids list which is handled later in compact::make
         if (init_branch_recursive(root, center).bad())
         {
             rna_tree::for_each_in_subtree(root,
@@ -1044,10 +1049,17 @@ void compact::init_multibranch(
         point c_junction = (c_parent + center(points_existing_new[0], points_existing_new[1])) / 2; //center of the new junction
         rotate_subtree(it_existing, c_junction, points_existing_new[0], points_existing_new[1]);
         
-        //Position the new branch
-        point points_new[2] = {move_point(p[0], p[1], -BASES_DISTANCE),
-            move_point(points_existing_new[0], points_existing_new[1], -BASES_DISTANCE)};
-        rotate_subtree(it_new, c_junction, points_new[0], points_new[1]);
+        //Position the new branch either left or right of the existing branch
+        if (it_existing == it.node->last_child) {
+            point points_new[2] = {move_point(p[0], p[1], -BASES_DISTANCE),
+                                   move_point(points_existing_new[0], points_existing_new[1], -BASES_DISTANCE)};
+            rotate_subtree(it_new, c_junction, points_new[0], points_new[1]);
+        } else {
+            point points_new[2] = {move_point(p[1], p[0], -BASES_DISTANCE),
+                                   move_point(points_existing_new[1], points_existing_new[0], -BASES_DISTANCE)};
+            rotate_subtree(it_new, c_junction, points_new[1], points_new[0]);
+        }
+        it_new->set_parent_center(c_junction);
         
     } else {
         circle c;
