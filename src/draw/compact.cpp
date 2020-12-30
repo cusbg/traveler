@@ -688,9 +688,13 @@ void compact::init_by_ancestor(
     
     iterator grandpar = rna_tree::parent(par);
     point par_par_center = par->get_parent_center();
-    if (!rna_tree::is_root(grandpar))
-        vec = normalize(par->center() - rna_tree::parent(par)->center());
-
+    if (!rna_tree::is_root(grandpar)) {
+        if (par_par_center.bad()) {
+            vec = normalize(par->center() - rna_tree::parent(par)->center());
+        } else {
+            vec = normalize(par->center() - par_par_center);
+        }
+    }
     else {
 //        assert(!par->get_parent_center().bad())
         if (par_par_center.bad()) {
