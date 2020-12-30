@@ -1021,7 +1021,7 @@ void compact::init_multibranch(
 
         }
     }
-    else if (it.number_of_children() == 2) {
+    else if (it.number_of_children() == 2 && (it.node->first_child->data.initiated_points() || it.node->last_child->data.initiated_points())) {
         /*
          * In case we inserted into a stem (one child is the stem the other is the new branch) we do not want
          * to put the tho branches on a circle, but rather place the new branch perpendicular to the existing stem.
