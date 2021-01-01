@@ -23,6 +23,7 @@
 #define POINT_HPP
 
 #include <ios>
+#include "vector"
 
 
 struct point
@@ -68,6 +69,7 @@ return *this; \
 point operator*(double value, const point& p);
 
 point center(const point &p1, const point &p2);
+point center(const std::vector<point> p);
 
 double distance(const point& p1, const point& p2);
 
