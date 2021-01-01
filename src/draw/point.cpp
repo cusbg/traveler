@@ -170,6 +170,17 @@ point center(const point &p1, const point &p2)
     return (p1 + p2) / 2;
 }
 
+point center(const std::vector<point> points) {
+    point c = point(0, 0);
+    for(point p: points) {
+        c += p;                
+    }
+
+    return  c / points.size();
+}
+
+
+
 double distance(const point& p1, const point& p2)
 {
     BINARY(p1, p2);

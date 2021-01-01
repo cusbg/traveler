@@ -688,12 +688,13 @@ void compact::init_by_ancestor(
 
     iterator grandpar = rna_tree::parent(par);
     point par_par_center = par->get_parent_center();
-    if (!rna_tree::is_root(grandpar))
+    if (!rna_tree::is_root(grandpar)) {
         if (par_par_center.bad()){
             vec = normalize(par->center() - rna_tree::parent(par)->center());
         } else {
             vec = normalize(par->center() - par_par_center);
         }
+    }
     else {
 //        assert(!par->get_parent_center().bad())
         if (par_par_center.bad()) {
@@ -1024,7 +1025,7 @@ void compact::init_multibranch(
 
         }
     }
-    else if (it.number_of_children() == 2) {
+    else if (it.number_of_children() == 2 && (it.node->first_child->data.initiated_points() || it.node->last_child->data.initiated_points())) {
         /*
          * In case we inserted into a stem (one child is the stem the other is the new branch) we do not want
          * to put the tho branches on a circle, but rather place the new branch perpendicular to the existing stem.
@@ -1072,6 +1073,7 @@ void compact::init_multibranch(
         c.centre = center(c.p1, c.p2);
         c.compute_sgn();
         auto points = c.init(get_number_of_places_for_bases(it), BASES_DISTANCE);
+        c.centre = center(points);
         
         int i = 0;
         for (sibling_iterator ch = it.begin(); ch != it.end(); ++ch) {
@@ -1081,8 +1083,18 @@ void compact::init_multibranch(
                 
                 i += LEAF_POINTS;
             } else {
-                rotate_subtree(ch, c.centre, points[i + 1], points[i + 3]);
+                point p1 = points[i + 1], p2 = points[i + 3];
+                point c_p1_p2 = center(p1, p2);
+                rotate_subtree(ch, c.centre, p1, p2);
                 i += PAIRED_POINTS;
+
+                //set parent orthogonal to the base-pair in the direction of the circle center
+                point shift_vector = orthogonal(p1 - p2) * BASES_DISTANCE;
+                if (distance(c_p1_p2 + shift_vector, c.centre) > distance(c_p1_p2, c.centre)) {
+                    ch->set_parent_center(c_p1_p2 - shift_vector);
+                } else {
+                    ch->set_parent_center(c_p1_p2 + shift_vector);
+                }
             }
         }
     }
