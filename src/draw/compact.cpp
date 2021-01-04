@@ -49,6 +49,7 @@ void compact::run(bool rotate_branches)
     init();
     make();
     set_53_labels(rna);
+    rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
     beautify(rotate_branches);
     checks();
 
@@ -136,8 +137,10 @@ void rotate_branch_by_angle(rna_tree &rna, rna_tree::iterator branch, double ang
 
     rna_tree::iterator parent = rna_tree::parent(branch);
 
-    bool left_end = is_leftest_pair(branch);
-    bool right_end = is_rightest_pair(branch);
+    // bool left_end = is_leftest_pair(branch);
+    // bool right_end = is_rightest_pair(branch);
+    bool left_end = rna_tree::is_first_child(branch);
+    bool right_end = rna_tree::is_last_child(branch);
 
     int cnt_siblings = parent.number_of_children();
     int ix_branch = child_index(branch);
@@ -149,9 +152,9 @@ void rotate_branch_by_angle(rna_tree &rna, rna_tree::iterator branch, double ang
 
         point pivot = branch->at(1).p;
 
-        for (rna_tree::post_order_iterator it = parent.begin(); it != branch; it++)
+        for (rna_tree::iterator it = branch.begin(); it != branch.end(); it++)
             rotate_node(it, pivot, angle);
-        rotate_node(branch, pivot, angle);
+        //rotate_node(branch, pivot, angle);
 
     } else if (right_end){
 
@@ -163,7 +166,7 @@ void rotate_branch_by_angle(rna_tree &rna, rna_tree::iterator branch, double ang
         point pivot = (branch->at(0).p + branch->at(1).p)/2;
         for (rna_tree::iterator it = branch.begin(); it != branch.end(); it++)
             rotate_node(it, pivot, angle);
-        rotate_node(branch, pivot, angle);
+        //rotate_node(branch, pivot, angle);
 
     }
 
@@ -1460,6 +1463,24 @@ int count_overlaps(const rna_tree::iterator it1, const rna_tree::iterator it2){
             for (auto ch = it2.begin(); ch != it2.end(); ++ch){
                 sum += count_overlaps(it1, ch);
             }
+            if (it2.number_of_children() > 1) {
+                rectangle bo;
+                for (auto it = it2.begin(); it != it2.end(); it++) {
+                    if (it->paired()) {
+                        bo += rectangle(it->at(0).p, it->at(1).p);
+                    } else {
+                        bo += rectangle(it->at(0).p, it->at(0).p);
+                    }
+                }
+
+                for (auto it = rna_tree::iterator(it1.begin()) ; it != it1.end(); ++it ) {
+                    /*if (bo.has(it->at(0).p)) sum += 1;
+                    if (it->paired() && bo.has(it->at(1).p)) sum += 1;*/
+                    if (bo_overlap(it->get_bounding_objects(), vector<rectangle>{bo})) {
+                        sum += it->paired() ? 2 : 1;
+                    }
+                }
+            }
         }
     }
 
@@ -1515,7 +1536,7 @@ void reposition_branch(rna_tree &rna, rna_tree::post_order_iterator it, rna_tree
     std::vector<int> angles;
     int ix_zero_angle = -1;
 
-    for (int angle = -90, ix = 0; angle <= 90; angle += 10, ix++) {
+    for (int angle = -180, ix = 0; angle <= 180 ; angle += 10, ix++) {
         angles.push_back(angle);
         if (angle == 0) ix_zero_angle = ix;
     }
@@ -1546,6 +1567,7 @@ void reposition_branch(rna_tree &rna, rna_tree::post_order_iterator it, rna_tree
             rotate_branch_by_angle(rna, it, angles[ix_angle]);
 
             int cnt_overlaps = count_overlaps(it, root);
+            // cout << cnt_overlaps << endl;
 
             // if the number of overlaps is minimum, prefer zero rotation (that could happen in multiple
             // mirrored angles lead to zero (or other minimum number) overlaps)
@@ -1602,11 +1624,26 @@ void compact::reposition_branches() {
 
     rna.update_bounding_boxes();
 
+    auto root = rna.begin();
+    vector<pair<iterator, int>> to_reposition;
     for (auto it = rna.begin_post(); it != rna.end_post(); ++it){
         if (is_repositionable(it)) {
-            reposition_branch(rna, it, rna.begin());
+            int cnt_overlaps = count_overlaps(it, root);
+            if (cnt_overlaps > rna.size(it) * 0.2) {
+                to_reposition.push_back(make_pair(it, rna.size(it)));
+            }
         }
     }
+
+    std::sort(to_reposition.begin(), to_reposition.end(), [](const auto &x, const auto &y)
+    {
+        return x.second < y.second;
+    });
+
+    for(auto tr:to_reposition){
+        reposition_branch(rna, tr.first, rna.begin());
+    }
+
 
     set_53_labels(rna);
 }

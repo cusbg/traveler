@@ -2067,7 +2067,7 @@ void tree<T, tree_node_allocator>::iterator_base::skip_children(bool skip)
    }
 
 template <class T, class tree_node_allocator>
-unsigned int tree<T, tree_node_allocator>::iterator_base::number_of_children() const
+    unsigned int tree<T, tree_node_allocator>::iterator_base::number_of_children() const
 	{
 	tree_node *pos=node->first_child;
 	if(pos==0) return 0;

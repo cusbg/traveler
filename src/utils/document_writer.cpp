@@ -448,7 +448,6 @@ std::string document_writer::get_rna_formatted(
                                                rna_tree rna,
                                                const numbering_def& numbering) const
 {
-    rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
     return
      get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post())
      +
