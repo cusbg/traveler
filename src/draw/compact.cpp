@@ -1635,7 +1635,7 @@ void compact::reposition_branches() {
         }
     }
 
-    std::sort(to_reposition.begin(), to_reposition.end(), [](const auto &x, const auto &y)
+    std::sort(to_reposition.begin(), to_reposition.end(), [](const pair<iterator, int> &x, const pair<iterator, int> &y)
     {
         return x.second < y.second;
     });
