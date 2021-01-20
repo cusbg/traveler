@@ -411,6 +411,7 @@ void rna_tree::compute_distances()
     dist = 0;
     point p, p_prev;
     vector<double> dists;
+    vector<double> stem_dists;
     for (pre_post_order_iterator it = ++this->begin_pre_post(); it != this->end_pre_post(); ++it, ++cnt){
         if (it.node->parent == NULL) {
             //the artificial root
@@ -420,6 +421,11 @@ void rna_tree::compute_distances()
         if (cnt) {
             dists.push_back(distance(p_prev, p));
             dist += distance(p_prev, p);
+
+            auto parent = it.node->parent;
+            if (it->paired() && parent->first_child == parent->last_child){
+                stem_dists.push_back(distance(p_prev, p));
+            }
         }
         p_prev = p;
 
@@ -427,6 +433,8 @@ void rna_tree::compute_distances()
     distances.seq_distance_avg = dist/(double)cnt;
     distances.seq_distance_median = median<double>(dists);
     distances.seq_distance_min = *std::min_element(dists.begin(), dists.end());
+
+    distances.stem_seq_distance_median = median<double>(stem_dists);
 
 
     // cout << "distances: " << distances.seq_distance_avg << "," << distances.seq_distance_median << "," << distances.seq_distance_min;

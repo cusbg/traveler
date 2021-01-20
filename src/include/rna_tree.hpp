@@ -157,6 +157,10 @@ public:
     {
         return distances.seq_distance_min;
     }
+    double get_stem_seq_distance_median() const
+    {
+        return distances.stem_seq_distance_median;
+    }
 
     void update_bounding_boxes(bool leafs_have_size = false);
 
@@ -201,6 +205,11 @@ private:
          * minimum distance between sequence-neighboring reisudes
          */
         double seq_distance_min;
+
+        /**
+         * median distance between sequence-neighboring reisudes in stems (these tend not to be influenced by possibly long distances in unpaired regions)
+         */
+        double stem_seq_distance_median;
 
     } distances;
 };

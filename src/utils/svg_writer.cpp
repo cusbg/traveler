@@ -382,7 +382,7 @@ std::string svg_writer::create_style_definitions(rna_tree& rna) const
         vector<style> styles;
     };
 
-    double line_stroke_width = rna.get_seq_distance_median() / 18;
+    double line_stroke_width = rna.get_stem_seq_distance_median() / 5;
 
     vector<element> elements;
     elements.push_back({"text", {}});
@@ -436,7 +436,7 @@ std::string svg_writer::create_style_definitions(rna_tree& rna) const
     out << endl;
 
     out << "text.numbering-label {fill: rgb(204, 204, 204);}" << endl;
-    out << "line.numbering-line {stroke: rgb(204, 204, 204);}" << endl;
+    out << "line.numbering-line {stroke: rgb(204, 204, 204); stroke-width: " << line_stroke_width / 2 << ";}" << endl;
     out << "text.background {fill: rgb(255, 255, 255);" << endl;
 
     out << ".template {visibility:hidden}";
@@ -454,7 +454,8 @@ std::string svg_writer::get_header_element(rna_tree& rna)
 
     TRACE("scale %s, bl %s, tr %s", get_scaling_ratio(), bl, tr);
 
-    double font_size = rna.get_seq_distance_median();
+    //double font_size = rna.get_seq_distance_median();
+    double font_size = rna.get_stem_seq_distance_median() * 1.2;
     set_font_size(font_size);
 
     out
