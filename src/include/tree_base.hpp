@@ -99,6 +99,8 @@ public:
     /* + pre_post_order iterators && reverse_post_order_iterators */
     inline pre_post_order_iterator begin_pre_post();
     inline pre_post_order_iterator end_pre_post();
+    inline pre_post_order_iterator begin_rev_pre_post();
+    inline pre_post_order_iterator end_rev_pre_post();
     inline reverse_post_order_iterator begin_rev_post();
     inline reverse_post_order_iterator end_rev_post();
     

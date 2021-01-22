@@ -1,7 +1,7 @@
 /*
  * File: tree_base_iter.hpp
  *
- * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>
+ * Copyright (C) 2016 Richard Eliáš <richard.elias@matfyz.cz>, 2021 David Hoksza <david.hoksza@mff.cuni.cz>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -50,6 +50,8 @@ public:
     
     _pre_post_order_iterator    operator++(int);
     _pre_post_order_iterator&   operator++();
+    _pre_post_order_iterator    operator--(int);
+    _pre_post_order_iterator&   operator--();
     
     inline bool preorder() const;
     inline size_t label_index() const;
@@ -119,11 +121,20 @@ tree_base<label_type>::_pre_post_order_iterator::operator++(int)
 }
 
 template <typename label_type>
+typename tree_base<label_type>::_pre_post_order_iterator
+tree_base<label_type>::_pre_post_order_iterator::operator--(int)
+{
+    _pre_post_order_iterator other = *this;
+    --(*this);
+    return other;
+}
+
+template <typename label_type>
 typename tree_base<label_type>::_pre_post_order_iterator&
 tree_base<label_type>::_pre_post_order_iterator::operator++()
 {
     // if preorder, go unltil i am leaf, then become postorder
-    // if postorder and have next sibling, became him, and become preorder
+    // if postorder and have next sibling, become him, and become preorder
 
     if (!_paired_leaf) {
         if (_preorder)
@@ -175,6 +186,53 @@ tree_base<label_type>::_pre_post_order_iterator::operator++()
 
     }
     
+    return *this;
+}
+
+template <typename label_type>
+typename tree_base<label_type>::_pre_post_order_iterator&
+tree_base<label_type>::_pre_post_order_iterator::operator--()
+{
+    if (!_paired_leaf) {
+        if (_preorder)
+        {
+            if (this->node->prev_sibling == nullptr) {
+                *this = base_iterator(this->node->parent);
+                _preorder = true;
+            }
+            else {
+                *this = base_iterator(this->node->prev_sibling);
+                _preorder = false;
+            }
+        }
+        else
+        {
+            if (is_leaf(*this)) {
+                if (this->node->prev_sibling == nullptr) {
+                    *this = base_iterator(this->node->parent);
+                    _preorder = true;
+                } else {
+                    *this = base_iterator(this->node->prev_sibling); //this will be either another leaf or postorder part of a base pair
+                    _preorder = false;
+                }
+            } else {
+                *this = base_iterator(this->node->last_child); //this will be either another leaf or postorder part of a base pair
+                _preorder = false;
+            }
+        }
+    } else {
+        if (!_preorder) {
+            _preorder = false;
+        } else {
+            if (this->node->prev_sibling == nullptr){
+                *this = base_iterator(this->node->parent);
+            } else {
+                *this = base_iterator(this->node->prev_sibling);
+                _preorder = false;
+            }
+        }
+    }
+
     return *this;
 }
 
@@ -279,6 +337,20 @@ typename tree_base<label_type>::pre_post_order_iterator
 tree_base<label_type>::end_pre_post()
 {
     return ++pre_post_order_iterator(begin(), false);
+}
+
+template <typename label_type>
+typename tree_base<label_type>::pre_post_order_iterator
+tree_base<label_type>::begin_rev_pre_post()
+{
+    return pre_post_order_iterator(begin(), false);
+}
+
+template <typename label_type>
+typename tree_base<label_type>::pre_post_order_iterator
+tree_base<label_type>::end_rev_pre_post()
+{
+    return --pre_post_order_iterator(begin(), true);
 }
 
 template <typename label_type>

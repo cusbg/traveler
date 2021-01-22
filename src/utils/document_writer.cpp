@@ -121,7 +121,7 @@ rectangle get_label_bb(point p, int number, float residue_distance){
     while (number != 0) { number /= 10; cnt_digits++; }
 
     // THe following is approximate
-    point dim = point(cnt_digits * residue_distance * 0.6,  residue_distance * 1.5);
+    point dim = point(cnt_digits * residue_distance * 1,  residue_distance * 1.7);
 
     return rectangle(p - dim / 2, p + dim /2);
 }
@@ -211,6 +211,15 @@ std::string document_writer::get_numbering_formatted(
         const std::vector<std::pair<point, point>> lines,
         const numbering_def& numbering) const
 {
+    /*
+     * The position of the label differs based on whether the residue is paired or not.
+     * If it is paired, the idea is to position it in the direction of the base pair facing away
+     * from the paired residue.
+     * If the residue is not paired, it is expected to be a part of a loop and then it should lay
+     * on a line connecting the residue and the center of the loop.
+     * If the position where it should be placed intersects another residue, a grid around the point is search
+     * to identify a better, non-intersecting, position.
+     */
     auto  found = std::find (numbering.positions.begin(), numbering.positions.end(), ix);
     if (!(found != numbering.positions.end() || (ix > 0 && ix % numbering.interval == 0))){
         return "";
