@@ -217,8 +217,7 @@ std::string document_writer::get_numbering_formatted(
      * from the paired residue.
      * If the residue is not paired, it is expected to be a part of a loop and then it should lay
      * on a line connecting the residue and the center of the loop.
-     * If the position where it should be placed intersects another residue, a grid around the point is search
-     * to identify a better, non-intersecting, position.
+     * In each case, the position is perpendicular to a line connecting previous and next residue.
      */
     auto  found = std::find (numbering.positions.begin(), numbering.positions.end(), ix);
     if (!(found != numbering.positions.end() || (ix > 0 && ix % numbering.interval == 0))){
@@ -227,25 +226,35 @@ std::string document_writer::get_numbering_formatted(
 
     ostringstream out;
 
-    point v, p1;
+    rna_tree::pre_post_order_iterator it_prev = --rna_tree::pre_post_order_iterator(it);
+    rna_tree::pre_post_order_iterator it_next = ++rna_tree::pre_post_order_iterator(it);
+    point p_it = it->at(it.label_index()).p;
+    point p_prev = it_prev->at(it_prev.label_index()).p;
+    point p_next = it_next->at(it_next.label_index()).p;
+    point p_center = center(p_prev, p_next);
+    point v_perp = normalize(orthogonal(p_prev - p_next));
+
     if (it->paired()){
-        p1 = it->at(it.label_index()).p;
-        point p2 = it->at(1 - it.label_index()).p;
-        v = normalize(p1 - p2);
+        point p_other = it->at(1-it.label_index()).p;
+        if (distance(p_center + v_perp, p_other) < distance(p_center - v_perp, p_other)) {
+            v_perp = -v_perp;
+        }
     } else {
         auto it_parent = rna_tree::parent(rna_tree::iterator(it));
-        point center = get_loop_center(it_parent);
-        p1 = it->at(0).p;
-        v = normalize(p1 - center);
+        point par_center = get_loop_center(it_parent);
+        if (distance(p_center + v_perp, par_center) < distance(p_center - v_perp, par_center)) {
+            v_perp = -v_perp;
+        }
     }
 
-    auto p = p1 + v * residue_distance * 3;
+    auto p = p_center + v_perp * residue_distance * 3;
     rectangle bb = get_label_bb(p, ix, residue_distance);
     if (rect_overlaps(bb, pos_residues) or rect_overlaps(bb, lines)) {
 //            p += normalize(v) * residue_distance * 3;
-        p = sample_relevant_space(bb, p, v, residue_distance, pos_residues, lines);
+        p = sample_relevant_space(bb, p, v_perp, residue_distance, pos_residues, lines);
         bb = get_label_bb(p, ix, residue_distance);
     }
+
 
     rna_label l;
     for (int i = 0; i < 2; ++i) {
@@ -269,9 +278,9 @@ std::string document_writer::get_numbering_formatted(
 
         out << get_label_formatted(l, label_class, label_info());
 
-        point p1_p = normalize(p - p1) ;
-        point isec = bb.intersection(p1, p);
-        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, -1, -1,  false, line_class);
+        point p_it_p = normalize(p - p_it) ;
+        point isec = bb.intersection(p, p_it);
+        out << get_line_formatted(p_center + p_it_p * residue_distance/2, isec, -1, -1,  false, line_class);
     }
 
     return out.str();
