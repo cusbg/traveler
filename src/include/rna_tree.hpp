@@ -136,9 +136,9 @@ public:
     {
         return distances.pairs_distance;
     }
-    double get_pair_base_distance() const
+    double get_base_pair_distance() const
     {
-        return distances.pair_base_distance;
+        return distances.base_pair_distance;
     }
     double get_loops_bases_distance() const
     {
@@ -188,7 +188,7 @@ private:
         /**
          * average distance between bases in a  basepair - C <-> G
          */
-        double pair_base_distance;
+        double base_pair_distance;
         /**
          * average distance between unpaired bases in loops
          */

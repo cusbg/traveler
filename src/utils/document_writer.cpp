@@ -413,15 +413,19 @@ double document_writer::get_scaling_ratio() const{
 }
 
 void document_writer::set_scaling_ratio(rna_tree& rna){
-//    auto bp_dist = rna.get_pair_base_distance();
+//    auto bp_dist = rna.get_base_pair_distance();
 //    scaling_ratio = 20 / bp_dist;
         this->settings.scaling_ratio = 1;
 };
 
 void document_writer::set_font_size(double size){
-//    auto bp_dist = rna.get_pair_base_distance();
+//    auto bp_dist = rna.get_base_pair_distance();
 //    scaling_ratio = 20 / bp_dist;
     this->settings.font_size = size;
+};
+
+inline double document_writer::get_font_size() const{
+    return this->settings.font_size;
 };
 
 std::string document_writer::get_rna_background_formatted(

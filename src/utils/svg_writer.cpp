@@ -158,7 +158,7 @@ struct svg_writer::style
 //    letter.y = LETTER.y; // scale.y;
 
     margin = point(100,100);
-//    auto bp_dist = rna.get_pair_base_distance();
+//    auto bp_dist = rna.get_base_pair_distance();
 //    scaling_ratio = 20 / bp_dist;
 //    scale = point(scaling_ratio , scaling_ratio);
 //    scale = point(8, 8);
@@ -170,6 +170,17 @@ struct svg_writer::style
 
     letter.x = dimensions.x;// / scale.x;
     letter.y = dimensions.y; // scale.y;
+
+    //double font_size = rna.get_seq_distance_median();
+    double font_size = rna.get_stem_seq_distance_median() * 1.2;
+    double bp_distance = rna.get_base_pair_distance();
+    // If the image is small, the font can be too big which can be recognized by basically not seeing the base pairs
+    // as all the space between bpaired residues is covered by the residue letters. If that is the case, the font
+    // size is modified
+    if ( abs(bp_distance - font_size) / bp_distance < 0.3){
+        font_size = 0.3 * bp_distance;
+    }
+    set_font_size(font_size);
 
     print(get_header_element(rna));
     print(create_style_definitions(rna));
@@ -382,7 +393,7 @@ std::string svg_writer::create_style_definitions(rna_tree& rna) const
         vector<style> styles;
     };
 
-    double line_stroke_width = rna.get_stem_seq_distance_median() / 5;
+    double line_stroke_width = get_font_size() / 5;
 
     vector<element> elements;
     elements.push_back({"text", {}});
@@ -454,17 +465,13 @@ std::string svg_writer::get_header_element(rna_tree& rna)
 
     TRACE("scale %s, bl %s, tr %s", get_scaling_ratio(), bl, tr);
 
-    //double font_size = rna.get_seq_distance_median();
-    double font_size = rna.get_stem_seq_distance_median() * 1.2;
-    set_font_size(font_size);
-
     out
     << "<svg"
     << "\n\t" << property("xmlns", "http://www.w3.org/2000/svg")
     << "\n\t" << property("width", msprintf("%f", letter.x))
     << "\n\t" << property("height", msprintf("%f", letter.y))
 //    << "\n\t" << get_styles({{"font-size",  "7px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
-    << "\n\t" << get_styles({{"font-size",  to_string(font_size) + "px"}, {"font-weight", "bold"}, {"font-family", "Helvetica"}})
+    << "\n\t" << get_styles({{"font-size",  to_string(get_font_size()) + "px"}, {"font-weight", "bold"}, {"font-family", "Helvetica"}})
     << ">"
     << endl;
     

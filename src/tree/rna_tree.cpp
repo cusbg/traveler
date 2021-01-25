@@ -29,7 +29,7 @@
 
 using namespace std;
 
-#define PAIRS_DISTANCE get_pair_base_distance()
+#define PAIRS_DISTANCE get_base_pair_distance()
 #define BASES_DISTANCE get_pairs_distance()
 
 inline static std::vector<rna_pair_label> convert(
@@ -382,7 +382,7 @@ void rna_tree::compute_distances()
         dist += distance(it->at(0).p, it->at(1).p);
         ++cnt;
     }
-    distances.pair_base_distance = dist / (double)cnt;
+    distances.base_pair_distance = dist / (double)cnt;
     
     // distance between unpaired bases in loops
     cnt = 0;
@@ -441,7 +441,7 @@ void rna_tree::compute_distances()
     
     INFO("Distances: pairs %s, pairbase %s, loops %s, sequence %s, sequence-median %s",
          distances.pairs_distance,
-         distances.pair_base_distance,
+         distances.base_pair_distance,
          distances.loops_bases_distance,
          distances.seq_distance_avg,
          distances.seq_distance_median);

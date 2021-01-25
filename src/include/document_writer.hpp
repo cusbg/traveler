@@ -170,6 +170,7 @@ public:
 
     virtual void set_scaling_ratio(rna_tree& rna);
     virtual void set_font_size(double size);
+    virtual double get_font_size() const;
     
 protected:
     virtual std::string get_line_formatted(

@@ -31,7 +31,7 @@ using namespace std;
 
 #define MULTIBRANCH_MINIMUM_SPLIT   10
 
-#define PAIRS_DISTANCE rna.get_pair_base_distance()
+#define PAIRS_DISTANCE rna.get_base_pair_distance()
 #define BASES_DISTANCE rna.get_pairs_distance()
 
 compact::compact(
