@@ -30,16 +30,28 @@ string traveler_writer::get_circle_formatted(point centre, double radius) const
     return "";
 }
 
-string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color, const label_info li) const
+string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color, const rna_pair_label::status_type status, const label_info li) const
 {
-    return get_label_formatted(label, color.get_name(), li);
+
+    return get_label_formatted(label, color.get_name(), status, li);
 }
 
-string traveler_writer::get_label_formatted(const rna_label& label, const std::string& clazz, const label_info li) const
+string traveler_writer::get_label_formatted(const rna_label& label, const std::string& clazz, const rna_pair_label::status_type status, const label_info li) const
 {
     ostringstream out;
 
-    out << "<point x=\"" << label.p.x << "\" y=\"" << label.p.y << "\" b=\"" << label.label << "\" id=\""<< li.ix << "\"/>"
+    out << "<point x=\"" << label.p.x << "\" y=\"" << label.p.y << "\" b=\"" << label.label
+        << "\" status=\"" << get_status_name(status) << "\" color=\"" << clazz << "\"";// nt=\"" << li.is_nt << "\"";
+
+
+    if (li.is_nt == 0) {
+        out << " associatedId=\"" << li.ix <<  "\"";
+
+    } else {
+        out << " id=\"" << li.ix <<  "\"";
+
+    }
+    out << "/>"
         << endl;
 
     return out.str();
@@ -57,9 +69,12 @@ string traveler_writer::get_line_formatted(point from, point to, const int ix_fr
     if (from.bad() || to.bad()) return "";
 
     out << "<line fromX=\"" << from.x << "\" fromY=\"" << from.y << "\" toX=\"" << to.x << "\" toY=\""
-        << to.y << "\" bp=\"" << int(is_base_pair) << "\"";
+        << to.y << "\"";// bp=\"" << int(is_base_pair) << "\"";
     if (is_base_pair) {
         out << " fromIx=\"" << ix_from << "\" toIx=\"" << ix_to << "\"";
+    } else {
+        out << " associatedId=\"" << ix_to << "\"";
+
     }
     out << "/>" << endl;
 

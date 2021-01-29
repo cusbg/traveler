@@ -58,12 +58,34 @@ class SETTINGS:
     LABEL_FONT_SIZE = 8
     LABEL_LINE_THICKNESS = 0.2
 
+class COLOR:
+    BLACK = "000000"
+    RED = "FF0000"
+    GREEN = "00FF00"
+    BLUE = "0000FF"
+    BROWN = "231709"
+
+
 class Residue:
     def __init__(self, attrs):
         self.x = float(attrs['x'])
         self.y = float(attrs['y'])
         self.label = attrs['b']
         self.id = attrs['id']
+        self.color = attrs['color']
+
+
+def residue_color(r: Residue) -> str:
+    if r.color.upper() == "BLACK":
+        return COLOR.BLACK
+    if r.color.upper() == "RED":
+        return COLOR.RED
+    if r.color.upper() == "GREEN":
+        return COLOR.GREEN
+    if r.color.upper() == "BLUE":
+        return COLOR.BLUE
+    if r.color.upper() == "brown":
+        return COLOR.BROWN
 
 
 class Label:
@@ -91,8 +113,8 @@ class BasePair:
         self.y1 = attrs['fromY']
         self.x2 = attrs['toX']
         self.y2 = attrs['toY']
-        self.id1 = attrs['fromIx']
-        self.id2 = attrs['toIx']
+        self.id1 = int(attrs['fromIx'])
+        self.id2 = int(attrs['toIx'])
 
 class Structure:
     def __init__(self, residues: List[Residue], labels: List[Label], bps: List[BasePair]):
@@ -101,11 +123,9 @@ class Structure:
         self.base_pairs: List[BasePair] = bps
 
     def get_center(self) -> List:
-        center = [0, 0]
-        for r in self.residues:
-            center[0] += r.x
-            center[1] += r.y
-        return [center[0]/len(self.residues), center[1]/len(self.residues)]
+        xs = [r.x for r in self.residues]
+        ys = [r.y for r in self.residues]
+        return [(max(xs) + min(xs)) / 2, (max(ys) + min(ys)) / 2]
 
 
 def get_structure(xml_root) -> Structure:
@@ -153,7 +173,7 @@ def convert_to_xrna(name: str, structure: Structure) -> str:
     # Header
     center = structure.get_center()
     xrna = "<ComplexDocument Name='{}'>\n".format(name)
-    xrna += "<SceneNodeGeom CenterX='{}' CenterY='{}' />\n".format(center[0], center[1])
+    xrna += "<SceneNodeGeom CenterX='{}' CenterY='{}' />\n".format(-center[0], -center[1])
     xrna += "<Complex Name='{}'>\n".format(name)
     xrna += "<RNAMolecule Name='{}'>\n".format(name)
 
@@ -165,7 +185,20 @@ def convert_to_xrna(name: str, structure: Structure) -> str:
 
     #Nuc
 
-    xrna += "<Nuc RefIDs='1-{}' Color='0' FontID='0' FontSize='{}' />\n".format(len(structure.residues)+1, SETTINGS.RESIDUE_FONT_SIZE)
+    # xrna += "<Nuc RefIDs='1-{}' Color='0' FontID='0' FontSize='{}' />\n".format(len(structure.residues)+1, SETTINGS.RESIDUE_FONT_SIZE)
+
+    color_prev = None
+    ix_prev = 1
+    ix = 0
+    for r in structure.residues:
+        ix += 1
+        color = residue_color(r)
+        if color != color_prev and color_prev is not None:
+            xrna += "<Nuc RefIDs='{}-{}' Color='{}' FontID='0' FontSize='{}' />\n".format(ix_prev, ix - 1, color_prev, SETTINGS.RESIDUE_FONT_SIZE)
+            ix_prev = ix
+        color_prev = color
+    xrna += "<Nuc RefIDs='{}-{}' Color='{}' FontID='0' FontSize='{}' />\n".format(ix_prev, ix - 1, color_prev, SETTINGS.RESIDUE_FONT_SIZE)
+
     xrna += "<Nuc RefIDs='1-{}' IsSchematic='false' SchematicColor='0' SchematicLineWidth='1.5' SchematicBPLineWidth='1.0' />\n".format(len(structure.residues)+1)
     # xrna += "<Nuc RefID='120' FormatType='9' />\n"
     for l in structure.labels:
@@ -180,9 +213,9 @@ def convert_to_xrna(name: str, structure: Structure) -> str:
 
     # Basepair Helixes
 
-    xrna += "<BasePairs nucID='1' length='10' bpNucID='119' />\n"
+    # xrna += "<BasePairs nucID='1' length='10' bpNucID='119' />\n"
     for bp in structure.base_pairs:
-        xrna += "<BasePairs nucID='{}' length='1' bpNucID='{}' />\n".format(bp.id1, bp.id2)
+        xrna += "<BasePairs nucID='{}' length='1' bpNucID='{}' />\n".format(bp.id1+1, bp.id2+1)
 
     # Footer
     xrna += "</RNAMolecule>\n"
@@ -190,6 +223,15 @@ def convert_to_xrna(name: str, structure: Structure) -> str:
     xrna += "</ComplexDocument>\n"
 
     return xrna
+
+
+def process_settings():
+    if args.residue_font_size:
+        SETTINGS.RESIDUE_FONT_SIZE = int(args.residue_font_size)
+    if args.residue_font_size:
+        SETTINGS.LABEL_FONT_SIZE = int(args.label_font_size)
+    if args.residue_font_size:
+        SETTINGS.LABEL_LINE_THICKNESS = float(args.label_line)
 
 
 def main():
@@ -213,6 +255,21 @@ if __name__ == '__main__':
                         metavar='FILE',
                         help="Output file name for the XRNA-formatted layout. "
                              "If non entered, the standard output will be used.")
+    parser.add_argument("-rfs", "--residue-font-size",
+                        required=False,
+                        default=SETTINGS.RESIDUE_FONT_SIZE,
+                        metavar='INT',
+                        help="Residue font size")
+    parser.add_argument("-lfs", "--label-font-size",
+                        required=False,
+                        default=SETTINGS.LABEL_FONT_SIZE,
+                        metavar='INT',
+                        help="Label font size")
+    parser.add_argument("-ll", "--label-line",
+                        required=False,
+                        default=SETTINGS.LABEL_LINE_THICKNESS,
+                        metavar='FLOAT',
+                        help="Label line thickness size")
 
     args = parser.parse_args()
 
@@ -221,4 +278,5 @@ if __name__ == '__main__':
         format='%(asctime)s [%(levelname)s] %(module)s - %(message)s',
         datefmt='%H:%M:%S')
 
+    process_settings()
     main()
