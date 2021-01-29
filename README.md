@@ -1,8 +1,10 @@
-# traveler - Template-based RnA VisuaLization
+# Traveler - Template-based RnA VisuaLization
 
 Visualization of RNA secondary structure using a template visualization (currently [Comparative RNA Web (CRW) Site](http://www.rna.icmb.utexas.edu/) postscripts and [VARNA](http://varna.lri.fr/) SVG formats are supported). The first  version of Traveler was developed by Richard Elias (and still the abosulte majority of the code is his work) and the original repository should be accessible at  https://github.com/rikiel/traveler .
 
 The following three images show what Traveler is good for. The first image is the visualization of 18S human rRNA from CRW, follows the correct visualization of Amblyospora bracteata's (AB) 18s rRNA (as downloaded from CRW) and the third image shows how Traveler visualizes the AB's 18s when given its secondary structure together with human rRNA secondary structure and visualization in postscript as a template.
+
+Traveler is used by RNACentral for visualization of all the secondary structures available in RNACentral. See the [R2DT](https://github.com/rnacentral/r2dt) project for details.
 
 ```
 $ mkdir test
