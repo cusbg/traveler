@@ -215,7 +215,7 @@ def convert_to_xrna(name: str, structure: Structure) -> str:
 
     # Basepair Helixes
 
-    xrna += "<BasePairs nucID='1' length='10' bpNucID='119' />\n"
+    # xrna += "<BasePairs nucID='1' length='10' bpNucID='119' />\n"
     for bp in structure.base_pairs:
         xrna += "<BasePairs nucID='{}' length='1' bpNucID='{}' />\n".format(bp.id1+1, bp.id2+1)
 
