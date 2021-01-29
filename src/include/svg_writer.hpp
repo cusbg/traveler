@@ -47,10 +47,12 @@ public: // formatters
     virtual std::string get_label_formatted(
                                             const rna_label& label,
                                             const RGB& color,
+                                            const rna_pair_label::status_type status,
                                             const label_info li) const;
     virtual std::string get_label_formatted(
             const rna_label& label,
             const std::string& clazz,
+            const rna_pair_label::status_type status,
             const label_info li) const;
     
 protected:
@@ -83,7 +85,7 @@ private:
                                const std::string& name,
                                const properties& properties,
                                const std::string& value = "",
-                               const label_info li = label_info(-1, "", -1, "")) const;
+                               const label_info li = label_info(-1, "", -1, "", true)) const;
 //    std::string create_element(
 //            const std::string& name,
 //            const properties& properties,

@@ -273,3 +273,16 @@ const point & rna_pair_label::get_parent_center()
 void rna_pair_label::set_p(const point _p, const size_t index) {
     this->at(index).p  =_p;
 }
+
+std::string get_status_name(const rna_pair_label::status_type type){
+    std::string types[] = {"untouched",
+                           "",
+                           "edited",
+                           "deleted",
+                           "inserted",
+                           "reinserted",
+                           "rotated",
+                           "pair_changed"};
+    return types[type];
+}
+

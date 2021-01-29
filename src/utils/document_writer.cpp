@@ -64,7 +64,7 @@ bool RGB::operator==(
     image_writers vec;
     vec.emplace_back(new svg_writer());
     // vec.emplace_back(new ps_writer());
-    if (!use_colors) {
+    if (use_colors) {
         vec.emplace_back(new traveler_writer());
     }
     
@@ -258,11 +258,14 @@ std::string document_writer::get_numbering_formatted(
         l.label = label;
         l.p = p;
 
-        out << get_label_formatted(l, label_class, label_info());
+        label_info li = label_info();
+        li.ix = ix;
+        li.is_nt = false;
+        out << get_label_formatted(l, label_class, it->status, li);
 
         point p1_p = normalize(p - p1) ;
         point isec = bb.intersection(p1, p);
-        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, -1, -1,  false, line_class);
+        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, -1, ix,  false, line_class);
     }
 
     return out.str();
@@ -276,8 +279,9 @@ std::string document_writer::get_label_formatted(
     
     ostringstream out;
 
+    //TODO: refactor -  superfluous passing of color and status at the same time
     out
-    << get_label_formatted(it->at(it.label_index()), get_default_color(it->status), li);
+    << get_label_formatted(it->at(it.label_index()), get_default_color(it->status), it->status, li);
 
     if (it->paired() &&
         it.preorder() &&
@@ -377,11 +381,11 @@ std::string document_writer::get_rna_subtree_formatted(
     auto print =
     [&rna, &out, &seq_ix, &residues_positions, &lines, &numbering, this](rna_tree::pre_post_order_iterator it)
     {
-        out << get_numbering_formatted(it, seq_ix, rna.get_pairs_distance(), residues_positions, lines, numbering);
         out << get_label_formatted(it, {seq_ix,
                                         it->at(it.label_index()).tmp_label,
                                         it->at(it.label_index()).tmp_ix,
                                         it->at(it.label_index()).tmp_numbering_label});
+        out << get_numbering_formatted(it, seq_ix, rna.get_pairs_distance(), residues_positions, lines, numbering);
         seq_ix++;
     };
     
@@ -418,7 +422,7 @@ std::string document_writer::get_rna_background_formatted(
         if (p1.bad() || p2.bad())
             continue;
 
-        point diff_orig = p2 - p1;
+        point diff_orig = p2 - p1;f
 
         point tmp = rna_tree::base_pair_edge_point(p1, p2, get_scaling_ratio());
         p2 = rna_tree::base_pair_edge_point(p2, p1, get_scaling_ratio());
