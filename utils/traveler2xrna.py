@@ -227,6 +227,15 @@ def convert_to_xrna(name: str, structure: Structure) -> str:
     return xrna
 
 
+def process_settings():
+    if args.residue_font_size:
+        SETTINGS.RESIDUE_FONT_SIZE = int(args.residue_font_size)
+    if args.residue_font_size:
+        SETTINGS.LABEL_FONT_SIZE = int(args.label_font_size)
+    if args.residue_font_size:
+        SETTINGS.LABEL_LINE_THICKNESS = float(args.label_line)
+
+
 def main():
     fn = args.input
     fname = os.path.basename(fn)
@@ -248,6 +257,21 @@ if __name__ == '__main__':
                         metavar='FILE',
                         help="Output file name for the XRNA-formatted layout. "
                              "If non entered, the standard output will be used.")
+    parser.add_argument("-rfs", "--residue-font-size",
+                        required=False,
+                        default=SETTINGS.RESIDUE_FONT_SIZE,
+                        metavar='INT',
+                        help="Residue font size")
+    parser.add_argument("-lfs", "--label-font-size",
+                        required=False,
+                        default=SETTINGS.LABEL_FONT_SIZE,
+                        metavar='INT',
+                        help="Label font size")
+    parser.add_argument("-ll", "--label-line",
+                        required=False,
+                        default=SETTINGS.LABEL_LINE_THICKNESS,
+                        metavar='FLOAT',
+                        help="Label line thickness size")
 
     args = parser.parse_args()
 
@@ -256,4 +280,5 @@ if __name__ == '__main__':
         format='%(asctime)s [%(levelname)s] %(module)s - %(message)s',
         datefmt='%H:%M:%S')
 
+    process_settings()
     main()
