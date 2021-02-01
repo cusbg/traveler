@@ -422,7 +422,7 @@ std::string document_writer::get_rna_background_formatted(
         if (p1.bad() || p2.bad())
             continue;
 
-        point diff_orig = p2 - p1;f
+        point diff_orig = p2 - p1;
 
         point tmp = rna_tree::base_pair_edge_point(p1, p2, get_scaling_ratio());
         p2 = rna_tree::base_pair_edge_point(p2, p1, get_scaling_ratio());
