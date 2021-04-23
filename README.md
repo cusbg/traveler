@@ -286,3 +286,13 @@ python3 ~/git/traveler/utils/infernal2mapping.py -i target.traveler.afa > target
 If you use Traveler in your research, please cite:
 * Elias, R., & Hoksza, D. (2017). TRAVeLer: a tool for template-based RNA secondary structure visualization. BMC Bioinformatics, 18(1), 487.
 * Eliás, R., & Hoksza, D. (2016). Rna secondary structure visualization using tree edit distance. International Journal of Bioscience, Biochemistry and Bioinformatics, 6(1), 9.
+
+## Support
+
+<p align="center">
+  <img src="img/logo-elixir.png" />
+</p>
+
+PrankWeb is a part of services provided by ELIXIR – European research infrastructure for biological information.
+See [services](https://www.elixir-czech.cz/services) provided [ELIXIR's Czech Republic Node](https://www.elixir-czech.cz/).
+
