@@ -35,7 +35,7 @@ using namespace std;
 #define COLOR_DEFAULT       RGB::BLACK
 
 // initialize RGB constants:
-const RGB RGB::RED = RGB(1., 0., 0., "red");
+const RGB RGB::RED = RGB(1., 0., 1., "red"); //changed to magenta
 const RGB RGB::GREEN = RGB(0., 1., 0., "green");
 const RGB RGB::BLUE = RGB(0., 0., 1., "blue");
 const RGB RGB::BLACK = RGB(0., 0., 0., "black");
