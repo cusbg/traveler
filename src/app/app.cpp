@@ -262,7 +262,8 @@ rna_tree app::create_matched(
     try
     {
         fasta f = read_fasta_file(fastafile);
-        return rna_tree(f.brackets, f.labels, f.id);
+
+        return rna_tree(f.brackets, f.constraints, f.labels, f.id);
     }
     catch (const my_exception& e)
     {
@@ -283,7 +284,7 @@ rna_tree app::create_templated(
         fasta f = read_fasta_file(fastafile);
         doc->adjust_residues_lists(f.brackets.size());
 
-        auto rna = rna_tree(f.brackets, doc->labels, doc->points, f.id);
+        auto rna = rna_tree(f.brackets, f.constraints, doc->labels, doc->points, f.id);
         rna.update_numbering_labels(doc->numbering_labels);
         return rna;
     }

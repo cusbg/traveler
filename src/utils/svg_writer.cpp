@@ -245,10 +245,11 @@ struct svg_writer::style
                                                          int ix_from,
                                                          int ix_to,
                                                          bool is_base_pair,
+                                                         bool is_predicted,
                                                          const RGB& color) const
 {
 
-    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, color.get_name());
+    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, is_predicted, color.get_name());
 }
 
 /* virtual */ std::string svg_writer::get_line_formatted(
@@ -257,14 +258,22 @@ struct svg_writer::style
         int ix_from,
         int ix_to,
         bool is_base_pair,
+        bool is_predicted,
         const std::string& clazz) const
 {
     properties out;
 
+    std::stringstream ssClazz;
+
+    ssClazz << clazz;
+    if (is_predicted) {
+        ssClazz << " predicted";
+    }
+
     out
             << get_point_formatted(from, "", "1")
             << get_point_formatted(to, "", "2")
-            << property("class", clazz);
+            << property("class", ssClazz.str());
 
     return create_element("line", out);
 }
@@ -425,6 +434,7 @@ std::string svg_writer::create_style_definitions() const
 
     out << "text.numbering-label {fill: rgb(204, 204, 204);}" << endl;
     out << "line.numbering-line {stroke: rgb(204, 204, 204);}" << endl;
+    out << "line.predicted {stroke: rgb(128, 128, 128); stroke-dasharray: 2}" << endl;
 
     out << ".template {visibility:hidden}";
     

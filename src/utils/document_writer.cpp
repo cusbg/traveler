@@ -25,6 +25,8 @@
 //#include "ps_writer.hpp"
 #include "traveler_writer.hpp"
 
+#include <iostream>
+
 using namespace std;
 
 #define COLOR_DELETE        RGB::GRAY
@@ -84,7 +86,8 @@ std::string document_writer::get_edge_formatted(
                                                 point to,
                                                 const int ix_from,
                                                 const int ix_to,
-                                                bool is_base_pair
+                                                bool is_base_pair,
+                                                bool is_predicted
                                                 ) const
 {
     if (from.bad() || to.bad())
@@ -92,6 +95,7 @@ std::string document_writer::get_edge_formatted(
         WARN("Cannot draw line between bad points");
         return "";
     }
+
     if (is_base_pair)
     {
         point tmp = rna_tree::base_pair_edge_point(from, to);
@@ -99,7 +103,7 @@ std::string document_writer::get_edge_formatted(
         from = tmp;
     }
     
-    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, RGB::BLACK);
+    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, is_predicted, RGB::BLACK);
 }
 
 bool rect_overlaps(const rectangle &r, const std::vector<point> &points ){
@@ -265,7 +269,7 @@ std::string document_writer::get_numbering_formatted(
 
         point p1_p = normalize(p - p1) ;
         point isec = bb.intersection(p1, p);
-        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, -1, ix,  false, line_class);
+        out << get_line_formatted(p1 + p1_p * residue_distance/2, isec, -1, ix,  false, false, line_class);
     }
 
     return out.str();
@@ -289,7 +293,8 @@ std::string document_writer::get_label_formatted(
         !rna_tree::is_root(it))
     {
         out
-        << get_edge_formatted(it->at(0).p, it->at(1).p, it->at(0).seq_ix, it->at(1).seq_ix, true);
+        << get_edge_formatted(it->at(0).p, it->at(1).p, it->at(0).seq_ix, it->at(1).seq_ix,
+                              true, it->is_de_novo_predicted());
     }
 
     auto x = out.str();
@@ -436,7 +441,7 @@ std::string document_writer::get_rna_background_formatted(
         int ix2 = prev->at(prev.label_index()).seq_ix;
 
         //If the edge points cross, then the line should not be drawn at all
-        if (diff.x > 0 && diff.y > 0) out << get_line_formatted(p1, p2, ix1, ix2, false, RGB::GRAY);
+        if (diff.x > 0 && diff.y > 0) out << get_line_formatted(p1, p2, ix1, ix2, false, false, RGB::GRAY);
     }
     
     return out.str();

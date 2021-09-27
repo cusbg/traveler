@@ -15,9 +15,9 @@ $ bin/traveler \
 ```
 
 <div>
-  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/human.png" width="30%"/>
-  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/A_bracteata.png" width="30%"/>
-  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/eab.colored.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/human.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/A_bracteata.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/eab.colored.png" width="30%"/>
 </div>
 
 
@@ -25,7 +25,7 @@ $ bin/traveler \
 - gcc with support of c++11
 
 ## Download:
-Use `git clone https://github.com/davidhoksza/traveler` to download project
+Use `git clone https://github.com/cusbg/traveler` to download project
 
 ## Build:
 	cd traveler/src
@@ -280,6 +280,29 @@ python3 ~/git/traveler/utils/infernal2mapping.py -i target.traveler.afa > target
 ~/git/traveler/bin/traveler --target-structure target.fasta --template-structure --file-format traveler template.layout template.fasta --draw target.map target
 
 ```
+
+## Providing information about the target structure
+
+In case of homology-based modeling, RNA structure is predicted in two steps; i) carrying over
+structure within conserved regions from template, and ii) de-novo prediction of the unconserved
+regions. Typically, one have substantially more confidence in the predictions in the conserved
+regions. Therefore, it make sense to be able to visualy distinguish base pairs predicted de novo
+from those which were copied over from the template. This information can be provided in the 
+template FASTA file in the optional fourth line. 
+
+```
+>structure predicted via constraint folding
+CAUCCGCAGGUGCCCCUAGAAAAAAAUUGUGCCUAGGACCCCCCUGCGCGAGGGGUAG 
+((.(((.(((....))).(((.....))...((..((.....))..)))...))).))
+---*--------------------------------------------------*---
+```
+
+In the above structure, the CG basepair was predicted de novo and not carried over from the template.
+This will be depicted in the resulting SVG as a dotted gray line between the respective bases.
+
+<p align="center">
+ <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/constraint-folding.jpg" width="80%"/>
+</p>
 
 
 ## Citation:

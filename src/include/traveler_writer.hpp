@@ -41,6 +41,7 @@ protected:
                                            int ix_from,
                                            int ix_to,
                                            bool is_base_pair,
+                                           bool is_predicted,
                                            const RGB& color) const;
     virtual std::string get_line_formatted(
             point from,
@@ -48,6 +49,7 @@ protected:
             int ix_from,
             int ix_to,
             bool is_base_pair,
+            bool is_predicted,
             const std::string& clazz) const;
         
 

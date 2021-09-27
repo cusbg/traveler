@@ -39,6 +39,14 @@ rna_pair_label::rna_pair_label(
                                const std::string& s)
 {
     labels.push_back({s, "", -1, "", point::bad_point()});
+    de_novo_predicted = false;
+}
+
+rna_pair_label::rna_pair_label(
+        const std::string& s,
+        const bool de_novo) : rna_pair_label(s)
+{
+    de_novo_predicted = de_novo;
 }
 
 const rna_label& rna_pair_label::operator[](
@@ -106,6 +114,12 @@ rna_pair_label rna_pair_label::operator+(
     rna_pair_label out;
     out.labels.push_back(labels.back());
     out.labels.push_back(other.labels.back());
+
+    if (de_novo_predicted != other.de_novo_predicted) {
+        throw illegal_state_exception("Problem with the provided constraint. Both base paired residues should be be either copied over or de-novo predicted");
+    }
+
+    out.de_novo_predicted = de_novo_predicted;
     
     return out;
 }

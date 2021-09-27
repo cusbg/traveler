@@ -68,6 +68,8 @@ public:
     rna_pair_label() = default;
     rna_pair_label(
                    const std::string& s);
+    rna_pair_label(
+            const std::string& s, const bool de_novo);
     bool operator==(
                     const rna_pair_label& other) const;
     rna_pair_label operator+(
@@ -102,6 +104,10 @@ public:
      * returns point between bases in pair. If signle pase is present, returns its position
      */
     point center() const;
+
+    inline bool is_de_novo_predicted() const{
+        return de_novo_predicted;
+    }
     
     void clear_points();
     /**
@@ -147,6 +153,8 @@ public:
     void set_node_ix_in_source(int source_ix){
         this->source_ix = source_ix;
     }
+
+
     
 public:
     status_type status = untouched;
@@ -154,6 +162,7 @@ public:
     
 private:
     std::vector<rna_label> labels;
+    bool de_novo_predicted; //information about whether a base-pair in the target was predicted de novo or copied over from template
     point parent_center;
     std::vector<rectangle> bounding_objects;
     int source_ix = 0; //node index in the source tree (template)
