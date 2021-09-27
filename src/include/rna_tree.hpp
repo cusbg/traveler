@@ -146,7 +146,7 @@ public:
 
     void update_labels_seq_ix();
 
-    inline bool has_folding_info() { return folding_info }
+    inline bool has_folding_info() { return folding_info; }
 
 private:
     /**
