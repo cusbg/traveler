@@ -172,13 +172,13 @@ struct svg_writer::style
     letter.y = dimensions.y; // scale.y;
 
     //double font_size = rna.get_seq_distance_median();
-    double font_size = rna.get_stem_seq_distance_median() * 1.2;
+    double font_size = rna.get_seq_distance_min() * 1.2;
     double bp_distance = rna.get_base_pair_distance();
     // If the image is small, the font can be too big which can be recognized by basically not seeing the base pairs
     // as all the space between bpaired residues is covered by the residue letters. If that is the case, the font
     // size is modified
-    if ( abs(bp_distance - font_size) / bp_distance < 0.3){
-        font_size = 0.3 * bp_distance;
+    if ( abs(bp_distance - font_size) / bp_distance < 0.5){
+        font_size = 0.25 * bp_distance;
     }
     set_font_size(font_size);
 
@@ -395,7 +395,7 @@ std::string svg_writer::create_style_definitions(rna_tree& rna) const
         vector<style> styles;
     };
 
-    double line_stroke_width = get_font_size() / 5;
+    double line_stroke_width = get_font_size() / 8;
 
     vector<element> elements;
     elements.push_back({"text", {}});
