@@ -70,6 +70,23 @@ bool contains_one_of(
         throw io_exception("write_file(%s) failed", filename);
 }
 
+/* inline, local */ std::string trim(
+        std::string s)
+{
+#define WHITESPACES " \t\n\r\f\v"
+    size_t pos;
+
+    pos = s.find_first_not_of(WHITESPACES);
+    if (pos != s.npos   )
+        s.erase(0, pos);
+    pos = s.find_last_not_of(WHITESPACES);
+    if (pos != s.npos)
+        s.erase(pos + 1);
+
+    return s;
+}
+
+
 /* global */ fasta read_fasta_file(
                                    const std::string& filename)
 {
@@ -77,7 +94,7 @@ bool contains_one_of(
         throw io_exception("read_file(%s) failed, file does not exist", filename);
     
     ifstream in(filename);
-    ostringstream labels, brackets;
+    ostringstream labels, brackets, constraints;
     string id, line;
     
     while(true)
@@ -114,13 +131,27 @@ bool contains_one_of(
         }
         if (contains_one_of(line, "[{(.)}]"))
             brackets << line;
+        else if (contains_one_of(line, "*-"))
+            constraints << line;
         else
             labels << line;
     }
     fasta f;
     f.id = id;
-    f.brackets = brackets.str();
-    f.labels = labels.str();
+    f.brackets = trim(brackets.str());
+    f.labels = trim(labels.str());
+    f.constraints = trim(constraints.str());
+
+    if (f.brackets.size() != f.labels.size()) {
+        throw wrong_argument_exception(
+                std::string("\nNumber of brackets != Number of labels\nBrackets: " + f.brackets + "\nLabels:   "+f.labels).c_str());
+    }
+
+    if (!f.constraints.empty() && f.brackets.size() != f.constraints.size()) {
+        std::ostringstream out;
+        throw wrong_argument_exception(
+                std::string("\nNumber of brackets != Number of constraints\nBrackets: " + f.brackets + "\nConstraints:   " + f.constraints).c_str());
+    }
     
     DEBUG("%s", to_cstr(f));
     return f;

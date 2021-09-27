@@ -26,6 +26,7 @@
 
 #define LABELS          "1234565731"
 #define BRACKETS        "(.(.(.).))"
+#define CONSTRAINTS     ""
 
 #define LABELS_DEL      "134565731"
 #define BRACKETS_DEL    "((.(.).))"
@@ -45,7 +46,7 @@ void rna_tree_test::run()
 
     typedef rna_tree::iterator iterator;
 
-    rna_tree rna(BRACKETS, LABELS);
+    rna_tree rna(BRACKETS, CONSTRAINTS, LABELS);
     iterator it;
 
     assert_equals(rna.get_labels(), LABELS);

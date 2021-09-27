@@ -32,6 +32,7 @@ struct fasta
     std::string id;
     std::string brackets;
     std::string labels;
+    std::string constraints; //to be used when the structure was predicted via constraint folding - * positions denote which base pairs were predicted de novo
     
     friend std::ostream& operator<<(std::ostream& out, fasta f);
 };

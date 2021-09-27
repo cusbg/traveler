@@ -33,21 +33,23 @@ using namespace std;
 #define BASES_DISTANCE get_pairs_distance()
 
 inline static std::vector<rna_pair_label> convert(
-                                                  const std::string& labels);
-
-inline static std::string trim(
-                               std::string s);
-
+                                                  const std::string& labels,
+                                                  const std::string& constraints);
 
 rna_tree::rna_tree(
                    const std::string& _brackets,
+                   const std::string& _constraints,
                    const std::string& _labels,
                    const std::string& _name)
 : tree_base<rna_pair_label>(
-                            trim(_brackets), convert(trim(_labels))), _name(_name)
+                            _brackets, convert(_labels, _constraints)), _name(_name)
 {
     set_postorder_ids();
     distances = {0xBADF00D, 0xBADF00D, 0xBADF00D};
+
+    if (!_constraints.empty()) {
+        folding_info = true;
+    }
     
     DEBUG("Tree '%s:%s' was constructed, size=%s;\n%s",
           id(), name(), size(), print_tree(false));
@@ -55,10 +57,11 @@ rna_tree::rna_tree(
 
 rna_tree::rna_tree(
                    const std::string& _brackets,
+                   const std::string& _constraints,
                    const std::string& _labels,
                    const std::vector<point>& _points,
                    const std::string& _name)
-: rna_tree(_brackets, _labels, _name)
+: rna_tree(_brackets, _constraints, _labels, _name)
 {
     update_points(_points);
 
@@ -73,14 +76,16 @@ void rna_tree::set_name(
 
 
 /* inline, local */ std::vector<rna_pair_label> convert(
-                                                        const std::string& labels)
+                                                        const std::string& labels,
+                                                        const std::string& constraints
+                                                        )
 {
     vector<rna_pair_label> vec;
     
     vec.reserve(labels.size());
-    
+
     for (size_t i = 0; i < labels.size(); ++i)
-        vec.emplace_back(labels.substr(i, 1));
+        vec.emplace_back(rna_pair_label(labels.substr(i, 1), constraints[i] == '*'));
     
     return vec;
 }
@@ -515,23 +520,6 @@ rna_tree::iterator child_by_index(rna_tree::iterator parent, size_t index) {
         index--; it++;
     }
     return it;
-}
-
-
-/* inline, local */ std::string trim(
-                                     std::string s)
-{
-#define WHITESPACES " \t\n\r\f\v"
-    size_t pos;
-    
-    pos = s.find_first_not_of(WHITESPACES);
-    if (pos != s.npos   )
-        s.erase(0, pos);
-    pos = s.find_last_not_of(WHITESPACES);
-    if (pos != s.npos)
-        s.erase(pos + 1);
-    
-    return s;
 }
 
 

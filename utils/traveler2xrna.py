@@ -84,7 +84,7 @@ def residue_color(r: Residue) -> str:
         return COLOR.GREEN
     if r.color.upper() == "BLUE":
         return COLOR.BLUE
-    if r.color.upper() == "brown":
+    if r.color.upper() == "BROWN":
         return COLOR.BROWN
 
 

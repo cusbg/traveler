@@ -43,10 +43,12 @@ public:
     rna_tree() = default;
     rna_tree(
              const std::string& _brackets,
+             const std::string& _constraints,
              const std::string& _labels,
              const std::string& _name = "");
     rna_tree(
              const std::string& _brackets,
+             const std::string& _constraints,
              const std::string& _labels,
              const std::vector<point>& _points,
              const std::string& _name = "");
@@ -170,15 +172,18 @@ public:
 
     void update_labels_seq_ix();
 
-public:
+    inline bool has_folding_info() { return folding_info; }
+
     /**
      * Compute distances between pairs and distances between unpaired bases in loops
      * as average distance from rna
      */
     void compute_distances();
+
     
 private:
     std::string _name;
+    bool folding_info = false; //whether the user provided line in the FASTA telling which bps were predicted de-novo and which were carried over from template
     struct
     {
         /**

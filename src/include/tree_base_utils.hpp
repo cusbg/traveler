@@ -42,14 +42,6 @@ tree_base<label_type>::tree_base(
                                  const labels_array& _labels)
 {
     APP_DEBUG_FNAME;
-    
-
-    if (_brackets.size() != _labels.size()) {
-        std::ostringstream out;
-        for (int i = 0; i < _labels.size(); ++i) out << _labels[i].at(0).label;
-        throw wrong_argument_exception(
-                std::string("\nNumber of brackets != Number of labels\nBrackets: " + _brackets + "\nLabels:   "+out.str()).c_str());
-    }
 
     iterator it;
     size_t i = 0;

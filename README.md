@@ -1,8 +1,8 @@
 # Traveler - Template-based RnA VisuaLization
 
-Visualization of RNA secondary structure using a template visualization (currently [Comparative RNA Web (CRW) Site](http://www.rna.icmb.utexas.edu/) postscripts and [VARNA](http://varna.lri.fr/) SVG formats are supported). The first  version of Traveler was developed by Richard Elias (and still the abosulte majority of the code is his work) and the original repository should be accessible at  https://github.com/rikiel/traveler .
+Visualization of RNA secondary structure using a template visualization (currently [Comparative RNA Web (CRW) Site](http://www.rna.icmb.utexas.edu/) postscripts and [VARNA](http://varna.lri.fr/) SVG formats are supported). The first  version of Traveler was developed by Richard Elias (and still the absolulte majority of the code is his work) and the original repository should be accessible at  https://github.com/rikiel/traveler .
 
-The following three images show what Traveler is good for. The first image is the visualization of 18S human rRNA from CRW, follows the correct visualization of Amblyospora bracteata's (AB) 18s rRNA (as downloaded from CRW) and the third image shows how Traveler visualizes the AB's 18s when given its secondary structure together with human rRNA secondary structure and visualization in postscript as a template.
+The following three images show the purpose of Traveler. The first image is the visualization of 18S human rRNA from CRW, follows the correct visualization of Amblyospora bracteata's (AB) 18s rRNA (as downloaded from CRW) and the third image shows how Traveler visualizes the AB's 18s when given its secondary structure together with human rRNA secondary structure and visualization in postscript as a template.
 
 Traveler is used by RNACentral for visualization of all the secondary structures available in RNACentral. See the [R2DT](https://github.com/rnacentral/r2dt) project for details.
 
@@ -15,9 +15,9 @@ $ bin/traveler \
 ```
 
 <div>
-  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/human.png" width="30%"/>
-  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/A_bracteata.png" width="30%"/>
-  <img src="https://raw.githubusercontent.com/davidhoksza/traveler/master/img/eab.colored.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/human.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/A_bracteata.png" width="30%"/>
+  <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/eab.colored.png" width="30%"/>
 </div>
 
 
@@ -25,7 +25,7 @@ $ bin/traveler \
 - gcc with support of c++11
 
 ## Download:
-Use `git clone https://github.com/davidhoksza/traveler` to download project
+Use `git clone https://github.com/cusbg/traveler` to download project
 
 ## Build:
 	cd traveler/src
@@ -84,7 +84,7 @@ The `traveler` executable is available in the PATH, and the current directory is
 
 	COLOR CODING:
 		Traveler uses the following color coding of nucleotides:
-		* Red - inserted bases
+		* Magenta - inserted bases
 		* Green - edited bases - e.g. the template has an adenosine at a position while the target has a cytosine at the same position and therefore cytosine will be colored green in the resulting layout)
 		* Blue - reinserted bases - happens when traveler needs to redraw simple structures like hairpins (for example due to the change in the number of bases)
 		* Brown - rotated parts - similar situation to reinserted bases, but takes place when redrawing a multibranch loop (in that case all branches need to be rotated to lie on a circle)
@@ -281,8 +281,41 @@ python3 ~/git/traveler/utils/infernal2mapping.py -i target.traveler.afa > target
 
 ```
 
+## Providing information about the target structure
+
+In case of homology-based modeling, RNA structure is predicted in two steps; i) carrying over
+structure within conserved regions from template, and ii) de-novo prediction of the unconserved
+regions. Typically, one have substantially more confidence in the predictions in the conserved
+regions. Therefore, it make sense to be able to visualy distinguish base pairs predicted de novo
+from those which were copied over from the template. This information can be provided in the 
+template FASTA file in the optional fourth line. 
+
+```
+>structure predicted via constraint folding
+CAUCCGCAGGUGCCCCUAGAAAAAAAUUGUGCCUAGGACCCCCCUGCGCGAGGGGUAG 
+((.(((.(((....))).(((.....))...((..((.....))..)))...))).))
+---*--------------------------------------------------*---
+```
+
+In the above structure, the CG basepair was predicted de novo and not carried over from the template.
+This will be depicted in the resulting SVG as a dotted gray line between the respective bases.
+
+<p align="center">
+ <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/constraint-folding.jpg" width="80%"/>
+</p>
+
 
 ## Citation:
 If you use Traveler in your research, please cite:
 * Elias, R., & Hoksza, D. (2017). TRAVeLer: a tool for template-based RNA secondary structure visualization. BMC Bioinformatics, 18(1), 487.
 * Eliás, R., & Hoksza, D. (2016). Rna secondary structure visualization using tree edit distance. International Journal of Bioscience, Biochemistry and Bioinformatics, 6(1), 9.
+
+## Support
+
+<p align="center">
+  <img src="img/logo-elixir.png" />
+</p>
+
+PrankWeb is a part of services provided by ELIXIR – European research infrastructure for biological information.
+See [services](https://www.elixir-czech.cz/services) provided [ELIXIR's Czech Republic Node](https://www.elixir-czech.cz/).
+
