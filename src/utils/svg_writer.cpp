@@ -459,7 +459,7 @@ std::string svg_writer::create_style_definitions(rna_tree& rna) const
 
     out << "text.numbering-label {fill: rgb(204, 204, 204);}" << endl;
     out << "line.numbering-line {stroke: rgb(204, 204, 204); stroke-width: " << line_stroke_width / 2 << ";}" << endl;
-    out << "line.predicted {stroke: rgb(128, 128, 128); stroke-dasharray: 2}" << endl;
+    out << "line.predicted {stroke: rgb(0, 0, 0); stroke-dasharray: 2}" << endl;
     out << "text.background {fill: rgb(255, 255, 255);" << endl;
 
     out << ".template {visibility:hidden}";
