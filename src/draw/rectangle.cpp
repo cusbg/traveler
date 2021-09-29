@@ -23,6 +23,7 @@
 #include "rectangle.hpp"
 
 #include <cmath>
+#include <cassert>
 
 using namespace std;
 
@@ -144,7 +145,7 @@ int orientation(point p, point q, point r)
 //https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
 // The main function that returns true if line segment 'p1q1'
 // and 'p2q2' intersect.
-bool lines_intersect(point p1, point q1, point p2, point q2)
+bool lines_intersect(const point p1, const point q1, const point p2, const point q2)
 {
     // Find the four orientations needed for general and
     // special cases
@@ -207,7 +208,10 @@ point rectangle::intersection(const point& p1, const point& p2) const{
     if (lines_intersect(p1, p2, get_top_left(), get_top_right() ) ) return lines_intersection_point (p1, p2, get_top_left(), get_top_right() );
     if (lines_intersect(p1, p2, get_top_right(), get_bottom_right() ) ) return lines_intersection_point (p1, p2, get_top_right(), get_bottom_right() );
     if (lines_intersect(p1, p2, get_bottom_right(), get_bottom_left() ) ) return lines_intersection_point (p1, p2, get_bottom_right(), get_bottom_left() );
-    if (lines_intersect(p1, p2, get_top_left(), get_bottom_left() ) ) return lines_intersection_point (p1, p2, get_top_left(), get_bottom_left() );
+    //if (lines_intersect(p1, p2, get_top_left(), get_bottom_left() ) ) return lines_intersection_point (p1, p2, get_top_left(), get_bottom_left() );
+    return lines_intersection_point (p1, p2, get_top_left(), get_bottom_left() );
+
+//    assert(false);
 
 }
 

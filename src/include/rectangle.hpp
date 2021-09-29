@@ -62,6 +62,8 @@ public:
 
 };
 
+bool lines_intersect(point p1, point q1, point p2, point q2);
+
 
 // other useful functions for points
 

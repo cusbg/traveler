@@ -120,65 +120,99 @@ bool rect_overlaps(const rectangle &r, const std::vector<pair<point, point>> &li
     return false;
 }
 
-rectangle get_label_bb(point p, int number, float residue_distance){
+rectangle get_label_bb(point p, int number, float font_size){
     int cnt_digits = 0;
     while (number != 0) { number /= 10; cnt_digits++; }
 
-    // THe following is approximate
-    point dim = point(cnt_digits * residue_distance * 1,  residue_distance * 1.7);
+    // The following is approximate *(font_size approximately corresponds to the height, and width is 0.6*height)
+    point dim = point(cnt_digits * font_size * 0.6, font_size);
 
     return rectangle(p - dim / 2, p + dim /2);
 }
 
+float isLeft( point P0, point P1, point P2 )
+{
+    return ( (P1.x - P0.x) * (P2.y - P0.y) - (P2.x - P0.x) * (P1.y - P0.y) );
+}
+
+bool pointInRect(point rect[], point P)
+{
+    //taken from https://gamedev.stackexchange.com/questions/110229/how-do-i-efficiently-check-if-a-point-is-inside-a-rotated-rectangle
+
+    return (isLeft(rect[0], rect[1], P) > 0 && isLeft(rect[1], rect[2], P) > 0 && isLeft(rect[2], rect[3], P) > 0 && isLeft(rect[3], rect[0], P) > 0);
+}
+
 point sample_relevant_space(rectangle &r, point &p_start, point &dir, float grid_density,
         const vector<point> &resiue_points,
-        const vector<pair<point, point>> &lines){
+        const vector<pair<point, point>> &lines,
+        const point &p_label){
 
-    point p_min = point(p_start.x, p_start.y), p_max = point(p_start.x, p_start.y);
     point dir_ortho = orthogonal(dir);
     vector<point> grid_points;
 
-    auto add_grid_point =
-            [&p_min, &p_max, &grid_points](point p)
-            {
-                p_min.x = min(p_min.x, p.x);
-                p_min.y = min(p_min.y, p.y);
-                p_max.x = max(p_max.x, p.x);
-                p_max.y = max(p_max.y, p.y);
+    const double iMax = 10;
+    const double iStep = 0.5;
+    const double jMax = 5;
+    const double jStep = 0.5;
 
-                grid_points.push_back(p);
-            };
-
-    for (int i = 0; i < 10; i++) {
-        point center = p_start + dir * i * grid_density ;
-        add_grid_point(center);
-        for (int j = 1; j <= 10; ++j) {
-            add_grid_point(center + dir_ortho * j * grid_density);
-            add_grid_point(center - dir_ortho * j * grid_density);
-        } 
+    // Generate points in a rectangle of which the p_start is in the middle of the "bottom" line
+    // The grid points are stored in the vector in the preferred order, so that later, the first grid point
+    // which passes conditions will be returned.
+    for (double i = 0; i < iMax; i += iStep) {
+        point p = p_start + dir * i * grid_density;
+        double j = 0;
+        while (j <= jMax) {
+            grid_points.push_back(p + dir_ortho * j * grid_density);
+            if (j > 0) grid_points.push_back(p - dir_ortho * j * grid_density);
+            j += jStep;
+        }
     }
 
-    point r_dim = abs(r.get_bottom_right() - r.get_top_left());
+    // Get the rectangle of the grid, in order to determin residue points and lines which are part of the
+    // grid (plus som padding). This is done to speed up later intersection checking so that it is not done
+    // for every grid point and _every_ residue poin/line
+    point grid_rect[] = {point(p_start - dir * grid_density - (jMax + 1) * dir_ortho * grid_density),
+                         point(p_start - dir * grid_density + (jMax + 1) * dir_ortho * grid_density),
+                         point(p_start + dir * (iMax + 1) * grid_density + (jMax + 1) * dir_ortho * grid_density),
+                         point(p_start + dir * (iMax + 1) * grid_density - (jMax + 1) * dir_ortho * grid_density)};
+
     vector<point> residue_points_in_grid;
-    rectangle grid_rect = rectangle(p_min - r_dim, p_max + r_dim);
-    for (point p: resiue_points){
-        if (grid_rect.has(p)){
-            residue_points_in_grid.push_back(p);
+    for (auto rp: resiue_points){
+        if ( pointInRect(grid_rect, rp)){
+            residue_points_in_grid.push_back(rp);
         }
     }
 
     vector<pair<point, point>> lines_in_grid;
     for (auto l: lines){
-        if (grid_rect.has(l.first) || grid_rect.has(l.second)){
+        if ( pointInRect(grid_rect, l.first) || pointInRect(grid_rect, l.second)){
             lines_in_grid.push_back(l);
         }
     }
 
     for (point p: grid_points) {
-        rectangle r_candidate = rectangle(p - r_dim/2, p + r_dim/2);
-        if (!rect_overlaps(r_candidate, residue_points_in_grid) && !rect_overlaps(r_candidate, lines_in_grid)) {
-            return p;
+        bool cont = true;
+        //do not consider grid points which are close to any residue point
+        for (auto rp: residue_points_in_grid) {
+            if (distance(rp, p) < grid_density){
+                cont = false;
+            };
         }
+        if (!cont) continue;
+
+        cont = true;
+        //do not consider lines which intersect with line connecting the grid point and the label point
+        for (auto l: lines_in_grid) {
+            if (lines_intersect(p_label, p_start, l.first, l.second)) {
+                cont = false;
+                break;
+            }
+        }
+
+        if (!cont) continue;
+
+        //return the first grid point which passes
+        return p;
     }
 
     return p_start;
@@ -221,7 +255,7 @@ std::string document_writer::get_numbering_formatted(
      * from the paired residue.
      * If the residue is not paired, it is expected to be a part of a loop and then it should lay
      * on a line connecting the residue and the center of the loop.
-     * In each case, the position is perpendicular to a line connecting previous and next residue.
+     * In each case, the position is perpendicular to a line connecting the previous and the next residue.
      */
     auto  found = std::find (numbering.positions.begin(), numbering.positions.end(), ix);
     if (!(found != numbering.positions.end() || (ix > 0 && ix % numbering.interval == 0))){
@@ -251,12 +285,14 @@ std::string document_writer::get_numbering_formatted(
         }
     }
 
-    auto p = p_center + v_perp * residue_distance * 3;
-    rectangle bb = get_label_bb(p, ix, residue_distance);
+
+    float grid_density = 1.5 * get_font_size();
+    auto p = p_it + v_perp * grid_density;
+    rectangle bb = get_label_bb(p, ix, get_font_size());
     if (rect_overlaps(bb, pos_residues) or rect_overlaps(bb, lines)) {
 //            p += normalize(v) * residue_distance * 3;
-        p = sample_relevant_space(bb, p, v_perp, residue_distance, pos_residues, lines);
-        bb = get_label_bb(p, ix, residue_distance);
+        p = sample_relevant_space(bb, p, v_perp, grid_density, pos_residues, lines, p_it);
+        bb = get_label_bb(p, ix, get_font_size());
     }
 
 
@@ -285,9 +321,8 @@ std::string document_writer::get_numbering_formatted(
         li.is_nt = false;
         out << get_label_formatted(l, label_class, it->status, li);
 
-        point p_it_p = normalize(p - p_it) ;
         point isec = bb.intersection(p, p_it);
-        out << get_line_formatted(p_center + p_it_p * residue_distance/2, isec, -1, ix,  false, false, line_class);
+        out << get_line_formatted(p_it + v_perp * get_font_size() * 0.6 , isec, -1, ix,  false, false, line_class);
     }
 
     return out.str();
@@ -398,7 +433,7 @@ std::string document_writer::get_rna_subtree_formatted(
                                                        const numbering_def& numbering) const
 {
     ostringstream out;
-    vector<point> residues_positions = vector<point>();//get_residues_positions(rna);
+    vector<point> residues_positions = get_residues_positions(rna);
     vector<pair<point, point>> lines = get_lines(rna);
     int seq_ix = 0;
     auto print =
@@ -408,7 +443,7 @@ std::string document_writer::get_rna_subtree_formatted(
                                         it->at(it.label_index()).tmp_label,
                                         it->at(it.label_index()).tmp_ix,
                                         it->at(it.label_index()).tmp_numbering_label});
-        out << get_numbering_formatted(it, seq_ix, rna.get_pairs_distance(), residues_positions, lines, numbering);
+        out << get_numbering_formatted(it, seq_ix, rna.get_seq_distance_median(), residues_positions, lines, numbering);
         seq_ix++;
     };
     
@@ -430,6 +465,7 @@ void document_writer::set_scaling_ratio(rna_tree& rna){
 void document_writer::set_font_size(double size){
 //    auto bp_dist = rna.get_base_pair_distance();
 //    scaling_ratio = 20 / bp_dist;
+
     this->settings.font_size = size;
 };
 
