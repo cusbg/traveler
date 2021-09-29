@@ -287,7 +287,7 @@ std::string document_writer::get_numbering_formatted(
 
 
     float grid_density = 1.5 * get_font_size();
-    auto p = p_it + v_perp * grid_density;
+    auto p = p_it + v_perp * grid_density * 1.5;
     rectangle bb = get_label_bb(p, ix, get_font_size());
     if (rect_overlaps(bb, pos_residues) or rect_overlaps(bb, lines)) {
 //            p += normalize(v) * residue_distance * 3;

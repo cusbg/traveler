@@ -93,9 +93,6 @@ void rna_tree::set_name(
     return vec;
 }
 
-
-
-
 void rna_tree::update_points(
                              const vector<point>& points)
 {
