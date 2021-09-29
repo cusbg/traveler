@@ -116,7 +116,7 @@ rna_pair_label rna_pair_label::operator+(
     out.labels.push_back(other.labels.back());
 
     if (de_novo_predicted != other.de_novo_predicted) {
-        throw illegal_state_exception("Problem with the provided constraint. Both base paired residues should be be either copied over or de-novo predicted");
+        throw illegal_state_exception("Constraint line issue. Both base paired residues should be be either copied over or de-novo predicted");
     }
 
     out.de_novo_predicted = de_novo_predicted;

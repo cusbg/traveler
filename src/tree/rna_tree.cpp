@@ -84,8 +84,11 @@ void rna_tree::set_name(
     
     vec.reserve(labels.size());
 
-    for (size_t i = 0; i < labels.size(); ++i)
-        vec.emplace_back(rna_pair_label(labels.substr(i, 1), constraints[i] == '*'));
+    for (size_t i = 0; i < labels.size(); ++i) {
+        bool de_novo = false;
+        if (!constraints.empty() && constraints[i] == '*') de_novo = true;
+        vec.emplace_back(rna_pair_label(labels.substr(i, 1), de_novo));
+    }
     
     return vec;
 }

@@ -65,7 +65,10 @@ public:
     };
     
 public:
-    rna_pair_label() = default;
+    rna_pair_label() {
+        de_novo_predicted = false;
+    }
+
     rna_pair_label(
                    const std::string& s);
     rna_pair_label(
