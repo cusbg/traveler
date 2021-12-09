@@ -752,7 +752,7 @@ void compact::init_multibranch(
         return n;
     };
     auto rotate_subtree =
-    [this](sibling_iterator root, point center, point p1, point p2)
+    [this, is_root](sibling_iterator root, point center, point p1, point p2)
     {
         //root is the root of the subtree to be rotated
         //points p1 and p2 are positions of where it should be positioned
@@ -762,11 +762,17 @@ void compact::init_multibranch(
         //are added to the remake_ids list which is handled later in compact::make
         if (init_branch_recursive(root, center).bad())
         {
-            rna_tree::for_each_in_subtree(root,
-                                          [](iterator iter)
-                                          {
-                                              rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
-                                          });
+            if (!is_root) {
+                /*
+                 * If this is called in the root, it means there was insertion of a base pair in the root which connected
+                 * previously disconnected 5' and 3' end. In such a case the whole structure would be denoted to remake,
+                 * thus all of its loops and inner loops would be remade which is wrong.
+                 */
+                rna_tree::for_each_in_subtree(root,
+                                              [](iterator iter) {
+                                                  rna_tree::parent(iter)->remake_ids.push_back(child_index(iter));
+                                              });
+            }
 
             root->set_p(p1, 0);
             root->set_p(p2, 1);
@@ -1102,12 +1108,13 @@ void compact::init_multibranch(
         }
     }
     auto set_label_status =
-    [](iterator iter)
+    [is_root](iterator iter)
     {
 #define lbl(type) rna_pair_label::type
         if (!contains({lbl(edited), lbl(deleted), lbl(inserted), lbl(reinserted)}, iter->status))
         {
-            iter->status = lbl(rotated);
+            /* If a stem is inserted directly into the root then the whole structure would basically be denoted as rotated (shown in brown). */
+            if (!is_root) iter->status = lbl(rotated);
         }
 #undef lbl
     };

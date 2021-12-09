@@ -47,8 +47,8 @@ do
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format varna ${TMP_DIR}${TMP}.svg ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
 done
 
-TGTS=( URS00008E3949_44689-DD_28S_3D )
-TMPS=( DD_28S_3D )
+TGTS=( URS00008E3949_44689-DD_28S_3D Oceanobacillus_iheyensis-EC_SSU_3D )
+TMPS=( DD_28S_3D EC_SSU_3D )
 
 for((i=0;i<${#TGTS[@]};i++))
 do

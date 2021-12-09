@@ -161,6 +161,14 @@ public:
     
 public:
     status_type status = untouched;
+    /*
+     * Positions (first childe = position 0) of childern which were somehow modified and need to be repositioned.
+     * It is filled in the mapping stage, where positions of removed children are captured as well as in the
+     * compact stage. That means that not all positions actually correspond to existing children as it also contains
+     * positions which were removed. This is how it was implemented by Richard Elias and it seems to work as
+     * still removed positions point to places where the change happened, but it is a bit fishy and should be
+     * double checked. The suspicious part is in compact::make where the code kind of depends on the children positions.
+     */
     std::vector<size_t> remake_ids;
     
 private:

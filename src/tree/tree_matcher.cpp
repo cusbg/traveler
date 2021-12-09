@@ -62,7 +62,7 @@ rna_tree& matcher::run(
 
 
     
-    mark(t1, map.get_to_remove(), rna_pair_label::deleted); //t1 is template -> remove superfluous nodes
+    mark(t1, map.get_to_remove(), rna_pair_label::deleted); //t1 is template -> remove extra nodes
     mark(t2, map.get_to_insert(), rna_pair_label::inserted); //t2 is target -> add nodes which are missing in template
 
     // T1 is a template which has removed and inserted nodes so it now fits the structure of target. To this tree

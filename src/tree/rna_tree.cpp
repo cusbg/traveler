@@ -502,6 +502,11 @@ point rna_tree::bottom_left_corner(
 
 
 
+/***
+ * Position of sib in the parent.
+ * @param sib
+ * @return
+ */
 /* global */ size_t child_index(
                                 rna_tree::sibling_iterator sib)
 {
