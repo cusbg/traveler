@@ -268,18 +268,25 @@ std::string document_writer::get_numbering_formatted(
     rna_tree::pre_post_order_iterator it_next = ++rna_tree::pre_post_order_iterator(it);
     point p_it = it->at(it.label_index()).p;
 
+    if (rna_tree::is_root(it_next)){
+        //the label would be for the 3' "residue"
+        return "";
+    }
     point p_center;
     point v_perp;
 
     point p_prev = it_prev->at(it_prev.label_index()).p;
-    if (rna_tree::is_root(it_next)){
-        p_center = p_it;
-        v_perp = normalize(orthogonal(p_prev - p_center));
-    } else {
-        point p_next = it_next->at(it_next.label_index()).p;
-        p_center = center(p_prev, p_next);
-        v_perp = normalize(orthogonal(p_prev - p_next));
-    }
+//    if (rna_tree::is_root(it_next)){
+//        p_center = p_it;
+//        v_perp = normalize(orthogonal(p_prev - p_center));
+//    } else {
+//        point p_next = it_next->at(it_next.label_index()).p;
+//        p_center = center(p_prev, p_next);
+//        v_perp = normalize(orthogonal(p_prev - p_next));
+//    }
+    point p_next = it_next->at(it_next.label_index()).p;
+    p_center = center(p_prev, p_next);
+    v_perp = normalize(orthogonal(p_prev - p_next));
 
 
 
