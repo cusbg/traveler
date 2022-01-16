@@ -195,7 +195,6 @@ size_t rna_pair_label::size() const
 
 bool rna_pair_label::paired() const
 {
-
     assert(labels.size() == 1 || labels.size() == 2);
     
     return labels.size() == 2;
