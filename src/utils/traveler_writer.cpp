@@ -15,11 +15,7 @@ streampos traveler_writer::print(const string& text)
     streampos pos = get_pos();
     
     fill();
-    
-    print_to_stream("<structure>\n");
     print_to_stream(text);
-    print_to_stream("</structure>\n");
-    
     seek_from_current_pos(sizeof("</structure>\n") -1);
     
     return pos;

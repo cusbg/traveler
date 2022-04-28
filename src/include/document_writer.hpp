@@ -53,6 +53,29 @@ struct label_info
     bool is_nt; // whether this is a nucleotide or numbering label
 };
 
+struct label_def {
+    rna_label label;
+    std::string clazz;
+    rna_pair_label::status_type status;
+    label_info li;
+};
+
+struct line_def {
+    point from;
+    point to;
+    int ix_from;
+    int ix_to;
+    bool is_base_pair;
+    bool is_predicted;
+    const std::string clazz;
+};
+
+struct labels_lines_def {
+    std::vector<label_def> label_defs;
+    std::vector<line_def> line_defs;
+};
+
+
 /**
  * class for printing visualization
  */
@@ -106,6 +129,14 @@ public: // formatters
             const std::vector<std::pair<point, point>> lines,
             const numbering_def& numbering) const;
 
+    labels_lines_def create_numbering_formatted(
+            rna_tree::pre_post_order_iterator it,
+            const int ix,
+            const float residue_distance,
+            const std::vector<point> pos_residues,
+            const std::vector<std::pair<point, point>> lines,
+            const numbering_def& numbering) const;
+
     std::string get_label_formatted(
                                     rna_tree::pre_post_order_iterator it,
                                     const label_info li) const;
@@ -128,10 +159,12 @@ public:
     std::string get_rna_background_formatted(
                                              rna_tree::pre_post_order_iterator begin,
                                              rna_tree::pre_post_order_iterator end) const;
-    std::string get_rna_formatted(
+
+    virtual std::string get_rna_formatted(
                                   rna_tree rna,
                                   const numbering_def& numbering) const;
-    std::string get_rna_subtree_formatted(
+
+    virtual std::string get_rna_subtree_formatted(
                                           rna_tree &rna,
                                           const numbering_def& numbering) const;
     
@@ -209,6 +242,10 @@ protected:
                                off_type offset);
 
     virtual double get_scaling_ratio() const;
+
+    std::vector<point> get_residues_positions(rna_tree &rna) const;
+
+    std::vector<std::pair<point, point>> get_lines(rna_tree &rna) const;
 
 private:
     void validate_stream() const;

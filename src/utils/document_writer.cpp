@@ -22,6 +22,7 @@
 
 #include "document_writer.hpp"
 #include "svg_writer.hpp"
+#include "json_writer.hpp"
 //#include "ps_writer.hpp"
 #include "traveler_writer.hpp"
 
@@ -64,6 +65,7 @@ bool RGB::operator==(
                                                         bool use_colors)
 {
     image_writers vec;
+    vec.emplace_back(new json_writer());
     vec.emplace_back(new svg_writer());
     // vec.emplace_back(new ps_writer());
     if (use_colors) {
@@ -241,7 +243,7 @@ point get_loop_center(rna_tree::iterator it) {
     return center / cnt;
 }
 
-std::string document_writer::get_numbering_formatted(
+labels_lines_def document_writer::create_numbering_formatted(
         rna_tree::pre_post_order_iterator it,
         const int ix,
         const float residue_distance,
@@ -257,12 +259,16 @@ std::string document_writer::get_numbering_formatted(
      * on a line connecting the residue and the center of the loop.
      * In each case, the position is perpendicular to a line connecting the previous and the next residue.
      */
+
+    vector<label_def> label_defs;
+    vector<line_def> line_defs;
+
     auto  found = std::find (numbering.positions.begin(), numbering.positions.end(), ix);
     if (!(found != numbering.positions.end() || (ix > 0 && ix % numbering.interval == 0))){
-        return "";
+        return {label_defs, line_defs};
     }
 
-    ostringstream out;
+
 
     rna_tree::pre_post_order_iterator it_prev = --rna_tree::pre_post_order_iterator(it);
     rna_tree::pre_post_order_iterator it_next = ++rna_tree::pre_post_order_iterator(it);
@@ -270,7 +276,7 @@ std::string document_writer::get_numbering_formatted(
 
     if (rna_tree::is_root(it_next)){
         //the label would be for the 3' "residue"
-        return "";
+        return {label_defs, line_defs};
     }
     point p_center;
     point v_perp;
@@ -314,6 +320,7 @@ std::string document_writer::get_numbering_formatted(
     }
 
 
+
     rna_label l;
     for (int i = 0; i < 2; ++i) {
         string label, label_class, line_class;
@@ -337,13 +344,40 @@ std::string document_writer::get_numbering_formatted(
         label_info li = label_info();
         li.ix = ix;
         li.is_nt = false;
-        out << get_label_formatted(l, label_class, it->status, li);
+        label_defs.push_back({l, label_class, it->status, li});
+        //out << get_label_formatted(l, label_class, it->status, li);
 
         point isec = bb.intersection(p, p_it);
-        out << get_line_formatted(p_it + v_perp * get_font_size() * 0.6 , isec, -1, ix,  false, false, line_class);
+        line_defs.push_back({p_it + v_perp * get_font_size() * 0.6 , isec, -1, ix,  false, false, line_class});
+        //out << get_line_formatted(p_it + v_perp * get_font_size() * 0.6 , isec, -1, ix,  false, false, line_class);
+    }
+
+    return {label_defs, line_defs};
+
+}
+
+std::string document_writer::get_numbering_formatted(
+        rna_tree::pre_post_order_iterator it,
+        const int ix,
+        const float residue_distance,
+        std::vector<point> pos_residues,
+        const std::vector<std::pair<point, point>> lines,
+        const numbering_def& numbering) const
+{
+    ostringstream out;
+
+    labels_lines_def lld = create_numbering_formatted(it, ix, residue_distance, pos_residues, lines, numbering);
+
+   for(label_def const& ld: lld.label_defs) {
+        out << get_label_formatted(ld.label, ld.clazz, ld.status, ld.li);
+    }
+
+    for(line_def const& ld: lld.line_defs) {
+        out << get_line_formatted(ld.from , ld.to, ld.ix_from, ld.ix_to, ld.is_base_pair, ld.is_predicted, ld.clazz);
     }
 
     return out.str();
+
 }
 
 std::string document_writer::get_label_formatted(
@@ -417,7 +451,7 @@ void document_writer::validate_stream() const
         throw io_exception("Writing document failed");
 }
 
-vector<point> get_residues_positions(rna_tree &rna){
+vector<point> document_writer::get_residues_positions(rna_tree &rna) const{
 
     vector<point> points;
     auto extract_point =
@@ -430,7 +464,7 @@ vector<point> get_residues_positions(rna_tree &rna){
     return points;
 }
 
-vector<pair<point, point>> get_lines(rna_tree &rna){
+vector<pair<point, point>> document_writer::get_lines(rna_tree &rna) const{
 
     vector<pair<point, point>> lines;
     auto extract_line =

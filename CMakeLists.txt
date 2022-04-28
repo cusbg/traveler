@@ -3,6 +3,7 @@ project(traveler)
 
 set(CMAKE_CXX_STANDARD 14)
 
+include_directories(assets/json)
 include_directories(src/include)
 include_directories(src/include/tests)
 include_directories(src/include/tree_hh)
@@ -47,6 +48,7 @@ add_executable(traveler
         src/include/rted.hpp
         src/include/strategy.hpp
         src/include/svg_writer.hpp
+        src/include/json_writer.hpp
         src/include/traveler_extractor.hpp
         src/include/traveler_writer.hpp
         src/include/tree_base.hpp
@@ -82,6 +84,7 @@ add_executable(traveler
         src/utils/logger.cpp
         src/utils/ps_writer.cpp
         src/utils/svg_writer.cpp
+        src/utils/json_writer.cpp
         src/utils/traveler_extractor.cpp
         src/utils/traveler_writer.cpp
         src/utils/types.cpp
