@@ -525,17 +525,18 @@ inline double document_writer::get_font_size() const{
     return this->settings.font_size;
 };
 
-std::string document_writer::get_rna_background_formatted(
-                                                          rna_tree::pre_post_order_iterator begin,
-                                                          rna_tree::pre_post_order_iterator end) const
+std::vector<line_def_rgb> document_writer::create_rna_background_formatted(
+        rna_tree::pre_post_order_iterator begin,
+        rna_tree::pre_post_order_iterator end) const
 {
     rna_tree::pre_post_order_iterator prev;
-    ostringstream out;
-    
+
+    std::vector<line_def_rgb> ld;
+
     while (++rna_tree::pre_post_order_iterator(begin) != end)
     {
         prev = begin++;
-        
+
         point p1 = prev->at(prev.label_index()).p;
         point p2 = begin->at(begin.label_index()).p;
 
@@ -557,9 +558,27 @@ std::string document_writer::get_rna_background_formatted(
         int ix2 = begin->at(begin.label_index()).seq_ix;
 
         //If the edge points cross, then the line should not be drawn at all
-        if (diff.x >= 0 && diff.y >= 0) out << get_line_formatted(p1, p2, ix1, ix2, false, false, RGB::GRAY);
+        if (diff.x >= 0 && diff.y >= 0) ld.push_back({p1, p2, ix1, ix2, false, false, RGB::GRAY});
+        //if (diff.x >= 0 && diff.y >= 0) out << get_line_formatted(p1, p2, ix1, ix2, false, false, RGB::GRAY);
     }
-    
+
+    //return out.str();
+    return ld;
+}
+
+std::string document_writer::get_rna_background_formatted(
+                                                          rna_tree::pre_post_order_iterator begin,
+                                                          rna_tree::pre_post_order_iterator end) const
+{
+
+    ostringstream out;
+
+    vector<line_def_rgb> lds = document_writer::create_rna_background_formatted(begin, end);
+
+    for(line_def_rgb const& ld: lds) {
+        out << get_line_formatted(ld.from , ld.to, ld.ix_from, ld.ix_to, ld.is_base_pair, ld.is_predicted, ld.color);
+    }
+
     return out.str();
 }
 
@@ -574,7 +593,8 @@ std::string document_writer::get_rna_formatted(
 
 void document_writer::init(
                            const std::string& filename,
-                           const std::string& suffix)
+                           const std::string& suffix,
+                           rna_tree& rna)
 {
     APP_DEBUG_FNAME;
     assert(!filename.empty());
@@ -597,6 +617,24 @@ void document_writer::init(
     if (!out.good())
         throw io_exception("Cannot open output file %s for writing.", filename);
     assert(out.good());
+
+    rna_tree::iterator root = rna.begin();
+    tr = rna_tree::top_right_corner(root);
+    bl = rna_tree::bottom_left_corner(root);
+
+    margin = point(100,100);
+    dimensions = (tr - bl) /** get_scaling_ratio()*/ + margin;
+    letter.x = dimensions.x;// / scale.x;
+    letter.y = dimensions.y; // scale.y;
+    double font_size = rna.get_seq_distance_min() * 1.2;
+    double bp_distance = rna.get_base_pair_distance();
+    // If the image is small, the font can be too big which can be recognized by basically not seeing the base pairs
+    // as all the space between base-paired residues is covered by the residue letters. If that is the case, the font
+    // size is modified
+    if ( abs(bp_distance - font_size) / bp_distance < 0.5){
+        font_size = 0.25 * bp_distance;
+    }
+    set_font_size(font_size);
 }
 
 void document_writer::seek(
@@ -652,4 +690,13 @@ void document_writer::use_colors(
 
 document_settings document_writer::get_settings() const{
     return this->settings;
+}
+
+point document_writer::map_point(const point& p, bool use_margin) const
+{
+
+    point p_new = (p - bl) * get_scaling_ratio() + (use_margin ? margin/2 : point(0,0));
+    p_new.y = letter.y - p_new.y;
+
+    return p_new;
 }

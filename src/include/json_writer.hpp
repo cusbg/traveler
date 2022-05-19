@@ -2,6 +2,7 @@
 #define json_writer_hpp
 
 #include "document_writer.hpp"
+#include "json.hpp"
 
 class json_writer : public document_writer
 {
@@ -58,6 +59,9 @@ protected:
 
 
     std::string get_rna_subtree_formatted(rna_tree &rna, const numbering_def &numbering) const;
+
+private:
+    nlohmann::json get_classes() const;
 };
 
 

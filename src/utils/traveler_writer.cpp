@@ -4,7 +4,7 @@ using namespace std;
 
 void traveler_writer::init(const string& filename, rna_tree& rna)
 {
-    document_writer::init(filename, ".xml");
+    document_writer::init(filename, ".xml", rna);
 }
 
 streampos traveler_writer::print(const string& text)

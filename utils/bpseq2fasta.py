@@ -1,5 +1,5 @@
 import sys
-import gzip
+import json
 import argparse
 import logging
 

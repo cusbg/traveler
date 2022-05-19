@@ -140,9 +140,9 @@ struct svg_writer::style
                                     const std::string& filename,
                                     rna_tree& rna)
 {
-    document_writer::init(filename, SVG_FILENAME_EXTENSION);
+    document_writer::init(filename, SVG_FILENAME_EXTENSION, rna);
 
-    rna_tree::iterator root = rna.begin();
+   /* rna_tree::iterator root = rna.begin();
     
     tr = rna_tree::top_right_corner(root);
     bl = rna_tree::bottom_left_corner(root);
@@ -162,7 +162,7 @@ struct svg_writer::style
 //    scaling_ratio = 20 / bp_dist;
 //    scale = point(scaling_ratio , scaling_ratio);
 //    scale = point(8, 8);
-    dimensions = (tr - bl) /** get_scaling_ratio()*/ + margin;
+    dimensions = (tr - bl) *//** get_scaling_ratio()*//* + margin;
 
 
 
@@ -180,7 +180,7 @@ struct svg_writer::style
     if ( abs(bp_distance - font_size) / bp_distance < 0.5){
         font_size = 0.25 * bp_distance;
     }
-    set_font_size(font_size);
+    set_font_size(font_size);*/
 
     print(get_header_element(rna));
     print(create_style_definitions(rna));
@@ -309,8 +309,9 @@ svg_writer::properties svg_writer::get_point_formatted(
     if (should_shift_p)
     {
         //cale_point(p);
-        p = (p - bl) * get_scaling_ratio() + margin/2;
-        p.y = letter.y - p.y;
+        // p = (p - bl) * get_scaling_ratio() + margin/2;
+        // p.y = letter.y - p.y;
+        p = map_point(p);
 //        p += shift;
     }
     

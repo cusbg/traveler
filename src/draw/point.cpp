@@ -103,6 +103,10 @@ point point::operator+(const point& other) const
 
 point point::operator-(const point& other) const
 {
+    if (this->bad() || other.bad()) {
+        int i = 1;
+
+    }
     BINARY(*this, other);
     
     return {x - other.x, y - other.y};

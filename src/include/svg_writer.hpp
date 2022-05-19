@@ -100,15 +100,6 @@ private:
                                    bool should_shift_p = true) const;
 
     void scale_point(point &p) const;
-    
-private:
-    point dimensions;
-    point margin;
-
-    point shift;
-//    point scale;
-    point tr, bl;
-    point letter;
 
 };
 

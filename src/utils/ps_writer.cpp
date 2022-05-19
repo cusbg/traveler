@@ -37,7 +37,7 @@ void ps_writer::init(
 {
     APP_DEBUG_FNAME;
     
-    document_writer::init(filename, PS_FILENAME_EXTENSION);
+    document_writer::init(filename, PS_FILENAME_EXTENSION, rna);
 
     print(get_default_prologue(rna.begin()));
 }

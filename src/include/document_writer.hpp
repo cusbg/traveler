@@ -70,11 +70,20 @@ struct line_def {
     const std::string clazz;
 };
 
+struct line_def_rgb {
+    point from;
+    point to;
+    int ix_from;
+    int ix_to;
+    bool is_base_pair;
+    bool is_predicted;
+    const RGB& color;
+};
+
 struct labels_lines_def {
     std::vector<label_def> label_defs;
     std::vector<line_def> line_defs;
 };
-
 
 /**
  * class for printing visualization
@@ -87,6 +96,19 @@ public:
     
 protected:
     document_writer() = default;
+
+    point dimensions;
+    point margin;
+    point shift;
+    point tr, bl;
+    point letter;
+
+    /**
+     * Maps point from the default coordinate frame to the one which uses SVG, i.e. [0,0] is top left, positive coordinates.
+     * @param p
+     * @return
+     */
+    point map_point(const point& p, bool use_margin = true) const;
     
 public:
     /**
@@ -154,11 +176,15 @@ public: // formatters
     
 public:
     /**
-     * returns rna backbone visualization
+     * returns rna backbone visualization, i.e. lines which connect residues following in sequence
      */
     std::string get_rna_background_formatted(
                                              rna_tree::pre_post_order_iterator begin,
                                              rna_tree::pre_post_order_iterator end) const;
+
+    std::vector<line_def_rgb> create_rna_background_formatted(
+            rna_tree::pre_post_order_iterator begin,
+            rna_tree::pre_post_order_iterator end) const;
 
     virtual std::string get_rna_formatted(
                                   rna_tree rna,
@@ -174,7 +200,8 @@ public:
      */
     void init(
               const std::string& filename,
-              const std::string& suffix);
+              const std::string& suffix,
+              rna_tree& rna);
     /**
      * initialize writer, set basic properties to document (scale/..)
      */
@@ -245,6 +272,11 @@ protected:
 
     std::vector<point> get_residues_positions(rna_tree &rna) const;
 
+    /**
+     * Obtain base-pair lines
+     * @param rna
+     * @return
+     */
     std::vector<std::pair<point, point>> get_lines(rna_tree &rna) const;
 
 private:
