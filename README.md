@@ -137,12 +137,14 @@ The file needs to contain three lines: moelcule description line (starts with th
 	other lines are filled with LABELS and BRACKETS in dot-bracket notation of secondary structure pairing
 	match-tree must contain both LABELS and BRACKETS, templated-tree need only BRACKETS
 
-### Example 1a: Visualize mouse 18S rRNA using human 18S rRNA as template using CRW ps image as the template layout.
+### Example 1a: Visualize mouse 18S rRNA using human 18S rRNA as template using CRW ps image as the template layout
 	$ mkdir test
 	$ bin/traveler \
 		--target-structure data/metazoa/mouse.fasta \
 		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
 		--all test/mouse_from_human
+
+Outputs a SVG and JSON file (see Example3 below for details)
 
 ### Example 1b: Visualize mouse 18S rRNA using human 18S rRNA as template using Traveler's XML input format as the template layout.
 	$ mkdir test
@@ -164,9 +166,18 @@ The file needs to contain three lines: moelcule description line (starts with th
 		--target-structure data/metazoa/mouse.fasta \
 		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
 		--draw --overlaps test/mouse_from_human.map test/mouse_from_human
+    # checks also if output molecule has overlaps and draws them in output image, but this information is not available in the json file (see below)
 
-	$ # generates 3 files - 2 .svg files (with/without colored bases (see COLOR CODING section)) and 1 .xml file with the basic layout information
-	$ # checks also if output molecule has overlaps and draws them in output image
+
+The above example enerates 2 files - 1 .svg file (see COLOR CODING section) and 1 .json file in the
+[RNA2D data schema format](https://github.com/LDWLab/RNA2D-data-schema/). The json file can then be
+converted into a SVG format using the `json2svg` utility (see the utils directory):
+
+```shell
+python3 utils/json2svg.py -i test/mouse_from_human.json -o test/mouse_from_human.json.svg
+```
+
+	
 
 
 #### Note:
