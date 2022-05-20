@@ -76,3 +76,5 @@ do
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format traveler ${TMP_DIR}${TMP}.tr ${TMP_DIR}/${TMP}.fasta --draw ${TGT_DIR}/${TGT}.map ${OUT_DIR}/${TGT}
 done
 
+for f in out/*.json; do python3 ../utils/json2svg.py -i $f -o ${f/.json/.json.svg}; done
+

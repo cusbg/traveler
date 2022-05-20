@@ -7,9 +7,10 @@ echo '.row{display: flex}'
 echo '.col{width: 50%}'
 echo 'img{max-width: 100%}'
 echo '</style></head><body>'
-for f in `ls out/ref-*colored.svg`; do
+for f in `ls out/ref-*.svg`; do
   tgt_ref=${f/out\//}
   tgt=${tgt_ref/ref-/}
+  tgt=${tgt/.svg/.json.svg}
   echo $tgt
   echo '<div class="row">'
   echo '<div class="col col-ref"><img src="'${tgt_ref}'"></div>'
