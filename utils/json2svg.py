@@ -149,7 +149,7 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size):
     for res in rna['sequence']:
         p = Point(round(float(res['x']), 2), round(float(res['y']), 2)) + MARGIN
         if p_prev:
-            residues += f'<line x1="{p_prev.x}" y1="{p_prev.y}" x2="{p.x}" y2="{p.y}" class="res-line" />\n'
+            residues += f'<line x1="{p_prev.x}" y1="{p_prev.y}" x2="{p.x}" y2="{p.y}" class="bp-line res-line" />\n'
         p_prev = p
 
     # Circles forming the background of the residues (these need to come AFTER the connecting lines as they need to be "above" them and SVG does not have z-index)
