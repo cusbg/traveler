@@ -68,9 +68,9 @@ bool RGB::operator==(
     vec.emplace_back(new json_writer());
     vec.emplace_back(new svg_writer());
     // vec.emplace_back(new ps_writer());
-    if (use_colors) {
-        vec.emplace_back(new traveler_writer());
-    }
+//    if (use_colors) {
+//        vec.emplace_back(new traveler_writer());
+//    }
     
     for (const auto& writer : vec)
         writer->use_colors(use_colors);

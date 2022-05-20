@@ -206,7 +206,6 @@ std::string json_writer::get_rna_subtree_formatted(
 
     json json_bps;
 
-
     for (const pair<int, int> bp: get_bps(rna)) {
         if (bp.first == -1 || bp.second == -1) continue; //5' end
         json json_bp;

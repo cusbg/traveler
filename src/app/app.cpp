@@ -228,12 +228,14 @@ void app::save(
         overlaps = overlap_checks().run(rna);
 
     
-    for (bool colored : {true, false})
+    //for (bool colored : {true, false})
+    for (bool colored : {true})
     {
         for (auto& writer : document_writer::get_writers(colored))
         {
             writer->set_scaling_ratio(rna);
-            string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
+            //string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
+            string file = filename;
             writer->init(file, rna);
             writer->print(writer->get_rna_formatted(rna, numbering));
 

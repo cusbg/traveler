@@ -23,6 +23,7 @@ $ bin/traveler \
 
 ## Requirements:
 - gcc with support of c++11
+- Python3 for running utils (e.g. conversion from [RNA2D-data-schema](https://github.com/LDWLab/RNA2D-data-schema/) JSON output) to SVG 
 
 ## Download:
 Use `git clone https://github.com/cusbg/traveler` to download project
