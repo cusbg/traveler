@@ -211,7 +211,7 @@ std::string json_writer::get_rna_subtree_formatted(
         json json_bp;
         json_bp["residueIndex1"] = bp.first + 1;
         json_bp["residueIndex2"] = bp.second + 1;
-        json_bp["basePairType"] = "null";
+        json_bp["basePairType"] = "canonical";
         json_bp["classes"] = {"bp-line"};
         json_bps.push_back(json_bp);
     }
