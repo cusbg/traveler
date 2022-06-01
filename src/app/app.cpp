@@ -235,7 +235,7 @@ void app::save(
         {
             writer->set_scaling_ratio(rna);
             //string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
-            string file = filename;
+            string file = filename + COLORED_FILENAME_EXTENSION; //the colored extension is kept for backward compatibility with the R2DT pipeline
             writer->init(file, rna);
             writer->print(writer->get_rna_formatted(rna, numbering));
 
