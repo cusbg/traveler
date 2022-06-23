@@ -1,5 +1,4 @@
 import sys
-import gzip
 import argparse
 import logging
 import json
@@ -164,7 +163,7 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size):
         dim.update(p)
         cls = " ".join(res['classes'])
         residues += f"<g>" \
-                    f"<title>{res['residueIndex']} (position.label in template: {res['templateResidueIndex']}.{res['templateResidueName']}')</title>" \
+                    f"<title>{res['residueIndex']} (position.label in template: {res['info']['templateResidueIndex']}.{res['info']['templateResidueName']})</title>" \
                     f"<text x=\"{p.x}\" y=\"{p.y}\" class=\"{cls}\" >{res['residueName']}</text>" \
                     f"</g>\n"
 

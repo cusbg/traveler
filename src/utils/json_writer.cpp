@@ -141,11 +141,14 @@ std::string json_writer::get_rna_subtree_formatted(
                 residue["residueName"] = it->at(it.label_index()).label;
                 residue["x"] = p.x;
                 residue["y"] = p.y;
-                residue["templateResidueName"] = it->at(it.label_index()).tmp_label;
-                residue["templateResidueIndex"] = it->at(it.label_index()).tmp_ix;
-                residue["templateNumberingLabel"] = it->at(it.label_index()).tmp_numbering_label;
                 residue["classes"] = {msprintf("text-%s", get_default_color(it->status).get_name()), "font"};
-                residue["info"] = "";
+
+                json info;
+                info["templateResidueName"] = it->at(it.label_index()).tmp_label;
+                info["templateResidueIndex"] = it->at(it.label_index()).tmp_ix;
+                info["templateNumberingLabel"] = it->at(it.label_index()).tmp_numbering_label;
+                residue["info"] = info;
+
                 json_sequence.push_back(residue);
 
                 update_dim(dim_min, dim_max, p.x, p.y);
