@@ -22,3 +22,23 @@ to SVG.
 ``
 python3 json2svg.py -i test_data/mouse_from_human.json -o test_data/mouse_from_human.json.svg
 ``
+
+## encrich_json
+
+Takes as input an [RNA2D schema](https://github.com/LDWLab/RNA2D-data-schema/) JSON file and annotations in 
+a [TSV file](test_data/mouse_from_human.annotations.tsv) and adds the annotations found in the TSV to the
+JSON. The resulting JSON is then either outputted into the console or into a file (the ``-o`` option).
+The TSV needs to contain residue index (``residue_index``) and residue name (``residue_name``) columns which specify
+which residues should be enriched. This happens by adding the annotations into the ``info`` field of the given
+residue. 
+
+If a residue name does not match the name of the corresponding residue in the input JSON, an exception
+is raised.
+
+If given annotation is already present for a residue, an exception is raised. This behavior can be overriden by specifying the ``-f`` 
+(``--force``) argument.
+
+``
+python3 enrich_json.py -ij test_data/mouse_from_human.json -id test_data/mouse_from_human.annotations.tsv
+``
+
