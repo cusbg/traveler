@@ -328,6 +328,6 @@ If you use Traveler in your research, please cite:
   <img src="img/logo-elixir.png" />
 </p>
 
-PrankWeb is a part of services provided by ELIXIR – European research infrastructure for biological information.
+Traveler is a part of services provided by ELIXIR – European research infrastructure for biological information.
 See [services](https://www.elixir-czech.cz/services) provided [ELIXIR's Czech Republic Node](https://www.elixir-czech.cz/).
 
