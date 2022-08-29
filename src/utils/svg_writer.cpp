@@ -339,7 +339,7 @@ std::string svg_writer::create_element(
 
     stringstream ss;
     //if (ix >= 0) ss << "<title>" << ix << " (label in template: " <<  << "</title>";
-    if (li.ix >= 0) {
+    if (li.ix >= 0 && li.is_nt) {
         ss << "<title>" << li.ix;
         if (li.tmp_ix >= 0) {
 
@@ -461,8 +461,7 @@ std::string svg_writer::create_style_definitions(rna_tree& rna) const
     out << "text.numbering-label {fill: rgb(204, 204, 204);}" << endl;
     out << "line.numbering-line {stroke: rgb(204, 204, 204); stroke-width: " << line_stroke_width / 2 << ";}" << endl;
     out << "line.predicted {stroke: rgb(0, 0, 0); stroke-dasharray: 2}" << endl;
-    out << "text.background {fill: rgb(255, 255, 255);" << endl;
-
+    //out << "text.background {fill: rgb(255, 255, 255);" << endl; //for some reason, when this is present, template visibility hidden does not apply (at least in Google Chrome v. 104)
     out << ".template {visibility:hidden}";
     
     out << endl << "]]>" << endl;
