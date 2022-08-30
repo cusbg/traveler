@@ -138,7 +138,8 @@ struct svg_writer::style
 
 /* virtual */ void svg_writer::init(
                                     const std::string& filename,
-                                    rna_tree& rna)
+                                    rna_tree& rna,
+                                    bool labels_template)
 {
     document_writer::init(filename, SVG_FILENAME_EXTENSION, rna);
 
@@ -183,7 +184,7 @@ struct svg_writer::style
     set_font_size(font_size);*/
 
     print(get_header_element(rna));
-    print(create_style_definitions(rna));
+    print(create_style_definitions(rna, labels_template));
 }
 //
 //void svg_writer::scale_point(point &p) const {
@@ -389,7 +390,7 @@ svg_writer::properties svg_writer::get_styles(
     return properties(property("style", out.str()));
 }
 
-std::string svg_writer::create_style_definitions(rna_tree& rna) const
+std::string svg_writer::create_style_definitions(rna_tree& rna, bool labels_template) const
 {
     ostringstream out;
     
@@ -462,7 +463,7 @@ std::string svg_writer::create_style_definitions(rna_tree& rna) const
     out << "line.numbering-line {stroke: rgb(204, 204, 204); stroke-width: " << line_stroke_width / 2 << ";}" << endl;
     out << "line.predicted {stroke: rgb(0, 0, 0); stroke-dasharray: 2}" << endl;
     //out << "text.background {fill: rgb(255, 255, 255);" << endl; //for some reason, when this is present, template visibility hidden does not apply (at least in Google Chrome v. 104)
-    out << ".template {visibility:hidden}";
+    out << "." << (labels_template ? "sequential" : "template") << " {visibility:hidden}"; //either show position labels based on sequence position in target, or based on the positions in template (provided by the user in the Traveler XML format)
     
     out << endl << "]]>" << endl;
     

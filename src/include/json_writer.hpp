@@ -16,7 +16,8 @@ public:
 public:
     void init(
                       const std::string& filename,
-                      rna_tree& rna) override;
+                      rna_tree& rna,
+                      bool labels_template) override;
     streampos print(
                             const std::string& text) override;
 

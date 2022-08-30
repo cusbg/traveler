@@ -207,7 +207,8 @@ public:
      */
     virtual void init(
                       const std::string& filename,
-                      rna_tree& rna) = 0;
+                      rna_tree& rna,
+                      bool labels_template) = 0;
     
     /**
      * fill document from actual position to end of file with `ch`-chars

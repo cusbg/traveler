@@ -45,6 +45,7 @@
 #define ARGS_VERBOSE                        {"-v", "--verbose"}
 #define ARGS_DEBUG                          {"--debug"}
 #define ARGS_NUMBERING                       {"-n", "--numbering"}
+#define ARGS_LABELS_TEMPLATE                 {"-l", "--labels-template"}
 
 #define COLORED_FILENAME_EXTENSION          ".colored"
 
@@ -58,6 +59,7 @@ struct app::arguments
     rna_tree templated; // template
     rna_tree matched; // target
     bool rotate_branches = false;
+    bool labels_template = false;
     
     struct
     {
@@ -132,7 +134,7 @@ void app::run(
         img_out = args.draw.file;
     }
 
-    run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out, args.numbering);
+    run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out, args.numbering, args.labels_template);
     
     INFO("END: APP");
 }
@@ -187,7 +189,8 @@ void app::run_drawing(
                       bool run_overlaps,
                       bool rotate_branches,
                       const std::string& file,
-                      const numbering_def& numbering)
+                      const numbering_def& numbering,
+                      bool labels_template)
 {
     APP_DEBUG_FNAME;
 
@@ -206,7 +209,7 @@ void app::run_drawing(
         //Compact goes through the structure and computes new coordinates where necessary
             compact(templated).run(rotate_branches);
 
-        save(file, templated, run_overlaps, numbering);
+        save(file, templated, run_overlaps, numbering, labels_template);
     }
     catch (const my_exception& e)
     {
@@ -218,7 +221,8 @@ void app::save(
                const std::string& filename,
                rna_tree& rna,
                bool overlap,
-               const numbering_def& numbering)
+               const numbering_def& numbering,
+               bool labels_template)
 {
     APP_DEBUG_FNAME;
 
@@ -236,7 +240,7 @@ void app::save(
             writer->set_scaling_ratio(rna);
             //string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
             string file = filename + COLORED_FILENAME_EXTENSION; //the colored extension is kept for backward compatibility with the R2DT pipeline
-            writer->init(file, rna);
+            writer->init(file, rna, labels_template);
             writer->print(writer->get_rna_formatted(rna, numbering));
 
             if (overlap)
@@ -348,6 +352,10 @@ void app::usage(
     << "\t[" << get_args(ARGS_VERBOSE) << "]"
     << endl
     << "\t[" << get_args(ARGS_ROTATE_BRANCHES) << "]"
+    << endl
+    << "\t[" << get_args(ARGS_NUMBERING) << "]"
+    << endl
+    << "\t[" << get_args(ARGS_LABELS_TEMPLATE) << "]"
     << endl;
 }
 
@@ -530,7 +538,10 @@ void app::print(
                 } catch (...) {
                     throw wrong_argument_exception("Unsupported numbering format");
                 };
-
+            }
+            else if (is_argument(ARGS_LABELS_TEMPLATE))
+            {
+                a.labels_template = true;
 
             }
             else

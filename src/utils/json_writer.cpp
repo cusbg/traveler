@@ -4,7 +4,7 @@
 using namespace std;
 using json = nlohmann::json;
 
-void json_writer::init(const string& filename, rna_tree& rna)
+void json_writer::init(const string& filename, rna_tree& rna, bool labels_template)
 {
     document_writer::init(filename, ".json", rna);
 }

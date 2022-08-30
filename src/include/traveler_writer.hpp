@@ -15,7 +15,8 @@ public:
 public:
     virtual void init(
                       const std::string& filename,
-                      rna_tree& rna);
+                      rna_tree& rna,
+                      bool labels_template);
     virtual streampos print(
                             const std::string& text);
     

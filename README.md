@@ -80,8 +80,13 @@ The `traveler` executable is available in the PATH, and the current directory is
 		    # The format allows to specify list of residue indexes and interval so that every residue index which
 		    # is modulo interval == 0 will be labeled. The default value is "10,20,30-50", i.e. residues with indexes
 		    # 10, 20, 30 and every 50th residue will be labeled.
-		[-v|--verbose] Prints information about the computation and othere details (such as number of overlaps,
-		when overlap switch is turned on)
+       [-l|--labels-template] Uses template labels for numbering. This
+            is useful, for example, in case of tRNA where users are used to the Sprinzl positions. Here, for instance, position 20a is
+            used instead of 21. So if the 21st residue is mapped onto a target residue with visible nubmer (e.g. 20 by default),
+            that label should show 20a irrespective of its position in the target (20).        
+       [-v|--verbose] Prints information about the computation and othere details (such as number of overlaps,
+               when overlap switch is turned on)
+		
 
 	COLOR CODING:
 		Traveler uses the following color coding of nucleotides:
@@ -100,7 +105,9 @@ Three types of template IMAGE\_FILE are currectly supported by Traveler:
 
 #### Traveler intermediate format:
 
-Traveler's intermediate format is a simple XML which contains an ordered list of nucleotides (information about lines is not necessary since lines connecting backbone are defined by the order of nucleotides and base pairing lines are defined by the secondary structure).
+Traveler's intermediate format is a simple XML which contains an ordered list of nucleotides 
+(information about lines is not necessary since lines connecting backbone are defined by the order of nucleotides and 
+base pairing lines are defined by the secondary structure).
 
 ##### Example:
 	<structure>
@@ -112,7 +119,34 @@ Traveler's intermediate format is a simple XML which contains an ordered list of
 	<point x="278.1 y="-504.6" b="A" />
 	</structure>
 
-Other extractors of RNA structure can be implemented and specified by the FILE\_FORMAT argument.
+Additionally, the format can include position labels which can then be used in the target numbering (see the ``-l`` argument).
+
+    <structure>
+    <point x="69.55" y="39.53" b="G" numbering-label="1"/>
+    <point x="69.91" y="46.89" b="N" numbering-label="2"/>
+    <point x="69.97" y="54.66" b="Y" numbering-label="3"/>
+    <point x="69.76" y="62.22" b="C" numbering-label="4"/>
+    <point x="69.91" y="69.57" b="N" numbering-label="5"/>
+    <point x="69.91" y="77.13" b="N" numbering-label="6"/>
+    <point x="69.76" y="84.89" b="R" numbering-label="7"/>
+    <point x="62.94" y="88.16" b="U" numbering-label="8"/>
+    <point x="57.38" y="93.50" b="G" numbering-label="9"/>
+    <point x="54.12" y="100.32" b="G" numbering-label="10"/>
+    <point x="46.77" y="100.32" b="C" numbering-label="11"/>
+    <point x="39.36" y="100.12" b="N" numbering-label="12"/>
+    <point x="31.86" y="100.32" b="Y" numbering-label="13"/>
+    <point x="26.52" y="94.97" b="A" numbering-label="14"/>
+    <point x="19.10" y="93.49" b="A" numbering-label="15"/>
+    <point x="11.91" y="96.38" b="U" numbering-label="16"/>
+    <point x="7.50" y="102.66" b="G" numbering-label="18"/>
+    <point x="7.50" y="110.22" b="G" numbering-label="19"/>
+    <point x="12.06" y="116.30" b="N" numbering-label="20"/>
+    <point x="19.05" y="119.19" b="N" numbering-label="20a"/>
+    <point x="26.52" y="117.92" b="A" numbering-label="21"/> 
+    ...
+    <structure>
+
+Other RNA structure extractors can be implemented and specified by the FILE\_FORMAT argument.
 
 ### Note on input sequence-structure file format:
 
@@ -171,7 +205,7 @@ Outputs a SVG and JSON file (see Example3 below for details)
 
 The above example enerates 2 files - 1 .svg file (see COLOR CODING section) and 1 .json file in the
 [RNA2D data schema format](https://github.com/LDWLab/RNA2D-data-schema/). The json file can then be
-converted into a SVG format using the `json2svg` utility (see the utils directory):
+converted into a SVG format using the `json2svg` utility (see the utils directory for more arguments):
 
 ```shell
 python3 utils/json2svg.py -i test/mouse_from_human.json -o test/mouse_from_human.json.svg

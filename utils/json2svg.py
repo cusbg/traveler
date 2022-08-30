@@ -40,7 +40,7 @@ def error_exit(message):
     sys.exit()
 
 
-def classes_defs():
+def classes_defs(labels_template):
     return [{
         'name': 'text-black',
         'fill': 'rgb(0, 0, 0)'
@@ -99,7 +99,7 @@ def classes_defs():
         'name': 'numbering-line',
         'stroke': GRAY
     }, {
-        'name': 'template',
+        'name': 'sequential' if labels_template else 'template',
         'visibility': 'hidden'
     }, {
         'name': 'bp-line',
@@ -118,9 +118,9 @@ def get_font_size(classes):
     return (float)((list(filter(lambda x: x["name"] == "font", classes))[0]["font-size"]).replace("px", ""))
 
 
-def classes_to_svg(data):
+def classes_to_svg(data, labels_template):
 
-    classes = data['classes'] + classes_defs()
+    classes = data['classes'] + classes_defs(labels_template)
 
     svg_classes = '<style type="text/css" >\n'
     svg_classes += '<![CDATA[\n'
@@ -210,12 +210,12 @@ def labels_to_svg(rna, dim: Dimensions):
     return svg_labels
 
 
-def to_svg(data):
+def to_svg(data, labels_template):
     
     dim = Dimensions()
 
     rna = data['rnaComplexes'][0]['rnaMolecules'][0]
-    svg_classes = classes_to_svg(data)
+    svg_classes = classes_to_svg(data, labels_template)
     res_pos: Dict[int, Point] = {}
     residues = residues_to_svg(rna, dim, res_pos, get_font_size(data['classes']))
     bps = bps_to_svg(rna, res_pos)
@@ -235,7 +235,7 @@ def main():
     with open(args.input, "r") as fr:
         data = json.load(fr)
         with (sys.stdout if args.output is None else open(args.output, "w")) as fw:
-            fw.write(to_svg(data))
+            fw.write(to_svg(data, args.labels_template))
 
 
 if __name__ == '__main__':
@@ -249,6 +249,9 @@ if __name__ == '__main__':
                         metavar='FILE',
                         help="Output file name for the SVG file. "
                              "If non entered, the standard output will be used.")
+    parser.add_argument("-l", "--labels-template",
+                        action='store_true',
+                        help="If set, the numbering labels will be based on numbering labels from template (e.g. Sprinzl positions for tRNA). ")
 
     args = parser.parse_args()
 

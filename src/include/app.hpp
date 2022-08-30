@@ -78,7 +78,8 @@ private:
                      bool run_overlaps,
                      bool rotate_branches,
                      const std::string& file,
-                     const numbering_def& numbering);
+                     const numbering_def& numbering,
+                     bool labels_template);
     
     /**
      * save both, colored and not colored documents
@@ -87,7 +88,8 @@ private:
               const std::string& filename,
               rna_tree& rna,
               bool overlaps,
-              const numbering_def& numbering);
+              const numbering_def& numbering,
+              bool labels_template);
     
 private:
     /**
