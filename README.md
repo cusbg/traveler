@@ -81,9 +81,9 @@ The `traveler` executable is available in the PATH, and the current directory is
 		    # is modulo interval == 0 will be labeled. The default value is "10,20,30-50", i.e. residues with indexes
 		    # 10, 20, 30 and every 50th residue will be labeled.
        [-l|--labels-template] Uses template labels for numbering. This
-            is useful, for example, in case of tRNA where users are used to the Sprinzl positions. Here, for instance, position 20a is
-            used instead of 21. So if the 21st residue is mapped onto a target residue with visible nubmer (e.g. 20 by default),
-            that label should show 20a irrespective of its position in the target (20).        
+            is useful, for example, in case of tRNA where users are used to the Sprinzl positions. Here, for instance, the 21st residue of a particular tRNA 
+	    is Sprinzl position 20a. So if the 21st residue is mapped onto a target residue with visible nubmer (e.g. 20 by default),
+            that label should show 20a irrespective of its position in the target.        
        [-v|--verbose] Prints information about the computation and othere details (such as number of overlaps,
                when overlap switch is turned on)
 		
