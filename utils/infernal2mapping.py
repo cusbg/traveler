@@ -42,11 +42,11 @@ def error_exit(message):
 
 def read_structures(f) -> List[SequenceStructureMapping]:
     f.readline()
-    sq = f.readline()
+    sq = f.readline().strip()
     f.readline()
-    str_full = f.readline()  # in positions of deletions (relative to template) this structure contains the base pairing information from template unlike str which might contain half pairs
+    str_full = f.readline().strip()  # in positions of deletions (relative to template) this structure contains the base pairing information from template unlike str which might contain half pairs
     f.readline()
-    str = f.readline()
+    str = f.readline().strip()
     assert len(sq) == len(str) == len(str_full)
 
     tgt_s_s_m = SequenceStructureMapping()
