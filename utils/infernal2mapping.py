@@ -7,9 +7,9 @@ with added .~ characters corresponding to insertions (these will match the lower
 corresponding to "-" nucleotides will result to target structure while removing ".~" characters results in the
 template structure.
 
-Parsing the INFERNAL input results in two structures which contain, sequnece and structure of both target and
-template (the template sequence has "-" at positions which were deleted since this information is not present in
-the mapping file) and mapping list which gives mapping from target/template to the position in the infernal
+Parsing the INFERNAL input results in two structures that contain sequence and structure of both target and
+template (the template sequence has only "-" at positions which were deleted since information about the template is not present in
+the input file) and mapping list which gives mapping from target/template to the position in the infernal
 mapping (since this contains both insertions and deletions).
 
 The structures are then processed into the pre-order sorted list of nodes of the target and template trees. Each node
