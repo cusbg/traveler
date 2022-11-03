@@ -25,7 +25,6 @@
 #include "tree_base.hpp"
 #include "rna_tree_label.hpp"
 
-
 struct point;
 
 struct document_settings {
@@ -58,7 +57,9 @@ public:
      */
     void update_points(
                        const std::vector<point>& points);
-    
+
+    std::vector<point> get_points();
+
     /**
      * insert `label` to tree before `it` and set
      * `steal` next siblings to be children of inserted node
@@ -180,7 +181,7 @@ public:
      */
     void compute_distances();
 
-    
+
 private:
     std::string _name;
     bool folding_info = false; //whether the user provided line in the FASTA telling which bps were predicted de-novo and which were carried over from template

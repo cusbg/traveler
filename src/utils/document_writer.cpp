@@ -59,8 +59,6 @@ bool RGB::operator==(
     return name == other.name;
 }
 
-
-
 /* static */ image_writers document_writer::get_writers(
                                                         bool use_colors)
 {
@@ -89,7 +87,8 @@ std::string document_writer::get_edge_formatted(
                                                 const int ix_from,
                                                 const int ix_to,
                                                 bool is_base_pair,
-                                                bool is_predicted
+                                                bool is_predicted,
+                                                const shape_options opts
                                                 ) const
 {
     if (from.bad() || to.bad())
@@ -381,7 +380,7 @@ std::string document_writer::get_numbering_formatted(
 }
 
 std::string document_writer::get_label_formatted(
-                                                 rna_tree::pre_post_order_iterator it, label_info li) const
+                                                 rna_tree::pre_post_order_iterator it, label_info li, const shape_options opts) const
 {
     if (!it->initiated_points())
         return "";
@@ -582,13 +581,98 @@ std::string document_writer::get_rna_background_formatted(
     return out.str();
 }
 
+
+std::string document_writer::render_pseudoknots(pseudoknots &pn) const
+{
+    ostringstream oss;
+
+//    for (auto s:pn.segments){
+//
+//        auto l = s.interval1.first->at(s.interval1.first.label_index());
+//        auto ll = s.interval2.first->at(s.interval2.first.label_index());
+//
+//        oss << get_line_formatted(l.p, ll.p, RGB::RED);
+//    }
+
+    shape_options opts_connection, opts_segment[2];
+    opts_segment[0].color = "gray";
+    opts_segment[1].color = "gray";
+    opts_connection.color = "gray";
+
+
+    //TODO: the shift is SVG-specific and should be somehow normalized
+//    point shift = -point(0, FONT_HEIGHT/2);
+    point shift = -point(0, 0);
+
+    for (auto s:pn.get_segments()) {
+
+        opts_segment[0].title = s.get_label();
+        opts_segment[1].title = s.get_label();
+
+        opts_segment[0].clazz = string("pseudoknot_segment1");
+        opts_segment[0].g_clazz = s.get_id();
+        opts_segment[1].clazz = string("pseudoknot_segment2");
+        opts_segment[1].g_clazz = s.get_id();
+
+        opts_connection.title = s.get_label();
+
+        int ix_int = 0;
+        for (auto interval: {s.interval1, s.interval2}) {
+
+//            oss << get_circle_formatted(s1->at(s1.label_index()).p + shift, FONT_HEIGHT/5*4, opts_segment);
+//            if (interval.second != interval.first) {
+//                oss << get_circle_formatted(interval.second->at(interval.second.label_index()).p, 4, opts_segment);
+//
+//            }
+            vector<point> points;
+            auto it = interval.first;
+            if (interval.first != interval.second) {
+                while (it != interval.second) {
+                    points.push_back(it->at(it.label_index()).p + shift);
+    //                oss << get_line_formatted(s1->at(s1.label_index()).p + shift, s2->at(s2.label_index()).p + shift, RGB::GRAY, opts_segment);
+                    it++;
+                }
+
+                points.push_back(it->at(it.label_index()).p + shift);
+                oss << get_polyline_formatted(points, RGB::GRAY, opts_segment[ix_int]);
+            } else {
+                oss << get_circle_formatted(it->at(it.label_index()).p + shift, pn.get_font_size()/2, opts_segment[ix_int]);
+
+            }
+
+
+            ix_int++;
+        }
+
+        vector<point> points;
+        for (line l:s.connecting_curve) {
+            points.push_back(l.first+ shift);
+//                oss << get_line_formatted(l.first, l.second, RGB::RED, opts_connection);
+        }
+        points.push_back(s.connecting_curve.back().second + shift);
+        opts_connection.clazz = string("pseudoknot_connection");
+        opts_connection.g_clazz = s.get_id();
+        oss << get_polyline_formatted(points, RGB::GRAY, opts_connection);
+
+
+
+    }
+
+    return oss.str();
+}
+
 std::string document_writer::get_rna_formatted(
                                                rna_tree rna,
-                                               const numbering_def& numbering) const
+                                               const numbering_def& numbering,
+                                               pseudoknots pn) const
 {
     rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
-    return get_rna_subtree_formatted(rna, numbering)
-           + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
+//    return get_rna_subtree_formatted(rna, numbering)
+//           + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
+    return render_pseudoknots(pn)
+        + get_rna_subtree_formatted(rna, numbering)
+        + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post())
+    ;
 }
 
 void document_writer::init(

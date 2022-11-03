@@ -23,6 +23,7 @@
 #define BOUNDING_BOX_HPP
 
 #include "point.hpp"
+#include <vector>
 
 
 struct rectangle
@@ -38,6 +39,7 @@ public:
     point get_top_right() const {return point(bottom_right.x, top_left.y);};
     point get_bottom_left() const { return  point(top_left.x, bottom_right.y); };
     point get_bottom_right() const { return bottom_right;};
+    std::vector<point> get_corners() const {return std::vector<point>{get_top_left(), get_top_right(), get_bottom_right(), get_bottom_left()}; };
 
 
     rectangle& operator=(const rectangle& other);

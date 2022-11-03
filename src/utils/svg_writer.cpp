@@ -90,7 +90,7 @@ public:
         }
         return NULL;
     }
-    
+
     friend std::ostream& operator<<(
                                     std::ostream& out,
                                     const properties& props)
@@ -213,14 +213,24 @@ struct svg_writer::style
 
 /* virtual */ std::string svg_writer::get_circle_formatted(
                                                            point centre,
-                                                           double radius) const
+                                                           double radius,
+                                                           const shape_options opts) const
 {
     properties out;
     
     out
     << get_point_formatted(centre, "c", "")
     << property("r", radius);
-    
+    if (opts.opacity >= 0){
+        out << property("fill-opacity", msprintf("%f", opts.opacity));
+    }
+    if (!opts.color.empty()) {
+        out << property("fill", msprintf("%s", opts.color));
+    }
+    if (!opts.clazz.empty()) {
+        out << property("class", msprintf("%s", opts.clazz));
+    }
+
     return create_element("circle", out);
 }
 
@@ -228,9 +238,10 @@ struct svg_writer::style
                                                           const rna_label& label,
                                                           const RGB& color,
                                                           const rna_pair_label::status_type status,
-                                                          const label_info li) const
+                                                          const label_info li,
+                                                          const shape_options opts) const
 {
-    return get_label_formatted(label, color.get_name(), status, li);
+    return get_label_formatted(label, color.get_name(), status, li, opts);
 //    properties out;
 //
 //    out
@@ -246,16 +257,18 @@ struct svg_writer::style
         const rna_label& label,
         const std::string& clazz,
         const rna_pair_label::status_type status,
-        const label_info li) const
+        const label_info li,
+        const shape_options opts) const
 {
     properties out;
-
+    
     out
-            << get_point_formatted(label.p, "", "")
-            //    << property("text-anchor", "middle")
-            //    << property("baseline-shift", "-50%")
+    << get_point_formatted(label.p, "", "")
+//    << property("text-anchor", "middle")
+//    << property("baseline-shift", "-50%")
+    //<< property("class", color.get_name());
             << property("class", clazz);
-
+    
     return create_element("text", out, label.label, li);
 }
 
@@ -267,10 +280,11 @@ struct svg_writer::style
                                                          int ix_to,
                                                          bool is_base_pair,
                                                          bool is_predicted,
-                                                         const RGB& color) const
+                                                         const RGB& color,
+                                                         const shape_options opts) const
 {
 
-    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, is_predicted, color.get_name());
+    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, is_predicted, color.get_name(), opts);
 }
 
 /* virtual */ std::string svg_writer::get_line_formatted(
@@ -280,7 +294,8 @@ struct svg_writer::style
         int ix_to,
         bool is_base_pair,
         bool is_predicted,
-        const std::string& clazz) const
+        const std::string& clazz,
+        const shape_options opts) const
 {
     properties out;
 
@@ -296,14 +311,63 @@ struct svg_writer::style
             << get_point_formatted(to, "", "2")
             << property("class", ssClazz.str());
 
+    if (opts.opacity >= 0){
+        out << property("stroke-opacity", msprintf("%f", opts.opacity));
+    }
+    if (opts.width >= 0) {
+        out << property("stroke-width", msprintf("%s", opts.width));
+    };
+
     return create_element("line", out);
+}
+
+std::string svg_writer::get_polyline_formatted(
+        std::vector<point> &points,
+        const RGB& color,
+        const shape_options opts) const {
+
+    properties out;
+
+    std::ostringstream oss_points;
+    bool first = true;
+    for (point p: points) {
+        if (first) {
+            first = false;
+        } else {
+            oss_points << ", ";
+        }
+        //shift_point(p);
+        p = map_point(p);
+        oss_points << p.x << " " << p.y;
+    }
+
+    out << property("points", oss_points.str());
+    out << property("class", msprintf("%s %s", color.get_name(), opts.clazz));
+    if (!opts.color.empty()) {
+        out << property("stroke", msprintf("%s", opts.color));
+    }
+    if (opts.opacity >= 0){
+        out << property("stroke-opacity", msprintf("%f", opts.opacity));
+    }
+    if (opts.width >= 0) {
+        out << property("stroke-width", msprintf("%s", opts.width));
+    }
+    if (!opts.title.empty()) {
+        out << property("stroke-width", msprintf("%s", opts.title));
+    }
+    if (!opts.g_clazz.empty()) {
+        out << property("stroke-width", msprintf("%s", opts.g_clazz));
+    }
+
+    return create_element("polyline", out, "", {-1, ""});
 }
 
 svg_writer::properties svg_writer::get_point_formatted(
                                                        point p,
                                                        const std::string& prefix,
                                                        const std::string& postfix,
-                                                       bool should_shift_p) const
+                                                       bool should_shift_p,
+                                                       const shape_options opts) const
 {
     properties out;
     
@@ -315,11 +379,11 @@ svg_writer::properties svg_writer::get_point_formatted(
         p = map_point(p);
 //        p += shift;
     }
-    
+
     out
     << property(msprintf("%sx%s", prefix, postfix), msprintf("%f", p.x))
     << property(msprintf("%sy%s", prefix, postfix), msprintf("%f", p.y));
-    
+
     return out;
 }
 
@@ -442,12 +506,14 @@ std::string svg_writer::create_style_definitions(rna_tree& rna, bool labels_temp
         }
         
         // by default when no color is specified, black is used
-        out
-        << endl
-        << element.name
-        << " {"
-        << get_color_style(feature_name, RGB::BLACK);
+        if (element.name != "circle") {
+            out
+                    << endl
+                    << element.name
+                    << " {"
+                    << get_color_style(feature_name, RGB::BLACK);
 //        << style("fill", "none");
+        }
 
         if (element.name == "text"){
             out << style("text-anchor", "middle");
@@ -455,7 +521,9 @@ std::string svg_writer::create_style_definitions(rna_tree& rna, bool labels_temp
             out << style("alignment-baseline", "middle");
 
         }
-        out << "}";
+        if (element.name != "circle") {
+            out << "}";
+        }
     }
     out << endl;
 
@@ -464,6 +532,11 @@ std::string svg_writer::create_style_definitions(rna_tree& rna, bool labels_temp
     out << "line.predicted {stroke: rgb(0, 0, 0); stroke-dasharray: 2}" << endl;
     //out << "text.background {fill: rgb(255, 255, 255);" << endl; //for some reason, when this is present, template visibility hidden does not apply (at least in Google Chrome v. 104)
     out << "." << (labels_template ? "sequential" : "template") << " {visibility:hidden}"; //either show position labels based on sequence position in target, or based on the positions in template (provided by the user in the Traveler XML format)
+
+    out << endl << "polyline {fill:none; stroke-linejoin:round; }";
+    out << endl << ".pseudoknot_segment1 {stroke-linecap:round; stroke-opacity: 0.4; stroke-width:" << to_string(get_font_size()) + "px" << "}";
+    out << endl << ".pseudoknot_segment2 {stroke-linecap:round; stroke-opacity: 0.4; stroke-width:" << to_string(get_font_size()) + "px" << "}";
+    out << endl << ".pseudoknot_connection {stroke-linecap:round; stroke-opacity: 0.2; stroke-width:" << 2   << "}";
     
     out << endl << "]]>" << endl;
     
@@ -477,7 +550,7 @@ std::string svg_writer::get_header_element(rna_tree& rna)
 //    bl = -bl - MARGIN / 2;
 
     TRACE("scale %s, bl %s, tr %s", get_scaling_ratio(), bl, tr);
-
+    
     out
     << "<svg"
     << "\n\t" << property("xmlns", "http://www.w3.org/2000/svg")

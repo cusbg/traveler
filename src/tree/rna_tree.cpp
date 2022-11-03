@@ -21,6 +21,7 @@
 
 
 #include <cfloat>
+#include <map>
 #include <iostream>
 #include <algorithm>
 
@@ -29,12 +30,13 @@
 
 using namespace std;
 
-#define PAIRS_DISTANCE get_base_pair_distance()
+#define PAIRS_DISTANCE get_pair_base_distance()
 #define BASES_DISTANCE get_pairs_distance()
 
 inline static std::vector<rna_pair_label> convert(
                                                   const std::string& labels,
-                                                  const std::string& constraints);
+                                                  const std::string& constraints,
+                                                    const std::string& brackets);
 
 rna_tree::rna_tree(
                    const std::string& _brackets,
@@ -42,7 +44,8 @@ rna_tree::rna_tree(
                    const std::string& _labels,
                    const std::string& _name)
 : tree_base<rna_pair_label>(
-                            _brackets, convert(_labels, _constraints)), _name(_name)
+                            _brackets, convert(_labels, _constraints, _brackets)), _name(_name)
+
 {
     set_postorder_ids();
     distances = {0xBADF00D, 0xBADF00D, 0xBADF00D};
@@ -50,7 +53,7 @@ rna_tree::rna_tree(
     if (!_constraints.empty()) {
         folding_info = true;
     }
-    
+
     DEBUG("Tree '%s:%s' was constructed, size=%s;\n%s",
           id(), name(), size(), print_tree(false));
 }
@@ -75,22 +78,81 @@ void rna_tree::set_name(
 
 
 
-/* inline, local */ std::vector<rna_pair_label> convert(
-                                                        const std::string& labels,
-                                                        const std::string& constraints
-                                                        )
-{
-    vector<rna_pair_label> vec;
-    
-    vec.reserve(labels.size());
+///* inline, local */ std::vector<rna_pair_label> convert(
+//                                                        const std::string& labels,
+//                                                        const std::string& constraints,
+//                                                        const std::string& brackets
+//                                                        )
+//{
+//    vector<rna_pair_label> vec;
+//
+//    vec.reserve(labels.size());
+//
+//    for (size_t i = 0; i < labels.size(); ++i) {
+//        bool de_novo = false;
+//        if (!constraints.empty() && constraints[i] == '*') de_novo = true;
+//        vec.emplace_back(rna_pair_label(labels.substr(i, 1), de_novo));
+//    }
+//
+//    return vec;
+//}
 
-    for (size_t i = 0; i < labels.size(); ++i) {
+std::vector<rna_pair_label> convert(
+                                    const std::string& labels,
+                                    const std::string& constraints,
+                                    const std::string& brackets)
+{
+    //TODO: Currently this actually works for only 1st level pseudoknots
+    vector<rna_pair_label> vec;
+    vec.reserve(labels.size());
+    std::map<char, size_t> pk_map;
+
+    string pn_chars = string(PSEUDOKNOT_CHARACTERS);
+    for (size_t i = 0; i < labels.size(); ++i)
+    {
+        char symbol = brackets[i];
+
         bool de_novo = false;
         if (!constraints.empty() && constraints[i] == '*') de_novo = true;
-        vec.emplace_back(rna_pair_label(labels.substr(i, 1), de_novo));
+
+        int ix_pn = pn_chars.find(symbol);
+        string pn = "";
+        if (ix_pn != string::npos) {
+            char pk_key;
+            if (ix_pn % 2 == 0) { //first residue in the base pair
+                pk_key = pn_chars[ix_pn];
+            } else { //second residue in the base pair
+                pk_key = pn_chars[ix_pn-1]; //pn_key always represents the opening bracket
+            }
+
+            if(ix_pn % 2 == 0) //opening bracket
+            {
+                if (pk_map.count(pk_key) == 0) { //if the current bracket type is not yet  in the map
+                    pk_map.emplace(pk_key, 0);
+                }
+                pn = to_string(pk_key) + to_string(pk_map[pk_key]);
+                pk_map[pk_key]++;
+            } else
+            { //closing bracket
+                pk_map[pk_key]--;
+                pn = to_string(pk_key) + to_string(pk_map[pk_key]);
+            }
+        }
+
+        vec.emplace_back(rna_pair_label(labels.substr(i, 1), de_novo, pn));
     }
-    
+
     return vec;
+}
+
+vector<point> rna_tree::get_points() {
+    APP_DEBUG_FNAME;
+
+    vector<point> points;
+    for (auto it = begin_pre_post(); it != end_pre_post(); ++it){
+        points.push_back(it->at(it.label_index()).p);
+    }
+    return points;
 }
 
 void rna_tree::update_points(

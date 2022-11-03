@@ -35,6 +35,7 @@ add_executable(traveler
         src/include/document_writer.hpp
         src/include/exception.hpp
         src/include/extractor.hpp
+        src/include/geometry.hpp
         src/include/gted.hpp
         src/include/gted_tree.hpp
         src/include/logger.hpp
@@ -42,7 +43,7 @@ add_executable(traveler
         src/include/mprintf.hpp
         src/include/overlap_checks.hpp
         src/include/point.hpp
-        src/include/ps_writer.hpp
+#        src/include/ps_writer.hpp
         src/include/rna_tree.hpp
         src/include/rna_tree_label.hpp
         src/include/rted.hpp
@@ -82,11 +83,17 @@ add_executable(traveler
         src/utils/exception.cpp
         src/utils/extractor.cpp
         src/utils/logger.cpp
-        src/utils/ps_writer.cpp
+#        src/utils/ps_writer.cpp
         src/utils/svg_writer.cpp
         src/utils/json_writer.cpp
         src/utils/traveler_extractor.cpp
         src/utils/traveler_writer.cpp
         src/utils/types.cpp
         src/utils/utils.cpp
-        src/utils/varna_extractor.cpp)
+        src/utils/varna_extractor.cpp
+        src/include/convex_hull.hpp
+        src/utils/convex_hull.cpp
+        src/include/geometry.hpp
+        src/utils/geometry.cpp
+        src/include/pseudoknots.hpp
+        src/draw/pseudoknots.cpp)

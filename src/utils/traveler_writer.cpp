@@ -21,18 +21,18 @@ streampos traveler_writer::print(const string& text)
     return pos;
 }
 
-string traveler_writer::get_circle_formatted(point centre, double radius) const
+string traveler_writer::get_circle_formatted(point centre, double radius, const shape_options opts) const
 {
     return "";
 }
 
-string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color, const rna_pair_label::status_type status, const label_info li) const
+string traveler_writer::get_label_formatted(const rna_label& label, const RGB& color, const rna_pair_label::status_type status, const label_info li, const shape_options opts) const
 {
 
-    return get_label_formatted(label, color.get_name(), status, li);
+    return get_label_formatted(label, color.get_name(), status, li, opts);
 }
 
-string traveler_writer::get_label_formatted(const rna_label& label, const std::string& clazz, const rna_pair_label::status_type status, const label_info li) const
+string traveler_writer::get_label_formatted(const rna_label& label, const std::string& clazz, const rna_pair_label::status_type status, const label_info li, const shape_options opts) const
 {
     ostringstream out;
 
@@ -53,12 +53,12 @@ string traveler_writer::get_label_formatted(const rna_label& label, const std::s
     return out.str();
 }
 
-string traveler_writer::get_line_formatted(point from, point to, int ix_from, int ix_to, const bool is_base_pair, bool is_predicted, const RGB& color) const
+string traveler_writer::get_line_formatted(point from, point to, int ix_from, int ix_to, const bool is_base_pair, bool is_predicted, const RGB& color, const shape_options opts) const
 {
-    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, is_predicted, color.get_name());
+    return get_line_formatted(from, to, ix_from, ix_to, is_base_pair, is_predicted, color.get_name(), opts);
 }
 
-string traveler_writer::get_line_formatted(point from, point to, const int ix_from, const int ix_to, const bool is_base_pair, bool is_predicted, const std::string& clazz) const
+string traveler_writer::get_line_formatted(point from, point to, const int ix_from, const int ix_to, const bool is_base_pair, bool is_predicted, const std::string& clazz, const shape_options opts) const
 {
     ostringstream out;
 
@@ -75,4 +75,20 @@ string traveler_writer::get_line_formatted(point from, point to, const int ix_fr
     out << "/>" << endl;
 
     return out.str();
+}
+
+std::string traveler_writer::get_polyline_formatted(
+        std::vector<point> &points,
+        const RGB& color,
+        const shape_options opts) const {
+
+    //TODO implement if needed
+    return "";
+};
+
+std::string traveler_writer::get_circle_formatted(
+        point centre,
+        double radius) const {
+    // TODO implement if needed
+    return "";
 }

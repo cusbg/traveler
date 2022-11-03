@@ -44,17 +44,25 @@ public:
 public: // formatters
     virtual std::string get_circle_formatted(
                                              point centre,
-                                             double radius) const;
+                                             double radius,
+                                             shape_options opts = shape_options()) const;
+
+
     virtual std::string get_label_formatted(
                                             const rna_label& label,
                                             const RGB& color,
-                                            const rna_pair_label::status_type status,
-                                            const label_info li) const;
+                                            rna_pair_label::status_type status,
+                                            label_info li,
+                                            shape_options opts = shape_options()) const;
     virtual std::string get_label_formatted(
             const rna_label& label,
             const std::string& clazz,
-            const rna_pair_label::status_type status,
-            const label_info li) const;
+            rna_pair_label::status_type status,
+            label_info li,
+            shape_options opts = shape_options()) const;
+
+
+
     
 protected:
     virtual std::string get_line_formatted(
@@ -64,7 +72,8 @@ protected:
                                            int ix_to,
                                            bool is_base_pair,
                                            bool is_predicted,
-                                           const RGB& color) const;
+                                           const RGB& color,
+                                           shape_options opts = shape_options()) const;
     virtual std::string get_line_formatted(
             point from,
             point to,
@@ -72,7 +81,13 @@ protected:
             int ix_to,
             bool is_base_pair,
             bool is_predicted,
-            const std::string& clazz) const;
+            const std::string& clazz,
+            shape_options opts = shape_options()) const;
+
+    virtual std::string get_polyline_formatted(
+            std::vector<point> &points,
+            const RGB& color,
+            shape_options opts = shape_options()) const;
 
 //    double get_scaling_ratio() const;
     
@@ -87,7 +102,10 @@ private:
                                const std::string& name,
                                const properties& properties,
                                const std::string& value = "",
-                               const label_info li = label_info(-1, "", -1, "", true)) const;
+                               label_info li = label_info(-1, "", -1, "", true)
+                               // const std::string& title = "",
+                                // const std::string& g_clazz = ""
+                                       ) const;
 //    std::string create_element(
 //            const std::string& name,
 //            const properties& properties,
@@ -98,9 +116,16 @@ private:
                                    point p,
                                    const std::string& prefix,
                                    const std::string& postfix,
-                                   bool should_shift_p = true) const;
+                                   bool should_shift_p = true,
+                                   shape_options opts = shape_options()) const;
 
-    void scale_point(point &p) const;
+    //void scale_point(point &p) const;
+
+    //point shift_point(point &p) const;
+
+private:
+    point dimensions;
+    point margin;
 
 };
 

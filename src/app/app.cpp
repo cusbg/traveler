@@ -85,7 +85,7 @@ struct app::arguments
     } traveler;
     numbering_def numbering;
 
-    
+
 public:
     /**
      * parse arguments
@@ -231,17 +231,17 @@ void app::save(
 //    if (overlap)
         overlaps = overlap_checks().run(rna);
 
-    
     //for (bool colored : {true, false})
     for (bool colored : {true})
     {
         for (auto& writer : document_writer::get_writers(colored))
         {
+            pseudoknots pn(rna, writer->get_settings());
             writer->set_scaling_ratio(rna);
             //string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
             string file = filename + COLORED_FILENAME_EXTENSION; //the colored extension is kept for backward compatibility with the R2DT pipeline
             writer->init(file, rna, labels_template);
-            writer->print(writer->get_rna_formatted(rna, numbering));
+            writer->print(writer->get_rna_formatted(rna, numbering, pn));
 
             if (overlap)
                 for (const auto& p : overlaps)
@@ -262,7 +262,7 @@ void app::save(
 
 
 
-rna_tree app::create_matched(
+rna_tree app::create_target(
                              const std::string& fastafile)
 {
     APP_DEBUG_FNAME;
@@ -279,7 +279,7 @@ rna_tree app::create_matched(
     }
 }
 
-rna_tree app::create_templated(
+rna_tree app::create_template(
                                const std::string& templatefile,
                                const std::string& templatetype,
                                const std::string& fastafile)
@@ -390,6 +390,7 @@ void app::print(
     
 }
 
+
 /* static */ app::arguments app::arguments::parse(
                                                   const std::vector<std::string>& args)
 {
@@ -446,7 +447,7 @@ void app::print(
             {
                 DEBUG("arg match-tree");
                 string fastafile = args.at(i + 1);
-                a.matched = app::create_matched(fastafile);
+                a.matched = app::create_target(fastafile);
                 ++i;
                 continue;
             }
@@ -462,7 +463,7 @@ void app::print(
                 }
                 templatefile = args.at(i + 1);
                 fastafile = args.at(i + 2);
-                a.templated = app::create_templated(templatefile, templatetype, fastafile);
+                a.templated = app::create_template(templatefile, templatetype, fastafile);
                 i += 2;
             }
             else if (is_argument(ARGS_ALL))
