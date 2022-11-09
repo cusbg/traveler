@@ -123,6 +123,7 @@ rna_pair_label rna_pair_label::operator+(
     rna_pair_label out;
     out.labels.push_back(labels.back());
     out.labels.push_back(other.labels.back());
+    out.de_novo_predicted = this->de_novo_predicted || other.de_novo_predicted;
     
     return out;
 }
