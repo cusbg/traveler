@@ -293,8 +293,6 @@ labels_lines_def document_writer::create_numbering_formatted(
     p_center = center(p_prev, p_next);
     v_perp = normalize(orthogonal(p_prev - p_next));
 
-
-
     if (it->paired()){
         point p_other = it->at(1-it.label_index()).p;
         if (distance(p_center + v_perp, p_other) < distance(p_center - v_perp, p_other)) {
@@ -308,17 +306,14 @@ labels_lines_def document_writer::create_numbering_formatted(
         }
     }
 
-
     float grid_density = 1.5 * get_font_size();
     auto p = p_it + v_perp * grid_density * 1.5;
-    rectangle bb = get_label_bb(p, ix, get_font_size());
+    rectangle bb = get_label_bb(p, ix, get_font_size()); //the purpose of the BB is to test whether the label won't intersect anything, if yes, it needs to be moved
     if (rect_overlaps(bb, pos_residues) or rect_overlaps(bb, lines)) {
 //            p += normalize(v) * residue_distance * 3;
         p = sample_relevant_space(bb, p, v_perp, grid_density, pos_residues, lines, p_it);
         bb = get_label_bb(p, ix, get_font_size());
     }
-
-
 
     rna_label l;
     for (int i = 0; i < 2; ++i) {

@@ -13,6 +13,7 @@ bool on_segment(point p, point q, point r)
     return false;
 }
 
+
 // To find orientation of ordered triplet (p, q, r).
 // The function returns following values
 // 0 --> p, q and r are colinear
@@ -44,7 +45,7 @@ bool lines_intersect(point p1, point q1, point p2, point q2)
 
     // General case
     if (o1 != o2 && o3 != o4)
-        return false; // colinear
+        return true;
 
     // Special Cases
     // p1, q1 and p2 are colinear and p2 lies on segment p1q1
