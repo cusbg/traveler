@@ -1,4 +1,5 @@
 #ifndef TRAVELER_PSEUDOKNOTS_HPP
+#define TRAVELER_PSEUDOKNOTS_HPP
 
 #include <vector>
 #include "rna_tree.hpp"
@@ -36,8 +37,5 @@ public:
 
 
 };
-
-
-#define TRAVELER_PSEUDOKNOTS_HPP
 
 #endif //TRAVELER_PSEUDOKNOTS_HPP
