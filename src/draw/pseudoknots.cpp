@@ -198,6 +198,8 @@ pseudoknots::pseudoknots(rna_tree &rna, const document_settings &settings) {
     this->font_size = settings.font_size;
     this->segments = find_pseudoknot_segments(rna.begin_pre_post(), rna.end_pre_post());
 
+    if (this->segments.size() == 0) return;
+
 //    auto points = rna.get_points();
     vector<point> points;
     for (rectangle bo: rna.begin()->get_bounding_objects()) {
