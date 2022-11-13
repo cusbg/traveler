@@ -536,7 +536,7 @@ std::string svg_writer::create_style_definitions(rna_tree& rna, bool labels_temp
     out << endl << "polyline {fill:none; stroke-linejoin:round; }";
     out << endl << ".pseudoknot_segment1 {stroke-linecap:round; stroke-opacity: 0.4; stroke-width:" << to_string(get_font_size()) + "px" << "}";
     out << endl << ".pseudoknot_segment2 {stroke-linecap:round; stroke-opacity: 0.4; stroke-width:" << to_string(get_font_size()) + "px" << "}";
-    out << endl << ".pseudoknot_connection {stroke-linecap:round; stroke-opacity: 0.2; stroke-width:" << 2   << "}";
+    out << endl << ".pseudoknot_connection {stroke-linecap:round; stroke-opacity: 0.2; stroke-width:" << 1.5   << "}";
     
     out << endl << "]]>" << endl;
     

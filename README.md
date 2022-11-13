@@ -350,11 +350,47 @@ This will be depicted in the resulting SVG as a dotted gray line between the res
  <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/constraint-folding.jpg" width="80%"/>
 </p>
 
+## Pseudoknots support
+
+Traveler supports visualziation of pseduoknots , but does not consider them during the matching process. 
+Specifically, when parsing the target structure, pseudoknot pairs are "depaired" and the matching is carried
+out as if the corresponding residues were unpaired. Then, after the layout is generated, the pseduknots are 
+reintroduced into the final visualization.
+
+Pseudoknots are visualized as straight gray lines with some level of opacity so that they do not clutter
+the layout. Still to decrease the clutter possibly caused by pseudoknots, continous regions of pseudoknots
+are grouped together. In such case, the pseudoknotted residues that follow in sequence gain gray background 
+and only the residues of the first pseudoknot are connected.
+
+To support pseduoknots of (efficiently) arbitrary depth, the following charcters can be used to mark pseudoknot
+pairs in the dot-bracket notation: ``[]{}AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz``. Odd characters
+denote opening brackets which even characters denote closing bracket. Follows an example of a target with second-level
+pseudoknots:v
+
+```
+>2 BPs added to stem
+CAUCCGCAGGUGCCCCUAGAAAAAAAUUGUGCCUAGGACCCCCCUGCGCGAGGGGUAG 
+((.(((A(((a...))).(((AAABA))b..((..((aaa.a))..)))...))).))
+---*--------------------------------------------------*---
+```
+
+To get the layout with the above target and the _base_ template from the test directory(
+[base.fasta](https://raw.githubusercontent.com/cusbg/traveler/master/tests/data/tmp/base.fasta)
+, [base.svg](https://raw.githubusercontent.com/cusbg/traveler/master/tests/data/tmp/base.svg)), run the following command:
+
+``
+traveler --target-structure add_bp_to_stem.fasta --template-structure --file-format varna base.svg base.fasta --all out
+``
+
+You should end up with the following layout:
+
+<p align="center">
+ <img src="https://raw.githubusercontent.com/cusbg/traveler/master/img/pn-base.svg" width="80%"/>
+</p>
 
 ## Citation:
 If you use Traveler in your research, please cite:
-* Elias, R., & Hoksza, D. (2017). TRAVeLer: a tool for template-based RNA secondary structure visualization. BMC Bioinformatics, 18(1), 487.
-* Eliás, R., & Hoksza, D. (2016). Rna secondary structure visualization using tree edit distance. International Journal of Bioscience, Biochemistry and Bioinformatics, 6(1), 9.
+* Elias, R., & Hoksza, D. (2017). [TRAVeLer: a tool for template-based RNA secondary structure visualization](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1885-4). BMC Bioinformatics, 18(1), 487.
 
 ## Support
 
