@@ -49,8 +49,7 @@ rna_pair_label::rna_pair_label(
         const bool de_novo,
         const std::string pseudoknot) : rna_pair_label(s)
 {
-    rna_label l;
-    l.pseudoknot = pseudoknot;
+    labels[0].pseudoknot = pseudoknot;
     de_novo_predicted = de_novo;
 }
 
@@ -115,9 +114,6 @@ bool rna_pair_label::operator==(
 rna_pair_label rna_pair_label::operator+(
                                          const rna_pair_label& other) const
 {
-    if (!(!paired() && !other.paired()))
-        int i = 0;
-
     assert(!paired() && !other.paired());
     
     rna_pair_label out;
@@ -271,6 +267,7 @@ void rna_pair_label::set_label_strings(
         } else {
             (*this)[i].tmp_label = (*this)[i].label;
             (*this)[i].label = other[i].label;
+            (*this)[i].pseudoknot = other[i].pseudoknot;
         }
 
     }

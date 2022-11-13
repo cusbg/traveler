@@ -231,13 +231,12 @@ void app::save(
 //    if (overlap)
         overlaps = overlap_checks().run(rna);
 
-    pseudoknots pn(rna, writer->get_settings());
-
     //for (bool colored : {true, false})
     for (bool colored : {true})
     {
         for (auto& writer : document_writer::get_writers(colored))
         {
+            pseudoknots pn(rna, writer->get_settings());
             writer->set_scaling_ratio(rna);
             //string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
             string file = filename + COLORED_FILENAME_EXTENSION; //the colored extension is kept for backward compatibility with the R2DT pipeline

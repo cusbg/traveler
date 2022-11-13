@@ -1,4 +1,5 @@
 #include <document_writer.hpp>
+#include <algorithm>
 #include "pseudoknots.hpp"
 #include "convex_hull.hpp"
 
@@ -6,15 +7,24 @@ using namespace std;
 
 vector<pseudoknot_segment> find_pseudoknot_segments(rna_tree::pre_post_order_iterator begin, rna_tree::pre_post_order_iterator end){
 
+
+//    int i=0;
+//    for (auto it = begin; it != end; it++){
+//        cout << i++ << " " << it->at(0).pseudoknot << "\n";
+//    }
+
     vector<pair<rna_tree::pre_post_order_iterator, rna_tree::pre_post_order_iterator>> pn_pairs;
 
     int ix_begin = 0;
+    vector<rna_tree::pre_post_order_iterator> processed_pns;
     while(begin != end)
     {
-        for (int i = 0; i < begin->size(); ++i)
+        if (begin->size() == 1 && std::find(processed_pns.begin(), processed_pns.end(), begin) == processed_pns.end()) //pseudoknots can be only at position of unpaired (in terms of non-pseudoknot pairing) nucleotides
+        //for (int i = 0; i < begin->size(); ++i)
 //        for(auto&& l: begin->labels)
         {
-            auto l = (*begin)[i];
+            //auto l = (*begin)[i];
+            auto l = (*begin)[0];
             if(!l.pseudoknot.empty())
             {
                 auto rest = begin;
@@ -23,13 +33,18 @@ vector<pseudoknot_segment> find_pseudoknot_segments(rna_tree::pre_post_order_ite
 
                 while(rest != end)
                 {
-                    for (int j = 0; j < rest->size(); ++j)
+                    if (rest->size()  == 1 && std::find(processed_pns.begin(), processed_pns.end(), rest) == processed_pns.end())
+                    //for (int j = 0; j < rest->size(); ++j)
 //                    for(auto&& ll: rest->labels)
                     {
-                        auto ll = (*rest)[j];
+                        //auto ll = (*rest)[j];
+                        auto ll = (*rest)[0];
                         if(ll.pseudoknot == l.pseudoknot)
                         {
                             pn_pairs.push_back(make_pair(begin, rest));
+                            processed_pns.push_back(begin);
+                            processed_pns.push_back(rest);
+                            break;
                         }
                     }
                     ++rest;

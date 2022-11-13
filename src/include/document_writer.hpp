@@ -90,6 +90,7 @@ struct labels_lines_def {
 struct  shape_options {
     double      opacity = -1;
     double      width = -1;
+    std::string id = "";
     std::string color = "";
     std::string clazz = "";
     std::string g_clazz = "";

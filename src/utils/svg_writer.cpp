@@ -353,10 +353,10 @@ std::string svg_writer::get_polyline_formatted(
         out << property("stroke-width", msprintf("%s", opts.width));
     }
     if (!opts.title.empty()) {
-        out << property("stroke-width", msprintf("%s", opts.title));
+        out << property("title", msprintf("%s", opts.title));
     }
-    if (!opts.g_clazz.empty()) {
-        out << property("stroke-width", msprintf("%s", opts.g_clazz));
+    if (!opts.id.empty()) {
+        out << property("id", msprintf("%s", opts.id));
     }
 
     return create_element("polyline", out, "", {-1, ""});

@@ -605,9 +605,9 @@ std::string document_writer::render_pseudoknots(pseudoknots &pn) const
         opts_segment[1].title = s.get_label();
 
         opts_segment[0].clazz = string("pseudoknot_segment1");
-        opts_segment[0].g_clazz = s.get_id();
+        opts_segment[0].id = s.get_id();
         opts_segment[1].clazz = string("pseudoknot_segment2");
-        opts_segment[1].g_clazz = s.get_id();
+        opts_segment[1].id = s.get_id();
 
         opts_connection.title = s.get_label();
 
@@ -646,7 +646,7 @@ std::string document_writer::render_pseudoknots(pseudoknots &pn) const
         }
         points.push_back(s.connecting_curve.back().second + shift);
         opts_connection.clazz = string("pseudoknot_connection");
-        opts_connection.g_clazz = s.get_id();
+        opts_connection.id = s.get_id();
         oss << get_polyline_formatted(points, RGB::GRAY, opts_connection);
 
 
