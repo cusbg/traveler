@@ -106,31 +106,27 @@ public:
 #define property svg_writer::properties::property
 };
 
-struct svg_writer::style
-{
-    const std::string name;
-    const std::string value;
-    
-    template<typename value_type>
-    style(
-          const std::string& name,
-          const value_type& value)
-    : name(name), value(to_string(value))
-    { }
-    
-    friend std::ostream& operator<< (
-                                     std::ostream& out,
-                                     const style& p)
-    {
-        out
-        << p.name
-        << ": "
-        << p.value
-        << "; ";
-        
-        return out;
-    }
-};
+//struct svg_writer::style
+//{
+//    const std::string name;
+//    const std::string value;
+//
+//    template<typename value_type>
+//    style(
+//          const std::string& name,
+//          const value_type& value)
+//    : name(name), value(to_string(value))
+//    { }
+//
+//    friend std::ostream& operator<< (
+//                                     std::ostream& out,
+//                                     const style& p)
+//    {
+//        out << p.name << ": " << p.value << "; ";
+//
+//        return out;
+//    }
+//};
 
 //double svg_writer::get_scaling_ratio() const{
 //    return scaling_ratio;
@@ -430,7 +426,7 @@ std::string svg_writer::create_element(
         return msprintf("<g>%s<%s %s>%s</%s></g>\n", ss.str(), name, properties, value, name);
 }
 
-svg_writer::style svg_writer::get_color_style(
+document_writer::style svg_writer::get_color_style(
         const std::string& feature,
         const RGB& color) const
 {
@@ -440,20 +436,32 @@ svg_writer::style svg_writer::get_color_style(
 #undef rgb_value
 }
 
-svg_writer::properties svg_writer::get_styles(
-                                              const std::vector<style>& styles) const
-{
-    ostringstream out;
-    
-    for (const style& s : styles)
-    {
-        out
-        << s;
-    }
-    
-    return properties(property("style", out.str()));
+//svg_writer::properties svg_writer::get_styles(
+//                                              const document_writer::styles& styles) const
+//{
+//    ostringstream out;
+//
+//    for (const style& s : styles)
+//    {
+//        out
+//        << s;
+//    }
+//
+//    return properties(property("style", out.str()));
+//}
+
+std::string serialize_style(const document_writer::style& s){
+    return msprintf("%s: %s; ", s.name, s.value);
 }
 
+std::string serialize_styles(const std::vector<document_writer::style>& styles){
+    stringstream ss;
+    for (auto  & s: styles){
+        ss << serialize_style(s);
+    }
+
+    return ss.str();
+}
 std::string svg_writer::create_style_definitions(rna_tree& rna, bool labels_template) const
 {
     ostringstream out;
@@ -463,24 +471,18 @@ std::string svg_writer::create_style_definitions(rna_tree& rna, bool labels_temp
     << "<!-- create color definitions -->"
     << endl
     << "<![CDATA[";
-    
-    struct element
-    {
-        string name;
-        vector<style> styles;
-    };
 
-    double line_stroke_width = get_font_size() / 8;
+    styles elements;
 
-    vector<element> elements;
-    elements.push_back({"text", {}});
-    elements.push_back({"circle", {{"fill", "none"}}});
-    elements.push_back({"line", {{"stroke-width", line_stroke_width}}});
+    //add styles which are SVG specific
+    elements["text"] = {{"font-size",  to_string(get_font_size()) + "px"}, {"font-weight", "bold"}, {"font-family", "Helvetica"}};
+    elements["circle"] = {{"fill", "none"}};
+    elements["line"] = {{"stroke-width", get_line_stroke_width()}};
     
     for (const auto& element : elements)
     {
         string feature_name;
-        if (element.name == "text") {
+        if (element.first == "text") {
             feature_name = "fill";
         } else {
             feature_name = "stroke";
@@ -490,53 +492,57 @@ std::string svg_writer::create_style_definitions(rna_tree& rna, bool labels_temp
         {
             out
             << endl
-            << element.name
+            << element.first
             << "."
             << rgb.get_name()
             << " {"
-            << get_color_style(feature_name, rgb);
+            << serialize_style(get_color_style(feature_name, rgb));
             
-            for (const style& s : element.styles)
-            {
-                out
-                << s;
+            for (const document_writer::style& s : element.second) {
+                out << serialize_style(s);
             }
             out
             << "}";
         }
         
         // by default when no color is specified, black is used
-        if (element.name != "circle") {
+        if (element.first != "circle") {
             out
                     << endl
-                    << element.name
+                    << element.first
                     << " {"
-                    << get_color_style(feature_name, RGB::BLACK);
+                    << serialize_style(get_color_style(feature_name, RGB::BLACK));
 //        << style("fill", "none");
         }
 
-        if (element.name == "text"){
-            out << style("text-anchor", "middle");
-//            out << style("baseline-shift", "sub");
-            out << style("alignment-baseline", "middle");
+        if (element.first == "text"){
+            auto sls = element.second;
+            sls.push_back({"text-anchor", "middle"});
+            sls.push_back({"alignment-baseline", "middle"});
+            out << serialize_styles(sls);
 
         }
-        if (element.name != "circle") {
+        if (element.first != "circle") {
             out << "}";
         }
     }
     out << endl;
 
-    out << "text.numbering-label {fill: rgb(204, 204, 204);}" << endl;
-    out << "line.numbering-line {stroke: rgb(204, 204, 204); stroke-width: " << line_stroke_width / 2 << ";}" << endl;
-    out << "line.predicted {stroke: rgb(0, 0, 0); stroke-dasharray: 2}" << endl;
-    //out << "text.background {fill: rgb(255, 255, 255);" << endl; //for some reason, when this is present, template visibility hidden does not apply (at least in Google Chrome v. 104)
-    out << "." << (labels_template ? "sequential" : "template") << " {visibility:hidden}"; //either show position labels based on sequence position in target, or based on the positions in template (provided by the user in the Traveler XML format)
+    elements = get_document_styles(labels_template);
+    for (const auto& element : elements) {
+        out << endl << element.first << "{" << serialize_styles(element.second) << "}";
+    }
 
-    out << endl << "polyline {fill:none; stroke-linejoin:round; }";
-    out << endl << ".pseudoknot_segment1 {stroke-linecap:round; stroke-opacity: 0.4; stroke-width:" << to_string(get_font_size()) + "px" << "}";
-    out << endl << ".pseudoknot_segment2 {stroke-linecap:round; stroke-opacity: 0.4; stroke-width:" << to_string(get_font_size()) + "px" << "}";
-    out << endl << ".pseudoknot_connection {stroke-linecap:round; stroke-opacity: 0.2; stroke-width:" << 1.5   << "}";
+//    out << "text.numbering-label {fill: rgb(204, 204, 204);}" << endl;
+//    out << "line.numbering-line {stroke: rgb(204, 204, 204); stroke-width: " << get_line_stroke_width() / 2 << ";}" << endl;
+//    out << "line.predicted {stroke: rgb(0, 0, 0); stroke-dasharray: 2}" << endl;
+//    //out << "text.background {fill: rgb(255, 255, 255);" << endl; //for some reason, when this is present, template visibility hidden does not apply (at least in Google Chrome v. 104)
+//    out << "." << (labels_template ? "sequential" : "template") << " {visibility:hidden}"; //either show position labels based on sequence position in target, or based on the positions in template (provided by the user in the Traveler XML format)
+//
+//    out << endl << "polyline {fill:none; stroke-linejoin:round; }";
+//    out << endl << ".pseudoknot_segment1 {stroke-linecap:round; stroke-opacity: 0.4; stroke-width:" << to_string(get_font_size()) + "px" << "}";
+//    out << endl << ".pseudoknot_segment2 {stroke-linecap:round; stroke-opacity: 0.4; stroke-width:" << to_string(get_font_size()) + "px" << "}";
+//    out << endl << ".pseudoknot_connection {stroke-linecap:round; stroke-opacity: 0.2; stroke-width:" << 1.5   << "}";
     
     out << endl << "]]>" << endl;
     
@@ -557,7 +563,7 @@ std::string svg_writer::get_header_element(rna_tree& rna)
     << "\n\t" << property("width", msprintf("%f", letter.x))
     << "\n\t" << property("height", msprintf("%f", letter.y))
 //    << "\n\t" << get_styles({{"font-size",  "7px"}, {"stroke", "none"}, {"font-family", "Helvetica"}})
-    << "\n\t" << get_styles({{"font-size",  to_string(get_font_size()) + "px"}, {"font-weight", "bold"}, {"font-family", "Helvetica"}})
+    //<< "\n\t" << get_styles({{"font-size",  to_string(get_font_size()) + "px"}, {"font-weight", "bold"}, {"font-family", "Helvetica"}})
     << ">"
     << endl;
     

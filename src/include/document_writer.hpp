@@ -23,6 +23,8 @@
 #define DOCUMENT_WRITER_HPP
 
 #include <fstream>
+#include <sstream>
+
 #include "rna_tree.hpp"
 #include "pseudoknots.hpp"
 
@@ -97,6 +99,7 @@ struct  shape_options {
     std::string title = "";
 
 };
+
 
 /**
  * class for printing visualization
@@ -257,9 +260,10 @@ public:
      */
     streampos get_pos();
 
-    virtual void set_scaling_ratio(rna_tree& rna);
-    virtual void set_font_size(double size);
-    virtual double get_font_size() const;
+    void set_scaling_ratio(rna_tree& rna);
+    void set_font_size(double size);
+    double get_font_size() const;
+    virtual double get_line_stroke_width() const;
 
 protected:
     virtual std::string get_line_formatted(
@@ -320,8 +324,25 @@ private:
 
     document_settings settings;
 
+
 public:
     document_settings get_settings() const;
+
+public:
+    struct style
+    {
+        std::string name;
+        std::string value;
+
+        template<typename value_type>
+        style(std::string name, value_type value): name(std::move(name)), value(to_string(value)) {}
+
+//        virtual std::stringstream serialize(const document_writer::style& s) = 0;
+    };
+
+    typedef std::map<std::string, std::vector<style>> styles;
+    styles get_document_styles(const bool labels_template) const;
+
 };
 
 

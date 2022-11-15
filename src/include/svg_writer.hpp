@@ -28,6 +28,8 @@ class svg_writer : public document_writer
 {
 private:
     struct properties;
+
+protected:
     struct style;
     
 public:
@@ -93,11 +95,10 @@ protected:
     
 private:
     std::string get_header_element(rna_tree& rna);
-    style get_color_style(
+    document_writer::style get_color_style(
             const std::string& feature,
             const RGB& color) const;
-    properties get_styles(
-                          const std::vector<style>& styles) const;
+//    properties get_styles(const document_writer::styles&) const;
     std::string create_element(
                                const std::string& name,
                                const properties& properties,
@@ -123,9 +124,18 @@ private:
 
     //point shift_point(point &p) const;
 
+
+
 private:
     point dimensions;
     point margin;
+
+//protected:
+//    struct style : document_writer::style {
+//        std::stringstream serialize(const document_writer::style& s) override {
+//            return std::stringstream ("");
+//        }
+//    };
 
 };
 

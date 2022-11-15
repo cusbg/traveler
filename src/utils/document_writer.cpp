@@ -27,6 +27,7 @@
 #include "traveler_writer.hpp"
 
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -519,6 +520,11 @@ inline double document_writer::get_font_size() const{
     return this->settings.font_size;
 };
 
+inline double document_writer::get_line_stroke_width() const{
+    return this->get_font_size() / 8;
+}
+
+
 std::vector<line_def_rgb> document_writer::create_rna_background_formatted(
         rna_tree::pre_post_order_iterator begin,
         rna_tree::pre_post_order_iterator end) const
@@ -771,6 +777,7 @@ document_settings document_writer::get_settings() const{
     return this->settings;
 }
 
+
 point document_writer::map_point(const point& p, bool use_margin) const
 {
 
@@ -778,4 +785,48 @@ point document_writer::map_point(const point& p, bool use_margin) const
     p_new.y = letter.y - p_new.y;
 
     return p_new;
+}
+
+document_writer::styles document_writer::get_document_styles(const bool labels_template) const {
+    styles styles;
+
+    styles["text.numbering-label"] = {{"fill", "rgb(204, 204, 204)"}};
+
+    styles["line.numbering-line"] = {
+            {"stroke","rgb(204, 204, 204)"},
+            {"stroke-width", get_line_stroke_width() / 2}
+    };
+
+    styles["line.predicted"] = {
+            {"stroke", "rgb(0, 0, 0)"},
+            {"stroke-dasharray", 2}
+    };
+
+    string key = labels_template ? "sequential" : "template";
+    styles[key] = {{"visibility", "hidden"}};
+
+    styles["polyline"] = {
+            {"fill", "none"},
+            {"stroke-linejoin", "round"}
+    };
+
+    styles[".pseudoknot_segment1"] = {
+            {"stroke-linecap", "round"},
+            {"stroke-opacity", "0.4"},
+            {"stroke-width", get_font_size()}
+    };
+
+    styles[".pseudoknot_segment2"] = {
+            {"stroke-linecap", "round"},
+            {"stroke-opacity", "0.4"},
+            {"stroke-width", get_font_size()}
+    };
+
+    styles[".pseudoknot_connection"] = {
+            {"stroke-linecap", "round"},
+            {"stroke-opacity", "0.2"},
+            {"stroke-width", 1.5}
+    };
+
+    return styles;
 }

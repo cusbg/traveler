@@ -22,6 +22,8 @@
 #ifndef RNA_TREE_HPP
 #define RNA_TREE_HPP
 
+#include <map>
+
 #include "tree_base.hpp"
 #include "rna_tree_label.hpp"
 
@@ -34,6 +36,9 @@ struct document_settings {
     double scaling_ratio = 1;
     double font_size = 0;
 };
+
+typedef std::map<std::string, std::string> clazz;
+typedef std::vector<clazz> classes;
 
 class rna_tree : public tree_base<rna_pair_label>
 {

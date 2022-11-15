@@ -227,6 +227,13 @@ std::string json_writer::get_rna_subtree_formatted(
     return structure.dump(2);
 }
 
+std::string json_writer::get_polyline_formatted(
+        std::vector<point> &points,
+        const RGB& color,
+        shape_options opts) const {
+    return "";
+}
+
 /* virtual */ std::string json_writer::get_circle_formatted(
         point centre,
         double radius,
@@ -284,11 +291,6 @@ std::string json_writer::get_rna_subtree_formatted(
     return "";
 }
 
-std::string json_writer::get_polyline_formatted(
-        std::vector<point> &points,
-        const RGB& color,
-        shape_options opts) const {
-    return "";
-}
+
 
 
