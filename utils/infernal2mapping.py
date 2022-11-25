@@ -19,6 +19,40 @@ hairpin ends with a base pair]).
 
 The pre-ordered lists are then scanned to identify indexes of nodes in the template tree which need to be matched/inserted/deleted
 to arrive to the target tree. This mapping is then sent to output and can be imported by Traveler.
+
+Notes on the '.afa' files by Eric Nawrocki:
+
+The aligned sequence and SS_cons strings will be the same length.
+
+In the aligned sequences, there are three types of columns:
+- lowercase nucleotides are insertions relative to the template
+
+- uppercase nucleotides align to a template position
+
+- dashes (-) align to a template position but indicate where a
+  template position is missing (has been deleted)
+
+In the aligned secondary structures, there are four types of columns:
+- The four characters in the set :_,- represent positions that align
+  to a single stranded position in the template (these will always
+  match up with either an uppercase nucleotide or a dash (-) in the
+  aligned sequence)
+
+- The four characters in the set {<([ are left halves of basepairs
+  (these will always match up with either an uppercase nucleotide or a
+  dash (-) in the aligned sequence)
+
+- The four characters in the set }>)] are right halves of basepairs
+  (these will always match up with either an uppercase nucleotide or a
+  dash (-) in the aligned sequence)
+
+- The two characters in the set .~ are insertions relative to the
+  template (these will always match up with a lowercase nucleotide in
+  the aligned sequence)
+
+If we strip out the characters in the set .~ from the aligned
+secondary structures, we will always get the full length template
+secondary structure.
 """
 import sys
 import argparse
