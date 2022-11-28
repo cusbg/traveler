@@ -52,10 +52,12 @@ public:
     _pre_post_order_iterator&   operator++();
     _pre_post_order_iterator    operator--(int);
     _pre_post_order_iterator&   operator--();
-    
+
     inline bool preorder() const;
     inline size_t label_index() const;
-    
+
+    int seq_ix() const;
+
 private:
     bool _preorder;
     bool _paired_leaf = false;
@@ -251,6 +253,25 @@ size_t tree_base<label_type>::_pre_post_order_iterator::label_index() const
 //    if (this->preorder() || this->number_of_children() == 1 )
         return 0;
     return 1;
+}
+
+template <typename label_type>
+int tree_base<label_type>::_pre_post_order_iterator::seq_ix() const
+{
+    //TODO: !!!!!!!! this implementation is quite costly and thus should be used scarsely
+
+    tree_base<label_type>::_pre_post_order_iterator it(*this);
+    while(!tree_base<label_type>::is_root(it)) {
+        it = it.node->parent;
+    }
+
+    int ix = 0;
+    while (it != *this) {
+        it++;
+        ix++;
+    }
+
+    return ix;
 }
 
 //

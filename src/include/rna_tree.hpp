@@ -22,9 +22,10 @@
 #ifndef RNA_TREE_HPP
 #define RNA_TREE_HPP
 
+#include <map>
+
 #include "tree_base.hpp"
 #include "rna_tree_label.hpp"
-
 
 struct point;
 
@@ -35,6 +36,9 @@ struct document_settings {
     double scaling_ratio = 1;
     double font_size = 0;
 };
+
+typedef std::map<std::string, std::string> clazz;
+typedef std::vector<clazz> classes;
 
 class rna_tree : public tree_base<rna_pair_label>
 {
@@ -58,7 +62,9 @@ public:
      */
     void update_points(
                        const std::vector<point>& points);
-    
+
+    std::vector<point> get_points();
+
     /**
      * insert `label` to tree before `it` and set
      * `steal` next siblings to be children of inserted node
@@ -180,7 +186,7 @@ public:
      */
     void compute_distances();
 
-    
+
 private:
     std::string _name;
     bool folding_info = false; //whether the user provided line in the FASTA telling which bps were predicted de-novo and which were carried over from template

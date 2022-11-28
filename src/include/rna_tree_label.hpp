@@ -35,20 +35,19 @@ struct rna_label
 {
     bool operator==(
                     const rna_label& other) const;
-
     
-    std::string label;
-    std::string tmp_label; //label used in the template (can be used to store information about the mapped nodes label in the template)
-    int tmp_ix; //position in template
-    std::string tmp_numbering_label; //is of type string because index can be 21a when provided by the user
-    point p;
-    int seq_ix; //sequential index of the label. Corresponds to the position of the label as assigned by the pre_post_order iterator
+    std::string label = "";
+    std::string tmp_label = ""; //label used in the template (can be used to store information about the mapped nodes label in the template)
+    int tmp_ix = -1; //position in template
+    std::string tmp_numbering_label = ""; //is of type string because index can be 21a when provided by the user
+    point p = point::bad_point();
+    int seq_ix = -1; //sequential index of the label. Corresponds to the position of the label as assigned by the pre_post_order iterator
+    std::string pseudoknot = "";
 };
 
 /**
  * object representing one node in tree - base or base pair
  */
-
 class rna_pair_label : public node_base
 {
 public:
@@ -65,14 +64,15 @@ public:
     };
     
 public:
-    rna_pair_label() {
-        de_novo_predicted = false;
-    }
+
+    rna_pair_label();
 
     rna_pair_label(
-                   const std::string& s);
+                   const std::string s);
+
     rna_pair_label(
-            const std::string& s, const bool de_novo);
+            const std::string s, bool de_novo, const std::string pseudoknot);
+
     bool operator==(
                     const rna_pair_label& other) const;
     rna_pair_label operator+(
@@ -111,7 +111,7 @@ public:
     inline bool is_de_novo_predicted() const{
         return de_novo_predicted;
     }
-    
+
     void clear_points();
     /**
      * set bases
@@ -158,7 +158,7 @@ public:
     }
 
 
-    
+
 public:
     status_type status = untouched;
     /*
@@ -173,7 +173,7 @@ public:
     
 private:
     std::vector<rna_label> labels;
-    bool de_novo_predicted; //information about whether a base-pair in the target was predicted de novo or copied over from template
+    bool de_novo_predicted = false; //information about whether a base-pair in the target was predicted de novo or copied over from template
     point parent_center;
     std::vector<rectangle> bounding_objects;
     int source_ix = 0; //node index in the source tree (template)

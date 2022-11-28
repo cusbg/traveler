@@ -27,6 +27,7 @@
 #include "traveler_writer.hpp"
 
 #include <iostream>
+#include <utility>
 
 using namespace std;
 
@@ -59,8 +60,6 @@ bool RGB::operator==(
     return name == other.name;
 }
 
-
-
 /* static */ image_writers document_writer::get_writers(
                                                         bool use_colors)
 {
@@ -89,7 +88,8 @@ std::string document_writer::get_edge_formatted(
                                                 const int ix_from,
                                                 const int ix_to,
                                                 bool is_base_pair,
-                                                bool is_predicted
+                                                bool is_predicted,
+                                                const shape_options opts
                                                 ) const
 {
     if (from.bad() || to.bad())
@@ -294,8 +294,6 @@ labels_lines_def document_writer::create_numbering_formatted(
     p_center = center(p_prev, p_next);
     v_perp = normalize(orthogonal(p_prev - p_next));
 
-
-
     if (it->paired()){
         point p_other = it->at(1-it.label_index()).p;
         if (distance(p_center + v_perp, p_other) < distance(p_center - v_perp, p_other)) {
@@ -309,17 +307,14 @@ labels_lines_def document_writer::create_numbering_formatted(
         }
     }
 
-
     float grid_density = 1.5 * get_font_size();
     auto p = p_it + v_perp * grid_density * 1.5;
-    rectangle bb = get_label_bb(p, ix, get_font_size());
+    rectangle bb = get_label_bb(p, ix, get_font_size()); //the purpose of the BB is to test whether the label won't intersect anything, if yes, it needs to be moved
     if (rect_overlaps(bb, pos_residues) or rect_overlaps(bb, lines)) {
 //            p += normalize(v) * residue_distance * 3;
         p = sample_relevant_space(bb, p, v_perp, grid_density, pos_residues, lines, p_it);
         bb = get_label_bb(p, ix, get_font_size());
     }
-
-
 
     rna_label l;
     for (int i = 0; i < 2; ++i) {
@@ -381,7 +376,7 @@ std::string document_writer::get_numbering_formatted(
 }
 
 std::string document_writer::get_label_formatted(
-                                                 rna_tree::pre_post_order_iterator it, label_info li) const
+                                                 rna_tree::pre_post_order_iterator it, label_info li, const shape_options opts) const
 {
     if (!it->initiated_points())
         return "";
@@ -525,6 +520,11 @@ inline double document_writer::get_font_size() const{
     return this->settings.font_size;
 };
 
+inline double document_writer::get_line_stroke_width() const{
+    return this->get_font_size() / 8;
+}
+
+
 std::vector<line_def_rgb> document_writer::create_rna_background_formatted(
         rna_tree::pre_post_order_iterator begin,
         rna_tree::pre_post_order_iterator end) const
@@ -582,13 +582,98 @@ std::string document_writer::get_rna_background_formatted(
     return out.str();
 }
 
+
+std::string document_writer::render_pseudoknots(pseudoknots &pn) const
+{
+    ostringstream oss;
+
+//    for (auto s:pn.segments){
+//
+//        auto l = s.interval1.first->at(s.interval1.first.label_index());
+//        auto ll = s.interval2.first->at(s.interval2.first.label_index());
+//
+//        oss << get_line_formatted(l.p, ll.p, RGB::RED);
+//    }
+
+    shape_options opts_connection, opts_segment[2];
+    opts_segment[0].color = "gray";
+    opts_segment[1].color = "gray";
+    opts_connection.color = "gray";
+
+
+    //TODO: the shift is SVG-specific and should be somehow normalized
+//    point shift = -point(0, FONT_HEIGHT/2);
+    point shift = -point(0, 0);
+
+    for (auto s:pn.get_segments()) {
+
+        opts_segment[0].title = s.get_label();
+        opts_segment[1].title = s.get_label();
+
+        opts_segment[0].clazz = string("pseudoknot_segment1");
+        opts_segment[0].id = s.get_id();
+        opts_segment[1].clazz = string("pseudoknot_segment2");
+        opts_segment[1].id = s.get_id();
+
+        opts_connection.title = s.get_label();
+
+        int ix_int = 0;
+        for (auto interval: {s.interval1, s.interval2}) {
+
+//            oss << get_circle_formatted(s1->at(s1.label_index()).p + shift, FONT_HEIGHT/5*4, opts_segment);
+//            if (interval.second != interval.first) {
+//                oss << get_circle_formatted(interval.second->at(interval.second.label_index()).p, 4, opts_segment);
+//
+//            }
+            vector<point> points;
+            auto it = interval.first;
+            if (interval.first != interval.second) {
+                while (it != interval.second) {
+                    points.push_back(it->at(it.label_index()).p + shift);
+    //                oss << get_line_formatted(s1->at(s1.label_index()).p + shift, s2->at(s2.label_index()).p + shift, RGB::GRAY, opts_segment);
+                    it++;
+                }
+
+                points.push_back(it->at(it.label_index()).p + shift);
+                oss << get_polyline_formatted(points, RGB::GRAY, opts_segment[ix_int]);
+            } else {
+                oss << get_circle_formatted(it->at(it.label_index()).p + shift, pn.get_font_size()/2, opts_segment[ix_int]);
+
+            }
+
+
+            ix_int++;
+        }
+
+        vector<point> points;
+        for (line l:s.connecting_curve) {
+            points.push_back(l.first+ shift);
+//                oss << get_line_formatted(l.first, l.second, RGB::RED, opts_connection);
+        }
+        points.push_back(s.connecting_curve.back().second + shift);
+        opts_connection.clazz = string("pseudoknot_connection");
+        opts_connection.id = s.get_id();
+        oss << get_polyline_formatted(points, RGB::GRAY, opts_connection);
+
+
+
+    }
+
+    return oss.str();
+}
+
 std::string document_writer::get_rna_formatted(
                                                rna_tree rna,
-                                               const numbering_def& numbering) const
+                                               const numbering_def& numbering,
+                                               pseudoknots pn) const
 {
     rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
-    return get_rna_subtree_formatted(rna, numbering)
-           + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
+//    return get_rna_subtree_formatted(rna, numbering)
+//           + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
+    return render_pseudoknots(pn)
+        + get_rna_subtree_formatted(rna, numbering)
+        + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post())
+    ;
 }
 
 void document_writer::init(
@@ -692,6 +777,7 @@ document_settings document_writer::get_settings() const{
     return this->settings;
 }
 
+
 point document_writer::map_point(const point& p, bool use_margin) const
 {
 
@@ -699,4 +785,48 @@ point document_writer::map_point(const point& p, bool use_margin) const
     p_new.y = letter.y - p_new.y;
 
     return p_new;
+}
+
+document_writer::styles document_writer::get_document_styles(const bool labels_template) const {
+    styles styles;
+
+    styles["text.numbering-label"] = {{"fill", "rgb(204, 204, 204)"}};
+
+    styles["line.numbering-line"] = {
+            {"stroke","rgb(204, 204, 204)"},
+            {"stroke-width", get_line_stroke_width() / 2}
+    };
+
+    styles["line.predicted"] = {
+            {"stroke", "rgb(0, 0, 0)"},
+            {"stroke-dasharray", 2}
+    };
+
+    string key = labels_template ? "sequential" : "template";
+    styles[key] = {{"visibility", "hidden"}};
+
+    styles["polyline"] = {
+            {"fill", "none"},
+            {"stroke-linejoin", "round"}
+    };
+
+    styles[".pseudoknot_segment1"] = {
+            {"stroke-linecap", "round"},
+            {"stroke-opacity", "0.4"},
+            {"stroke-width", get_font_size()}
+    };
+
+    styles[".pseudoknot_segment2"] = {
+            {"stroke-linecap", "round"},
+            {"stroke-opacity", "0.4"},
+            {"stroke-width", get_font_size()}
+    };
+
+    styles[".pseudoknot_connection"] = {
+            {"stroke-linecap", "round"},
+            {"stroke-opacity", "0.2"},
+            {"stroke-width", 1.5}
+    };
+
+    return styles;
 }

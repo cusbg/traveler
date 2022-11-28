@@ -31,8 +31,8 @@ do
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure ${TMP_DIR}${TMP}.ps ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
 done
 
-TGTS=( J01436.1456.1522 add_bp_to_stem )
-TMPS=( RF00005_Eukaryota-5E6M base )
+TGTS=( J01436.1456.1522 add_bp_to_stem add_bp_to_stem_pn )
+TMPS=( RF00005_Eukaryota-5E6M base base )
 
 for((i=0;i<${#TGTS[@]};i++))
 do

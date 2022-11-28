@@ -4,17 +4,19 @@
 
 echo '<!DOCTYPE html><html><head><style>'
 echo '.row{display: flex}'
-echo '.col{width: 50%}'
+echo '.col{width: 33%}'
 echo 'img{max-width: 100%}'
 echo '</style></head><body>'
 for f in `ls out/ref-*.svg`; do
   tgt_ref=${f/out\//}
   tgt=${tgt_ref/ref-/}
-  tgt=${tgt/.svg/.json.svg}
+  tgt=${tgt/.svg/.colored.svg}
+  tgt_json=${tgt/.svg/.json.svg}
   echo $tgt
   echo '<div class="row">'
   echo '<div class="col col-ref"><img src="'${tgt_ref}'"></div>'
   echo '<div class="col col-tgt"><img src="'${tgt}'"></div>'
+  echo '<div class="col col-tgt"><img src="'${tgt_json}'"></div>'
   echo '</div>'
 
 done

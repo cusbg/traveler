@@ -78,7 +78,8 @@ private:
                      bool run_overlaps,
                      bool rotate_branches,
                      const std::string& file,
-                     const numbering_def& numbering);
+                     const numbering_def& numbering,
+                     bool labels_template);
     
     /**
      * save both, colored and not colored documents
@@ -87,20 +88,21 @@ private:
               const std::string& filename,
               rna_tree& rna,
               bool overlaps,
-              const numbering_def& numbering);
+              const numbering_def& numbering,
+              bool labels_template);
     
 private:
     /**
      * reads both seq & fold file and construct rna tree
      */
-    static rna_tree create_matched(
+    static rna_tree create_target(
                                    const std::string& fastafile);
     
     /**
      * reads ps & fold file and construct rna tree
      * from ps extract rna sequence and node positions in image
      */
-    static rna_tree create_templated(
+    static rna_tree create_template(
                                      const std::string& templatefile,
                                      const std::string& templatetype,
                                      const std::string& fastafile);

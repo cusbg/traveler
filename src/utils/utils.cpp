@@ -129,7 +129,7 @@ bool contains_one_of(
            DEBUG("Removing line feed\n");
            line = line.substr( 0, line.size() - 1 );
         }
-        if (contains_one_of(line, "[{(.)}]"))
+        if (contains_one_of(line, ".(){}[]"))
             brackets << line;
         else if (contains_one_of(line, "*-"))
             constraints << line;

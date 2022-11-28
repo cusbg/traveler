@@ -32,22 +32,27 @@ bool rna_label::operator==(
     return label == other.label;
 }
 
-
-
-
-rna_pair_label::rna_pair_label(
-                               const std::string& s)
+rna_pair_label::rna_pair_label()
 {
-    labels.push_back({s, "", -1, "", point::bad_point()});
-    de_novo_predicted = false;
 }
 
 rna_pair_label::rna_pair_label(
-        const std::string& s,
-        const bool de_novo) : rna_pair_label(s)
+                               const std::string s)
 {
+    rna_label l;
+    l.label = s;
+    labels.push_back(l);
+}
+
+rna_pair_label::rna_pair_label(
+        const std::string s,
+        const bool de_novo,
+        const std::string pseudoknot) : rna_pair_label(s)
+{
+    labels[0].pseudoknot = pseudoknot;
     de_novo_predicted = de_novo;
 }
+
 
 const rna_label& rna_pair_label::operator[](
                                             size_t index) const
@@ -114,12 +119,7 @@ rna_pair_label rna_pair_label::operator+(
     rna_pair_label out;
     out.labels.push_back(labels.back());
     out.labels.push_back(other.labels.back());
-
-    if (de_novo_predicted != other.de_novo_predicted) {
-        throw illegal_state_exception("Constraint line issue. Both base paired residues should be be either copied over or de-novo predicted");
-    }
-
-    out.de_novo_predicted = de_novo_predicted;
+    out.de_novo_predicted = this->de_novo_predicted || other.de_novo_predicted;
     
     return out;
 }
@@ -195,6 +195,7 @@ size_t rna_pair_label::size() const
 
 bool rna_pair_label::paired() const
 {
+
     assert(labels.size() == 1 || labels.size() == 2);
     
     return labels.size() == 2;
@@ -266,6 +267,7 @@ void rna_pair_label::set_label_strings(
         } else {
             (*this)[i].tmp_label = (*this)[i].label;
             (*this)[i].label = other[i].label;
+            (*this)[i].pseudoknot = other[i].pseudoknot;
         }
 
     }
@@ -298,4 +300,3 @@ std::string get_status_name(const rna_pair_label::status_type type){
                            "pair_changed"};
     return types[type];
 }
-

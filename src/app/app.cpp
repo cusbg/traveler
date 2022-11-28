@@ -45,6 +45,7 @@
 #define ARGS_VERBOSE                        {"-v", "--verbose"}
 #define ARGS_DEBUG                          {"--debug"}
 #define ARGS_NUMBERING                       {"-n", "--numbering"}
+#define ARGS_LABELS_TEMPLATE                 {"-l", "--labels-template"}
 
 #define COLORED_FILENAME_EXTENSION          ".colored"
 
@@ -58,6 +59,7 @@ struct app::arguments
     rna_tree templated; // template
     rna_tree matched; // target
     bool rotate_branches = false;
+    bool labels_template = false;
     
     struct
     {
@@ -83,7 +85,7 @@ struct app::arguments
     } traveler;
     numbering_def numbering;
 
-    
+
 public:
     /**
      * parse arguments
@@ -132,7 +134,7 @@ void app::run(
         img_out = args.draw.file;
     }
 
-    run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out, args.numbering);
+    run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out, args.numbering, args.labels_template);
     
     INFO("END: APP");
 }
@@ -187,7 +189,8 @@ void app::run_drawing(
                       bool run_overlaps,
                       bool rotate_branches,
                       const std::string& file,
-                      const numbering_def& numbering)
+                      const numbering_def& numbering,
+                      bool labels_template)
 {
     APP_DEBUG_FNAME;
 
@@ -206,7 +209,7 @@ void app::run_drawing(
         //Compact goes through the structure and computes new coordinates where necessary
             compact(templated).run(rotate_branches);
 
-        save(file, templated, run_overlaps, numbering);
+        save(file, templated, run_overlaps, numbering, labels_template);
     }
     catch (const my_exception& e)
     {
@@ -218,7 +221,8 @@ void app::save(
                const std::string& filename,
                rna_tree& rna,
                bool overlap,
-               const numbering_def& numbering)
+               const numbering_def& numbering,
+               bool labels_template)
 {
     APP_DEBUG_FNAME;
 
@@ -227,17 +231,17 @@ void app::save(
 //    if (overlap)
         overlaps = overlap_checks().run(rna);
 
-    
     //for (bool colored : {true, false})
     for (bool colored : {true})
     {
         for (auto& writer : document_writer::get_writers(colored))
         {
+            pseudoknots pn(rna, writer->get_settings());
             writer->set_scaling_ratio(rna);
             //string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
             string file = filename + COLORED_FILENAME_EXTENSION; //the colored extension is kept for backward compatibility with the R2DT pipeline
-            writer->init(file, rna);
-            writer->print(writer->get_rna_formatted(rna, numbering));
+            writer->init(file, rna, labels_template);
+            writer->print(writer->get_rna_formatted(rna, numbering, pn));
 
             if (overlap)
                 for (const auto& p : overlaps)
@@ -258,7 +262,7 @@ void app::save(
 
 
 
-rna_tree app::create_matched(
+rna_tree app::create_target(
                              const std::string& fastafile)
 {
     APP_DEBUG_FNAME;
@@ -275,7 +279,7 @@ rna_tree app::create_matched(
     }
 }
 
-rna_tree app::create_templated(
+rna_tree app::create_template(
                                const std::string& templatefile,
                                const std::string& templatetype,
                                const std::string& fastafile)
@@ -348,6 +352,10 @@ void app::usage(
     << "\t[" << get_args(ARGS_VERBOSE) << "]"
     << endl
     << "\t[" << get_args(ARGS_ROTATE_BRANCHES) << "]"
+    << endl
+    << "\t[" << get_args(ARGS_NUMBERING) << "]"
+    << endl
+    << "\t[" << get_args(ARGS_LABELS_TEMPLATE) << "]"
     << endl;
 }
 
@@ -381,6 +389,7 @@ void app::print(
     
     
 }
+
 
 /* static */ app::arguments app::arguments::parse(
                                                   const std::vector<std::string>& args)
@@ -438,7 +447,7 @@ void app::print(
             {
                 DEBUG("arg match-tree");
                 string fastafile = args.at(i + 1);
-                a.matched = app::create_matched(fastafile);
+                a.matched = app::create_target(fastafile);
                 ++i;
                 continue;
             }
@@ -454,7 +463,7 @@ void app::print(
                 }
                 templatefile = args.at(i + 1);
                 fastafile = args.at(i + 2);
-                a.templated = app::create_templated(templatefile, templatetype, fastafile);
+                a.templated = app::create_template(templatefile, templatetype, fastafile);
                 i += 2;
             }
             else if (is_argument(ARGS_ALL))
@@ -530,7 +539,10 @@ void app::print(
                 } catch (...) {
                     throw wrong_argument_exception("Unsupported numbering format");
                 };
-
+            }
+            else if (is_argument(ARGS_LABELS_TEMPLATE))
+            {
+                a.labels_template = true;
 
             }
             else

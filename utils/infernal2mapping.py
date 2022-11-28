@@ -7,9 +7,9 @@ with added .~ characters corresponding to insertions (these will match the lower
 corresponding to "-" nucleotides will result to target structure while removing ".~" characters results in the
 template structure.
 
-Parsing the INFERNAL input results in two structures which contain, sequnece and structure of both target and
-template (the template sequence has "-" at positions which were deleted since this information is not present in
-the mapping file) and mapping list which gives mapping from target/template to the position in the infernal
+Parsing the INFERNAL input results in two structures that contain sequence and structure of both target and
+template (the template sequence has only "-" at positions which were deleted since information about the template is not present in
+the input file) and mapping list which gives mapping from target/template to the position in the infernal
 mapping (since this contains both insertions and deletions).
 
 The structures are then processed into the pre-order sorted list of nodes of the target and template trees. Each node
@@ -19,6 +19,40 @@ hairpin ends with a base pair]).
 
 The pre-ordered lists are then scanned to identify indexes of nodes in the template tree which need to be matched/inserted/deleted
 to arrive to the target tree. This mapping is then sent to output and can be imported by Traveler.
+
+Notes on the '.afa' files by Eric Nawrocki:
+
+The aligned sequence and SS_cons strings will be the same length.
+
+In the aligned sequences, there are three types of columns:
+- lowercase nucleotides are insertions relative to the template
+
+- uppercase nucleotides align to a template position
+
+- dashes (-) align to a template position but indicate where a
+  template position is missing (has been deleted)
+
+In the aligned secondary structures, there are four types of columns:
+- The four characters in the set :_,- represent positions that align
+  to a single stranded position in the template (these will always
+  match up with either an uppercase nucleotide or a dash (-) in the
+  aligned sequence)
+
+- The four characters in the set {<([ are left halves of basepairs
+  (these will always match up with either an uppercase nucleotide or a
+  dash (-) in the aligned sequence)
+
+- The four characters in the set }>)] are right halves of basepairs
+  (these will always match up with either an uppercase nucleotide or a
+  dash (-) in the aligned sequence)
+
+- The two characters in the set .~ are insertions relative to the
+  template (these will always match up with a lowercase nucleotide in
+  the aligned sequence)
+
+If we strip out the characters in the set .~ from the aligned
+secondary structures, we will always get the full length template
+secondary structure.
 """
 import sys
 import argparse
@@ -42,11 +76,11 @@ def error_exit(message):
 
 def read_structures(f) -> List[SequenceStructureMapping]:
     f.readline()
-    sq = f.readline()
+    sq = f.readline().strip()
     f.readline()
-    str_full = f.readline()  # in positions of deletions (relative to template) this structure contains the base pairing information from template unlike str which might contain half pairs
+    str_full = f.readline().strip()  # in positions of deletions (relative to template) this structure contains the base pairing information from template unlike str which might contain half pairs
     f.readline()
-    str = f.readline()
+    str = f.readline().strip()
     assert len(sq) == len(str) == len(str_full)
 
     tgt_s_s_m = SequenceStructureMapping()

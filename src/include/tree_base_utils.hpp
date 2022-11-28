@@ -23,8 +23,9 @@
 #define TREE_BASE_UTILS_HPP
 
 #include "tree_base.hpp"
+#include <iostream>
 
-#define PSEUDOKNOT_CHARACTERS "[{}]"
+#define PSEUDOKNOT_CHARACTERS "[]{}AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz"
 
 //
 // tree<> functions:

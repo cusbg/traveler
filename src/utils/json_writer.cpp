@@ -4,7 +4,7 @@
 using namespace std;
 using json = nlohmann::json;
 
-void json_writer::init(const string& filename, rna_tree& rna)
+void json_writer::init(const string& filename, rna_tree& rna, bool labels_template)
 {
     document_writer::init(filename, ".json", rna);
 }
@@ -23,7 +23,8 @@ streampos json_writer::print(const string& text)
 
 std::string json_writer::get_rna_formatted(
         rna_tree rna,
-        const numbering_def& numbering) const
+        const numbering_def& numbering,
+        pseudoknots pn) const
 {
     rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
     return get_rna_subtree_formatted(rna, numbering); //+ get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
@@ -229,9 +230,17 @@ std::string json_writer::get_rna_subtree_formatted(
     return structure.dump(2);
 }
 
+std::string json_writer::get_polyline_formatted(
+        std::vector<point> &points,
+        const RGB& color,
+        shape_options opts) const {
+    return "";
+}
+
 /* virtual */ std::string json_writer::get_circle_formatted(
         point centre,
-        double radius) const
+        double radius,
+        shape_options opts) const
 {
 
     return "";
@@ -241,7 +250,8 @@ std::string json_writer::get_rna_subtree_formatted(
         const rna_label& label,
         const RGB& color,
         const rna_pair_label::status_type status,
-        const label_info li) const
+        const label_info li,
+        const shape_options opts) const
 {
     return "";
 }
@@ -250,7 +260,8 @@ std::string json_writer::get_rna_subtree_formatted(
         const rna_label& label,
         const std::string& clazz,
         const rna_pair_label::status_type status,
-        const label_info li) const
+        const label_info li,
+        const shape_options opts) const
 {
     return "";
 }
@@ -263,7 +274,8 @@ std::string json_writer::get_rna_subtree_formatted(
         int ix_to,
         bool is_base_pair,
         bool is_predicted,
-        const RGB& color) const
+        const RGB& color,
+        const shape_options opts) const
 {
 
     return "";
@@ -276,9 +288,12 @@ std::string json_writer::get_rna_subtree_formatted(
         int ix_to,
         bool is_base_pair,
         bool is_predicted,
-        const std::string& clazz) const
+        const std::string& clazz,
+        const shape_options opts) const
 {
     return "";
 }
+
+
 
 
