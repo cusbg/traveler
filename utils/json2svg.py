@@ -47,7 +47,7 @@ def get_color_class(attribute, val):
 
 
 def get_color_attributes(params):
-    return params["coloring"].keys()
+    return params["coloring"].keys() if params else []
 
 
 def classes_defs(labels_template, coloring):
@@ -138,7 +138,7 @@ def get_font_size(classes):
 
 def classes_to_svg(data, labels_template, params):
 
-    classes = data['classes'] + classes_defs(labels_template, params["coloring"])
+    classes = data['classes'] + classes_defs(labels_template, params["coloring"] if params else {})
 
     svg_classes = '<style type="text/css" >\n'
     svg_classes += '<![CDATA[\n'
@@ -259,10 +259,12 @@ def main():
 
     with open(args.input, "r") as fr:
         data = json.load(fr)
-        with open(args.params, "r") as fp:
-            params = json.load(fp)
-            with (sys.stdout if args.output is None else open(args.output, "w")) as fw:
-                fw.write(to_svg(data, args.labels_template, params))
+        params = {}
+        if args.params:
+            with open(args.params, "r") as fp:
+                params = json.load(fp)
+        with (sys.stdout if args.output is None else open(args.output, "w")) as fw:
+            fw.write(to_svg(data, args.labels_template, params))
 
 
 if __name__ == '__main__':
