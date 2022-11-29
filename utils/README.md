@@ -61,8 +61,8 @@ probabilities from the Infernal `cmscan` utility. Then, the params file can look
 Such definition could then be passed to `json2svg`:
 
 ```
-python3 json2svg.py -i test_data/URS000080E2F0_93929-RF01734.enriched.json -o test_data/URS000080E2F0_93929-RF01734.enriched.json.json.svg
-python3 json2svg.py -i test_data/URS00002A2E83_10090-HS_SSU_3D.enriched.json -o test_data/URS00002A2E83_10090-HS_SSU_3D.enriched.json.svg
+python3 json2svg.py -p test_data/params.json -i test_data/URS000080E2F0_93929-RF01734.enriched.json -o test_data/URS000080E2F0_93929-RF01734.enriched.svg
+python3 json2svg.py -p test_data/params.json -i test_data/URS00002A2E83_10090-HS_SSU_3D.enriched.json -o test_data/URS00002A2E83_10090-HS_SSU_3D.enriched.svg
 ```
 The coloring definition will be turned into SVG classes, which will be assigned to corresponding
 residues. To switch between the original coloring and the user-provided coloring, you will need to invalidate the class
