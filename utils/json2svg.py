@@ -1,9 +1,11 @@
 import sys
-import gzip
 import argparse
 import logging
 import json
+import re
 from typing import Dict
+
+
 
 
 class Point:
@@ -40,7 +42,23 @@ def error_exit(message):
     sys.exit()
 
 
-def classes_defs(labels_template):
+def get_color_class(attribute, val):
+    return re.sub('[.,*]', '_', f'color-{attribute}-{val}')
+
+
+def get_color_attributes(params):
+    return params["coloring"].keys() if params else []
+
+
+def classes_defs(labels_template, coloring):
+    color_classes = []
+    for attribute, values in coloring.items():
+        for v, rgb in values["values"].items():
+            color_classes.append({
+                'name': get_color_class(attribute=attribute, val=v),
+                'fill': rgb
+            })
+
     return [{
         'name': 'text-black',
         'fill': 'rgb(0, 0, 0)'
@@ -111,16 +129,16 @@ def classes_defs(labels_template):
         'name': 'res-line',
         'stroke': GRAY
     },
-    ]
+    ] + color_classes
 
 
 def get_font_size(classes):
     return (float)((list(filter(lambda x: x["name"] == "font", classes))[0]["font-size"]).replace("px", ""))
 
 
-def classes_to_svg(data, labels_template):
+def classes_to_svg(data, labels_template, params):
 
-    classes = data['classes'] + classes_defs(labels_template)
+    classes = data['classes'] + classes_defs(labels_template, params["coloring"] if params else {})
 
     svg_classes = '<style type="text/css" >\n'
     svg_classes += '<![CDATA[\n'
@@ -140,8 +158,9 @@ def classes_to_svg(data, labels_template):
     return svg_classes
 
 
-def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size):
+def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size, params):
 
+    color_attributes = get_color_attributes(params)
     residues = '<g class="residues">'
 
     # Lines connected residues in the sequence are drawn
@@ -163,8 +182,14 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size):
         res_pos[res['residueIndex']] = p
         dim.update(p)
         cls = " ".join(res['classes'])
+        title = f"Position: {res['residueIndex']} (position.label in template: {res['info']['templateResidueIndex']}.{res['info']['templateResidueName']})"
+        for attr in res['info'].keys():
+            if attr in color_attributes:
+                cls = f'{cls} {get_color_class(attr, res["info"][attr])}'
+                title = f'{title}\n{params["coloring"][attr]["label"]}: {res["info"][attr]}'
+
         residues += f"<g>" \
-                    f"<title>{res['residueIndex']} (position.label in template: {res['templateResidueIndex']}.{res['templateResidueName']}')</title>" \
+                    f"<title>{title}</title>" \
                     f"<text x=\"{p.x}\" y=\"{p.y}\" class=\"{cls}\" >{res['residueName']}</text>" \
                     f"</g>\n"
 
@@ -210,14 +235,14 @@ def labels_to_svg(rna, dim: Dimensions):
     return svg_labels
 
 
-def to_svg(data, labels_template):
+def to_svg(data, labels_template, params):
     
     dim = Dimensions()
 
     rna = data['rnaComplexes'][0]['rnaMolecules'][0]
-    svg_classes = classes_to_svg(data, labels_template)
+    svg_classes = classes_to_svg(data, labels_template, params)
     res_pos: Dict[int, Point] = {}
-    residues = residues_to_svg(rna, dim, res_pos, get_font_size(data['classes']))
+    residues = residues_to_svg(rna=rna, dim=dim, res_pos=res_pos, font_size=get_font_size(data['classes']), params=params)
     bps = bps_to_svg(rna, res_pos)
     svg_labels = labels_to_svg(rna, dim)
 
@@ -234,8 +259,12 @@ def main():
 
     with open(args.input, "r") as fr:
         data = json.load(fr)
+        params = {}
+        if args.params:
+            with open(args.params, "r") as fp:
+                params = json.load(fp)
         with (sys.stdout if args.output is None else open(args.output, "w")) as fw:
-            fw.write(to_svg(data, args.labels_template))
+            fw.write(to_svg(data, args.labels_template, params))
 
 
 if __name__ == '__main__':
@@ -249,6 +278,9 @@ if __name__ == '__main__':
                         metavar='FILE',
                         help="Output file name for the SVG file. "
                              "If non entered, the standard output will be used.")
+    parser.add_argument("-p", "--params",
+                        metavar='FILE',
+                        help="Params file")
     parser.add_argument("-l", "--labels-template",
                         action='store_true',
                         help="If set, the numbering labels will be based on numbering labels from template (e.g. Sprinzl positions for tRNA). ")
