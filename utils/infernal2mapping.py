@@ -81,6 +81,12 @@ def read_structures(f) -> List[SequenceStructureMapping]:
     str_full = f.readline().strip()  # in positions of deletions (relative to template) this structure contains the base pairing information from template unlike str which might contain half pairs
     f.readline()
     str = f.readline().strip()
+    f.readline()
+    str_orig = f.readline().strip() # it input can contain also original secondary structure before depairing carried out by the R2DT pipeline
+    # (depairing happens when there are non-canonical base pairs in the template - these are then removed from the template secondary structure
+    # but then it can happen that the sequence and template structures are not valid with respect to the rules described in the header of this file)
+    if str_orig != '':
+        str = str_orig
     assert len(sq) == len(str) == len(str_full)
 
     tgt_s_s_m = SequenceStructureMapping()

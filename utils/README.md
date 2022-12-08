@@ -1,5 +1,25 @@
 # Traveler utilities
 
+## infernal2mapping.py
+
+Takes the Infernal target-template information (`.afa` file) and generates mapping (see the main README for more details).
+The input file contains the template sequence and information about mapping of its secondary structure onto the template
+seoncary structure.
+
+```
+infernal2mapping.py -i test_data/URS00008E3949.traveler.afa -o test_data/URS00008E3949.map
+```
+
+However, due to the depairing process introduced in the R2DT pipeline, it can happen that the template structure
+actually does not correctly maps to the sequence (some positions which should be paired, are not paired - see the rules
+in the header of the `infernal2mapping.py` script) and the resulting mapping is actually not valid (the mapping proces
+does not fail, but Traveler does). Thus, it is possible to add additional line that specifies
+the original target structure.
+
+```
+infernal2mapping.py -i test_data/URS00008E3949.traveler.orig_ss.afag -o test_data/URS00008E3949.map
+```
+
 ## traveler2xrna
 
 Export of Traveler's XML output to XRNA.
