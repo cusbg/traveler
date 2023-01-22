@@ -78,37 +78,39 @@ def read_structures(f) -> List[SequenceStructureMapping]:
     f.readline()
     sq = f.readline().strip()
     f.readline()
-    str_full = f.readline().strip()  # in positions of deletions (relative to template) this structure contains the base pairing information from template unlike str which might contain half pairs
+    str_tgt = f.readline().strip()
     f.readline()
-    str = f.readline().strip()
+    str_temp = f.readline().strip()
     f.readline()
-    str_orig = f.readline().strip() # it input can contain also original secondary structure before depairing carried out by the R2DT pipeline
-    # (depairing happens when there are non-canonical base pairs in the template - these are then removed from the template secondary structure
-    # but then it can happen that the sequence and template structures are not valid with respect to the rules described in the header of this file)
-    if str_orig != '':
-        str = str_orig
-    assert len(sq) == len(str) == len(str_full)
+    str_temp_orig = f.readline().strip() # the input can contain also original secondary structure before depairing carried out by the R2DT pipeline.
+    # Depairing happens when there are non-canonical base pairs in the template - these are then removed from the template secondary structure
+    # but then it can happen that the sequence and template structures are not valid with respect to the rules described in the header of this file.
+    # However, to Traveler is then passed the original template, i.e. the one corresponding to the "orig", where the non-canonical base pairs exist.
+    assert len(sq) == len(str_temp) == len(str_tgt)
+
+    str_temp_used = str_temp_orig if str_temp_orig else str_temp
 
     tgt_s_s_m = SequenceStructureMapping()
     tmp_s_s_m = SequenceStructureMapping() # as for sequence, template contains dashes at positions which were deleted in target
-    tmp_full_s_s_m = SequenceStructureMapping()
+    #tmp_full_s_s_m = SequenceStructureMapping()
 
     # Non-bracket and non-alpha symbols correspond to gaps in sequence
     tgt_s_s_m.sq = sq.replace('-', '')
     # . and ~ symbols correspond to insertions with respect to template
-    tmp_s_s_m.str = str.replace('.', '').replace('~', '')
-    tmp_full_s_s_m.str = copy.deepcopy(tmp_s_s_m.str)
+    tmp_s_s_m.str = str_temp_used.replace('.', '').replace('~', '')
+    #tmp_full_s_s_m.str = copy.deepcopy(tmp_s_s_m.str)
 
     for i, letter in enumerate(sq):
         if letter != '-':
-            tgt_s_s_m.str += str[i]
+            tgt_s_s_m.str += str_temp[i]
             tgt_s_s_m.m.append(i)
         if not 'a' <= letter <= 'z' and letter != 'X':
             tmp_s_s_m.sq += letter
             tmp_s_s_m.m.append(i)
-            tmp_full_s_s_m.m.append(i)
+            #tmp_full_s_s_m.m.append(i)
 
-    return [sq, tgt_s_s_m, tmp_s_s_m, tmp_full_s_s_m]
+    #return [sq, tgt_s_s_m, tmp_s_s_m, tmp_full_s_s_m]
+    return [sq, tgt_s_s_m, tmp_s_s_m]
 
 
 def get_ix(ix_cap: int, str_ix: List[List[int]]) -> int:
@@ -267,12 +269,17 @@ def convert_to_aln_ix(str_ix: List[List[int]], s_s_m: SequenceStructureMapping) 
 
 def main():
     with open(args.input, "r") as fr:
-        sq_aln, tgt_s_s_m, tmp_s_s_m, tmp_full_s_s_m = read_structures(fr)
-        tmp_str_ix = read_str_ix(tmp_full_s_s_m, [])
-        tmp_affected = get_affected_positions_in_tmp(sq_aln=sq_aln, s_s_m=tmp_full_s_s_m, str_ix=tmp_str_ix)
+        sq_aln, tgt_s_s_m, tmp_s_s_m = read_structures(fr)
+        #tmp_str_ix = read_str_ix(tmp_full_s_s_m, [])
+        tmp_str_ix = read_str_ix(tmp_s_s_m, [])
+        #print(f"Template size: {len(tmp_str_ix)}")
+        #tmp_affected = get_affected_positions_in_tmp(sq_aln=sq_aln, s_s_m=tmp_full_s_s_m, str_ix=tmp_str_ix)
+        tmp_affected = get_affected_positions_in_tmp(sq_aln=sq_aln, s_s_m=tmp_s_s_m, str_ix=tmp_str_ix)
         tgt_str_ix = read_str_ix(tgt_s_s_m, tmp_affected)
+        #print(f"Target size: {len([s for s in tgt_str_ix if s != '-'])}")
 
-        tmp_str_ix_aln = convert_to_aln_ix(tmp_str_ix, tmp_full_s_s_m)
+        #tmp_str_ix_aln = convert_to_aln_ix(tmp_str_ix, tmp_full_s_s_m)
+        tmp_str_ix_aln = convert_to_aln_ix(tmp_str_ix, tmp_s_s_m)
         tgt_str_ix_aln = convert_to_aln_ix(tgt_str_ix, tgt_s_s_m)
 
         m = get_mapping(tmp_str_ix_aln, tgt_str_ix_aln)

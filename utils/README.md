@@ -84,12 +84,17 @@ Such definition could then be passed to `json2svg`:
 python3 json2svg.py -p test_data/params.json -i test_data/URS000080E2F0_93929-RF01734.enriched.json -o test_data/URS000080E2F0_93929-RF01734.enriched.svg
 python3 json2svg.py -p test_data/params.json -i test_data/URS00002A2E83_10090-HS_SSU_3D.enriched.json -o test_data/URS00002A2E83_10090-HS_SSU_3D.enriched.svg
 ```
-The coloring definition will be turned into SVG classes, which will be assigned to corresponding
+The coloring definition will be turned into SVG classes, which will be assigned to circles drawn 
+beneath the corresponding
 residues. To switch between the original coloring and the user-provided coloring, you will need to invalidate the class
-`color-*` definitions in the SVG. 
+`color-*` definitions in the SVG or add `fill-opacity: 0` property to them. 
 
-Theoretically, one could provide multiple annotations based on which the diagram can be colored. However, switching
-between them could be more complicated.
+Theoretically, one could provide multiple annotations based on which the diagram can be colored. This would
+result in drawing multiple circles beneath the residues with multiple annotation. There are two problems: 1) there will
+be as many more SVG elements as there are annotations which might turn an interactive visualization unresponsive and
+2) switching between the individual annotations could be more complicated. One way to do the switching would be
+to set `fill-opacity: 0` to the `color-property-value` classes where `property` would correspond to the name 
+3) of the property you want to disable.
 
 Information about the value of the parameters used for coloring is provided in the residue titles, which show upon 
 hovering.
@@ -113,6 +118,6 @@ If given annotation is already present for a residue, an exception is raised. Th
 (``--force``) argument.
 
 ``
-python3 enrich_json.py -ij test_data/mouse_from_human.json -id test_data/mouse_from_human.annotations.tsv
+python3 enrich_json.py -i test_data/mouse_from_human.json -id test_data/mouse_from_human.annotations.tsv
 ``
 

@@ -3,10 +3,7 @@ import argparse
 import logging
 import json
 import re
-from typing import Dict
-
-
-
+from typing import Dict, Tuple
 
 class Point:
     def __init__(self, x, y):
@@ -50,13 +47,29 @@ def get_color_attributes(params):
     return params["coloring"].keys() if params else []
 
 
+def rgb2triplet(rgb: str) -> Tuple[int, int, int]:
+    r, g, b = re.search('\((.*),(.*),(.*)\)', rgb).group(1, 2, 3)
+    return int(r), int(g), int(b)
+
+
+def rgba2rgb(rgb: Tuple[int, int, int], a: float = 0.6) -> str:
+    background = (255, 255, 255)
+
+    rgb_blended = [0, 0, 0]
+    rgb_blended[0] = rgb[0] * a + (1.0 - a) * background[0]
+    rgb_blended[1] = rgb[1] * a + (1.0 - a) * background[1]
+    rgb_blended[2] = rgb[2] * a + (1.0 - a) * background[2]
+
+    return f'rgb({rgb_blended[0]}, {rgb_blended[1]}, {rgb_blended[2]})'
+
+
 def classes_defs(labels_template, coloring):
     color_classes = []
     for attribute, values in coloring.items():
         for v, rgb in values["values"].items():
             color_classes.append({
                 'name': get_color_class(attribute=attribute, val=v),
-                'fill': rgb
+                'fill': rgba2rgb(rgb2triplet(rgb))
             })
 
     return [{
@@ -174,7 +187,15 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size, 
     # Circles forming the background of the residues (these need to come AFTER the connecting lines as they need to be "above" them and SVG does not have z-index)
     for res in rna['sequence']:
         p = Point(round(float(res['x']), 2), round(float(res['y']), 2)) + MARGIN
-        residues += f"<circle cx=\"{p.x}\" cy=\"{p.y}\" class=\"residue-circle\" r=\"{font_size*0.75}\"/>\n"
+        is_circle  = False
+        for attr in res['info'].keys():
+            if attr in color_attributes:
+                residues += f'<circle cx="{p.x}" cy="{p.y}" class="residue-circle {get_color_class(attr, res["info"][attr])}" r="{font_size * 0.75}"/>\n'
+                is_circle = True
+        if not is_circle:
+            # in case there is no info attribute with color, we need to add white circle to cover the lines which go to the center of the letters
+            residues += f"<circle cx=\"{p.x}\" cy=\"{p.y}\" class=\"residue-circle\" r=\"{font_size*0.75}\"/>\n"
+
 
     # Residue letters
     for res in rna['sequence']:
@@ -185,7 +206,7 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size, 
         title = f"Position: {res['residueIndex']} (position.label in template: {res['info']['templateResidueIndex']}.{res['info']['templateResidueName']})"
         for attr in res['info'].keys():
             if attr in color_attributes:
-                cls = f'{cls} {get_color_class(attr, res["info"][attr])}'
+                # cls = f'{cls} {get_color_class(attr, res["info"][attr])}'
                 title = f'{title}\n{params["coloring"][attr]["label"]}: {res["info"][attr]}'
 
         residues += f"<g>" \
