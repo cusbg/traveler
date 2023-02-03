@@ -117,7 +117,7 @@ is raised.
 If given annotation is already present for a residue, an exception is raised. This behavior can be overriden by specifying the ``-f`` 
 (``--force``) argument.
 
-``
-python3 enrich_json.py -i test_data/mouse_from_human.json -id test_data/mouse_from_human.annotations.tsv
-``
+```
+python3 enrich_json.py -ij test_data/mouse_from_human.json -id test_data/mouse_from_human.annotations.tsv
+```
 

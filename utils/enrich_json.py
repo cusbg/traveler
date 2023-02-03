@@ -36,10 +36,10 @@ def map_res_index_to_ix(data):
 
 def int_or_fl(value):
     try:
-        value = float(value)
+        value = int(value)
     except ValueError:
         try:
-            value = int(value)
+            value = float(value)            
         except ValueError:
             pass
     return value
