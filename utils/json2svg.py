@@ -56,9 +56,9 @@ def rgba2rgb(rgb: Tuple[int, int, int], a: float = 0.6) -> str:
     background = (255, 255, 255)
 
     rgb_blended = [0, 0, 0]
-    rgb_blended[0] = rgb[0] * a + (1.0 - a) * background[0]
-    rgb_blended[1] = rgb[1] * a + (1.0 - a) * background[1]
-    rgb_blended[2] = rgb[2] * a + (1.0 - a) * background[2]
+    rgb_blended[0] = int(rgb[0] * a + (1.0 - a) * background[0])
+    rgb_blended[1] = int(rgb[1] * a + (1.0 - a) * background[1])
+    rgb_blended[2] = int(rgb[2] * a + (1.0 - a) * background[2])
 
     return f'rgb({rgb_blended[0]}, {rgb_blended[1]}, {rgb_blended[2]})'
 
