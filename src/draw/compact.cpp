@@ -267,7 +267,8 @@ void rotate_branch_by_angle(rna_tree &rna, rna_tree::iterator branch, double ang
 
 void normalize_nodes(rna_tree& rna, std::vector<compact::sibling_iterator> nodes, bool five_end){
     for (int i = 1; i < nodes.size(); ++i) {
-        point p0 = i == 1 && !five_end ? nodes[i-1]->at(1).p : nodes[i-1]->at(0).p;
+        //the "nodes[i-1]->paired()" condition is for situation where there is no structure at all and thus there is no paired nucleotide
+        point p0 = i == 1 && !five_end && nodes[i-1]->paired() ? nodes[i-1]->at(1).p : nodes[i-1]->at(0).p;
         point p1 = nodes[i]->at(0).p;
         double d = distance(p0, p1);
         point shift_vect = normalize(p1 - p0) * (d-BASES_DISTANCE);
@@ -285,7 +286,7 @@ void normalize_3_end(rna_tree &  rna) {
     compact::iterator root = rna.begin();
 
     compact::sibling_iterator it = compact::sibling_iterator(root.begin().range_last());
-    //locate last node with children
+    //locate last node with children (in case there is a secondary structure, otherwise, all residues are unpaired)
     while(!it->paired() && it != root.begin()) it--;
 
     std::vector<compact::sibling_iterator> nodes;
@@ -302,8 +303,8 @@ void normalize_5_end(rna_tree& rna) {
 
     compact::sibling_iterator it = root.begin();
     std::vector<compact::sibling_iterator> nodes;
-    while(!it->paired() && it != root.end()) nodes.push_back(it++);
-    nodes.push_back(it);
+    while(it != root.end() && !it->paired()) nodes.push_back(it++);
+    if (it != root.end())  nodes.push_back(it);
     if (nodes.size() < 2) return;
 
     //reverse the order so that the node go in the direction from the first base pair to the beginning of the structure
