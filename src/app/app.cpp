@@ -292,6 +292,11 @@ rna_tree app::create_template(
         fasta f = read_fasta_file(fastafile);
         doc->adjust_residues_lists(f.brackets.size());
 
+        if (f.brackets.size() != doc->labels.size())
+        {
+            throw illegal_state_exception("The number of bases extracted from the template image file does not match the number of secondary structure positions in the fasta file.");
+        }
+
         auto rna = rna_tree(f.brackets, f.constraints, doc->labels, doc->points, f.id);
         rna.update_numbering_labels(doc->numbering_labels);
         return rna;
