@@ -1,5 +1,6 @@
 #include <document_writer.hpp>
 #include <algorithm>
+#include <limits>
 #include "pseudoknots.hpp"
 #include "convex_hull.hpp"
 
