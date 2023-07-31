@@ -4,6 +4,11 @@
 using namespace std;
 using json = nlohmann::json;
 
+struct bp_info {
+    int ix1, ix2;
+    bool is_predicted;
+};
+
 void json_writer::init(const string& filename, rna_tree& rna, bool labels_template)
 {
     document_writer::init(filename, ".json", rna);
@@ -48,9 +53,9 @@ vector<string> split_clazz(string clazz) {
     return tokens;
 }
 
-vector<pair<int, int>> get_bps(rna_tree &rna){
+vector<bp_info> get_bps(rna_tree &rna){
 
-    vector<pair<int, int>> bps;
+    vector<bp_info> bps;
     /*auto extract_line =
             [&bps](rna_tree::iterator it)
             {
@@ -63,7 +68,7 @@ vector<pair<int, int>> get_bps(rna_tree &rna){
     rna_tree::for_each_in_subtree(rna.begin(), extract_line);*/
     for (auto it = rna.begin(); it != rna.end(); ++it){
         if (it->paired()) {
-            bps.push_back(make_pair(it->at(0).seq_ix, it->at(1).seq_ix));
+            bps.push_back(bp_info{it->at(0).seq_ix, it->at(1).seq_ix, it->is_de_novo_predicted()});
         }
     }
     return bps;
@@ -215,13 +220,16 @@ std::string json_writer::get_rna_subtree_formatted(
 
     json json_bps;
 
-    for (const pair<int, int> bp: get_bps(rna)) {
-        if (bp.first == -1 || bp.second == -1) continue; //5' end
+    for (const bp_info bp: get_bps(rna)) {
+        if (bp.ix1 == -1 || bp.ix2 == -1) continue; //5' end
         json json_bp;
-        json_bp["residueIndex1"] = bp.first + 1;
-        json_bp["residueIndex2"] = bp.second + 1;
+        json_bp["residueIndex1"] = bp.ix1 + 1;
+        json_bp["residueIndex2"] = bp.ix2 + 1;
         json_bp["basePairType"] = "canonical";
         json_bp["classes"] = {"bp-line"};
+        if (bp.is_predicted) {
+            json_bp["classes"].push_back("bp-line-predicted");
+        }
         json_bps.push_back(json_bp);
     }
 
