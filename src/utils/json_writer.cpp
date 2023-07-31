@@ -51,8 +51,8 @@ vector<string> split_clazz(string clazz) {
 vector<pair<int, int>> get_bps(rna_tree &rna){
 
     vector<pair<int, int>> bps;
-    auto extract_line =
-            [&bps](rna_tree::pre_post_order_iterator it)
+    /*auto extract_line =
+            [&bps](rna_tree::iterator it)
             {
                 if (it->paired()) {
                     bps.push_back(make_pair(it->at(0).seq_ix, it->at(1).seq_ix));
@@ -60,7 +60,12 @@ vector<pair<int, int>> get_bps(rna_tree &rna){
 
             };
 
-    rna_tree::for_each_in_subtree(rna.begin(), extract_line);
+    rna_tree::for_each_in_subtree(rna.begin(), extract_line);*/
+    for (auto it = rna.begin(); it != rna.end(); ++it){
+        if (it->paired()) {
+            bps.push_back(make_pair(it->at(0).seq_ix, it->at(1).seq_ix));
+        }
+    }
     return bps;
 }
 
