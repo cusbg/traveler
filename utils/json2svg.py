@@ -136,6 +136,9 @@ def classes_defs(labels_template, coloring):
         'name': 'bp-line',
         'stroke': 'rgb(0, 0, 0)'
     }, {
+        'name': 'bp-line-predicted',
+        'stroke-dasharray': '2'
+    },{
         'name': 'residue-circle',
         'fill': 'rgb(255,255,255)'
     }, {
