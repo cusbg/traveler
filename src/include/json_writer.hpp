@@ -71,7 +71,9 @@ protected:
             shape_options opts = shape_options()) const;
 
 
-    std::string get_rna_subtree_formatted(rna_tree &rna, const numbering_def &numbering) const;
+    std::string get_rna_subtree_formatted(rna_tree &rna, const numbering_def &numbering, const pseudoknots& pn) const;
+
+    std::string render_pseudoknots( pseudoknots &pn) const;
 
 private:
     nlohmann::json get_classes() const;

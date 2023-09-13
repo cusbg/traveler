@@ -6,15 +6,13 @@
 
 using namespace std;
 
-vector<pseudoknot_segment> find_pseudoknot_segments(rna_tree::pre_post_order_iterator begin, rna_tree::pre_post_order_iterator end){
+void pseudoknots::find_pseudoknot_segments(rna_tree::pre_post_order_iterator begin, rna_tree::pre_post_order_iterator end){
 
 
 //    int i=0;
 //    for (auto it = begin; it != end; it++){
 //        cout << i++ << " " << it->at(0).pseudoknot << "\n";
 //    }
-
-    vector<pair<rna_tree::pre_post_order_iterator, rna_tree::pre_post_order_iterator>> pn_pairs;
 
     int ix_begin = 0;
     vector<rna_tree::pre_post_order_iterator> processed_pns;
@@ -42,7 +40,7 @@ vector<pseudoknot_segment> find_pseudoknot_segments(rna_tree::pre_post_order_ite
                         auto ll = (*rest)[0];
                         if(ll.pseudoknot == l.pseudoknot)
                         {
-                            pn_pairs.push_back(make_pair(begin, rest));
+                            this->pairs.push_back(make_pair(begin, rest));
                             processed_pns.push_back(begin);
                             processed_pns.push_back(rest);
                             break;
@@ -56,26 +54,22 @@ vector<pseudoknot_segment> find_pseudoknot_segments(rna_tree::pre_post_order_ite
         ++begin; ++ix_begin;
     }
 
-    vector<pseudoknot_segment> segments;
-
-    if (pn_pairs.size() > 0){
-        pseudoknot_segment s = {make_pair(pn_pairs[0].first, pn_pairs[0].first), make_pair(pn_pairs[0].second, pn_pairs[0].second)};
-        for (int i = 1; i < pn_pairs.size(); ++i){
+    if (this->pairs.size() > 0){
+        pseudoknot_segment s = {make_pair(this->pairs[0].first, this->pairs[0].first), make_pair(this->pairs[0].second, this->pairs[0].second)};
+        for (int i = 1; i < this->pairs.size(); ++i){
             auto next1 = rna_tree::pre_post_order_iterator(s.interval1.second); next1++;
-            auto next2 = rna_tree::pre_post_order_iterator(pn_pairs[i].second); next2++;
-            if (next1 == pn_pairs[i].first && next2 == s.interval2.first){
+            auto next2 = rna_tree::pre_post_order_iterator(this->pairs[i].second); next2++;
+            if (next1 == this->pairs[i].first && next2 == s.interval2.first){
                 //if the first and second residue in the considered pseudoknot pair both directly extend the last pseudoknot segment, let's extend the segment
-                s.interval1.second = pn_pairs[i].first;
-                s.interval2.first = pn_pairs[i].second;
+                s.interval1.second = this->pairs[i].first;
+                s.interval2.first = this->pairs[i].second;
             } else {
-                segments.push_back(s);
-                s = {make_pair(pn_pairs[i].first, pn_pairs[i].first), make_pair(pn_pairs[i].second, pn_pairs[i].second)};
+                this->segments.push_back(s);
+                s = {make_pair(this->pairs[i].first, this->pairs[i].first), make_pair(this->pairs[i].second, this->pairs[i].second)};
             }
         }
-        segments.push_back(s);
+        this->segments.push_back(s);
     }
-
-    return segments;
 }
 
 
@@ -212,7 +206,7 @@ bool curves_share_point(vector<line> l1, vector<line> l2) {
 
 pseudoknots::pseudoknots(rna_tree &rna, const document_settings &settings) {
     this->font_size = settings.font_size;
-    this->segments = find_pseudoknot_segments(rna.begin_pre_post(), rna.end_pre_post());
+    this->find_pseudoknot_segments(rna.begin_pre_post(), rna.end_pre_post());
 
     if (this->segments.size() == 0) return;
 

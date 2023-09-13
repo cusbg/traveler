@@ -32,7 +32,7 @@ std::string json_writer::get_rna_formatted(
         pseudoknots pn) const
 {
     rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
-    return get_rna_subtree_formatted(rna, numbering); //+ get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
+    return get_rna_subtree_formatted(rna, numbering, pn); //+ get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
 }
 
 vector<string> split_clazz(string clazz) {
@@ -128,7 +128,8 @@ void update_dim(point &dim_min, point &dim_max, const double x, const double y){
 
 std::string json_writer::get_rna_subtree_formatted(
         rna_tree &rna,
-        const numbering_def& numbering) const
+        const numbering_def& numbering,
+        const pseudoknots& pn) const
 {
     json structure = json::parse(R"({"rnaComplexes": [{"name": "complex","rnaMolecules": [{"name": "molecule","sequence": [],"basePairs": [], "labels":[] }]}]})");
 
@@ -216,7 +217,7 @@ std::string json_writer::get_rna_subtree_formatted(
 
     remove_margins(json_sequence, json_labels, dim_min, dim_max);
 
-    //Write base pairing information
+    //export base pairing information
 
     json json_bps;
 
@@ -230,6 +231,16 @@ std::string json_writer::get_rna_subtree_formatted(
         if (bp.is_predicted) {
             json_bp["classes"].push_back("bp-line-predicted");
         }
+        json_bps.push_back(json_bp);
+    }
+
+    //export pseudoknots
+
+    for (const pseudoknot_pair pn: pn.get_pairs()){
+        json json_bp;
+        json_bp["residueIndex1"] = pn.first->at(0).seq_ix + 1;
+        json_bp["residueIndex2"] = pn.second->at(0).seq_ix + 1;
+        json_bp["basePairType"] = "pseudoknot";
         json_bps.push_back(json_bp);
     }
 

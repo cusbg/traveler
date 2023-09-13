@@ -477,7 +477,8 @@ vector<pair<point, point>> document_writer::get_lines(rna_tree &rna) const{
 
 std::string document_writer::get_rna_subtree_formatted(
                                                        rna_tree &rna,
-                                                       const numbering_def& numbering) const
+                                                       const numbering_def& numbering,
+                                                       const pseudoknots& pn) const
 {
     ostringstream out;
     vector<point> residues_positions = get_residues_positions(rna);
@@ -671,7 +672,7 @@ std::string document_writer::get_rna_formatted(
 //    return get_rna_subtree_formatted(rna, numbering)
 //           + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
     return render_pseudoknots(pn)
-        + get_rna_subtree_formatted(rna, numbering)
+        + get_rna_subtree_formatted(rna, numbering, pn)
         + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post())
     ;
 }
