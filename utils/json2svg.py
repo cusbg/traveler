@@ -63,7 +63,7 @@ def rgba2rgb(rgb: Tuple[int, int, int], a: float = 0.6) -> str:
     return f'rgb({rgb_blended[0]}, {rgb_blended[1]}, {rgb_blended[2]})'
 
 
-def classes_defs(labels_template, coloring):
+def classes_defs(labels_template, coloring, font_size):
     color_classes = []
     for attribute, values in coloring.items():
         for v, rgb in values["values"].items():
@@ -144,7 +144,25 @@ def classes_defs(labels_template, coloring):
     }, {
         'name': 'res-line',
         'stroke': GRAY
-    },
+    }, {
+        'name': 'pseudoknot_segment1',
+        'stroke-linecap': 'round',
+        'stroke-opacity': 0.4,
+        'stroke-width': font_size*1.2,
+        'stroke': GRAY
+    }, {
+        'name': 'pseudoknot_segment2',
+        'stroke-linecap': 'round',
+        'stroke-opacity': 0.4,
+        'stroke-width': font_size*1.2,
+        'stroke': GRAY
+    }, {
+        'name': 'pseudoknot_connection',
+        'stroke-linecap': 'round',
+        'stroke-opacity': 0.2,
+        'stroke-width': 1.5,
+        'stroke': GRAY
+    }
     ] + color_classes
 
 
@@ -154,7 +172,7 @@ def get_font_size(classes):
 
 def classes_to_svg(data, labels_template, params):
 
-    classes = data['classes'] + classes_defs(labels_template, params["coloring"] if params else {})
+    classes = data['classes'] + classes_defs(labels_template, params["coloring"] if params else {}, get_font_size(data['classes']))
 
     svg_classes = '<style type="text/css" >\n'
     svg_classes += '<![CDATA[\n'
@@ -174,7 +192,7 @@ def classes_to_svg(data, labels_template, params):
     return svg_classes
 
 
-def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size, params):
+def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], res_info: Dict[int, Dict], font_size, params):
 
     color_attributes = get_color_attributes(params)
     residues = '<g class="residues">'
@@ -204,6 +222,7 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size, 
     for res in rna['sequence']:
         p = Point(round(float(res['x']), 2), round(float(res['y']), 2)) + MARGIN
         res_pos[res['residueIndex']] = p
+        res_info[res['residueIndex']] = res
         dim.update(p)
         cls = " ".join(res['classes'])
         title = f"Position: {res['residueIndex']} (position.label in template: {res['info']['templateResidueIndex']}.{res['info']['templateResidueName']})"
@@ -222,16 +241,76 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], font_size, 
     return residues
 
 
-def bps_to_svg(rna, res_pos: Dict[int, Point]):
+def bps_pn_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict]):
+    
+    segments = []
+    segment = None
+    for bp in rna['basePairs']:        
+        if 'info' in bp and bp['info'] == "pseudoknot":
+            r1 = bp['residueIndex1']
+            r2 = bp['residueIndex2']
+            if segment is not None and segment['interval1']['end'] + 1 == r1 and r2 + 1 == segment['interval2']['begin']:
+                segment['interval1']['end'] = r1
+                segment['interval2']['begin'] = r2
+            else:
+                if segment is not None:
+                    segments.append(segment)
+                segment = {
+                    'interval1': {
+                        'begin': r1,
+                        'end': r1
+                    },
+                    'interval2': {
+                        'begin': r2,
+                        'end': r2
+                    }
+                }
+    if segment is not None:
+        segments.append(segment)
+
+    bps = '<g class="bps-pn">'
+    for segment in segments:
+        ix = [
+            [segment['interval1']['begin'], segment['interval1']['end']],
+            [segment['interval2']['begin'], segment['interval2']['end']]
+        ]
+        p = [
+            [res_pos[ix[0][0]], res_pos[ix[0][1]]],
+            [res_pos[ix[1][0]], res_pos[ix[1][1]]]
+        ]
+        lbl = [
+            ''.join([res_info[i]['residueName'] for i in range(ix[0][0], ix[0][1]+1)]),
+            ''.join([res_info[i]['residueName'] for i in range(ix[1][0], ix[1][1]+1)])
+        ]
+        
+        title = f'Pseudoknot {ix[0][0]}:{ix[0][1]}--{ix[1][0]}:{ix[1][1]}({lbl[0]}--{lbl[1]})'
+        for s_ix in [0,1]:            
+            bps += f'<polyline points="{p[s_ix][0].x} {p[s_ix][0].y}, {p[s_ix][1].x} {p[s_ix][1].y}" class="pseudoknot_segment{s_ix+1}" title="{title}"/>'            
+        bps += f'<polyline points="{p[0][0].x} {p[0][0].y}, {p[1][0].x} {p[1][0].y}" class="pseudoknot_connection" title="{title}"/>'            
+
+    bps += "</g>"
+    return bps        
+
+
+def bps_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict]):
+    """
+
+    Args:
+        rna (_type_): ['rnaComplexes'][0]['rnaMolecules'][0] part of the JSON schema.
+        res_pos (Dict[int, Point]): Positions of the residues which are needed to correctly position the base pairs.
+
+    Returns:
+        string: part of svg with the base pairing rendering instructions
+    """
 
     bps = '<g class="bps">'
     for bp in rna['basePairs']:
         r1 = bp['residueIndex1']
         r2 = bp['residueIndex2']
         p1 = res_pos[r1]
-        p2 = res_pos[r2]
-        cls = " ".join(bp['classes'])
-        bps += f'<line x1="{p1.x}" y1="{p1.y}" x2="{p2.x}" y2="{p2.y}" class="{cls}" />\n'
+        p2 = res_pos[r2]        
+        cls = 'class = "{}"'.format(" ".join(bp['classes'])) if 'classes' in bp else ''
+        bps += f'<line x1="{p1.x}" y1="{p1.y}" x2="{p2.x}" y2="{p2.y}" {cls} />\n'
     bps += '</g>'
 
     return bps
@@ -266,8 +345,10 @@ def to_svg(data, labels_template, params):
     rna = data['rnaComplexes'][0]['rnaMolecules'][0]
     svg_classes = classes_to_svg(data, labels_template, params)
     res_pos: Dict[int, Point] = {}
-    residues = residues_to_svg(rna=rna, dim=dim, res_pos=res_pos, font_size=get_font_size(data['classes']), params=params)
-    bps = bps_to_svg(rna, res_pos)
+    res_info: Dict[int, Dict] = {}
+    residues = residues_to_svg(rna=rna, dim=dim, res_pos=res_pos, res_info=res_info, font_size=get_font_size(data['classes']), params=params)
+    bps = bps_to_svg(rna, res_pos, res_info)
+    bps_pn = bps_pn_to_svg(rna, res_pos, res_info)
     svg_labels = labels_to_svg(rna, dim)
 
     svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{dim.p2.x + 2*MARGIN.x}" height="{dim.p2.y + 2*MARGIN.y}">\n'
@@ -275,6 +356,7 @@ def to_svg(data, labels_template, params):
     svg += bps + '\n'
     svg += residues + '\n'
     svg += svg_labels + '\n'
+    svg += bps_pn + '\n'
     svg += '</svg>'
     return svg
 
