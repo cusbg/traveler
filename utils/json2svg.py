@@ -246,7 +246,7 @@ def bps_pn_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict]):
     segments = []
     segment = None
     for bp in rna['basePairs']:        
-        if 'info' in bp and bp['info'] == "pseudoknot":
+        if 'info' in bp and 'type' in bp['info'] and bp['info']['type'] == "pseudoknot":
             r1 = bp['residueIndex1']
             r2 = bp['residueIndex2']
             if segment is not None and segment['interval1']['end'] + 1 == r1 and r2 + 1 == segment['interval2']['begin']:

@@ -244,7 +244,7 @@ std::string json_writer::get_rna_subtree_formatted(
         json_bp["residueIndex1"] = pn.first->at(0).seq_ix + 1;
         json_bp["residueIndex2"] = pn.second->at(0).seq_ix + 1;
         json_bp["basePairType"] = "canonical";
-        json_bp["info"] = "pseudoknot";
+        json_bp["info"] = {{"type", "pseudoknot"}};
         json_bps.push_back(json_bp);
     }
 
