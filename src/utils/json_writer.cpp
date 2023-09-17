@@ -99,7 +99,7 @@ json json_writer::get_classes() const {
             },{
                     {"name", "text-blue"},
             },{
-                    {"name", "text-black"},
+                    {"name", "text-red"},
             }
     });
 }
