@@ -324,8 +324,8 @@ def labels_to_svg(rna, dim: Dimensions):
         lbl_line = lbl['labelLine']
         svg_labels += '<g class="label">\n'
         p = Point(lbl_content["x"],lbl_content["y"]) + MARGIN
-        p1 = Point(lbl_line["x1"], lbl_line["y1"]) + MARGIN
-        p2 = Point(lbl_line["x2"], lbl_line["y2"]) + MARGIN
+        p1 = Point(lbl_line["points"][0]["x"], lbl_line["points"][0]["y"]) + MARGIN
+        p2 = Point(lbl_line["points"][1]["x"], lbl_line["points"][1]["y"]) + MARGIN
         dim.update(p)
         dim.update(p1)
         dim.update(p2)

@@ -111,10 +111,11 @@ void remove_margins(json &json_sequence, json &json_labels, const point &dim_min
         json &l = json_labels[i];
         l["labelContent"]["x"] = (double)l["labelContent"]["x"] - dim_min.x;
         l["labelContent"]["y"] = (double)l["labelContent"]["y"] - dim_min.y;
-        l["labelLine"]["x1"] = (double)l["labelLine"]["x1"] - dim_min.x;
-        l["labelLine"]["y1"] = (double)l["labelLine"]["y1"] - dim_min.y;
-        l["labelLine"]["x2"] = (double)l["labelLine"]["x2"] - dim_min.x;
-        l["labelLine"]["y2"] = (double)l["labelLine"]["y2"] - dim_min.y;
+        for (int j =0; j < l["labelLine"].size(); ++j){
+            json &p = l["labelLine"]["points"][j];
+            p["x"] = (double)p["x"] - dim_min.x;
+            p["y"] = (double)p["y"] - dim_min.y;
+        }
     }
 
 }
@@ -176,12 +177,14 @@ std::string json_writer::get_rna_subtree_formatted(
                     point p_from = map_point(line_def.from, false);
                     point p_to = map_point(line_def.to, false);
                     label["residueIndex"] = line_def.ix_to;
-                    label["labelLine"] = {
-                            {"x1", p_from.x},
-                            {"y1", p_from.y},
-                            {"x2", p_to.x},
-                            {"y2", p_to.y},
-                    };
+                    json p1, p2;
+                    p1["x"] = p_from.x;
+                    p1["y"] = p_from.y;
+                    p2["x"] = p_to.x;
+                    p2["y"] = p_to.y;
+                    label["labelLine"]["points"] = json::array();
+                    label["labelLine"]["points"].push_back(p1);
+                    label["labelLine"]["points"].push_back(p2);
                     label["labelLine"]["classes"] = json::array();
                     if (line_def.is_predicted) {
                         label["labelLine"]["classes"].push_back("predicted");
