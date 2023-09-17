@@ -81,15 +81,25 @@ json json_writer::get_classes() const {
                     {"font-size", to_string(get_font_size()) + "px"},
                     {"font-weight", "bold"},
                     {"font-family", "Helvetica"}
-            },
-            {
+            }, {
                     {"name", "numbering-line"},
                     {"stroke-width", ceil(get_font_size() / 16 * 10000.0) / 10000.0},
                     {"stroke", "rgb(204, 204, 204)"}
-            },
-            {
+            }, {
                     {"name", "bp-line"},
                     {"stroke-width", ceil(get_font_size() / 8 * 10000.0) / 10000.0}
+            },{
+                    {"name", "bp-line-predicted"}, //all used classes need to be defined even if empty
+            },{
+                    {"name", "sequential"},
+            },{
+                    {"name", "text-green"},
+            },{
+                    {"name", "text-black"},
+            },{
+                    {"name", "text-blue"},
+            },{
+                    {"name", "text-black"},
             }
     });
 }
