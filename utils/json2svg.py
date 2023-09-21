@@ -205,7 +205,7 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], res_info: D
             residues += f'<line x1="{p_prev.x}" y1="{p_prev.y}" x2="{p.x}" y2="{p.y}" class="bp-line res-line" />\n'
         p_prev = p
 
-    # Circles forming the background of the residues (these need to come AFTER the connecting lines as they need to be "above" them and SVG does not have z-index)
+    # Circles forming the background of the residues (these need to come AFTER the connecting lines as they need to be "above" them and SVG does not have z-index)    
     for res in rna['sequence']:
         p = Point(round(float(res['x']), 2), round(float(res['y']), 2)) + MARGIN
         is_circle  = False
@@ -215,16 +215,17 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], res_info: D
                 is_circle = True
         if not is_circle:
             # in case there is no info attribute with color, we need to add white circle to cover the lines which go to the center of the letters
-            residues += f"<circle cx=\"{p.x}\" cy=\"{p.y}\" class=\"residue-circle\" r=\"{font_size*0.75}\"/>\n"
+            residues += f'<circle cx="{p.x}" cy="{p.y}" class="residue-circle" r="{font_size*0.75}"/>\n'
 
 
+    clases_for_sequence = " ".join(rna['classesForSequence']) if 'classesForSequence' in rna else ""
     # Residue letters
     for res in rna['sequence']:
         p = Point(round(float(res['x']), 2), round(float(res['y']), 2)) + MARGIN
         res_pos[res['residueIndex']] = p
         res_info[res['residueIndex']] = res
         dim.update(p)
-        cls = " ".join(res['classes'])
+        cls = " ".join(res['classes']) + " " + clases_for_sequence
         title = f"Position: {res['residueIndex']} (position.label in template: {res['info']['templateResidueIndex']}.{res['info']['templateResidueName']})"
         for attr in res['info'].keys():
             if attr in color_attributes:
@@ -318,6 +319,7 @@ def bps_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict]):
 
 def labels_to_svg(rna, dim: Dimensions):
 
+    clases_for_labels = " ".join(rna['classesForLabels']) if 'classesForLabels' in rna else ""
     svg_labels = '<g class="labels">\n'
     for lbl in rna['labels']:
         lbl_content = lbl['labelContent']
@@ -329,7 +331,7 @@ def labels_to_svg(rna, dim: Dimensions):
         dim.update(p)
         dim.update(p1)
         dim.update(p2)
-        svg_labels += f'<text x="{p.x}" y="{p.y}" class="{" ".join(lbl_content["classes"])}" >{lbl_content["label"]}</text>\n'
+        svg_labels += f'<text x="{p.x}" y="{p.y}" class="{clases_for_labels} {" ".join(lbl_content["classes"])}" >{lbl_content["label"]}</text>\n'
         svg_labels += f'<line x1="{p1.x}" y1="{p1.y}" x2="{p2.x}" y2="{p2.y}" class="{" ".join(lbl_line["classes"])}" />\n'
         svg_labels += '</g>'
 

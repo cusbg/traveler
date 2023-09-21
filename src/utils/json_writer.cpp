@@ -164,7 +164,7 @@ std::string json_writer::get_rna_subtree_formatted(
                 residue["residueName"] = it->at(it.label_index()).label;
                 residue["x"] = p.x;
                 residue["y"] = p.y;
-                residue["classes"] = {msprintf("text-%s", get_default_color(it->status).get_name()), "font"};
+                residue["classes"] = {msprintf("text-%s", get_default_color(it->status).get_name())};
 
                 json info;
                 info["templateResidueName"] = it->at(it.label_index()).tmp_label;
@@ -209,7 +209,7 @@ std::string json_writer::get_rna_subtree_formatted(
                             {"label", label_def.label.label},
                             {"x", p.x},
                             {"y", p.y},
-                            {"classes", {"font"}}
+                            {"classes", {}}
                     };
                     if (!label_def.clazz.empty()) {
                         for (const string& cls: split_clazz(label_def.clazz)){
@@ -262,6 +262,12 @@ std::string json_writer::get_rna_subtree_formatted(
     json_mol["sequence"] = json_sequence;
     json_mol["basePairs"] = json_bps;
     json_mol["labels"] = json_labels;
+    json_mol["classesForLabels"] = {
+            "font"
+    };
+    json_mol["classesForSequence"] = {
+            "font"
+    };
 
     structure["classes"] = this->get_classes();
 
