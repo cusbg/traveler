@@ -27,6 +27,8 @@ do
 
     if [ "$visual_only" = false ] ; then
         ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure ${TMP_DIR}${TMP}.ps ${TMP_DIR}/${TMP}.fasta --ted ${OUT_DIR}${TGT}.map
+    else
+        echo "Skipping mappig..."
     fi
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure ${TMP_DIR}${TMP}.ps ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
 done
@@ -43,6 +45,8 @@ do
 
     if [ "$visual_only" = false ] ; then
         ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format varna ${TMP_DIR}${TMP}.svg ${TMP_DIR}/${TMP}.fasta --ted ${OUT_DIR}${TGT}.map
+    else
+        echo "Skipping mappig..."
     fi
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format varna ${TMP_DIR}${TMP}.svg ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
 done
@@ -59,6 +63,8 @@ do
 
     if [ "$visual_only" = false ] ; then
         ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format traveler ${TMP_DIR}${TMP}.tr ${TMP_DIR}/${TMP}.fasta --ted ${OUT_DIR}${TGT}.map
+    else
+        echo "Skipping mappig..."
     fi
     ${TRAVELER_DIR}traveler --target-structure ${TGT_DIR}${TGT}.fasta  --template-structure --file-format traveler ${TMP_DIR}${TMP}.tr ${TMP_DIR}/${TMP}.fasta --draw ${OUT_DIR}${TGT}.map ${OUT_DIR}/${TGT}
 done
