@@ -478,7 +478,8 @@ vector<pair<point, point>> document_writer::get_lines(rna_tree &rna) const{
 std::string document_writer::get_rna_subtree_formatted(
                                                        rna_tree &rna,
                                                        const numbering_def& numbering,
-                                                       const pseudoknots& pn) const
+                                                       const pseudoknots& pn,
+                                                       bool labels_absolute) const
 {
     ostringstream out;
     vector<point> residues_positions = get_residues_positions(rna);
@@ -666,13 +667,14 @@ std::string document_writer::render_pseudoknots(pseudoknots &pn) const
 std::string document_writer::get_rna_formatted(
                                                rna_tree rna,
                                                const numbering_def& numbering,
-                                               pseudoknots pn) const
+                                               pseudoknots pn,
+                                               bool labels_absolute) const
 {
     rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
 //    return get_rna_subtree_formatted(rna, numbering)
 //           + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
     return render_pseudoknots(pn)
-        + get_rna_subtree_formatted(rna, numbering, pn)
+        + get_rna_subtree_formatted(rna, numbering, pn, labels_absolute)
         + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post())
     ;
 }

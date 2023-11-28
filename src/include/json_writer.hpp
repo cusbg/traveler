@@ -24,7 +24,8 @@ public:
     std::string get_rna_formatted(
             rna_tree rna,
             const numbering_def& numbering,
-            pseudoknots pn) const override;
+            pseudoknots pn,
+            bool labels_absolute) const override;
     
 public: // formatters
     std::string get_circle_formatted(
@@ -71,7 +72,7 @@ protected:
             shape_options opts = shape_options()) const;
 
 
-    std::string get_rna_subtree_formatted(rna_tree &rna, const numbering_def &numbering, const pseudoknots& pn) const;
+    std::string get_rna_subtree_formatted(rna_tree &rna, const numbering_def &numbering, const pseudoknots& pn, bool labels_absolute) const;
 
     std::string render_pseudoknots( pseudoknots &pn) const;
 

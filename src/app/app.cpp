@@ -46,6 +46,7 @@
 #define ARGS_DEBUG                          {"--debug"}
 #define ARGS_NUMBERING                       {"-n", "--numbering"}
 #define ARGS_LABELS_TEMPLATE                 {"-l", "--labels-template"}
+#define ARGS_LABELS_ABSOLUTE                 {"-la", "--labels-absolute"}
 
 #define COLORED_FILENAME_EXTENSION          ".colored"
 
@@ -60,6 +61,7 @@ struct app::arguments
     rna_tree matched; // target
     bool rotate_branches = false;
     bool labels_template = false;
+    bool labels_absolute = false;
     
     struct
     {
@@ -134,7 +136,7 @@ void app::run(
         img_out = args.draw.file;
     }
 
-    run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out, args.numbering, args.labels_template);
+    run_drawing(args.templated, args.matched, map, draw, overlaps, args.rotate_branches, img_out, args.numbering, args.labels_template, args.labels_absolute);
     
     INFO("END: APP");
 }
@@ -190,7 +192,8 @@ void app::run_drawing(
                       bool rotate_branches,
                       const std::string& file,
                       const numbering_def& numbering,
-                      bool labels_template)
+                      bool labels_template,
+                      bool labels_absolute)
 {
     APP_DEBUG_FNAME;
 
@@ -209,7 +212,7 @@ void app::run_drawing(
         //Compact goes through the structure and computes new coordinates where necessary
             compact(templated).run(rotate_branches);
 
-        save(file, templated, run_overlaps, numbering, labels_template);
+        save(file, templated, run_overlaps, numbering, labels_template, labels_absolute);
     }
     catch (const my_exception& e)
     {
@@ -222,7 +225,8 @@ void app::save(
                rna_tree& rna,
                bool overlap,
                const numbering_def& numbering,
-               bool labels_template)
+               bool labels_template,
+               bool labels_absolute)
 {
     APP_DEBUG_FNAME;
 
@@ -241,7 +245,7 @@ void app::save(
             //string file = colored ? filename + COLORED_FILENAME_EXTENSION : filename;
             string file = filename + COLORED_FILENAME_EXTENSION; //the colored extension is kept for backward compatibility with the R2DT pipeline
             writer->init(file, rna, labels_template);
-            writer->print(writer->get_rna_formatted(rna, numbering, pn));
+            writer->print(writer->get_rna_formatted(rna, numbering, pn, labels_absolute));
 
             if (overlap)
                 for (const auto& p : overlaps)
@@ -548,6 +552,11 @@ void app::print(
             else if (is_argument(ARGS_LABELS_TEMPLATE))
             {
                 a.labels_template = true;
+
+            }
+            else if (is_argument(ARGS_LABELS_ABSOLUTE))
+            {
+                a.labels_absolute = true;
 
             }
             else

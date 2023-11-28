@@ -211,12 +211,14 @@ public:
     virtual std::string get_rna_formatted(
                                   rna_tree rna,
                                   const numbering_def& numbering,
-                                  pseudoknots pn) const;
+                                  pseudoknots pn,
+                                  bool labels_absolute) const;
 
     virtual std::string get_rna_subtree_formatted(
                                           rna_tree &rna,
                                           const numbering_def& numbering,
-                                          const pseudoknots& pn) const;
+                                          const pseudoknots& pn,
+                                          bool labels_absolute) const;
     
     std::string render_pseudoknots(
             pseudoknots &pn) const;

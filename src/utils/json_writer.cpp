@@ -29,10 +29,11 @@ streampos json_writer::print(const string& text)
 std::string json_writer::get_rna_formatted(
         rna_tree rna,
         const numbering_def& numbering,
-        pseudoknots pn) const
+        pseudoknots pn,
+        bool labels_absolute) const
 {
     rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
-    return get_rna_subtree_formatted(rna, numbering, pn); //+ get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
+    return get_rna_subtree_formatted(rna, numbering, pn, labels_absolute); //+ get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
 }
 
 vector<string> split_clazz(string clazz) {
@@ -110,24 +111,26 @@ json json_writer::get_classes() const {
  * @param json_sequence
  * @param json_labels
  */
-void remove_margins(json &json_sequence, json &json_labels, const point &dim_min, const point &dim_max) {
+void remove_margins(json &json_sequence, json &json_labels, const point &dim_min, const point &dim_max, const bool labels_absolute) {
 
     for (int i =0; i < json_sequence.size(); ++i){
         json &r = json_sequence[i];
         r["x"] = (double)r["x"] - dim_min.x;
         r["y"] = (double)r["y"] - dim_min.y;
     }
-    for (int i =0; i < json_labels.size(); ++i){
-        json &l = json_labels[i];
-        l["labelContent"]["x"] = (double)l["labelContent"]["x"] - dim_min.x;
-        l["labelContent"]["y"] = (double)l["labelContent"]["y"] - dim_min.y;
-        for (int j =0; j < l["labelLine"].size(); ++j){
-            json &p = l["labelLine"]["points"][j];
-            p["x"] = (double)p["x"] - dim_min.x;
-            p["y"] = (double)p["y"] - dim_min.y;
+    if (labels_absolute){
+        //if the labels are relative, we only need to shift the elements that the labels derive their position from
+        for (int i =0; i < json_labels.size(); ++i){
+            json &l = json_labels[i];
+            l["labelContent"]["x"] = (double)l["labelContent"]["x"] - dim_min.x;
+            l["labelContent"]["y"] = (double)l["labelContent"]["y"] - dim_min.y;
+            for (int j =0; j < l["labelLine"].size(); ++j){
+                json &p = l["labelLine"]["points"][j];
+                p["x"] = (double)p["x"] - dim_min.x;
+                p["y"] = (double)p["y"] - dim_min.y;
+            }
         }
     }
-
 }
 
 void update_dim(point &dim_min, point &dim_max, const double x, const double y){
@@ -137,10 +140,12 @@ void update_dim(point &dim_min, point &dim_max, const double x, const double y){
     if (y > dim_max.y) dim_max.y = y;
 }
 
+
 std::string json_writer::get_rna_subtree_formatted(
         rna_tree &rna,
         const numbering_def& numbering,
-        const pseudoknots& pn) const
+        const pseudoknots& pn,
+        bool labels_absolute) const
 {
     json structure = json::parse(R"({"rnaComplexes": [{"name": "complex","rnaMolecules": [{"name": "molecule","sequence": [],"basePairs": [], "labels":[] }]}]})");
 
@@ -156,7 +161,7 @@ std::string json_writer::get_rna_subtree_formatted(
     point dim_max = point(point(numeric_limits<double>::min(), numeric_limits<double>::min()));
 
     auto jsonize =
-            [&rna, &json_sequence, &json_labels, &seq_ix, &residues_positions, &lines, &numbering, &dim_min, &dim_max, this](rna_tree::pre_post_order_iterator it)
+            [&rna, &json_sequence, &json_labels, &seq_ix, &residues_positions, &lines, &numbering, &dim_min, &dim_max, &labels_absolute, this](rna_tree::pre_post_order_iterator it)
             {
                 point p = map_point(it->at(it.label_index()).p, false);
                 json residue;
@@ -184,8 +189,14 @@ std::string json_writer::get_rna_subtree_formatted(
                     json label;
                     label_def label_def = lld.label_defs[i];
                     line_def line_def = lld.line_defs[i];
-                    point p_from = map_point(line_def.from, false);
-                    point p_to = map_point(line_def.to, false);
+                    point p_from_abs = map_point(line_def.from, false);
+                    point p_to_abs = map_point(line_def.to, false);
+                    point p_from = p_from_abs, p_to = p_to_abs;
+                    if (!labels_absolute){
+                        p_from -= p;
+                        p_to -= p;
+                    }
+
                     label["residueIndex"] = line_def.ix_to;
                     json p1, p2;
                     p1["x"] = p_from.x;
@@ -204,11 +215,15 @@ std::string json_writer::get_rna_subtree_formatted(
                             label["labelLine"]["classes"].push_back(cls);
                         }
                     }
-                    point p = map_point(label_def.label.p, false);
+                    point p_label_abs = map_point(label_def.label.p, false);
+                    point p_label = p_label_abs;
+                    if (!labels_absolute){
+                        p_label -= p;
+                    }
                     label["labelContent"] = {
                             {"label", label_def.label.label},
-                            {"x", p.x},
-                            {"y", p.y},
+                            {"x", p_label.x},
+                            {"y", p_label.y},
                             {"classes", {}}
                     };
                     if (!label_def.clazz.empty()) {
@@ -218,9 +233,9 @@ std::string json_writer::get_rna_subtree_formatted(
                     }
                     json_labels.push_back(label);
 
-                    update_dim(dim_min, dim_max, p_from.x, p_from.y);
-                    update_dim(dim_min, dim_max, p_to.x, p_to.y);
-                    update_dim(dim_min, dim_max, p.x, p.y);
+                    update_dim(dim_min, dim_max, p_from_abs.x, p_from_abs.y);
+                    update_dim(dim_min, dim_max, p_to_abs.x, p_to_abs.y);
+                    update_dim(dim_min, dim_max, p_label_abs.x, p_label_abs.y);
                 }
 
                 seq_ix++;
@@ -228,7 +243,7 @@ std::string json_writer::get_rna_subtree_formatted(
 
     rna_tree::for_each_in_subtree(rna.begin_pre_post(), jsonize);
 
-    remove_margins(json_sequence, json_labels, dim_min, dim_max);
+    remove_margins(json_sequence, json_labels, dim_min, dim_max, labels_absolute);
 
     //export base pairing information
 
