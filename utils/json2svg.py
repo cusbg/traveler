@@ -39,7 +39,7 @@ def error_exit(message):
     sys.exit()
 
 
-def get_color_class(attribute, val):
+def get_color_class(attribute, val):    
     return re.sub('[.,*]', '_', f'color-{attribute}-{val}')
 
 

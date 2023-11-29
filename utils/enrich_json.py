@@ -3,6 +3,7 @@ import argparse
 import logging
 import json
 import csv
+import math
 
 RESIDUE_INDEX = 'residue_index'
 RESIDUE_NAME = 'residue_name'
@@ -35,17 +36,21 @@ def map_res_index_to_ix(data):
 
 
 def int_or_fl(value):
+    value_orig = value
     try:
         value = int(value)
     except ValueError:
         try:
             value = float(value)            
+            if math.isnan(value):
+                # This is in order not to convert NaN to nan which might cause issues downstream when converting the annotations to color classes in SVG
+                value = value_orig
         except ValueError:
-            pass
+            pass        
     return value
 
 
-def enrich_structure(structure, data, force_overwrite: bool):
+def enrich_structure(structure, data, force_overwrite: bool):    
     res_ix_ix = map_res_index_to_ix(data=data)
     for res in structure['rnaComplexes'][0]['rnaMolecules'][0]['sequence']:
         res_ix = res['residueIndex']
