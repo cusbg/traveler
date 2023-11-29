@@ -74,18 +74,22 @@ The `traveler` executable is available in the PATH, and the current directory is
 			# use mapping in FILE_MAPPING_IN and outputs layout as an .svg image and .xml file to files with prefix OUT_PREFIX
 			# if optional argument --overlaps is present overlaps in the layout are identified and highlighted
 		[-r|--rotate] If switched on, Traveler tries to rotate hairpins to minimize the number of overlaps. In some
-		cases, this can lead to a more convoluted layout and therefore this features is turned off by default.
+			cases, this can lead to a more convoluted layout and therefore this features is turned off by default.
 		[-n|--numbering] NUMBERING_DEFINITION
 		    # Allows to specify residues which will have number information next to it in the resulting diagram.
 		    # The format allows to specify list of residue indexes and interval so that every residue index which
 		    # is modulo interval == 0 will be labeled. The default value is "10,20,30-50", i.e. residues with indexes
-		    # 10, 20, 30 and every 50th residue will be labeled.
+        	# 10, 20, 30 and every 50th residue will be labeled.
        [-l|--labels-template] Uses template labels for numbering. This
-            is useful, for example, in case of tRNA where users are used to the Sprinzl positions. Here, for instance, the 21st residue of a particular tRNA 
-	    is Sprinzl position 20a. So if the 21st residue is mapped onto a target residue with visible nubmer (e.g. 20 by default),
-            that label should show 20a irrespective of its position in the target.        
-       [-v|--verbose] Prints information about the computation and othere details (such as number of overlaps,
-               when overlap switch is turned on)
+        	is useful, for example, in case of tRNA where users are used to the Sprinzl positions. 
+			Here, for instance, the 21st residue of a particular tRNA 
+            is Sprinzl position 20a. So if the 21st residue is mapped onto a target residue with visible nubmer (e.g. 20 by default),
+            that label should show 20a irrespective of its position in the target.
+      	[-la|--labels-absolute] If set, the label 	and label line coordinates in the json output file will be absolute. 
+        	This used to be the default (and only possible) behavior. In the current
+		   	version, the label and label line coordinates are relative to the position of the 	residue they correspond to.
+       	[-v|--verbose] Prints information about the computation and othere details (such as number of overlaps,
+            when overlap switch is turned on)
 		
 
 	COLOR CODING:
@@ -173,19 +177,13 @@ The file needs to contain three lines: moelcule description line (starts with th
 
 ### Example 1a: Visualize mouse 18S rRNA using human 18S rRNA as template using CRW ps image as the template layout
 	$ mkdir test
-	$ bin/traveler \
-		--target-structure data/metazoa/mouse.fasta \
-		--template-structure data/metazoa/human.ps data/metazoa/human.fasta \
-		--all test/mouse_from_human
+	$ bin/traveler --target-structure data/metazoa/mouse.fasta --template-structure data/metazoa/human.ps data/metazoa/human.fasta --all test/mouse_from_human
 
 Outputs a SVG and JSON file (see Example3 below for details)
 
 ### Example 1b: Visualize mouse 18S rRNA using human 18S rRNA as template using Traveler's XML input format as the template layout.
 	$ mkdir test
-	$ bin/traveler \
-		--target-structure data/metazoa/mouse.fasta \
-		--template-structure --file-format traveler data/metazoa/human.xml data/metazoa/human.fasta \
-		--all test/mouse_from_human_xml_input
+	$ bin/traveler --target-structure data/metazoa/mouse.fasta  --template-structure --file-format traveler data/metazoa/human.xml data/metazoa/human.fasta --all test/mouse_from_human_xml_input
 
 ### Example 2: Compute TED distance and mapping between human 18S rRNA (template) and mouse 18S rRNA (target).
 	$ mkdir test

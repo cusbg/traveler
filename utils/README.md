@@ -45,7 +45,7 @@ used instead of 21. So if the 21st residue is mapped onto a residue of target wi
 irrespective of its position in the target.
 
 ``
-python3 json2svg.py -i test_data/mouse_from_human.json -o test_data/mouse_from_human.json.svg
+python3 json2svg.py -i test_data/mouse_from_human.colored.json -o test_data/mouse_from_human.colored.json.svg
 ``
 
 Passing a params file specifying the custom coloring of the diagram is possible. The coloring happens based on attributes

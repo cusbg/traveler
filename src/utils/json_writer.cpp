@@ -352,7 +352,3 @@ std::string json_writer::get_polyline_formatted(
 {
     return "";
 }
-
-
-
-

@@ -365,6 +365,8 @@ void app::usage(
     << "\t[" << get_args(ARGS_NUMBERING) << "]"
     << endl
     << "\t[" << get_args(ARGS_LABELS_TEMPLATE) << "]"
+    << endl
+    << "\t[" << get_args(ARGS_LABELS_ABSOLUTE) << "]"
     << endl;
 }
 

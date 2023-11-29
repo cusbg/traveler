@@ -11,7 +11,8 @@ class Point:
         self.y = y
 
     def __add__(self, other):
-        return Point(self.x + other.x, self.y + other.y)
+        return Point(self.x + other.x, self.y + other.y)    
+    
 
 
 class Dimensions:
@@ -317,7 +318,7 @@ def bps_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict]):
     return bps
 
 
-def labels_to_svg(rna, dim: Dimensions):
+def labels_to_svg(rna, dim: Dimensions, labels_absolute: bool, res_pos: Dict[int, Point]):
 
     clases_for_labels = " ".join(rna['classesForLabels']) if 'classesForLabels' in rna else ""
     svg_labels = '<g class="labels">\n'
@@ -325,9 +326,21 @@ def labels_to_svg(rna, dim: Dimensions):
         lbl_content = lbl['labelContent']
         lbl_line = lbl['labelLine']
         svg_labels += '<g class="label">\n'
-        p = Point(lbl_content["x"],lbl_content["y"]) + MARGIN
-        p1 = Point(lbl_line["points"][0]["x"], lbl_line["points"][0]["y"]) + MARGIN
-        p2 = Point(lbl_line["points"][1]["x"], lbl_line["points"][1]["y"]) + MARGIN
+        p = Point(lbl_content["x"],lbl_content["y"])
+        p1 = Point(lbl_line["points"][0]["x"], lbl_line["points"][0]["y"])
+        p2 = Point(lbl_line["points"][1]["x"], lbl_line["points"][1]["y"])
+
+        if not labels_absolute:
+            residue_index = lbl['residueIndex']
+            p_res = res_pos[residue_index]
+            p += p_res
+            p1 += p_res
+            p2 += p_res
+        else:
+            p += MARGIN
+            p1 += MARGIN
+            p2 += MARGIN
+        
         dim.update(p)
         dim.update(p1)
         dim.update(p2)
@@ -340,7 +353,7 @@ def labels_to_svg(rna, dim: Dimensions):
     return svg_labels
 
 
-def to_svg(data, labels_template, params):
+def to_svg(data, labels_template, labels_absolute, params):
     
     dim = Dimensions()
 
@@ -351,7 +364,7 @@ def to_svg(data, labels_template, params):
     residues = residues_to_svg(rna=rna, dim=dim, res_pos=res_pos, res_info=res_info, font_size=get_font_size(data['classes']), params=params)
     bps = bps_to_svg(rna, res_pos, res_info)
     bps_pn = bps_pn_to_svg(rna, res_pos, res_info)
-    svg_labels = labels_to_svg(rna, dim)
+    svg_labels = labels_to_svg(rna, dim, labels_absolute, res_pos)
 
     svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{dim.p2.x + 2*MARGIN.x}" height="{dim.p2.y + 2*MARGIN.y}">\n'
     svg += svg_classes + '\n'
@@ -372,7 +385,7 @@ def main():
             with open(args.params, "r") as fp:
                 params = json.load(fp)
         with (sys.stdout if args.output is None else open(args.output, "w")) as fw:
-            fw.write(to_svg(data, args.labels_template, params))
+            fw.write(to_svg(data, args.labels_template, args.labels_absolute, params))
 
 
 if __name__ == '__main__':
@@ -392,6 +405,10 @@ if __name__ == '__main__':
     parser.add_argument("-l", "--labels-template",
                         action='store_true',
                         help="If set, the numbering labels will be based on numbering labels from template (e.g. Sprinzl positions for tRNA). ")
+    parser.add_argument("-a", "--labels-absolute",
+                        action='store_true',
+                        default=False,
+                        help="If true, it is expected the label coordinates are absolute (original behavior of Traveler) and not relative (new behavior of Traveler) with respect to their respective residue position.")
 
     args = parser.parse_args()
 
