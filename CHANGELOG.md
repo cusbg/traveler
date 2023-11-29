@@ -19,6 +19,7 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 - Canonical basePairType in output JSON
 - Removed titles from numbering labels
 - Hidden elements in SVG (template labels and lines) showing up 
+- Propagation of NaN values in annotations (during the enrichment) to SVG classes
 
 ##  [3.0.0]
 
