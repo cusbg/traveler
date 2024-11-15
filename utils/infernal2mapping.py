@@ -97,8 +97,14 @@ def read_structures(f) -> List[SequenceStructureMapping]:
     # Non-bracket and non-alpha symbols correspond to gaps in sequence
     tgt_s_s_m.sq = sq.replace('-', '')
     # . and ~ symbols correspond to insertions with respect to template
-    tmp_s_s_m.str = str_temp_used.replace('.', '').replace('~', '')
     #tmp_full_s_s_m.str = copy.deepcopy(tmp_s_s_m.str)
+
+    tmp_s_s_m.str = ''
+    for nt, str_character in zip(sq, str_temp_used):
+        # if nt is lowercase AND str_character is . or ~, then it is an insertion, so skip it
+        if 'a' <= nt <= 'z' and str_character in '.~':
+            continue
+        tmp_s_s_m.str += str_character
 
     for i, letter in enumerate(sq):
         if letter != '-':
