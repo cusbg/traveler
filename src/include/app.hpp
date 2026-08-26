@@ -79,8 +79,9 @@ private:
                      bool rotate_branches,
                      const std::string& file,
                      const numbering_def& numbering,
-                     bool labels_template);
-    
+                     bool labels_template,
+                     bool pseudoknot_single_line);
+
     /**
      * save both, colored and not colored documents
      */
@@ -89,7 +90,8 @@ private:
               rna_tree& rna,
               bool overlaps,
               const numbering_def& numbering,
-              bool labels_template);
+              bool labels_template,
+              bool pseudoknot_single_line);
     
 private:
     /**

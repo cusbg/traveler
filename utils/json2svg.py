@@ -48,7 +48,7 @@ def get_color_attributes(params):
 
 
 def rgb2triplet(rgb: str) -> Tuple[int, int, int]:
-    r, g, b = re.search('\((.*),(.*),(.*)\)', rgb).group(1, 2, 3)
+    r, g, b = re.search(r'\((.*),(.*),(.*)\)', rgb).group(1, 2, 3)
     return int(r), int(g), int(b)
 
 
@@ -242,17 +242,18 @@ def residues_to_svg(rna, dim: Dimensions, res_pos: Dict[int, Point], res_info: D
     return residues
 
 
-def bps_pn_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict]):
-    
+def bps_pn_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict], pseudoknot_single_line: bool = False):
+
     segments = []
     segment = None
-    for bp in rna['basePairs']:        
+    for bp in rna['basePairs']:
         if 'info' in bp and 'type' in bp['info'] and bp['info']['type'] == "pseudoknot":
             r1 = bp['residueIndex1']
             r2 = bp['residueIndex2']
             if segment is not None and segment['interval1']['end'] + 1 == r1 and r2 + 1 == segment['interval2']['begin']:
                 segment['interval1']['end'] = r1
                 segment['interval2']['begin'] = r2
+                segment['pairs'].append((r1, r2))
             else:
                 if segment is not None:
                     segments.append(segment)
@@ -264,7 +265,8 @@ def bps_pn_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict]):
                     'interval2': {
                         'begin': r2,
                         'end': r2
-                    }
+                    },
+                    'pairs': [(r1, r2)]
                 }
     if segment is not None:
         segments.append(segment)
@@ -283,14 +285,22 @@ def bps_pn_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict]):
             ''.join([res_info[i]['residueName'] for i in range(ix[0][0], ix[0][1]+1)]),
             ''.join([res_info[i]['residueName'] for i in range(ix[1][0], ix[1][1]+1)])
         ]
-        
+
         title = f'Pseudoknot {ix[0][0]}:{ix[0][1]}--{ix[1][0]}:{ix[1][1]}({lbl[0]}--{lbl[1]})'
-        for s_ix in [0,1]:            
-            bps += f'<polyline points="{p[s_ix][0].x} {p[s_ix][0].y}, {p[s_ix][1].x} {p[s_ix][1].y}" class="pseudoknot_segment{s_ix+1}" title="{title}"/>'            
-        bps += f'<polyline points="{p[0][0].x} {p[0][0].y}, {p[1][0].x} {p[1][0].y}" class="pseudoknot_connection" title="{title}"/>'            
+        for s_ix in [0,1]:
+            bps += f'<polyline points="{p[s_ix][0].x} {p[s_ix][0].y}, {p[s_ix][1].x} {p[s_ix][1].y}" class="pseudoknot_segment{s_ix+1}" title="{title}"/>'
+
+        if pseudoknot_single_line:
+            bps += f'<polyline points="{p[0][0].x} {p[0][0].y}, {p[1][0].x} {p[1][0].y}" class="pseudoknot_connection" title="{title}"/>'
+        else:
+            for r1, r2 in segment['pairs']:
+                p1 = res_pos[r1]
+                p2 = res_pos[r2]
+                pair_title = f'Pseudoknot {r1}:{r1}--{r2}:{r2}({res_info[r1]["residueName"]}--{res_info[r2]["residueName"]})'
+                bps += f'<polyline points="{p1.x} {p1.y}, {p2.x} {p2.y}" class="pseudoknot_connection" title="{pair_title}"/>'
 
     bps += "</g>"
-    return bps        
+    return bps
 
 
 def bps_to_svg(rna, res_pos: Dict[int, Point], res_info: Dict[int, Dict]):
@@ -340,8 +350,8 @@ def labels_to_svg(rna, dim: Dimensions):
     return svg_labels
 
 
-def to_svg(data, labels_template, params):
-    
+def to_svg(data, labels_template, params, pseudoknot_single_line=False):
+
     dim = Dimensions()
 
     rna = data['rnaComplexes'][0]['rnaMolecules'][0]
@@ -350,7 +360,7 @@ def to_svg(data, labels_template, params):
     res_info: Dict[int, Dict] = {}
     residues = residues_to_svg(rna=rna, dim=dim, res_pos=res_pos, res_info=res_info, font_size=get_font_size(data['classes']), params=params)
     bps = bps_to_svg(rna, res_pos, res_info)
-    bps_pn = bps_pn_to_svg(rna, res_pos, res_info)
+    bps_pn = bps_pn_to_svg(rna, res_pos, res_info, pseudoknot_single_line)
     svg_labels = labels_to_svg(rna, dim)
 
     svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{dim.p2.x + 2*MARGIN.x}" height="{dim.p2.y + 2*MARGIN.y}">\n'
@@ -372,7 +382,7 @@ def main():
             with open(args.params, "r") as fp:
                 params = json.load(fp)
         with (sys.stdout if args.output is None else open(args.output, "w")) as fw:
-            fw.write(to_svg(data, args.labels_template, params))
+            fw.write(to_svg(data, args.labels_template, params, args.pseudoknot_single_line))
 
 
 if __name__ == '__main__':
@@ -392,6 +402,10 @@ if __name__ == '__main__':
     parser.add_argument("-l", "--labels-template",
                         action='store_true',
                         help="If set, the numbering labels will be based on numbering labels from template (e.g. Sprinzl positions for tRNA). ")
+    parser.add_argument("-pksl", "--pseudoknot-single-line",
+                        action='store_true',
+                        help="Draws a single summary line per pseudoknot segment instead of "
+                             "one line per base pair (the default). Off by default.")
 
     args = parser.parse_args()
 

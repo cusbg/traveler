@@ -44,6 +44,9 @@ is useful, for example, in case of tRNA where users are used to the Sprinzl posi
 used instead of 21. So if the 21st residue is mapped onto a residue of target with visible label, that label should show 20a 
 irrespective of its position in the target.
 
+By default, each pseudoknot base pair gets its own connecting line in the output. Pass `-pksl`/`--pseudoknot-single-line`
+to instead draw a single summary line per contiguous pseudoknot segment (the previous behavior).
+
 ``
 python3 json2svg.py -i test_data/mouse_from_human.json -o test_data/mouse_from_human.json.svg
 ``

@@ -84,6 +84,8 @@ The `traveler` executable is available in the PATH, and the current directory is
             is useful, for example, in case of tRNA where users are used to the Sprinzl positions. Here, for instance, the 21st residue of a particular tRNA 
 	    is Sprinzl position 20a. So if the 21st residue is mapped onto a target residue with visible nubmer (e.g. 20 by default),
             that label should show 20a irrespective of its position in the target.        
+       [-pksl|--pseudoknot-single-line] Draws a single summary line per pseudoknot segment instead of
+            one line per base pair (the default). Off by default.
        [-v|--verbose] Prints information about the computation and othere details (such as number of overlaps,
                when overlap switch is turned on)
 		
@@ -359,8 +361,11 @@ reintroduced into the final visualization.
 
 Pseudoknots are visualized as straight gray lines with some level of opacity so that they do not clutter
 the layout. Still to decrease the clutter possibly caused by pseudoknots, continous regions of pseudoknots
-are grouped together. In such case, the pseudoknotted residues that follow in sequence gain gray background 
-and only the residues of the first pseudoknot are connected.
+are grouped together, and the pseudoknotted residues that follow in sequence gain gray background. By default,
+each base pair within such a group gets its own connecting line; pass ``-pksl``/``--pseudoknot-single-line``
+to instead draw a single summary line connecting the first residue of each side of the group, which is more
+compact but hides the per-pair geometry. This applies both to Traveler's own SVG output (`--draw`) and to the
+`utils/json2svg.py` JSON-to-SVG converter, which accepts the same `-pksl`/`--pseudoknot-single-line` flag.
 
 To support pseduoknots of (efficiently) arbitrary depth, the following charcters can be used to mark pseudoknot
 pairs in the dot-bracket notation: ``[]{}AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz``. Odd characters
