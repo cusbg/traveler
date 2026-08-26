@@ -29,7 +29,8 @@ streampos json_writer::print(const string& text)
 std::string json_writer::get_rna_formatted(
         rna_tree rna,
         const numbering_def& numbering,
-        pseudoknots pn) const
+        pseudoknots pn,
+        bool pseudoknot_single_line) const
 {
     rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
     return get_rna_subtree_formatted(rna, numbering, pn); //+ get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
@@ -249,10 +250,10 @@ std::string json_writer::get_rna_subtree_formatted(
 
     //export pseudoknots
 
-    for (const pseudoknot_pair pn: pn.get_pairs()){
+    for (const pseudoknot_pair& pkpair: pn.get_pairs()){
         json json_bp;
-        json_bp["residueIndex1"] = pn.first->at(0).seq_ix + 1;
-        json_bp["residueIndex2"] = pn.second->at(0).seq_ix + 1;
+        json_bp["residueIndex1"] = pkpair.first->at(0).seq_ix + 1;
+        json_bp["residueIndex2"] = pkpair.second->at(0).seq_ix + 1;
         json_bp["basePairType"] = "canonical";
         json_bp["info"] = {{"type", "pseudoknot"}};
         json_bps.push_back(json_bp);

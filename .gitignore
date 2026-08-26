@@ -6,3 +6,5 @@ precomputed/
 .ycm_extra_conf.pyc
 
 generated-images*
+
+CLAUDE.local.md

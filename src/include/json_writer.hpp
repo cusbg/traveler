@@ -24,7 +24,8 @@ public:
     std::string get_rna_formatted(
             rna_tree rna,
             const numbering_def& numbering,
-            pseudoknots pn) const override;
+            pseudoknots pn,
+            bool pseudoknot_single_line) const override;
     
 public: // formatters
     std::string get_circle_formatted(

@@ -211,7 +211,8 @@ public:
     virtual std::string get_rna_formatted(
                                   rna_tree rna,
                                   const numbering_def& numbering,
-                                  pseudoknots pn) const;
+                                  pseudoknots pn,
+                                  bool pseudoknot_single_line) const;
 
     virtual std::string get_rna_subtree_formatted(
                                           rna_tree &rna,
@@ -219,7 +220,8 @@ public:
                                           const pseudoknots& pn) const;
     
     std::string render_pseudoknots(
-            pseudoknots &pn) const;
+            pseudoknots &pn,
+            bool pseudoknot_single_line) const;
 
 public:
     /**

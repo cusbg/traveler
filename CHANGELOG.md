@@ -6,11 +6,22 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ### Added
 
+### Removed
+
+### Fixed
+
+##  [3.1.0] - 2026-08-26
+
+### Added
+
 - Infernal2mapping supports original secondary structure.
 - Support of custom coloring.
 - Ability to enrich RNA2D JSON files.
 - Ability to specify template-based numbering.
 - Support of pseudoknots.
+- Pseudoknot connections are now drawn as one line per base pair instead of a single summary line per segment.
+- `-pksl`/`--pseudoknot-single-line` option to restore the previous single-summary-line pseudoknot rendering.
+- `utils/json2svg.py` now also draws one pseudoknot connection line per base pair by default, with a matching `-pksl`/`--pseudoknot-single-line` opt-out flag.
 
 ### Removed
 

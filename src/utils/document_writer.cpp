@@ -584,7 +584,7 @@ std::string document_writer::get_rna_background_formatted(
 }
 
 
-std::string document_writer::render_pseudoknots(pseudoknots &pn) const
+std::string document_writer::render_pseudoknots(pseudoknots &pn, bool pseudoknot_single_line) const
 {
     ostringstream oss;
 
@@ -646,30 +646,40 @@ std::string document_writer::render_pseudoknots(pseudoknots &pn) const
             ix_int++;
         }
 
-        // Emit one connection line PER base pair, using the explicit pair
-        // list maintained by the pseudoknots class. A pair belongs to this
-        // segment iff its first residue iterator lies within interval1
-        // (walking from interval1.first to interval1.second inclusive).
         opts_connection.clazz = string("pseudoknot_connection");
         opts_connection.id = s.get_id();
 
-        for (auto& pkpair : pn.get_pairs()) {
-            bool in_segment = false;
-            auto it = s.interval1.first;
-            for (;;) {
-                if (it == pkpair.first) { in_segment = true; break; }
-                if (it == s.interval1.second) break;
-                ++it;
+        if (pseudoknot_single_line) {
+            // legacy behavior: a single summary line per segment, from the
+            // first residue of interval1 to the first residue of interval2.
+            vector<point> points;
+            for (line l:s.connecting_curve) {
+                points.push_back(l.first+ shift);
             }
-            if (!in_segment) continue;
+            points.push_back(s.connecting_curve.back().second + shift);
+            oss << get_polyline_formatted(points, RGB::GRAY, opts_connection);
+        } else {
+            // default behavior: one connection line PER base pair, using the
+            // explicit pair list maintained by the pseudoknots class. A pair
+            // belongs to this segment iff its first residue iterator lies
+            // within interval1 (walking from interval1.first to
+            // interval1.second inclusive).
+            for (auto& pkpair : pn.get_pairs()) {
+                bool in_segment = false;
+                auto it = s.interval1.first;
+                for (;;) {
+                    if (it == pkpair.first) { in_segment = true; break; }
+                    if (it == s.interval1.second) break;
+                    ++it;
+                }
+                if (!in_segment) continue;
 
-            point p1 = pkpair.first->at(pkpair.first.label_index()).p + shift;
-            point p2 = pkpair.second->at(pkpair.second.label_index()).p + shift;
-            vector<point> pair_pts = { p1, p2 };
-            oss << get_polyline_formatted(pair_pts, RGB::GRAY, opts_connection);
+                point p1 = pkpair.first->at(pkpair.first.label_index()).p + shift;
+                point p2 = pkpair.second->at(pkpair.second.label_index()).p + shift;
+                vector<point> pair_pts = { p1, p2 };
+                oss << get_polyline_formatted(pair_pts, RGB::GRAY, opts_connection);
+            }
         }
-
-
 
     }
 
@@ -679,12 +689,13 @@ std::string document_writer::render_pseudoknots(pseudoknots &pn) const
 std::string document_writer::get_rna_formatted(
                                                rna_tree rna,
                                                const numbering_def& numbering,
-                                               pseudoknots pn) const
+                                               pseudoknots pn,
+                                               bool pseudoknot_single_line) const
 {
     rna.update_labels_seq_ix(); //set indexes for the individual labels which is needed for outputing base pair indexes (at least in the traveler writer)
 //    return get_rna_subtree_formatted(rna, numbering)
 //           + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post());
-    return render_pseudoknots(pn)
+    return render_pseudoknots(pn, pseudoknot_single_line)
         + get_rna_subtree_formatted(rna, numbering, pn)
         + get_rna_background_formatted(rna.begin_pre_post(), rna.end_pre_post())
     ;
