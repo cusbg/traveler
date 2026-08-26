@@ -646,15 +646,28 @@ std::string document_writer::render_pseudoknots(pseudoknots &pn) const
             ix_int++;
         }
 
-        vector<point> points;
-        for (line l:s.connecting_curve) {
-            points.push_back(l.first+ shift);
-//                oss << get_line_formatted(l.first, l.second, RGB::RED, opts_connection);
-        }
-        points.push_back(s.connecting_curve.back().second + shift);
+        // Emit one connection line PER base pair, using the explicit pair
+        // list maintained by the pseudoknots class. A pair belongs to this
+        // segment iff its first residue iterator lies within interval1
+        // (walking from interval1.first to interval1.second inclusive).
         opts_connection.clazz = string("pseudoknot_connection");
         opts_connection.id = s.get_id();
-        oss << get_polyline_formatted(points, RGB::GRAY, opts_connection);
+
+        for (auto& pkpair : pn.get_pairs()) {
+            bool in_segment = false;
+            auto it = s.interval1.first;
+            for (;;) {
+                if (it == pkpair.first) { in_segment = true; break; }
+                if (it == s.interval1.second) break;
+                ++it;
+            }
+            if (!in_segment) continue;
+
+            point p1 = pkpair.first->at(pkpair.first.label_index()).p + shift;
+            point p2 = pkpair.second->at(pkpair.second.label_index()).p + shift;
+            vector<point> pair_pts = { p1, p2 };
+            oss << get_polyline_formatted(pair_pts, RGB::GRAY, opts_connection);
+        }
 
 
 
