@@ -547,6 +547,9 @@ void app::print(
                         a.numbering.positions.push_back(stoi(token));
                         s_positions.erase(0, pos + 1);
                     }
+                    if (!s_positions.empty()) {
+                        a.numbering.positions.push_back(stoi(s_positions));
+                    }
                 } catch (...) {
                     throw wrong_argument_exception("Unsupported numbering format");
                 };
