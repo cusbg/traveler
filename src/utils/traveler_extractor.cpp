@@ -29,6 +29,7 @@ void traveler_extractor::extract(const string& filename)
             s >> p.x >> p.y >> base >> numbering_label;
             } else {
                 s >> p.x >> p.y >> base;
+                numbering_label.clear();
             }
 
             assert(!s.fail() && base.size() == 1);
