@@ -11,6 +11,8 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 ### Fixed
 
 - Numbering-label visibility rule (`-l`/`--labels-template`) used a type selector instead of a class selector, so sequential and template labels were both drawn on top of each other in every mode
+- `numbering-label` no longer leaks from a labeled point onto subsequent unlabeled points on partially-labeled templates
+- `--numbering`/`-n` no longer silently drops the last position in the list (and no longer falls back to defaults when only one position is given)
 
 ##  [3.1.0] - 2026-08-26
 
