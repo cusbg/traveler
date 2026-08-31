@@ -827,7 +827,7 @@ document_writer::styles document_writer::get_document_styles(const bool labels_t
             {"stroke-dasharray", 2}
     };
 
-    string key = labels_template ? "sequential" : "template";
+    string key = labels_template ? ".sequential" : ".template";
     styles[key] = {{"visibility", "hidden"}};
 
     styles["polyline"] = {
