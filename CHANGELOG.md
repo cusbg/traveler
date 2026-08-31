@@ -10,6 +10,8 @@ The project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html
 
 ### Fixed
 
+- Numbering-label visibility rule (`-l`/`--labels-template`) used a type selector instead of a class selector, so sequential and template labels were both drawn on top of each other in every mode
+
 ##  [3.1.0] - 2026-08-26
 
 ### Added
